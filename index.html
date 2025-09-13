@@ -37,7 +37,8 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 .color-input{width:40px;height:36px;border:0;padding:0;background:none}
 .small-btn{padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;font-size:13px;cursor:pointer}
 .preview{display:flex;justify-content:center;margin:12px 0;width:100%}
-canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.06);background:#fff}
+canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
+#previewImage{max-width:100%;height:auto;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.06);background:#fff}
 .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%}
 button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
 .download{background:#1da1f2;color:#fff}
@@ -66,13 +67,14 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
     <div class="controls-grid" id="controlsGrid"></div>
     <div class="preview">
       <canvas id="preview" width="1300" height="1300"></canvas>
+      <img id="previewImage" alt="生成画像" />
     </div>
     <div class="actions">
       <button class="main download" id="downloadBtn">画像をダウンロード</button>
       <button class="main share" id="shareBtn">Xでpost</button>
       <button class="main" id="resetBtn">色の初期化</button>
     </div>
-    <p class="hint">※ 画像はブラウザで生成します。Xへの画像自動添付はできないため、ダウンロード後に画像を添付して投稿してください。URLは自動でクリップボードへコピーします。</p>
+    <p class="hint">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
     <footer>#共有感覚</footer>
 </div>
 
@@ -84,9 +86,14 @@ const TEXT_STROKE_COLOR = '#000';  // 文字縁取り色
 const TEXT_STROKE_WIDTH = 1;    // 文字の縁取り幅
 const CIRCLE_STROKE_COLOR = '#000'; // 丸縁取り色
 const CIRCLE_STROKE_WIDTH = 0.5;   // 丸の縁取り幅
+
+// --------------------
+// 追加設定（HTMLから簡単に変更可能）
+// --------------------
 const CIRCLE_RADIUS = 70;           // 丸の半径
 const CIRCLE_GAP = 190;             // 丸と丸の間隔（縦横共通）
 const CENTER_VERTICAL_GAP = 260;    // 中央の縦の空白幅
+// --------------------
 
 // 描画用位置
 const leftXs  = [124, 124 + CIRCLE_GAP, 124 + 2*CIRCLE_GAP];   
@@ -148,7 +155,7 @@ function makeControls(){
   uiOrder.forEach(k=>{
     const card=document.createElement('div'); card.className='kana-card';
     const row=document.createElement('div'); row.className='kana-row';
-    const lab=document.createElement('label'); lab.textContent=uiLabels[k];  // ←「行」付き表示
+    const lab=document.createElement('label'); lab.textContent=uiLabels[k];
     row.appendChild(lab);
 
     const container=document.createElement('div');
@@ -196,6 +203,7 @@ function makeControls(){
 // 描画
 const canvas=document.getElementById('preview');
 const ctx=canvas.getContext('2d');
+const previewImage=document.getElementById('previewImage');
 
 function drawCircleWithText(cx, cy, r, col, kana) {
   ctx.beginPath();
@@ -241,11 +249,14 @@ function drawPreview(){
   ctx.fillStyle='#111';
   ctx.font=`bold ${32}px "font"`;
   ctx.textAlign='right'; ctx.fillText('#共有感覚',1260,1260-36);
+
+  // 生成画像をimgに反映 → 右クリック/長押し保存可能にする
+  previewImage.src = canvas.toDataURL("image/png");
 }
 
 // 初期化
 function init(){
-  loadFromURL(); makeControls(); drawPreview(); saveToURL();
+  loadFromURL(); makeControls(); saveToURL();
 
   document.getElementById('downloadBtn').addEventListener('click',()=>{
     const c=canvas;
@@ -277,7 +288,14 @@ function init(){
     }
   });
 }
-init();
+
+// ページ読み込み時にフォントを確実にロードしてから描画開始
+window.addEventListener("load", () => {
+  document.fonts.load("16px font").then(() => {
+    init();
+    drawPreview(); // 最初から指定フォントで描画
+  });
+});
 </script>
 </body>
 </html>

@@ -40,11 +40,38 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
 #previewImage{max-width:100%;height:auto;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.06);background:#fff}
 .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%}
-button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
 .download{background:#1da1f2;color:#fff}
 .share{background:#111;color:#fff}
 .hint{font-size:12px;color:#666;margin-top:6px;text-align:center}
 footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
+
+/* モーダル */
+.modal {
+  display:none; 
+  position:fixed;
+  z-index:1000;
+  left:0;top:0;
+  width:100%;height:100%;
+  overflow:auto;
+  background:rgba(0,0,0,0.6);
+}
+.modal-content {
+  background:#fff;
+  margin:10% auto;
+  padding:20px;
+  border-radius:10px;
+  max-width:400px;
+  text-align:center;
+}
+.modal-content img{max-width:100%;height:auto;margin-top:10px}
+.close {
+  color:#aaa;
+  float:right;
+  font-size:24px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
 /* PC（幅600px以上）では2列 */
 @media (min-width:600px){
@@ -70,12 +97,21 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
       <img id="previewImage" alt="生成画像" />
     </div>
     <div class="actions">
-      <button class="main download" id="downloadBtn">画像をダウンロード</button>
-      <button class="main share" id="shareBtn">Xでpost</button>
-      <button class="main" id="resetBtn">色の初期化</button>
+      <button class="main share" id="shareBtn"><img src="post.png" alt="" style="width:16px;height:16px;">ポスト</button>
+      <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
+      <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
     </div>
     <p class="hint">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
     <footer>#共有感覚</footer>
+</div>
+
+<!-- モーダル -->
+<div id="saveModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="saveClose">&times;</span>
+    <p>このサイトのurlをコピーしてメモアプリ等に保存してください。8:49 2025/09/14<br>※選択した色情報はurlの<font color="#FF6969">後半部分</font>に保存されています。</p>
+    <img src="howtosave.png" alt="保存方法">
+  </div>
 </div>
 
 <script>
@@ -258,19 +294,10 @@ function drawPreview(){
 function init(){
   loadFromURL(); makeControls(); saveToURL();
 
-  document.getElementById('downloadBtn').addEventListener('click',()=>{
-    const c=canvas;
-    c.toBlob(b=>{
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(b); a.download='共有感覚.png'; a.click();
-    });
-  });
-
   document.getElementById('shareBtn').addEventListener('click',()=>{
     saveToURL();
-    const text=encodeURIComponent('私の「共有感覚」を作りました！');
-    const url=encodeURIComponent(location.href);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`,'_blank');
+    const text = encodeURIComponent('お題「あ行、か行…ってどんな色？」 #共有感覚\nhttps://mo3ym.github.io/synestheshare/');
+    window.open(`https://twitter.com/intent/tweet?text=${text}`,'_blank');
   });
 
   document.getElementById('resetBtn').addEventListener('click',()=>{  
@@ -278,6 +305,19 @@ function init(){
       allKana.forEach(k=>colorMap[k]=[...defaultColors]);
       makeControls(); drawPreview(); saveToURL();
     }
+  });
+
+  // 入力内容を一時保存（モーダル表示）
+  document.getElementById('saveBtn').addEventListener('click',()=>{
+    const modal=document.getElementById('saveModal');
+    modal.style.display="block";
+  });
+  document.getElementById('saveClose').addEventListener('click',()=>{
+    document.getElementById('saveModal').style.display="none";
+  });
+  window.addEventListener('click',(e)=>{
+    const modal=document.getElementById('saveModal');
+    if(e.target===modal){ modal.style.display="none"; }
   });
 
   window.addEventListener("resize", ()=>{

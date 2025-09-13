@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>共有感覚</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'font';
+  src: url('font.otf') format('opentype');
+}
+:root{--bg:#ffffff;--ui:#111}
+html,body{
+  height:100%;margin:0;
+  font-family:"Noto Sans JP",system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ui);
+}
+.wrap{
+  max-width:800px;
+  margin:0 auto;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
+.controls-grid{
+  display:grid;
+  gap:10px;
+  margin-bottom:10px;
+  width:100%;
+}
+.kana-card{border:1px solid #eee;padding:8px;border-radius:8px;background:#fff}
+.kana-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kana-row label{width:40px;font-weight:700}
+.color-input{width:40px;height:36px;border:0;padding:0;background:none}
+.small-btn{padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;font-size:13px;cursor:pointer}
+.preview{display:flex;justify-content:center;margin:12px 0;width:100%}
+canvas{max-width:100%;height:auto;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.06);background:#fff}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%}
+button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+.download{background:#1da1f2;color:#fff}
+.share{background:#111;color:#fff}
+.hint{font-size:12px;color:#666;margin-top:6px;text-align:center}
+footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
+
+/* PC（幅600px以上）では2列 */
+@media (min-width:600px){
+  .controls-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+/* スマホ（幅599px以下）では1列 */
+@media (max-width:599px){
+  .controls-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="logo"><img src="logo.png" style="max-width:70%;height:auto;display:block;margin:0 auto;"></div>
+    <div class="controls-grid" id="controlsGrid"></div>
+    <div class="preview">
+      <canvas id="preview" width="1300" height="1300"></canvas>
+    </div>
+    <div class="actions">
+      <button class="main download" id="downloadBtn">画像をダウンロード</button>
+      <button class="main share" id="shareBtn">Xでpost</button>
+      <button class="main" id="resetBtn">色の初期化</button>
+    </div>
+    <p class="hint">※ 画像はブラウザで生成します。Xへの画像自動添付はできないため、ダウンロード後に画像を添付して投稿してください。URLは自動でクリップボードへコピーします。</p>
+    <footer>#共有感覚</footer>
+</div>
+
+<script>
+// 設定
+const FONT_SIZE_RATIO = 0.8;  // フォントサイズ比（丸半径に対する比率）
+const BRIGHTNESS_THRESHOLD = 0.8; // 縁取りを入れる明度の閾値
+const TEXT_STROKE_COLOR = '#000';  // 文字縁取り色
+const TEXT_STROKE_WIDTH = 1;    // 文字の縁取り幅
+const CIRCLE_STROKE_COLOR = '#000'; // 丸縁取り色
+const CIRCLE_STROKE_WIDTH = 0.5;   // 丸の縁取り幅
+const CIRCLE_RADIUS = 70;           // 丸の半径
+const CIRCLE_GAP = 190;             // 丸と丸の間隔（縦横共通）
+const CENTER_VERTICAL_GAP = 260;    // 中央の縦の空白幅
+
+// 描画用位置
+const leftXs  = [124, 124 + CIRCLE_GAP, 124 + 2*CIRCLE_GAP];   
+const rightXs = [802, 802 + CIRCLE_GAP, 802 + 2*CIRCLE_GAP];  
+const startY = CENTER_VERTICAL_GAP;
+const stepY  = CIRCLE_GAP;
+
+// ベースの仮名
+const leftKana  = ["あ","か","さ","た","な"];
+const rightKana = ["は","ま","や","ら","わ"];
+const allKana   = leftKana.concat(rightKana);
+
+// UIラベル（行付き）
+const uiLabels = {
+  "あ":"あ行","か":"か行","さ":"さ行","た":"た行","な":"な行",
+  "は":"は行","ま":"ま行","や":"や行","ら":"ら行","わ":"わ行"
+};
+
+// 並び順（PC=2列, SP=1列）
+const uiOrder2col = ["あ","は","か","ま","さ","や","た","ら","な","わ"];
+const uiOrder1col = ["あ","か","さ","た","な","は","ま","や","ら","わ"];
+let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
+
+const defaultColors = ["#000000","#3D3D3D","#797979"];
+let colorMap = {};
+
+// 輝度計算
+function luminance(hex){
+  const h=hex.replace('#','');
+  const r=parseInt(h.substring(0,2),16)/255;
+  const g=parseInt(h.substring(2,4),16)/255;
+  const b=parseInt(h.substring(4,6),16)/255;
+  const srgb=[r,g,b].map(c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4));
+  return 0.2126*srgb[0]+0.7152*srgb[1]+0.0722*srgb[2];
+}
+
+// URLから復元
+function loadFromURL(){
+  const p=new URLSearchParams(location.search);
+  allKana.forEach(k=>{
+    let arr=[]; for(let i=1;i<=3;i++){ const v=p.get(k+i); if(v) arr.push(v); }
+    if(arr.length===0) arr=[...defaultColors];
+    colorMap[k]=arr;
+  });
+}
+
+// URLへ保存
+function saveToURL(){
+  const p=new URLSearchParams();
+  allKana.forEach(k=>{ colorMap[k].forEach((c,i)=>p.set(k+(i+1),c)); });
+  history.replaceState(null,'','?'+p.toString());
+  if(navigator.clipboard) navigator.clipboard.writeText(location.href).catch(()=>{});
+}
+
+// UI生成
+function makeControls(){
+  const grid=document.getElementById('controlsGrid');
+  grid.innerHTML='';
+  uiOrder.forEach(k=>{
+    const card=document.createElement('div'); card.className='kana-card';
+    const row=document.createElement('div'); row.className='kana-row';
+    const lab=document.createElement('label'); lab.textContent=uiLabels[k];  // ←「行」付き表示
+    row.appendChild(lab);
+
+    const container=document.createElement('div');
+    container.style.display='flex'; container.style.gap='6px';
+
+    if(!colorMap[k]) colorMap[k] = [...defaultColors];
+
+    colorMap[k].forEach((col,i)=>{
+      const wrap=document.createElement('div');
+      wrap.style.display='flex';wrap.style.alignItems='center';wrap.style.gap='4px';
+
+      const inp=document.createElement('input');
+      inp.type='color'; inp.value=col; inp.className='color-input';
+      inp.addEventListener('input',()=>{ colorMap[k][i]=inp.value; drawPreview(); saveToURL(); });
+
+      wrap.appendChild(inp);
+
+      if(colorMap[k].length>1){
+        const rem=document.createElement('button');
+        rem.textContent='×'; rem.className='small-btn';
+        rem.addEventListener('click',()=>{
+          if(confirm("作成した色を削除して良いですか？")){
+            colorMap[k].splice(i,1); 
+            makeControls(); drawPreview(); saveToURL();
+          }
+        });
+        wrap.appendChild(rem);
+      }
+      container.appendChild(wrap);
+    });
+
+    if(colorMap[k].length<3){
+      const add=document.createElement('button');
+      add.textContent='+色追加'; add.className='small-btn';
+      add.addEventListener('click',()=>{ colorMap[k].push(defaultColors[colorMap[k].length]); makeControls(); drawPreview(); saveToURL(); });
+      container.appendChild(add);
+    }
+
+    row.appendChild(container);
+    card.appendChild(row);
+    grid.appendChild(card);
+  });
+}
+
+// 描画
+const canvas=document.getElementById('preview');
+const ctx=canvas.getContext('2d');
+
+function drawCircleWithText(cx, cy, r, col, kana) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = col;
+  ctx.fill();
+
+  if(luminance(col) > BRIGHTNESS_THRESHOLD){
+    ctx.lineWidth = CIRCLE_STROKE_WIDTH;
+    ctx.strokeStyle = CIRCLE_STROKE_COLOR;
+    ctx.stroke();
+  }
+  ctx.closePath();
+
+  ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px "font"`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  if(luminance(col) > BRIGHTNESS_THRESHOLD){
+    ctx.lineWidth = TEXT_STROKE_WIDTH;
+    ctx.strokeStyle = TEXT_STROKE_COLOR;
+    ctx.strokeText(kana, cx, cy+r*0.05);
+  }
+  ctx.fillStyle = '#fff';
+  ctx.fillText(kana, cx, cy+r*0.05);
+}
+
+function drawPreview(){
+  ctx.clearRect(0,0,1300,1300);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,1300,1300);
+
+  leftKana.forEach((k,i)=>{
+    const y=startY+i*stepY;
+    const xs=leftXs.slice(0,colorMap[k].length);
+    xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
+  });
+  rightKana.forEach((k,i)=>{
+    const y=startY+i*stepY;
+    const xs=rightXs.slice(0,colorMap[k].length);
+    xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
+  });
+
+  ctx.fillStyle='#111';
+  ctx.font=`bold ${32}px "font"`;
+  ctx.textAlign='right'; ctx.fillText('#共有感覚',1260,1260-36);
+}
+
+// 初期化
+function init(){
+  loadFromURL(); makeControls(); drawPreview(); saveToURL();
+
+  document.getElementById('downloadBtn').addEventListener('click',()=>{
+    const c=canvas;
+    c.toBlob(b=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(b); a.download='shared-sense.png'; a.click();
+    });
+  });
+
+  document.getElementById('shareBtn').addEventListener('click',()=>{
+    saveToURL();
+    const text=encodeURIComponent('私の「共有感覚」を作りました！');
+    const url=encodeURIComponent(location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`,'_blank');
+  });
+
+  document.getElementById('resetBtn').addEventListener('click',()=>{  
+    if(confirm("作成したすべての色を削除して良いですか？")){
+      allKana.forEach(k=>colorMap[k]=[...defaultColors]);
+      makeControls(); drawPreview(); saveToURL();
+    }
+  });
+
+  window.addEventListener("resize", ()=>{
+    const newOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
+    if(newOrder.toString()!==uiOrder.toString()){
+      uiOrder = newOrder;
+      makeControls();
+    }
+  });
+}
+init();
+</script>
+</body>
+</html>

@@ -46,7 +46,11 @@ button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:
 .hint{font-size:14px;color:#666;margin-top:6px;text-align:center}
 footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
 .ex{font-size:12px;color:#666;margin-top:6px;text-align:center}
-footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
+.footer-separator{
+  width:100%;
+  border-top:1px solid #ddd;
+  margin:20px 0 10px 0;
+}
 
 /* モーダル */
 .modal {
@@ -107,7 +111,11 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
       <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
       <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
     </div>
-    <br><br><br><br>
+
+    <!-- サイトコンテンツとフッターの境界 -->
+    <div class="footer-separator"></div>
+    
+    <!-- フッター部分 -->
     <p class="ex">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
     <footer>#共有感覚</footer>
 </div>
@@ -123,39 +131,30 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 
 <script>
 // 設定
-const FONT_SIZE_RATIO = 0.8;  // フォントサイズ比（丸半径に対する比率）
-const BRIGHTNESS_THRESHOLD = 0.8; // 縁取りを入れる明度の閾値
-const TEXT_STROKE_COLOR = '#000';  // 文字縁取り色
-const TEXT_STROKE_WIDTH = 1;    // 文字の縁取り幅
-const CIRCLE_STROKE_COLOR = '#000'; // 丸縁取り色
-const CIRCLE_STROKE_WIDTH = 0.5;   // 丸の縁取り幅
+const FONT_SIZE_RATIO = 0.8;
+const BRIGHTNESS_THRESHOLD = 0.8;
+const TEXT_STROKE_COLOR = '#000';
+const TEXT_STROKE_WIDTH = 1;
+const CIRCLE_STROKE_COLOR = '#000';
+const CIRCLE_STROKE_WIDTH = 0.5;
+const CIRCLE_RADIUS = 70;
+const CIRCLE_GAP = 190;
+const CENTER_VERTICAL_GAP = 260;
 
-// --------------------
-// 追加設定（HTMLから簡単に変更可能）
-// --------------------
-const CIRCLE_RADIUS = 70;           // 丸の半径
-const CIRCLE_GAP = 190;             // 丸と丸の間隔（縦横共通）
-const CENTER_VERTICAL_GAP = 260;    // 中央の縦の空白幅
-// --------------------
-
-// 描画用位置
 const leftXs  = [124, 124 + CIRCLE_GAP, 124 + 2*CIRCLE_GAP];   
 const rightXs = [802, 802 + CIRCLE_GAP, 802 + 2*CIRCLE_GAP];  
 const startY = CENTER_VERTICAL_GAP;
 const stepY  = CIRCLE_GAP;
 
-// ベースの仮名
 const leftKana  = ["あ","か","さ","た","な"];
 const rightKana = ["は","ま","や","ら","わ"];
 const allKana   = leftKana.concat(rightKana);
 
-// UIラベル（行付き）
 const uiLabels = {
   "あ":"あ行","か":"か行","さ":"さ行","た":"た行","な":"な行",
   "は":"は行","ま":"ま行","や":"や行","ら":"ら行","わ":"わ行"
 };
 
-// 並び順（PC=2列, SP=1列）
 const uiOrder2col = ["あ","は","か","ま","さ","や","た","ら","な","わ"];
 const uiOrder1col = ["あ","か","さ","た","な","は","ま","や","ら","わ"];
 let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
@@ -163,7 +162,6 @@ let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
 const defaultColors = ["#000000","#3D3D3D","#797979"];
 let colorMap = {};
 
-// 輝度計算
 function luminance(hex){
   const h=hex.replace('#','');
   const r=parseInt(h.substring(0,2),16)/255;
@@ -173,7 +171,6 @@ function luminance(hex){
   return 0.2126*srgb[0]+0.7152*srgb[1]+0.0722*srgb[2];
 }
 
-// URLから復元
 function loadFromURL(){
   const p=new URLSearchParams(location.search);
   allKana.forEach(k=>{
@@ -183,7 +180,6 @@ function loadFromURL(){
   });
 }
 
-// URLへ保存
 function saveToURL(){
   const p=new URLSearchParams();
   allKana.forEach(k=>{ colorMap[k].forEach((c,i)=>p.set(k+(i+1),c)); });
@@ -191,7 +187,6 @@ function saveToURL(){
   if(navigator.clipboard) navigator.clipboard.writeText(location.href).catch(()=>{});
 }
 
-// UI生成
 function makeControls(){
   const grid=document.getElementById('controlsGrid');
   grid.innerHTML='';
@@ -209,13 +204,10 @@ function makeControls(){
     colorMap[k].forEach((col,i)=>{
       const wrap=document.createElement('div');
       wrap.style.display='flex';wrap.style.alignItems='center';wrap.style.gap='4px';
-
       const inp=document.createElement('input');
       inp.type='color'; inp.value=col; inp.className='color-input';
       inp.addEventListener('input',()=>{ colorMap[k][i]=inp.value; drawPreview(); saveToURL(); });
-
       wrap.appendChild(inp);
-
       if(colorMap[k].length>1){
         const rem=document.createElement('button');
         rem.textContent='×'; rem.className='small-btn';
@@ -243,33 +235,20 @@ function makeControls(){
   });
 }
 
-// 描画
 const canvas=document.getElementById('preview');
 const ctx=canvas.getContext('2d');
 const previewImage=document.getElementById('previewImage');
 
-function drawCircleWithText(cx, cy, r, col, kana) {
+function drawCircleWithText(cx, cy, r, col, kana){
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI*2);
-  ctx.fillStyle = col;
-  ctx.fill();
-
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){
-    ctx.lineWidth = CIRCLE_STROKE_WIDTH;
-    ctx.strokeStyle = CIRCLE_STROKE_COLOR;
-    ctx.stroke();
-  }
+  ctx.fillStyle = col; ctx.fill();
+  if(luminance(col) > BRIGHTNESS_THRESHOLD){ ctx.lineWidth = CIRCLE_STROKE_WIDTH; ctx.strokeStyle = CIRCLE_STROKE_COLOR; ctx.stroke(); }
   ctx.closePath();
-
   ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px "font"`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){
-    ctx.lineWidth = TEXT_STROKE_WIDTH;
-    ctx.strokeStyle = TEXT_STROKE_COLOR;
-    ctx.strokeText(kana, cx, cy+r*0.05);
-  }
+  if(luminance(col) > BRIGHTNESS_THRESHOLD){ ctx.lineWidth = TEXT_STROKE_WIDTH; ctx.strokeStyle = TEXT_STROKE_COLOR; ctx.strokeText(kana, cx, cy+r*0.05); }
   ctx.fillStyle = '#fff';
   ctx.fillText(kana, cx, cy+r*0.05);
 }
@@ -277,7 +256,6 @@ function drawCircleWithText(cx, cy, r, col, kana) {
 function drawPreview(){
   ctx.clearRect(0,0,1300,1300);
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,1300,1300);
-
   leftKana.forEach((k,i)=>{
     const y=startY+i*stepY;
     const xs=leftXs.slice(0,colorMap[k].length);
@@ -288,36 +266,28 @@ function drawPreview(){
     const xs=rightXs.slice(0,colorMap[k].length);
     xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
   });
-
   ctx.fillStyle='#111';
-  ctx.font=`bold ${32}px "font"`;
-  ctx.textAlign='right'; ctx.fillText('#共有感覚',1260,1260-36);
-
-  // 生成画像をimgに反映 → 右クリック/長押し保存可能にする
+  ctx.font=`bold 32px "font"`;
+  ctx.textAlign='right';
+  ctx.fillText('#共有感覚',1260,1260-36);
   previewImage.src = canvas.toDataURL("image/png");
 }
 
-// 初期化
 function init(){
   loadFromURL(); makeControls(); saveToURL();
-
   document.getElementById('shareBtn').addEventListener('click',()=>{
     saveToURL();
     const text = encodeURIComponent('お題「あ行、か行…ってどんな色？」 #共有感覚\nhttps://mo3ym.github.io/synestheshare/');
     window.open(`https://twitter.com/intent/tweet?text=${text}`,'_blank');
   });
-
   document.getElementById('resetBtn').addEventListener('click',()=>{  
     if(confirm("作成したすべての色を削除して良いですか？")){
       allKana.forEach(k=>colorMap[k]=[...defaultColors]);
       makeControls(); drawPreview(); saveToURL();
     }
   });
-
-  // 入力内容を一時保存（モーダル表示）
   document.getElementById('saveBtn').addEventListener('click',()=>{
-    const modal=document.getElementById('saveModal');
-    modal.style.display="block";
+    document.getElementById('saveModal').style.display="block";
   });
   document.getElementById('saveClose').addEventListener('click',()=>{
     document.getElementById('saveModal').style.display="none";
@@ -326,21 +296,16 @@ function init(){
     const modal=document.getElementById('saveModal');
     if(e.target===modal){ modal.style.display="none"; }
   });
-
   window.addEventListener("resize", ()=>{
     const newOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
-    if(newOrder.toString()!==uiOrder.toString()){
-      uiOrder = newOrder;
-      makeControls();
-    }
+    if(newOrder.toString()!==uiOrder.toString()){ uiOrder = newOrder; makeControls(); }
   });
 }
 
-// ページ読み込み時にフォントを確実にロードしてから描画開始
 window.addEventListener("load", () => {
   document.fonts.load("16px font").then(() => {
     init();
-    drawPreview(); // 最初から指定フォントで描画
+    drawPreview();
   });
 });
 </script>

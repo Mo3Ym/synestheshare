@@ -43,7 +43,9 @@ canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
 button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
 .download{background:#1da1f2;color:#fff}
 .share{background:#111;color:#fff}
-.hint{font-size:12px;color:#666;margin-top:6px;text-align:center}
+.hint{font-size:14px;color:#666;margin-top:6px;text-align:center}
+footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
+.ex{font-size:12px;color:#666;margin-top:6px;text-align:center}
 footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
 
 /* モーダル */
@@ -99,13 +101,14 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
       <canvas id="preview" width="1300" height="1300"></canvas>
       <img id="previewImage" alt="生成画像" />
     </div>
-    <p class="image_save">※画像は <b>長押し</b> または <b>右クリック</b> で保存できます。</p>
+    <p class="hint">※画像は <b>長押し</b> または <b>右クリック</b> で保存</p>
     <div class="actions">
       <button class="main share" id="shareBtn"><img src="post.png" alt="" style="width:16px;height:16px;">ポスト</button>
       <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
       <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
     </div>
-    <p class="hint">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
+    <br><br><br><br>
+    <p class="ex">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
     <footer>#共有感覚</footer>
 </div>
 

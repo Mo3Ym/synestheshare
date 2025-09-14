@@ -64,6 +64,9 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   max-width:400px;
   text-align:center;
 }
+.modal-content p {
+  text-align: left; /* ← ポップアップ内の文章だけ左詰めに変更 */
+}
 .modal-content img{max-width:100%;height:auto;margin-top:10px}
 .close {
   color:#aaa;
@@ -96,10 +99,11 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
       <canvas id="preview" width="1300" height="1300"></canvas>
       <img id="previewImage" alt="生成画像" />
     </div>
+    <p class="image_save">※画像は <b>長押し</b> または <b>右クリック</b> で保存できます。</p>
     <div class="actions">
       <button class="main share" id="shareBtn"><img src="post.png" alt="" style="width:16px;height:16px;">ポスト</button>
-      <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
       <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
+      <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
     </div>
     <p class="hint">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
     <footer>#共有感覚</footer>
@@ -109,7 +113,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 <div id="saveModal" class="modal">
   <div class="modal-content">
     <span class="close" id="saveClose">&times;</span>
-    <p>このサイトのurlをコピーしてメモアプリ等に保存してください。<br>※選択した色情報はurlの<font color="#FF6969">後半部分</font>に保存されています。</p>
+    <p>サイトURLをコピーしてメモアプリ等に保存してください。<br>※選択した色情報はURLの<font color="#FF6969">末尾</font>に含まれています。</p>
     <img src="howtosave.png" alt="保存方法">
   </div>
 </div>
@@ -339,4 +343,3 @@ window.addEventListener("load", () => {
 </script>
 </body>
 </html>
-

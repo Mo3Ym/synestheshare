@@ -332,7 +332,7 @@ function drawFooterHash() {
   ctx.textBaseline = 'alphabetic';
   const widths = chars.map(ch=>{
     const font = fonts[ch] || fonts['default'];
-    ctx.font = `700 48px "${font}"`;
+    ctx.font = `700 38px "${font}"`;
     return ctx.measureText(ch).width;
   });
   const total = widths.reduce((a,b)=>a+b,0);
@@ -342,7 +342,7 @@ function drawFooterHash() {
   for(let i=0;i<chars.length;i++){
     const ch = chars[i];
     const font = fonts[ch] || fonts['default'];
-    ctx.font = `700 48px "${font}"`;
+    ctx.font = `700 35px "${font}"`;
     ctx.fillStyle = (ch === '有') ? '#D1D1D1' : '#000000';
     ctx.fillText(ch, x, y);
     x += widths[i];

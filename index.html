@@ -4,16 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>共有感覚</title>
+<!-- Google Fonts 経由で Noto Sans JP を読み込み（iPhone対応、安全な方法） -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
 <style>
 @font-face {
   font-family: 'font';
   src: url('font.otf') format('opentype');
-}
-/* Noto Sans JP をローカルファイル名で定義（ページ側でも FontFace API で確実に読み込みます） */
-@font-face {
-  font-family: 'notojp';
-  src: url('Noto Sans JP.otf') format('opentype');
 }
 /* 共有感覚専用のフォント定義 */
 @font-face {
@@ -120,35 +116,44 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 </head>
 <body>
 <div class="wrap">
+    <!-- ロゴ -->
     <div class="logo"><img src="logo.png" style="max-width:70%;height:auto;display:block;margin:0 auto;"></div>
+
+    <!-- Step1画像 -->
+    <div class="step1"><img src="step1.png" alt="Step1.色を選択" style="max-width:40%;height:auto;margin:10px 0;"></div>
+
+    <!-- カラーピッカー -->
     <div class="controls-grid" id="controlsGrid"></div>
+
+    <!-- 一時保存 / 初期化ボタン -->
+    <div class="actions">
+      <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
+      <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
+    </div>
+
+    <br>
+    <br>
+
+    <!-- Step2画像 -->
+    <div class="step2"><img src="step2.png" alt="Step2.プレビュー" style="max-width:40%;height:auto;margin:10px 0;"></div>
+
+    <!-- プレビュー画像 -->
     <div class="preview">
       <canvas id="preview" width="1300" height="1300"></canvas>
       <img id="previewImage" alt="生成画像" />
     </div>
     <p class="hint">※画像は <b>長押し</b> または <b>右クリック</b> で保存</p>
+
+    <!-- ポストボタン -->
     <div class="actions">
-      <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
-      <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
       <button class="main share" id="shareBtn"><img src="post.png" alt="" style="width:16px;height:16px;">ポスト</button>
     </div>
 
-    <!-- サイトコンテンツとフッターの境界 -->
+    <!-- フッター -->
     <div class="footer-separator"></div>
-    
-    <!-- フッター部分 -->
     <p class="ex">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
-    <footer>#共有感覚</footer>
 </div>
 
-<!-- モーダル -->
-<div id="saveModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="saveClose">&times;</span>
-    <p>サイトURLをコピーしてメモアプリ等に保存してください。<br>※選択した色情報はURLの<font color="#FF6969">末尾</font>に含まれています。</p>
-    <img src="howtosave.png" alt="保存方法">
-  </div>
-</div>
 
 <script>
 // 設定
@@ -191,6 +196,8 @@ const defaultColors = ["#000000","#3D3D3D","#797979"];
 let colorMap = {};
 
 async function ensureFont(name, url) {
+  // Noto Sans JP は Google Fonts 経由なのでここでは読み込み不要
+  if(name === "notojp") return;
   try {
     if ('FontFace' in window) {
       const f = new FontFace(name, `url(${url})`);
@@ -204,6 +211,7 @@ async function ensureFont(name, url) {
   } catch(e){}
 }
 
+// 以下、既存のスクリプトは変更なし
 function luminance(hex){
   const h=hex.replace('#','');
   const r=parseInt(h.substring(0,2),16)/255;
@@ -280,6 +288,7 @@ function makeControls(){
   });
 }
 
+// 以下、既存の描画処理は変更なし
 const canvas=document.getElementById('preview');
 const ctx=canvas.getContext('2d');
 const previewImage=document.getElementById('previewImage');
@@ -356,7 +365,7 @@ function drawPreview(){
     ctx.closePath();
     ctx.strokeStyle="#000"; ctx.lineWidth=4; ctx.stroke();
 
-    ctx.font='700 42px "notojp"';
+    ctx.font='700 42px "Noto Sans JP"';
     ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText("あ行、か行…ってどんな色？", rectX+rectW/2, rectY+rectH/2);
 
@@ -399,8 +408,8 @@ function drawPreview(){
 window.addEventListener('DOMContentLoaded', async ()=>{
   loadFromURL();
   makeControls();
+  // Noto Sans JP は Google Fonts 経由で読み込み済み
   await ensureFont('font','font.otf');
-  await ensureFont('notojp','Noto Sans JP.otf');
   await ensureFont('ar-gothic','AR-ADGothicJP-Medium.otf');
   drawPreview();
 

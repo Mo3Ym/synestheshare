@@ -10,6 +10,16 @@
   font-family: 'font';
   src: url('font.otf') format('opentype');
 }
+/* Noto Sans JP をローカルファイル名で定義（ページ側でも FontFace API で確実に読み込みます） */
+@font-face {
+  font-family: 'notojp';
+  src: url('Noto Sans JP.otf') format('opentype');
+}
+/* 共有感覚専用のフォント定義 */
+@font-face {
+  font-family: 'ar-gothic';
+  src: url('AR-ADGothicJP-Medium.otf') format('opentype');
+}
 :root{--bg:#ffffff;--ui:#111}
 html,body{
   height:100%;margin:0;
@@ -38,7 +48,7 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 .small-btn{padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;font-size:13px;cursor:pointer}
 .preview{display:flex;justify-content:center;margin:12px 0;width:100%}
 canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
-#previewImage{max-width:100%;height:auto;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.06);background:#fff}
+#previewImage{max-width:100%;height:auto;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.06);background:#fff;display:block}
 .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%}
 button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
 .download{background:#1da1f2;color:#fff}
@@ -137,24 +147,37 @@ const TEXT_STROKE_COLOR = '#B0B0B0';
 const TEXT_STROKE_WIDTH = 1;
 const CIRCLE_STROKE_COLOR = '#B0B0B0';
 const CIRCLE_STROKE_WIDTH = 0.5;
-const CIRCLE_RADIUS = 70;
-const CIRCLE_GAP = 190;
-const CENTER_VERTICAL_GAP = 260;
 
-const leftXs  = [124, 124 + CIRCLE_GAP, 124 + 2*CIRCLE_GAP];   
-const rightXs = [802, 802 + CIRCLE_GAP, 802 + 2*CIRCLE_GAP];  
+// ここで調整：丸のサイズ・間隔・開始位置など
+const CIRCLE_RADIUS = 70;
+// 丸と丸の間隔（縦横ともに狭める）
+const CIRCLE_GAP = 170;
+// 上部矩形と丸の縦オフセット
+const CENTER_VERTICAL_GAP = 385;
+
+// 右方向に全体をシフトさせるための補正値
+// 「一番左側の丸の右端部分」=0、「一番右側の丸の右端部分」=canvas.width に合わせる
+const totalWidth = (910 + 2*CIRCLE_GAP + CIRCLE_RADIUS) - (124 - CIRCLE_RADIUS); // 右端 - 左端
+const canvasWidth = 1300;
+const shiftX = (canvasWidth - totalWidth)/2; // 左右の余白を均等にする
+
+const leftXs  = [124 + shiftX, 124 + CIRCLE_GAP + shiftX, 124 + 2*CIRCLE_GAP + shiftX];   
+const rightXs = [802 + shiftX, 802 + CIRCLE_GAP + shiftX, 802 + 2*CIRCLE_GAP + shiftX];  
 const startY = CENTER_VERTICAL_GAP;
 const stepY  = CIRCLE_GAP;
 
+// ベースの仮名
 const leftKana  = ["あ","か","さ","た","な"];
 const rightKana = ["は","ま","や","ら","わ"];
 const allKana   = leftKana.concat(rightKana);
 
+// UIラベル（行付き）
 const uiLabels = {
   "あ":"あ行","か":"か行","さ":"さ行","た":"た行","な":"な行",
   "は":"は行","ま":"ま行","や":"や行","ら":"ら行","わ":"わ行"
 };
 
+// 並び順（PC=2列, SP=1列）
 const uiOrder2col = ["あ","は","か","ま","さ","や","た","ら","な","わ"];
 const uiOrder1col = ["あ","か","さ","た","な","は","ま","や","ら","わ"];
 let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
@@ -162,6 +185,22 @@ let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
 const defaultColors = ["#000000","#3D3D3D","#797979"];
 let colorMap = {};
 
+// --- フォントを確実にロードするユーティリティ ---
+async function ensureFont(name, url) {
+  try {
+    if ('FontFace' in window) {
+      const f = new FontFace(name, `url(${url})`);
+      await f.load();
+      document.fonts.add(f);
+      return;
+    }
+  } catch(e){}
+  try {
+    await document.fonts.load(`16px "${name}"`);
+  } catch(e){}
+}
+
+// 輝度計算
 function luminance(hex){
   const h=hex.replace('#','');
   const r=parseInt(h.substring(0,2),16)/255;
@@ -171,6 +210,7 @@ function luminance(hex){
   return 0.2126*srgb[0]+0.7152*srgb[1]+0.0722*srgb[2];
 }
 
+// URLから復元
 function loadFromURL(){
   const p=new URLSearchParams(location.search);
   allKana.forEach(k=>{
@@ -180,6 +220,7 @@ function loadFromURL(){
   });
 }
 
+// URLへ保存
 function saveToURL(){
   const p=new URLSearchParams();
   allKana.forEach(k=>{ colorMap[k].forEach((c,i)=>p.set(k+(i+1),c)); });
@@ -187,6 +228,7 @@ function saveToURL(){
   if(navigator.clipboard) navigator.clipboard.writeText(location.href).catch(()=>{});
 }
 
+// UI生成
 function makeControls(){
   const grid=document.getElementById('controlsGrid');
   grid.innerHTML='';
@@ -204,10 +246,13 @@ function makeControls(){
     colorMap[k].forEach((col,i)=>{
       const wrap=document.createElement('div');
       wrap.style.display='flex';wrap.style.alignItems='center';wrap.style.gap='4px';
+
       const inp=document.createElement('input');
       inp.type='color'; inp.value=col; inp.className='color-input';
       inp.addEventListener('input',()=>{ colorMap[k][i]=inp.value; drawPreview(); saveToURL(); });
+
       wrap.appendChild(inp);
+
       if(colorMap[k].length>1){
         const rem=document.createElement('button');
         rem.textContent='×'; rem.className='small-btn';
@@ -235,6 +280,7 @@ function makeControls(){
   });
 }
 
+// 描画
 const canvas=document.getElementById('preview');
 const ctx=canvas.getContext('2d');
 const previewImage=document.getElementById('previewImage');
@@ -243,70 +289,160 @@ function drawCircleWithText(cx, cy, r, col, kana){
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI*2);
   ctx.fillStyle = col; ctx.fill();
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){ ctx.lineWidth = CIRCLE_STROKE_WIDTH; ctx.strokeStyle = CIRCLE_STROKE_COLOR; ctx.stroke(); }
+  if(luminance(col) > BRIGHTNESS_THRESHOLD){
+    ctx.lineWidth = CIRCLE_STROKE_WIDTH;
+    ctx.strokeStyle = CIRCLE_STROKE_COLOR;
+    ctx.stroke();
+  }
   ctx.closePath();
+
+  // 文字は font.otf に寄せた見た目を優先して 'font' を使用
   ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px "font"`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){ ctx.lineWidth = TEXT_STROKE_WIDTH; ctx.strokeStyle = TEXT_STROKE_COLOR; ctx.strokeText(kana, cx, cy+r*0.05); }
+  if(luminance(col) > BRIGHTNESS_THRESHOLD){
+    ctx.lineWidth = TEXT_STROKE_WIDTH;
+    ctx.strokeStyle = TEXT_STROKE_COLOR;
+    ctx.strokeText(kana, cx, cy+r*0.05);
+  }
   ctx.fillStyle = '#fff';
   ctx.fillText(kana, cx, cy+r*0.05);
 }
 
+function drawFooterHash() {
+  // 右下に '#共有感覚' を描画。'#'だけ游ゴシック、それ以外はAR ADGothicJP Medium、'有'のみグレー
+  const chars = ['#','共','有','感','覚'];
+  const fonts = {
+    '#':'游ゴシック',
+    'default':'ar-gothic'
+  };
+
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  // 幅を計測
+  const widths = chars.map(ch=>{
+    const font = fonts[ch] || fonts['default'];
+    ctx.font = `700 48px "${font}"`;
+    return ctx.measureText(ch).width;
+  });
+  const total = widths.reduce((a,b)=>a+b,0);
+  const margin = 24;
+  let x = canvas.width - margin - total;
+  const y = canvas.height - 24 - 10; // ← 26px 上に移動
+
+  for(let i=0;i<chars.length;i++){
+    const ch = chars[i];
+    const font = fonts[ch] || fonts['default'];
+    ctx.font = `700 48px "${font}"`;
+    ctx.fillStyle = (ch === '有') ? '#D1D1D1' : '#000000';
+    ctx.fillText(ch, x, y);
+    x += widths[i];
+  }
+}
+
 function drawPreview(){
-  ctx.clearRect(0,0,1300,1300);
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,1300,1300);
-  leftKana.forEach((k,i)=>{
-    const y=startY+i*stepY;
-    const xs=leftXs.slice(0,colorMap[k].length);
-    xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
-  });
-  rightKana.forEach((k,i)=>{
-    const y=startY+i*stepY;
-    const xs=rightXs.slice(0,colorMap[k].length);
-    xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
-  });
-  ctx.fillStyle='#111';
-  ctx.font=`bold 32px "font"`;
-  ctx.textAlign='right';
-  ctx.fillText('#共有感覚',1260,1260-36);
-  previewImage.src = canvas.toDataURL("image/png");
-}
+  try{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-function init(){
-  loadFromURL(); makeControls(); saveToURL();
-  document.getElementById('shareBtn').addEventListener('click',()=>{
-    saveToURL();
-    const text = encodeURIComponent('お題「あ行、か行…ってどんな色？」 #共有感覚\nhttps://mo3ym.github.io/synestheshare/');
-    window.open(`https://twitter.com/intent/tweet?text=${text}`,'_blank');
-  });
-  document.getElementById('resetBtn').addEventListener('click',()=>{  
-    if(confirm("作成したすべての色を削除して良いですか？")){
-      allKana.forEach(k=>colorMap[k]=[...defaultColors]);
-      makeControls(); drawPreview(); saveToURL();
+    // ▼ 上部に角丸四角＋お題（サイズを大きめに）
+    const rectX = 60;
+    const rectY = 75;
+    const rectW = 1180; // 横に長く
+    const rectH = 150;  // 縦に少し長く
+    const radius = 36;
+    ctx.beginPath();
+    ctx.moveTo(rectX+radius, rectY);
+    ctx.lineTo(rectX+rectW-radius, rectY);
+    ctx.quadraticCurveTo(rectX+rectW, rectY, rectX+rectW, rectY+radius);
+    ctx.lineTo(rectX+rectW, rectY+rectH-radius);
+    ctx.quadraticCurveTo(rectX+rectW, rectY+rectH, rectX+rectW-radius, rectY+rectH);
+    ctx.lineTo(rectX+radius, rectY+rectH);
+    ctx.quadraticCurveTo(rectX, rectY+rectH, rectX, rectY+rectH-radius);
+    ctx.lineTo(rectX, rectY+radius);
+    ctx.quadraticCurveTo(rectX, rectY, rectX+radius, rectY);
+    ctx.closePath();
+    ctx.strokeStyle="#000"; ctx.lineWidth=4; ctx.stroke();
+
+    // お題テキスト（Noto Sans JP を確実に使用）
+    ctx.font='700 42px "notojp"';
+    ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText("あ行、か行…ってどんな色？", rectX+rectW/2, rectY+rectH/2);
+
+    // ▼ 丸を描画
+    leftKana.forEach((k,i)=>{
+      const y=startY+i*stepY;
+      const xs=leftXs.slice(0,colorMap[k].length);
+      xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
+    });
+    rightKana.forEach((k,i)=>{
+      const y=startY+i*stepY;
+      const xs=rightXs.slice(0,colorMap[k].length);
+      xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
+    });
+
+    // ▼ 右下の '#共有感覚'
+    drawFooterHash();
+
+    // 生成画像を img に反映
+    try {
+      const data = canvas.toDataURL("image/png");
+      previewImage.src = data;
+      previewImage.style.display = 'block';
+    } catch(e) {
+      try {
+        canvas.toBlob(blob => {
+          if (!blob) { previewImage.removeAttribute('src'); return; }
+          const url = URL.createObjectURL(blob);
+          previewImage.src = url;
+          previewImage.style.display = 'block';
+          setTimeout(()=>URL.revokeObjectURL(url), 10000);
+        }, 'image/png');
+      } catch(err){
+        console.error('Canvas export failed:', err);
+        previewImage.removeAttribute('src');
+      }
     }
-  });
-  document.getElementById('saveBtn').addEventListener('click',()=>{
-    document.getElementById('saveModal').style.display="block";
-  });
-  document.getElementById('saveClose').addEventListener('click',()=>{
-    document.getElementById('saveModal').style.display="none";
-  });
-  window.addEventListener('click',(e)=>{
-    const modal=document.getElementById('saveModal');
-    if(e.target===modal){ modal.style.display="none"; }
-  });
-  window.addEventListener("resize", ()=>{
-    const newOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
-    if(newOrder.toString()!==uiOrder.toString()){ uiOrder = newOrder; makeControls(); }
-  });
+  }catch(err){
+    console.error('drawPreview error:', err);
+  }
 }
 
-window.addEventListener("load", () => {
-  document.fonts.load("16px font").then(() => {
-    init();
-    drawPreview();
-  });
+// 初期化
+window.addEventListener('DOMContentLoaded', async ()=>{
+  loadFromURL();
+  makeControls();
+
+  // ページ読み込み時から指定フォントを確実に反映
+  await ensureFont('font','font.otf');
+  await ensureFont('notojp','Noto Sans JP.otf');
+  await ensureFont('ar-gothic','AR-ADGothicJP-Medium.otf');
+
+  drawPreview();
+
+  // 保存モーダル処理
+  const modal=document.getElementById('saveModal');
+  const saveBtn=document.getElementById('saveBtn');
+  const closeBtn=document.getElementById('saveClose');
+  saveBtn.onclick=()=>{modal.style.display='block';};
+  closeBtn.onclick=()=>{modal.style.display='none';};
+  window.onclick=e=>{if(e.target==modal){modal.style.display='none';}};
+
+  // リセット処理
+  document.getElementById('resetBtn').onclick=()=>{
+    if(confirm("全ての色を初期化して良いですか？")){
+      colorMap={}; loadFromURL(); makeControls(); drawPreview(); saveToURL();
+    }
+  };
+
+  // ポスト処理
+  document.getElementById('shareBtn').onclick=()=>{
+    const text="#共有感覚";
+    const url=location.href;
+    const shareUrl=`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(shareUrl,'_blank');
+  };
 });
 </script>
 </body>

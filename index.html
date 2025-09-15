@@ -16,7 +16,7 @@
   font-family: 'ar-gothic';
   src: url('AR-ADGothicJP-Medium.otf') format('opentype');
 }
-:root{--bg:#ffffff;--ui:#111}
+:root{--bg:#F2F2F2;--ui:#111} /* 背景色 */
 html,body{
   height:100%;margin:0;
   font-family:"Noto Sans JP",system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
@@ -120,7 +120,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
     <div class="logo"><img src="logo.png" style="max-width:70%;height:auto;display:block;margin:0 auto;"></div>
 
     <!-- Step1画像 -->
-    <div class="step1"><img src="step1.png" alt="Step1.色を選択" style="max-width:40%;height:auto;margin:10px 0;"></div>
+    <div class="step1"><img src="step1.png" alt="Step1.色を選択" height="50"></div>
 
     <!-- カラーピッカー -->
     <div class="controls-grid" id="controlsGrid"></div>
@@ -135,7 +135,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
     <br>
 
     <!-- Step2画像 -->
-    <div class="step2"><img src="step2.png" alt="Step2.プレビュー" style="max-width:40%;height:auto;margin:10px 0;"></div>
+    <div class="step2"><img src="step2.png" alt="Step2.プレビュー" height="50"></div>
 
     <!-- プレビュー画像 -->
     <div class="preview">
@@ -198,13 +198,12 @@ const uiLabels = {
 
 const uiOrder2col = ["あ","は","か","ま","さ","や","た","ら","な","わ"];
 const uiOrder1col = ["あ","か","さ","た","な","は","ま","や","ら","わ"];
-let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
+let uiOrder = [];
 
 const defaultColors = ["#000000","#3D3D3D","#797979"];
 let colorMap = {};
 
 async function ensureFont(name, url) {
-  // Noto Sans JP は Google Fonts 経由なのでここでは読み込み不要
   if(name === "notojp") return;
   try {
     if ('FontFace' in window) {
@@ -219,7 +218,6 @@ async function ensureFont(name, url) {
   } catch(e){}
 }
 
-// 以下、既存のスクリプトは変更なし
 function luminance(hex){
   const h=hex.replace('#','');
   const r=parseInt(h.substring(0,2),16)/255;
@@ -326,8 +324,8 @@ function drawCircleWithText(cx, cy, r, col, kana){
 function drawFooterHash() {
   const chars = ['#','共','有','感','覚'];
   const fonts = {
-    '#':'游ゴシック',
-    'default':'ar-gothic'
+    '#':'Noto Sans JP',
+    'default':'Noto Sans JP'
   };
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
@@ -413,13 +411,22 @@ function drawPreview(){
   }
 }
 
+// 画面幅に応じて uiOrder を更新する関数
+function updateUIOrder() {
+  if(window.innerWidth >= 600) uiOrder = uiOrder2col;
+  else uiOrder = uiOrder1col;
+  makeControls();
+  drawPreview();
+}
+
 window.addEventListener('DOMContentLoaded', async ()=>{
   loadFromURL();
-  makeControls();
-  // Noto Sans JP は Google Fonts 経由で読み込み済み
   await ensureFont('font','font.otf');
   await ensureFont('ar-gothic','AR-ADGothicJP-Medium.otf');
-  drawPreview();
+
+  updateUIOrder(); // 初回ロード時
+
+  window.addEventListener('resize', ()=>{ updateUIOrder(); });
 
   const modal=document.getElementById('saveModal');
   const saveBtn=document.getElementById('saveBtn');
@@ -428,9 +435,11 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   closeBtn.onclick=()=>{modal.style.display='none';};
   window.onclick=e=>{if(e.target==modal){modal.style.display='none';}};
 
-  document.getElementById('resetBtn').onclick=()=>{
-    if(confirm("全ての色を初期化して良いですか？")){
-      colorMap={}; loadFromURL(); makeControls(); drawPreview(); saveToURL();
+  document.getElementById('resetBtn').onclick = () => {
+    if (confirm("全ての色をデフォルトに戻して良いですか？")) {
+      allKana.forEach(k => { colorMap[k] = [...defaultColors]; });
+      updateUIOrder();
+      saveToURL();
     }
   };
 

@@ -44,7 +44,18 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 .kana-card{border:1px solid #eee;padding:8px;border-radius:8px;background:#fff}
 .kana-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .kana-row label{width:40px;font-weight:700}
-.color-input{width:40px;height:36px;border:0;padding:0;background:none}
+/* iPhone対応：カラーピッカーを正円にする */
+.color-input{
+  width:40px;
+  height:40px;
+  border:0;
+  padding:0;
+  background:none;
+  -webkit-appearance:none;
+  appearance:none;
+  border-radius:50%;
+  aspect-ratio:1/1;
+}
 .small-btn{padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;font-size:13px;cursor:pointer}
 .preview{display:flex;justify-content:center;margin:12px 0;width:100%}
 canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
@@ -117,9 +128,9 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
     </div>
     <p class="hint">※画像は <b>長押し</b> または <b>右クリック</b> で保存</p>
     <div class="actions">
-      <button class="main share" id="shareBtn"><img src="post.png" alt="" style="width:16px;height:16px;">ポスト</button>
       <button class="main" id="saveBtn"><img src="save.png" alt="" style="width:16px;height:16px;">入力内容を一時保存</button>
       <button class="main" id="resetBtn"><img src="reset.png" alt="" style="width:16px;height:16px;">色を初期化</button>
+      <button class="main share" id="shareBtn"><img src="post.png" alt="" style="width:16px;height:16px;">ポスト</button>
     </div>
 
     <!-- サイトコンテンツとフッターの境界 -->
@@ -150,34 +161,28 @@ const CIRCLE_STROKE_WIDTH = 0.5;
 
 // ここで調整：丸のサイズ・間隔・開始位置など
 const CIRCLE_RADIUS = 70;
-// 丸と丸の間隔（縦横ともに狭める）
 const CIRCLE_GAP = 170;
-// 上部矩形と丸の縦オフセット
 const CENTER_VERTICAL_GAP = 385;
 
 // 右方向に全体をシフトさせるための補正値
-// 「一番左側の丸の右端部分」=0、「一番右側の丸の右端部分」=canvas.width に合わせる
-const totalWidth = (910 + 2*CIRCLE_GAP + CIRCLE_RADIUS) - (124 - CIRCLE_RADIUS); // 右端 - 左端
+const totalWidth = (910 + 2*CIRCLE_GAP + CIRCLE_RADIUS) - (124 - CIRCLE_RADIUS);
 const canvasWidth = 1300;
-const shiftX = (canvasWidth - totalWidth)/2; // 左右の余白を均等にする
+const shiftX = (canvasWidth - totalWidth)/2;
 
 const leftXs  = [124 + shiftX, 124 + CIRCLE_GAP + shiftX, 124 + 2*CIRCLE_GAP + shiftX];   
 const rightXs = [802 + shiftX, 802 + CIRCLE_GAP + shiftX, 802 + 2*CIRCLE_GAP + shiftX];  
 const startY = CENTER_VERTICAL_GAP;
 const stepY  = CIRCLE_GAP;
 
-// ベースの仮名
 const leftKana  = ["あ","か","さ","た","な"];
 const rightKana = ["は","ま","や","ら","わ"];
 const allKana   = leftKana.concat(rightKana);
 
-// UIラベル（行付き）
 const uiLabels = {
   "あ":"あ行","か":"か行","さ":"さ行","た":"た行","な":"な行",
   "は":"は行","ま":"ま行","や":"や行","ら":"ら行","わ":"わ行"
 };
 
-// 並び順（PC=2列, SP=1列）
 const uiOrder2col = ["あ","は","か","ま","さ","や","た","ら","な","わ"];
 const uiOrder1col = ["あ","か","さ","た","な","は","ま","や","ら","わ"];
 let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
@@ -185,7 +190,6 @@ let uiOrder = window.innerWidth>=600 ? uiOrder2col : uiOrder1col;
 const defaultColors = ["#000000","#3D3D3D","#797979"];
 let colorMap = {};
 
-// --- フォントを確実にロードするユーティリティ ---
 async function ensureFont(name, url) {
   try {
     if ('FontFace' in window) {
@@ -200,7 +204,6 @@ async function ensureFont(name, url) {
   } catch(e){}
 }
 
-// 輝度計算
 function luminance(hex){
   const h=hex.replace('#','');
   const r=parseInt(h.substring(0,2),16)/255;
@@ -210,7 +213,6 @@ function luminance(hex){
   return 0.2126*srgb[0]+0.7152*srgb[1]+0.0722*srgb[2];
 }
 
-// URLから復元
 function loadFromURL(){
   const p=new URLSearchParams(location.search);
   allKana.forEach(k=>{
@@ -220,7 +222,6 @@ function loadFromURL(){
   });
 }
 
-// URLへ保存
 function saveToURL(){
   const p=new URLSearchParams();
   allKana.forEach(k=>{ colorMap[k].forEach((c,i)=>p.set(k+(i+1),c)); });
@@ -228,7 +229,6 @@ function saveToURL(){
   if(navigator.clipboard) navigator.clipboard.writeText(location.href).catch(()=>{});
 }
 
-// UI生成
 function makeControls(){
   const grid=document.getElementById('controlsGrid');
   grid.innerHTML='';
@@ -257,7 +257,7 @@ function makeControls(){
         const rem=document.createElement('button');
         rem.textContent='×'; rem.className='small-btn';
         rem.addEventListener('click',()=>{
-          if(confirm("作成した色を削除して良いですか？")){
+          if(confirm("選択した色を削除して良いですか？")){
             colorMap[k].splice(i,1); 
             makeControls(); drawPreview(); saveToURL();
           }
@@ -280,7 +280,6 @@ function makeControls(){
   });
 }
 
-// 描画
 const canvas=document.getElementById('preview');
 const ctx=canvas.getContext('2d');
 const previewImage=document.getElementById('previewImage');
@@ -295,8 +294,6 @@ function drawCircleWithText(cx, cy, r, col, kana){
     ctx.stroke();
   }
   ctx.closePath();
-
-  // 文字は font.otf に寄せた見た目を優先して 'font' を使用
   ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px "font"`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -310,17 +307,13 @@ function drawCircleWithText(cx, cy, r, col, kana){
 }
 
 function drawFooterHash() {
-  // 右下に '#共有感覚' を描画。'#'だけ游ゴシック、それ以外はAR ADGothicJP Medium、'有'のみグレー
   const chars = ['#','共','有','感','覚'];
   const fonts = {
     '#':'游ゴシック',
     'default':'ar-gothic'
   };
-
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-
-  // 幅を計測
   const widths = chars.map(ch=>{
     const font = fonts[ch] || fonts['default'];
     ctx.font = `700 48px "${font}"`;
@@ -329,8 +322,7 @@ function drawFooterHash() {
   const total = widths.reduce((a,b)=>a+b,0);
   const margin = 24;
   let x = canvas.width - margin - total;
-  const y = canvas.height - 24 - 10; // ← 26px 上に移動
-
+  const y = canvas.height - 24 - 10;
   for(let i=0;i<chars.length;i++){
     const ch = chars[i];
     const font = fonts[ch] || fonts['default'];
@@ -346,11 +338,10 @@ function drawPreview(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    // ▼ 上部に角丸四角＋お題（サイズを大きめに）
     const rectX = 60;
     const rectY = 75;
-    const rectW = 1180; // 横に長く
-    const rectH = 150;  // 縦に少し長く
+    const rectW = 1180;
+    const rectH = 150;
     const radius = 36;
     ctx.beginPath();
     ctx.moveTo(rectX+radius, rectY);
@@ -365,12 +356,10 @@ function drawPreview(){
     ctx.closePath();
     ctx.strokeStyle="#000"; ctx.lineWidth=4; ctx.stroke();
 
-    // お題テキスト（Noto Sans JP を確実に使用）
     ctx.font='700 42px "notojp"';
     ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText("あ行、か行…ってどんな色？", rectX+rectW/2, rectY+rectH/2);
 
-    // ▼ 丸を描画
     leftKana.forEach((k,i)=>{
       const y=startY+i*stepY;
       const xs=leftXs.slice(0,colorMap[k].length);
@@ -382,10 +371,8 @@ function drawPreview(){
       xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
     });
 
-    // ▼ 右下の '#共有感覚'
     drawFooterHash();
 
-    // 生成画像を img に反映
     try {
       const data = canvas.toDataURL("image/png");
       previewImage.src = data;
@@ -409,19 +396,14 @@ function drawPreview(){
   }
 }
 
-// 初期化
 window.addEventListener('DOMContentLoaded', async ()=>{
   loadFromURL();
   makeControls();
-
-  // ページ読み込み時から指定フォントを確実に反映
   await ensureFont('font','font.otf');
   await ensureFont('notojp','Noto Sans JP.otf');
   await ensureFont('ar-gothic','AR-ADGothicJP-Medium.otf');
-
   drawPreview();
 
-  // 保存モーダル処理
   const modal=document.getElementById('saveModal');
   const saveBtn=document.getElementById('saveBtn');
   const closeBtn=document.getElementById('saveClose');
@@ -429,14 +411,12 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   closeBtn.onclick=()=>{modal.style.display='none';};
   window.onclick=e=>{if(e.target==modal){modal.style.display='none';}};
 
-  // リセット処理
   document.getElementById('resetBtn').onclick=()=>{
     if(confirm("全ての色を初期化して良いですか？")){
       colorMap={}; loadFromURL(); makeControls(); drawPreview(); saveToURL();
     }
   };
 
-  // ポスト処理
   document.getElementById('shareBtn').onclick=()=>{
     const text="#共有感覚";
     const url=location.href;

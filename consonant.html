@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>共有感覚</title>
+<title>共有感覚 「あ行、か行…ってどんな色？」</title>
 <!-- Google Fonts 経由で Noto Sans JP を読み込み（iPhone対応、安全な方法） -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/main_sub.css" />
@@ -182,6 +182,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 
     <!-- フッター -->
     <div class="footer-separator"></div>
+    <p class="ex">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
     <p class="ex">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
 </div>
 
@@ -475,9 +476,8 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   };
 
   document.getElementById('shareBtn').onclick=()=>{
-    const text="#共有感覚";
-    const url=location.href;
-    const shareUrl=`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    const text="#共有感覚 https://mo3ym.github.io/synestheshare/";
+    const shareUrl=`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(shareUrl,'_blank');
   };
 });

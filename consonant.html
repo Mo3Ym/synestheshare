@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>共有感覚 「あ行、か行…ってどんな色？」</title>
+<title>SynestheShare 「あ行、か行…ってどんな色？」</title>
 <!-- Google Fonts 経由で Noto Sans JP を読み込み（iPhone対応、安全な方法） -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/main_sub.css" />
-    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+<!-- Google Fonts Outfit を読み込み -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main_sub.css" />
+<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 <style>
 @font-face {
   font-family: 'font';
@@ -149,7 +151,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 <div class="wrap">
     <!-- ロゴ -->
     <div class="logo"><img src="logo.png" style="max-width:70%;height:auto;display:block;margin:0 auto;"></div>
-
+    <br><br>
     <!-- Step1画像 -->
     <div class="step1"><img src="step1.png" alt="Step1.色を選択"></div>
 
@@ -353,31 +355,17 @@ function drawCircleWithText(cx, cy, r, col, kana){
   ctx.fillText(kana, cx, cy+r*0.05);
 }
 
+// ハッシュタグ描画
+const FOOTER_X_OFFSET = -24; // ← 水平方向の位置調整
+const FOOTER_Y_OFFSET = -24; // ← 垂直方向の位置調整
+
 function drawFooterHash() {
-  const chars = ['#','共','有','感','覚'];
-  const fonts = {
-    '#':'Noto Sans JP',
-    'default':'Noto Sans JP'
-  };
-  ctx.textAlign = 'left';
+  const text = "#SynestheShare";
+  ctx.font = '700 35px "Outfit", sans-serif';
+  ctx.textAlign = 'right';
   ctx.textBaseline = 'alphabetic';
-  const widths = chars.map(ch=>{
-    const font = fonts[ch] || fonts['default'];
-    ctx.font = `700 38px "${font}"`;
-    return ctx.measureText(ch).width;
-  });
-  const total = widths.reduce((a,b)=>a+b,0);
-  const margin = 24;
-  let x = canvas.width - margin - total;
-  const y = canvas.height - 24 - 10;
-  for(let i=0;i<chars.length;i++){
-    const ch = chars[i];
-    const font = fonts[ch] || fonts['default'];
-    ctx.font = `700 35px "${font}"`;
-    ctx.fillStyle = (ch === '有') ? '#D1D1D1' : '#000000';
-    ctx.fillText(ch, x, y);
-    x += widths[i];
-  }
+  ctx.fillStyle = '#000000';
+  ctx.fillText(text, canvas.width + FOOTER_X_OFFSET, canvas.height + FOOTER_Y_OFFSET);
 }
 
 function drawPreview(){
@@ -401,7 +389,9 @@ function drawPreview(){
     ctx.lineTo(rectX, rectY+radius);
     ctx.quadraticCurveTo(rectX, rectY, rectX+radius, rectY);
     ctx.closePath();
-    ctx.strokeStyle="#000"; ctx.lineWidth=4; ctx.stroke();
+    ctx.strokeStyle='#000';
+    ctx.lineWidth=2;
+    ctx.stroke();
 
     ctx.font='700 42px "Noto Sans JP"';
     ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';

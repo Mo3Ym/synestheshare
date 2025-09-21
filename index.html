@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="ja">
 <head>
-    <title>共有感覚</title>
+    <title>SynestheShare</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
@@ -11,6 +11,9 @@
 
     <!-- Noto Sans JP を読み込む -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- Google Fonts Outfit を読み込む -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- 全体を Noto Sans JP に強制適用 -->
     <style>
@@ -24,6 +27,50 @@
         button, input, select, textarea, a {
             font-family: 'Noto Sans JP', sans-serif !important;
         }
+
+        /* SynestheShare のタイトルだけ Outfit にする */
+        h1 {
+            font-family: 'Outfit', sans-serif !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 3rem;
+            text-align: left;
+        }
+        h1 img {
+            height: 1em; /* 文字サイズに合わせて縦を揃える */
+            width: auto;
+            display: inline-block;
+        }
+
+        /* banner 内の content */
+        .banner .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; /* デフォルトは左寄せ */
+        }
+
+        /* 横幅824px以下で中央寄せに切り替え */
+        @media screen and (max-width: 824px) {
+            .banner .content {
+                align-items: center;
+                text-align: center;
+            }
+            h1 {
+                justify-content: center;
+                text-align: center;
+                flex-wrap: wrap;
+                font-size: 2.4rem;
+            }
+        }
+
+        /* スマホ向けのさらに狭い幅 */
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body class="is-preload">
@@ -33,7 +80,7 @@
         <!-- One -->
         <section class="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
             <div class="content">
-                <h1>共有感覚</h1>
+                <h1><img src="logo_A.png" alt="Logo">SynestheShare</h1>
                 <p class="major">自分だけの共感覚を作ろう！</p>
                 <ul class="actions stacked">
                     <li><a href="#first" class="button big wide smooth-scroll-middle">はじめる</a></li>
@@ -44,63 +91,63 @@
             </div>
         </section>
 
-				<!-- Two -->
-					<section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
-						<div class="content">
-							<h2>アルファベットってどんな色？</h2>
-							<ul class="actions stacked">
-								<li><a href="#" class="button">このお題を選択</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="images/alphabet.png" alt="" />
-						</div>
-					</section>
+        <!-- Two -->
+        <section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
+            <div class="content">
+                <h2>アルファベットってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="#" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/alphabet.png" alt="" />
+            </div>
+        </section>
 
-				<!-- Three -->
-					<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
-						<div class="content">
-							<h2>数字ってどんな色？</h2>
-							<ul class="actions stacked">
-								<li><a href="#" class="button">このお題を選択</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="images/number.png" alt="" />
-						</div>
-					</section>
+        <!-- Three -->
+        <section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>数字ってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="#" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/number.png" alt="" />
+            </div>
+        </section>
 
-				<!-- Four -->
-					<section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
-						<div class="content">
-							<h2>あ行、か行…ってどんな色？</h2>
-							<ul class="actions stacked">
-								<li><a href="consonant.html" class="button">このお題を選択</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="images/consonant.png" alt="" />
-						</div>
-					</section>
+        <!-- Four -->
+        <section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>あ行、か行…ってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="consonant.html" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/consonant.png" alt="" />
+            </div>
+        </section>
 
-				<!-- Five -->
-					<section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
-						<div class="content">
-							<h2>教科ってどんな色？</h2>
-							<ul class="actions stacked">
-								<li><a href="#" class="button">このお題を選択</a></li>
-							</ul>
-						</div>
-						<div class="image">
-							<img src="images/subject.png" alt="" />
-						</div>
-					</section>
+        <!-- Five -->
+        <section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>教科ってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="#" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/subject.png" alt="" />
+            </div>
+        </section>
 
         <!-- Footer -->
         <footer class="wrapper style1 align-center">
             <div class="inner">
                 <p>&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-	　　    <p>フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
+                <p>フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
             </div>
         </footer>
 

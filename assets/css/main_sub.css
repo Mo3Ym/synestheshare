@@ -1,0 +1,125 @@
+/*
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+*/
+
+/* --- CSSリセットの定義は省略 --- */
+
+/* ボタンのスタイルを特定のクラスに絞って再定義 */
+.button.big.wide.smooth-scroll-middle {
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	-ms-appearance: none;
+	appearance: none;
+	-moz-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+	-webkit-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+	-ms-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+	border: 0;
+	cursor: pointer;
+	display: inline-flex;          /* flexbox に変更 */
+	align-items: center;           /* 縦方向中央揃え */
+	justify-content: center;       /* 横方向中央揃え */
+	gap: 0.5em;                    /* アイコンとテキストの間の隙間 */
+	font-weight: 400;
+	letter-spacing: 0.125em;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+	white-space: nowrap;
+	font-size: 0.8rem; /* 元の.largeの設定 */
+	max-width: 20rem;
+	height: 4em; /* 元の.largeの設定 */
+	line-height: 1; /* flexbox では line-height は 1 に調整 */
+	border-radius: 4em; /* 元の.largeの設定 */
+	padding: 0 3em; /* 元の.largeの設定 */
+	min-width: 14em; /* 元の.wideの設定 */
+	text-overflow: ellipsis;
+	overflow: hidden;
+	background-color: transparent;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+	color: #000000 !important;
+}
+
+.button.big.wide.smooth-scroll-middle img {
+	width: 22px;
+	height: 22px;
+	display: inline-block; /* 必要なら指定 */
+	vertical-align: middle; /* 念のため */
+}
+
+/* ホバー時のスタイル */
+.button.big.wide.smooth-scroll-middle:hover {
+	box-shadow: inset 0 0 0 1px #47D3E5;
+	color: #47D3E5 !important;
+}
+
+.button.big.wide.smooth-scroll-middle:active {
+	background-color: rgba(71, 211, 229, 0.2);
+	box-shadow: inset 0 0 0 1px #47D3E5;
+	color: #47D3E5 !important;
+}
+
+/* ボタンのプライマリーカラーを特定のクラスに絞って再定義 (もし必要なら) */
+.button.big.wide.smooth-scroll-middle.primary {
+	background-color: #000000;
+	box-shadow: none;
+	color: #ffffff !important;
+}
+
+.button.big.wide.smooth-scroll-middle.primary:hover {
+	background-color: #47D3E5;
+}
+
+.button.big.wide.smooth-scroll-middle.primary:active {
+	background-color: #1ebdd1;
+}
+
+/* レスポンシブ対応 */
+@media screen and (max-width: 980px) {
+  .button.big.wide.smooth-scroll-middle {
+    min-width: 12em;
+    padding: 0 2.5em;
+    font-size: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 736px) {
+  .button.big.wide.smooth-scroll-middle {
+    min-width: 10em;
+    padding: 0 2em;
+    font-size: 0.7rem;
+    height: 3.5em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .button.big.wide.smooth-scroll-middle {
+    width: 100%;      /* 幅いっぱいに */
+    min-width: auto;  /* 固定幅を解除 */
+    padding: 0 1.5em;
+    font-size: 0.65rem;
+    height: 3.2em;
+    border-radius: 3.2em;
+  }
+}
+
+h1 {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1em;
+}
+h1:before {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  display: inline-block;
+  width: 60px;
+  height: 5px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  background-color: black;
+  border-radius: 2px;
+}

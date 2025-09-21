@@ -107,19 +107,26 @@
 
 h1 {
   position: relative;
-  display: inline-block;
-  margin-bottom: 1em;
+  padding: 0.25em 0;
+
+  display: flex;          /* 文字と画像を横並びに */
+  align-items: center;    /* 文字と画像を縦中央揃え */
+  gap: 0.5em;             /* 文字と画像の間隔 */
 }
-h1:before {
-  content: '';
+
+h1 img {
+  width: auto;            /* 横幅は自動 */
+  height: auto;           /* 高さも自動、HTML側で設定可能 */
+}
+
+h1:after {
+  content: "";
+  display: block;
+  height: 4px;
+  background: -webkit-linear-gradient(to right, rgb(255, 186, 115), #ffb2b2);
+  background: linear-gradient(to right, rgb(255, 186, 115), #ffb2b2);
   position: absolute;
-  bottom: -15px;
-  display: inline-block;
-  width: 60px;
-  height: 5px;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
-  background-color: black;
-  border-radius: 2px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 }

@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>SynestheShare 「あ行、か行…ってどんな色？」</title>
+<link rel="icon" href="./assets/icons/favicon.ico">
 <!-- Google Fonts 経由で Noto Sans JP を読み込み（iPhone対応、安全な方法） -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
 <!-- Google Fonts Outfit を読み込み -->
@@ -15,12 +16,11 @@
   font-family: 'font';
   src: url('font/03スマートフォントUI.otf') format('opentype');
 }
-/* 共有感覚専用のフォント定義 */
 @font-face {
   font-family: 'ar-gothic';
   src: url('AR-ADGothicJP-Medium.otf') format('opentype');
 }
-:root{--bg:#FFFFFF;--ui:#111} /* 背景色 */
+:root{--bg:#FFFFFF;--ui:#111} // 背景色
 html,body{
   height:100%;margin:0;
   font-family:"Noto Sans JP",system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
@@ -238,7 +238,7 @@ const CIRCLE_GAP = 170;
 // 丸の縦の開始位置
 const CENTER_VERTICAL_GAP = 385;
 
-// 右方向に全体をシフトさせるための補正値
+// 位置調整用
 const totalWidth = (910 + 2*CIRCLE_GAP + CIRCLE_RADIUS) - (124 - CIRCLE_RADIUS);
 const canvasWidth = 1300;
 const shiftX = (canvasWidth - totalWidth)/2;

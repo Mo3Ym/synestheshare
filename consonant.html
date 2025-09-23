@@ -8,7 +8,9 @@
 <!-- Google Fonts 経由で Noto Sans JP を読み込み -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
 <!-- Google Fonts Outfit を読み込み -->
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+<!-- Google Fonts Outfit ExtraLight 200を読み込み -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main_sub.css" />
 <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
@@ -361,10 +363,10 @@ function makeControls(){
         const rem=document.createElement('button');
         rem.textContent='×'; rem.className='small-btn';
         rem.addEventListener('click',()=>{
-          if(confirm("選択した色を削除して良いですか？")){
-            colorMap[k].splice(i,1); 
-            makeControls(); drawPreview(); saveToURL();
-          }
+          // iPhone等でダイアログを表示しない設定でも削除されるよう変更
+          try { if(!confirm("選択した色を削除して良いですか？")){} } catch(e){}
+          colorMap[k].splice(i,1); 
+          makeControls(); drawPreview(); saveToURL();
         });
         wrap.appendChild(rem);
       }
@@ -416,7 +418,7 @@ const FOOTER_Y_OFFSET = -24; // ← 垂直方向の位置調整
 
 function drawFooterHash() {
   const text = "#SynestheShare";
-  ctx.font = '700 35px "Outfit", sans-serif';
+  ctx.font = '600 35px "Outfit", sans-serif'; // ExtraLight (200)
   ctx.textAlign = 'right';
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#000000';

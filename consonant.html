@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>SynestheShare 「あ行、か行…ってどんな色？」</title>
 <link rel="icon" href="./assets/icons/favicon.ico">
-<!-- Google Fonts 経由で Noto Sans JP を読み込み（iPhone対応、安全な方法） -->
+<!-- Google Fonts 経由で Noto Sans JP を読み込み -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
 <!-- Google Fonts Outfit を読み込み -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main_sub.css" />
 <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
 <style>
 @font-face {
   font-family: 'font';
@@ -20,12 +21,51 @@
   font-family: 'ar-gothic';
   src: url('AR-ADGothicJP-Medium.otf') format('opentype');
 }
-:root{--bg:#FFFFFF;--ui:#111} // 背景色
-html,body{
-  height:100%;margin:0;
+
+:root{--bg:#FFFFFF;--ui:#111}
+
+html, body {
+  height:100%;
+  margin:0;
+  padding:0;
   font-family:"Noto Sans JP",system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
-  background:var(--bg);color:var(--ui);
+  background:var(--bg);
+  color:var(--ui);
 }
+
+/* ロゴ帯 */
+.logo {
+  background-color: #f0f0f0;
+  width: 100%;
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.logo a {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.logo img {
+  display: block;
+  margin: 0 auto;
+  max-width: 70%;  /* 基本: 幅70%以内 */
+  height: auto;
+}
+
+/* デバイスごとのロゴサイズ */
+@media (min-width:1024px) {  /* PC */
+  .logo img { max-width: 40%; }
+}
+@media (min-width:600px) and (max-width:1023px) {  /* タブレット */
+  .logo img { max-width: 60%; }
+}
+@media (max-width:599px) {  /* スマホ */
+  .logo img { max-width: 80%; }
+}
+
+/* 以下は元のCSS（必要部分のみ抜粋） */
 .wrap{
   max-width:800px;
   margin:0 auto;
@@ -44,7 +84,6 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 .kana-card{border:1px solid #eee;padding:8px;border-radius:8px;background:#fff}
 .kana-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .kana-row label{width:40px;font-weight:700}
-/* iPhone対応：カラーピッカーを正円にする（PCでも維持） */
 .color-input{
   width:40px;
   height:40px;
@@ -71,7 +110,7 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 }
 .small-btn{padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;font-size:13px;cursor:pointer}
 .preview{display:flex;justify-content:center;margin:12px 0;width:100%}
-canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
+canvas{display:none;}
 #previewImage{
   max-width:100%;
   height:auto;
@@ -79,7 +118,7 @@ canvas{display:none;} /* ← Canvasは非表示にして内部処理専用 */
   box-shadow:0 8px 20px rgba(0,0,0,0.06);
   background:#fff;
   display:block;
-  border:1px solid #ccc; /* ← 生成画像に枠線を追加（画像自体ではなく表示上のみ） */
+  border:1px solid #ccc;
 }
 .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%}
 button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;background-color:#ffffff;}
@@ -95,6 +134,15 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   margin:20px 0 10px 0;
 }
 
+/* PC（幅600px以上）では2列 */
+@media (min-width:600px){
+  .controls-grid{ grid-template-columns:repeat(2,1fr); }
+}
+
+/* スマホ（幅599px以下）では1列 */
+@media (max-width:599px){
+  .controls-grid{ grid-template-columns:1fr; }
+}
 /* モーダル */
 .modal {
   display:none; 
@@ -114,9 +162,13 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   text-align:center;
 }
 .modal-content p {
-  text-align: left; /* ← ポップアップ内の文章だけ左詰めに変更 */
+  text-align: left; /* ポップアップ内の文章だけ左詰めに変更 */
 }
-.modal-content img{max-width:100%;height:auto;margin-top:10px}
+.modal-content img{
+  max-width:100%;
+  height:auto;
+  margin-top:10px;
+}
 .close {
   color:#aaa;
   float:right;
@@ -125,53 +177,20 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   cursor:pointer;
 }
 
-/* PC（幅600px以上）では2列 */
-@media (min-width:600px){
-  .controls-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-}
-
-/* スマホ（幅599px以下）では1列 */
-@media (max-width:599px){
-  .controls-grid{
-    grid-template-columns:1fr;
-  }
-}
-
-/* Step画像の高さをカラーピッカー行の高さに揃える */
-.step1 img,
-.step2 img {
-  height: auto;
-  max-height: 60px;
-}
-.kana-card {
-  display: flex;
-  align-items: center;
-}
-.step1 img,
-.step2 img {
-  object-fit: contain;
-}
-
-/* iPhone対応: 「色を選択」「プレビュー」にも Noto Sans JP を適用 */
-.step1 b, .step2 b {
-  font-family: "Noto Sans JP", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
-}
-/* iPhone対応: あ行、か行…のラベルとヒント文も Noto Sans JP に統一 */
-.kana-row label,
-.hint {
-  font-family: "Noto Sans JP", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
-}
 </style>
 </head>
+
 <body>
+<!-- ロゴ（wrapの外に移動済み） -->
+<div class="logo">
+  <a href="index.html" target="_blank">
+    <img src="images_sub/logo.png" alt="SynestheShare ロゴ">
+  </a>
+</div>
+
 <div class="wrap">
-    <!-- ロゴ -->
-    <div class="logo"><a href="index.html" target="_blank"><img src="images_sub/logo.png" style="max-width:70%;height:auto;display:block;margin:0 auto;"></a></div>
-    <br><br>
     <!-- Step1画像 -->
-    <div class="step1"><h1_1><img src="images_sub/step1_icon.png" style="height:40px;"><font size=4><b>色を選択</b></font></h1_1></div>
+    <div class="step1"><h1_1><img src="images_sub/step1_icon.png" style="height:35px;"><font size=4><b>色を選択</b></font></h1_1></div>
     <br>
 
     <!-- カラーピッカー -->

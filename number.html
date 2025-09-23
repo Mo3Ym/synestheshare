@@ -78,10 +78,12 @@ html, body {
 }
 h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 
-/* controls グリッド（レスポンシブ：画面幅に応じて1〜5列、最大5列） */
+/* controls グリッド（レスポンシブ：画面幅に応じて1〜5列、最大5列）
+   各セル（枠）はグリッドの幅に合わせて横いっぱいに広がるようにしています。
+   グリッドの gap は枠同士の「適度な間隔」を担保します。 */
 .controls-grid{
   display:grid;
-  gap:10px;
+  gap:12px; /* 枠同士の適度な間隔（調整可） */
   margin-bottom:10px;
   width:100%;
   grid-template-columns: repeat(1, 1fr); /* デフォルト: 1列（小さいスマホ） */
@@ -89,6 +91,7 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 }
 
 /* カード（枠）--- 枠線は残しつつ中央揃え、内側はコンパクトに */
+/* 重要: width:100% にしてグリッドセルの幅を埋めるようにする */
 .kana-card{
   border:1px solid #eee;
   padding:6px 8px;           /* 小さめにしてコンパクトに */
@@ -100,9 +103,9 @@ h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
   align-items:center;
 
   box-sizing:border-box;
-  max-width:160px;           /* 画面幅に応じて小さめに見えるよう制限 */
-  margin:0 auto;             /* グリッドセル内で中央寄せ */
+  width:100%;                /* グリッドセルの横幅を埋める */
   min-height:44px;
+  /* max-width を設定しないことで、各セルで余白が残らないようにします */
 }
 .kana-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .kana-row label{

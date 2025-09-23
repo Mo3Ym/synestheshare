@@ -1,546 +1,168 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SynestheShare 「あ行、か行…ってどんな色？」</title>
-<link rel="icon" href="./assets/icons/favicon.ico">
-<!-- Google Fonts 経由で Noto Sans JP を読み込み -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
-<!-- Google Fonts Outfit を読み込み -->
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-<!-- Google Fonts Outfit ExtraLight 200を読み込み -->
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/main_sub.css" />
-<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <title>SynestheShare</title>
+    <link rel="icon" href="./assets/icons/favicon.ico">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-<style>
-@font-face {
-  font-family: 'font';
-  src: url('font/03スマートフォントUI.otf') format('opentype');
-}
-@font-face {
-  font-family: 'ar-gothic';
-  src: url('AR-ADGothicJP-Medium.otf') format('opentype');
-}
+    <!-- 元のスタイルシート -->
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
-:root{--bg:#FFFFFF;--ui:#111}
+    <!-- Noto Sans JP を読み込む -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-html, body {
-  height:100%;
-  margin:0;
-  padding:0;
-  font-family:"Noto Sans JP",system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--ui);
-}
+    <!-- Google Fonts Outfit を読み込む -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 
-/* ロゴ帯 */
-.logo {
-  background-color: #f0f0f0;
-  width: 100%;
-  padding: 20px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.logo a {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-}
-.logo img {
-  display: block;
-  margin: 0 auto;
-  max-width: 70%;  /* 基本: 幅70%以内 */
-  height: auto;
-}
+    <!-- 全体を Noto Sans JP に強制適用 -->
+    <style>
+        /* html, body だけでなく全ての要素に強制適用 */
+        * {
+            font-family: 'Noto Sans JP', sans-serif !important;
+            font-weight: normal !important; /* 必要に応じて太さを調整 */
+        }
 
-/* デバイスごとのロゴサイズ */
-@media (min-width:1024px) {  /* PC */
-  .logo img { max-width: 40%; }
-}
-@media (min-width:600px) and (max-width:1023px) {  /* タブレット */
-  .logo img { max-width: 60%; }
-}
-@media (max-width:599px) {  /* スマホ */
-  .logo img { max-width: 80%; }
-}
+        /* ボタンやリンクのテキストも強制適用 */
+        button, input, select, textarea, a {
+            font-family: 'Noto Sans JP', sans-serif !important;
+        }
 
-/* 以下は元のCSS（必要部分のみ抜粋） */
-.wrap{
-  max-width:800px;
-  margin:0 auto;
-  padding:14px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
-.controls-grid{
-  display:grid;
-  gap:10px;
-  margin-bottom:10px;
-  width:100%;
-}
-.kana-card{border:1px solid #eee;padding:8px;border-radius:8px;background:#fff}
-.kana-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.kana-row label{width:40px;font-weight:700}
-.color-input{
-  width:40px;
-  height:40px;
-  border:0;
-  padding:0;
-  background:none;
-  -webkit-appearance:none;
-  appearance:none;
-  border-radius:50%;
-  aspect-ratio:1/1;
-}
-.color-input::-webkit-color-swatch{
-  border:none;
-  border-radius:50%;
-  padding:0;
-}
-.color-input::-webkit-color-swatch-wrapper{
-  border-radius:50%;
-  padding:0;
-}
-.color-input::-moz-color-swatch{
-  border:none;
-  border-radius:50%;
-}
-.small-btn{padding:6px 8px;border-radius:6px;border:1px solid #ddd;background:#fafafa;font-size:13px;cursor:pointer}
-.preview{display:flex;justify-content:center;margin:12px 0;width:100%}
-canvas{display:none;}
-#previewImage{
-  max-width:100%;
-  height:auto;
-  border-radius:8px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.06);
-  background:#fff;
-  display:block;
-  border:1px solid #ccc;
-}
-.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;width:100%}
-button.main{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;background-color:#ffffff;}
-button.black{padding:10px 12px;border-radius:8px;border:0;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;background-color:#000000;color:#ffffff;}
-.download{background:#1da1f2;color:#fff}
-.share{background:#111;color:#fff}
-.hint{font-size:14px;color:#666;margin-top:6px;text-align:center}
-footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color:#111;width:100%}
-.ex{font-size:12px;color:#666;margin-top:6px;text-align:center}
-.footer-separator{
-  width:100%;
-  border-top:1px solid #ddd;
-  margin:20px 0 10px 0;
-}
+        /* SynestheShare のタイトルだけ Outfit にする */
+        h1 {
+            font-family: 'Outfit', sans-serif !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 3rem;
+            text-align: left;
+        }
+        h1 img {
+            height: 1em; /* 文字サイズに合わせて縦を揃える */
+            width: auto;
+            display: inline-block;
+        }
 
-/* PC（幅600px以上）では2列 */
-@media (min-width:600px){
-  .controls-grid{ grid-template-columns:repeat(2,1fr); }
-}
+        /* banner 内の content */
+        .banner .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; /* デフォルトは左寄せ */
+        }
 
-/* スマホ（幅599px以下）では1列 */
-@media (max-width:599px){
-  .controls-grid{ grid-template-columns:1fr; }
-}
-/* モーダル */
-.modal {
-  display:none; 
-  position:fixed;
-  z-index:1000;
-  left:0;top:0;
-  width:100%;height:100%;
-  overflow:auto;
-  background:rgba(0,0,0,0.6);
-}
-.modal-content {
-  background:#fff;
-  margin:10% auto;
-  padding:20px;
-  border-radius:10px;
-  max-width:400px;
-  text-align:center;
-}
-.modal-content p {
-  text-align: left; /* ポップアップ内の文章だけ左詰めに変更 */
-}
-.modal-content img{
-  max-width:100%;
-  height:auto;
-  margin-top:10px;
-}
-.close {
-  color:#aaa;
-  float:right;
-  font-size:24px;
-  font-weight:bold;
-  cursor:pointer;
-}
+        /* 横幅824px以下で中央寄せに切り替え */
+        @media screen and (max-width: 824px) {
+            .banner .content {
+                align-items: center;
+                text-align: center;
+            }
+            h1 {
+                justify-content: center;
+                text-align: center;
+                flex-wrap: wrap;
+                font-size: 2.4rem;
+            }
+        }
 
-</style>
+        /* スマホ向けのさらに狭い幅 */
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
+<body class="is-preload">
 
-<body>
-<!-- ロゴ（wrapの外に移動済み） -->
-<div class="logo">
-  <a href="index.html" target="_blank">
-    <img src="images_sub/logo.png" alt="SynestheShare ロゴ">
-  </a>
-</div>
+    <div id="wrapper" class="divided">
 
-<div class="wrap">
-    <!-- Step1画像 -->
-    <div class="step1"><h1_1><img src="images_sub/step1_icon.png" style="height:35px;"><font size=4><b>色を選択</b></font></h1_1></div>
-    <br>
+        <!-- One -->
+        <section class="banner style1 orient-left content-align-left image-position-right fullscreen onload-image-fade-in onload-content-fade-right">
+            <div class="content">
+                <h1><img src="images_sub/logo_A.png">SynestheShare</h1>
+                <p class="major">自分だけの共感覚を作ろう！</p>
+                <ul class="actions stacked">
+                    <li><a href="#first" class="button big wide smooth-scroll-middle">はじめる</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/banner.png" alt="" />
+            </div>
+        </section>
 
-    <!-- カラーピッカー -->
-    <div class="controls-grid" id="controlsGrid"></div>
+        <!-- Two -->
+        <section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
+            <div class="content">
+                <h2>アルファベットってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="#" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/alphabet.png" alt="" />
+            </div>
+        </section>
 
-    <!-- 一時保存 / 初期化ボタン -->
-    <div class="actions">
-      <button id="saveBtn" class="button big wide smooth-scroll-middle"><img src="images_sub/save.png" alt="" style="width:18px;height:18px;"><span>入力内容を一時保存</span></button>
-      <button id="resetBtn" class="button big wide smooth-scroll-middle"><img src="images_sub/reset.png" alt="" style="width:18px;height:18px;">色を初期化</button>
+        <!-- Three -->
+        <section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>数字ってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="#" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/number.png" alt="" />
+            </div>
+        </section>
+
+        <!-- Four -->
+        <section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>あ行、か行…ってどんな色？</h2>
+                <p><font color="gray">※子音ごとに最大3色まで選べます。</font></p>
+                <ul class="actions stacked">
+                    <li><a href="consonant.html" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/consonant.png" alt="" />
+            </div>
+        </section>
+
+        <!-- Five -->
+        <section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
+            <div class="content">
+                <h2>教科ってどんな色？</h2>
+                <ul class="actions stacked">
+                    <li><a href="#" class="button">このお題を選択</a></li>
+                </ul>
+            </div>
+            <div class="image">
+                <img src="images/subject.png" alt="" />
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="wrapper style1 align-center">
+            <div class="inner">
+                <p>&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+                <p>フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
+            </div>
+        </footer>
+
     </div>
 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
 
-    <!-- Step2画像 -->
-    <div class="step2"><h1_2><img src="images_sub/step2_icon.png" style="height:30px;"><font size=4><b>プレビュー</b></font></h1_2></div>
-
-    <!-- プレビュー画像 -->
-    <div class="preview">
-      <canvas id="preview" width="1300" height="1300"></canvas>
-      <img id="previewImage" alt="生成画像" />
-    </div>
-    <p class="hint">※画像を <b>長押し</b> または <b>右クリック</b> で保存</p>
-
-    <!-- ポストボタン -->
-    <div class="actions">
-      <button  class="button big wide smooth-scroll-middle" id="shareBtn"><img src="images_sub/post.png" alt="x" style="width:16px;height:16px;">でポスト</button>
-    </div>
-    <br>
-    <br>
-    <br>
-
-    <!-- フッター -->
-    <div class="footer-separator"></div>
-    <p class="ex">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-    <p class="ex">フォント：スマートフォントUI<br>フリーダウンロード：https://flopdesign.booth.pm/items/2296502</p>
-</div>
-
-<!-- モーダル -->
-<div id="saveModal" class="modal">
-  <div class="modal-content">
-    <span class="close" id="saveClose">&times;</span>
-    <p>サイトURLをコピーしてメモアプリ等に保存してください。<br>※選択した色情報はURLの<font color="#FF6969">末尾</font>に含まれています。</p>
-    <img src="images_sub/howtosave.png" alt="保存方法">
-  </div>
-</div>
-
-<script>
-// 設定
-
-// 文字の大きさ（丸との比較値）
-const FONT_SIZE_RATIO = 0.8;
-// 文字と丸に縁取りがされるしきい値
-const BRIGHTNESS_THRESHOLD = 0.8;
-// 文字の縁取りの色
-const TEXT_STROKE_COLOR = '#B0B0B0';
-// 文字の縁取りの太さ
-const TEXT_STROKE_WIDTH = 1;
-// 丸の縁取りの色
-const CIRCLE_STROKE_COLOR = '#B0B0B0';
-// 丸の縁取りの太さ
-const CIRCLE_STROKE_WIDTH = 0.5;
-
-// お題の枠線の太さ
-const BORDER_LINE_WIDTH = 4;
-
-// 丸のサイズ
-const CIRCLE_RADIUS = 70;
-// 丸の間隔
-const CIRCLE_GAP = 170;
-// 丸の縦の開始位置
-const CENTER_VERTICAL_GAP = 385;
-
-// 位置調整用
-const totalWidth = (910 + 2*CIRCLE_GAP + CIRCLE_RADIUS) - (124 - CIRCLE_RADIUS);
-const canvasWidth = 1300;
-const shiftX = (canvasWidth - totalWidth)/2;
-
-const leftXs  = [124 + shiftX, 124 + CIRCLE_GAP + shiftX, 124 + 2*CIRCLE_GAP + shiftX];   
-const rightXs = [802 + shiftX, 802 + CIRCLE_GAP + shiftX, 802 + 2*CIRCLE_GAP + shiftX];  
-const startY = CENTER_VERTICAL_GAP;
-const stepY  = CIRCLE_GAP;
-
-const leftKana  = ["あ","か","さ","た","な"];
-const rightKana = ["は","ま","や","ら","わ"];
-const allKana   = leftKana.concat(rightKana);
-
-const uiLabels = {
-  "あ":"あ行","か":"か行","さ":"さ行","た":"た行","な":"な行",
-  "は":"は行","ま":"ま行","や":"や行","ら":"ら行","わ":"わ行"
-};
-
-const uiOrder2col = ["あ","は","か","ま","さ","や","た","ら","な","わ"];
-const uiOrder1col = ["あ","か","さ","た","な","は","ま","や","ら","わ"];
-let uiOrder = [];
-
-const defaultColors = ["#000000","#3D3D3D","#797979"];
-let colorMap = {};
-
-async function ensureFont(name, url) {
-  if(name === "notojp") return;
-  try {
-    if ('FontFace' in window) {
-      const f = new FontFace(name, `url(${url})`);
-      await f.load();
-      document.fonts.add(f);
-      return;
-    }
-  } catch(e){}
-  try {
-    await document.fonts.load(`16px "${name}"`);
-  } catch(e){}
-}
-
-function luminance(hex){
-  const h=hex.replace('#','');
-  const r=parseInt(h.substring(0,2),16)/255;
-  const g=parseInt(h.substring(2,4),16)/255;
-  const b=parseInt(h.substring(4,6),16)/255;
-  const srgb=[r,g,b].map(c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4));
-  return 0.2126*srgb[0]+0.7152*srgb[1]+0.0722*srgb[2];
-}
-
-function loadFromURL(){
-  const p=new URLSearchParams(location.search);
-  allKana.forEach(k=>{
-    let arr=[]; for(let i=1;i<=3;i++){ const v=p.get(k+i); if(v) arr.push(v); }
-    if(arr.length===0) arr=[...defaultColors];
-    colorMap[k]=arr;
-  });
-}
-
-function saveToURL(){
-  const p=new URLSearchParams();
-  allKana.forEach(k=>{ colorMap[k].forEach((c,i)=>p.set(k+(i+1),c)); });
-  history.replaceState(null,'','?'+p.toString());
-  if(navigator.clipboard) navigator.clipboard.writeText(location.href).catch(()=>{});
-}
-
-function makeControls(){
-  const grid=document.getElementById('controlsGrid');
-  grid.innerHTML='';
-  uiOrder.forEach(k=>{
-    const card=document.createElement('div'); card.className='kana-card';
-    const row=document.createElement('div'); row.className='kana-row';
-    const lab=document.createElement('label'); lab.textContent=uiLabels[k];
-    row.appendChild(lab);
-
-    const container=document.createElement('div');
-    container.style.display='flex'; container.style.gap='6px';
-
-    if(!colorMap[k]) colorMap[k] = [...defaultColors];
-
-    colorMap[k].forEach((col,i)=>{
-      const wrap=document.createElement('div');
-      wrap.style.display='flex';wrap.style.alignItems='center';wrap.style.gap='4px';
-
-      const inp=document.createElement('input');
-      inp.type='color'; inp.value=col; inp.className='color-input';
-      inp.addEventListener('input',()=>{ colorMap[k][i]=inp.value; drawPreview(); saveToURL(); });
-
-      wrap.appendChild(inp);
-
-      if(colorMap[k].length>1){
-        const rem=document.createElement('button');
-        rem.textContent='×'; rem.className='small-btn';
-        rem.addEventListener('click',()=>{
-          try { if(!confirm("選択した色を削除して良いですか？")){} } catch(e){}
-          colorMap[k].splice(i,1); 
-          makeControls(); drawPreview(); saveToURL();
-        });
-        wrap.appendChild(rem);
-      }
-      container.appendChild(wrap);
-    });
-
-    if(colorMap[k].length<3){
-      const add=document.createElement('button');
-      add.textContent='+色追加'; add.className='small-btn';
-      add.addEventListener('click',()=>{ colorMap[k].push(defaultColors[colorMap[k].length]); makeControls(); drawPreview(); saveToURL(); });
-      container.appendChild(add);
-    }
-
-    row.appendChild(container);
-    card.appendChild(row);
-    grid.appendChild(card);
-  });
-}
-
-const canvas=document.getElementById('preview');
-const ctx=canvas.getContext('2d');
-const previewImage=document.getElementById('previewImage');
-
-function drawCircleWithText(cx, cy, r, col, kana){
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI*2);
-  ctx.fillStyle = col; ctx.fill();
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){
-    ctx.lineWidth = CIRCLE_STROKE_WIDTH;
-    ctx.strokeStyle = CIRCLE_STROKE_COLOR;
-    ctx.stroke();
-  }
-  ctx.closePath();
-  ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px "font"`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){
-    ctx.lineWidth = TEXT_STROKE_WIDTH;
-    ctx.strokeStyle = TEXT_STROKE_COLOR;
-    ctx.strokeText(kana, cx, cy+r*0.05);
-  }
-  ctx.fillStyle = '#fff';
-  ctx.fillText(kana, cx, cy+r*0.05);
-}
-
-// ハッシュタグ描画
-const FOOTER_X_OFFSET = -24; // ← 水平方向の位置調整
-const FOOTER_Y_OFFSET = -24; // ← 垂直方向の位置調整
-
-function drawFooterHash() {
-  const text = "#SynestheShare";
-  ctx.font = '600 35px "Outfit", sans-serif'; // ExtraLight (200)
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#000000';
-  ctx.fillText(text, canvas.width + FOOTER_X_OFFSET, canvas.height + FOOTER_Y_OFFSET);
-}
-
-function drawPreview(){
-  try{
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    const rectX = 60;
-    const rectY = 75;
-    const rectW = 1180;
-    const rectH = 150;
-    const radius = 36;
-    ctx.beginPath();
-    ctx.moveTo(rectX+radius, rectY);
-    ctx.lineTo(rectX+rectW-radius, rectY);
-    ctx.quadraticCurveTo(rectX+rectW, rectY, rectX+rectW, rectY+radius);
-    ctx.lineTo(rectX+rectW, rectY+rectH-radius);
-    ctx.quadraticCurveTo(rectX+rectW, rectY+rectH, rectX+rectW-radius, rectY+rectH);
-    ctx.lineTo(rectX+radius, rectY+rectH);
-    ctx.quadraticCurveTo(rectX, rectY+rectH, rectX, rectY+rectH-radius);
-    ctx.lineTo(rectX, rectY+radius);
-    ctx.quadraticCurveTo(rectX, rectY, rectX+radius, rectY);
-    ctx.closePath();
-    ctx.strokeStyle='#000';
-    ctx.lineWidth=BORDER_LINE_WIDTH; // ← HTML内の定数で制御
-    ctx.stroke();
-
-    ctx.font='700 42px "Noto Sans JP"';
-    ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText("あ行、か行…ってどんな色のイメージ？", rectX+rectW/2, rectY+rectH/2);
-
-    leftKana.forEach((k,i)=>{
-      const y=startY+i*stepY;
-      const xs=leftXs.slice(0,colorMap[k].length);
-      xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
-    });
-    rightKana.forEach((k,i)=>{
-      const y=startY+i*stepY;
-      const xs=rightXs.slice(0,colorMap[k].length);
-      xs.forEach((x,j)=>drawCircleWithText(x,y,CIRCLE_RADIUS,colorMap[k][j],k));
-    });
-
-    drawFooterHash();
-
-    try {
-      const data = canvas.toDataURL("image/png");
-      previewImage.src = data;
-      previewImage.style.display = 'block';
-    } catch(e) {
-      try {
-        canvas.toBlob(blob => {
-          if (!blob) { previewImage.removeAttribute('src'); return; }
-          const url = URL.createObjectURL(blob);
-          previewImage.src = url;
-          previewImage.style.display = 'block';
-          setTimeout(()=>URL.revokeObjectURL(url), 10000);
-        }, 'image/png');
-      } catch(err){
-        console.error('Canvas export failed:', err);
-        previewImage.removeAttribute('src');
-      }
-    }
-  }catch(err){
-    console.error('drawPreview error:', err);
-  }
-}
-
-// 画面幅に応じて uiOrder を更新する関数
-function updateUIOrder() {
-  if(window.innerWidth >= 600) uiOrder = uiOrder2col;
-  else uiOrder = uiOrder1col;
-  makeControls();
-  drawPreview();
-}
-
-window.addEventListener('DOMContentLoaded', async ()=>{
-  loadFromURL();
-  await ensureFont('font','font.otf');
-  await ensureFont('ar-gothic','AR-ADGothicJP-Medium.otf');
-
-  updateUIOrder(); // 初回ロード時
-
-  window.addEventListener('resize', ()=>{ updateUIOrder(); });
-
-  const modal=document.getElementById('saveModal');
-  const saveBtn=document.getElementById('saveBtn');
-  const closeBtn=document.getElementById('saveClose');
-  saveBtn.onclick=()=>{modal.style.display='block';};
-  closeBtn.onclick=()=>{modal.style.display='none';};
-  window.onclick=e=>{if(e.target==modal){modal.style.display='none';}};
-
-  document.getElementById('resetBtn').onclick = () => {
-    if (confirm("全ての色をデフォルトに戻して良いですか？")) {
-      allKana.forEach(k => { colorMap[k] = [...defaultColors]; });
-      updateUIOrder();
-      saveToURL();
-    }
-  };
-
-  document.getElementById('shareBtn').onclick=async ()=>{
-    try{
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      if(!blob) return;
-      const file = new File([blob], 'synestheshare.png', {type:'image/png'});
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // GitHub Pages 上では直接Xに画像をアップロードできないため、
-      // 一時的に Blob URL を使い、投稿ウィンドウで開く
-      const imageUrl = URL.createObjectURL(blob);
-      const text = "#SynestheShare https://mo3ym.github.io/synestheshare/";
-      const shareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(imageUrl)}`;
-      window.open(shareUrl, '_blank');
-      setTimeout(()=>URL.revokeObjectURL(imageUrl), 10000);
-    }catch(e){
-      console.error(e);
-    }
-  };
-});
-</script>
 </body>
 </html>

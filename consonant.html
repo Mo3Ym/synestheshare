@@ -153,8 +153,14 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 .step2 img {
   object-fit: contain;
 }
+
 /* iPhone対応: 「色を選択」「プレビュー」にも Noto Sans JP を適用 */
 .step1 b, .step2 b {
+  font-family: "Noto Sans JP", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+}
+/* iPhone対応: あ行、か行…のラベルとヒント文も Noto Sans JP に統一 */
+.kana-row label,
+.hint {
   font-family: "Noto Sans JP", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
 }
 </style>

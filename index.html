@@ -18,18 +18,15 @@
 
     <!-- 全体を Noto Sans JP に強制適用 -->
     <style>
-        /* html, body だけでなく全ての要素に強制適用 */
         * {
             font-family: 'Noto Sans JP', sans-serif !important;
-            font-weight: normal !important; /* 必要に応じて太さを調整 */
+            font-weight: normal !important;
         }
 
-        /* ボタンやリンクのテキストも強制適用 */
         button, input, select, textarea, a {
             font-family: 'Noto Sans JP', sans-serif !important;
         }
 
-        /* SynestheShare のタイトルだけ Outfit にする */
         h1 {
             font-family: 'Outfit', sans-serif !important;
             display: flex;
@@ -39,20 +36,18 @@
             text-align: left;
         }
         h1 img {
-            height: 1em; /* 文字サイズに合わせて縦を揃える */
+            height: 1em;
             width: auto;
             display: inline-block;
         }
 
-        /* banner 内の content */
         .banner .content {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: flex-start; /* デフォルトは左寄せ */
+            align-items: flex-start;
         }
 
-        /* 横幅824px以下で中央寄せに切り替え */
         @media screen and (max-width: 824px) {
             .banner .content {
                 align-items: center;
@@ -66,11 +61,16 @@
             }
         }
 
-        /* スマホ向けのさらに狭い幅 */
         @media screen and (max-width: 480px) {
             h1 {
                 font-size: 1.8rem;
             }
+        }
+
+        /* 👇 改行許容を有効化するための追加 */
+        h2 {
+            white-space: normal !important;
+            word-break: keep-all;
         }
     </style>
 </head>
@@ -95,7 +95,7 @@
         <!-- Two -->
         <section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in" id="first">
             <div class="content">
-                <h2>アルファベットってどんな色？</h2>
+                <h2>アルファベットって<wbr>どんな色？</h2>
                 <ul class="actions stacked">
                     <li><a href="#" class="button">このお題を選択</a></li>
                 </ul>
@@ -108,7 +108,7 @@
         <!-- Three -->
         <section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
             <div class="content">
-                <h2>数字ってどんな色？</h2>
+                <h2>数字って<wbr>どんな色？</h2>
                 <ul class="actions stacked">
                     <li><a href="number.html" class="button">このお題を選択</a></li>
                 </ul>
@@ -121,7 +121,7 @@
         <!-- Four -->
         <section class="spotlight style1 orient-right content-align-left image-position-center onscroll-image-fade-in">
             <div class="content">
-                <h2>あ行、か行…ってどんな色？</h2>
+                <h2>あ行、か行…って<wbr>どんな色？</h2>
                 <p><font color="gray">※子音ごとに最大3色まで選べます。</font></p>
                 <ul class="actions stacked">
                     <li><a href="consonant.html" class="button">このお題を選択</a></li>
@@ -135,7 +135,7 @@
         <!-- Five -->
         <section class="spotlight style1 orient-left content-align-left image-position-center onscroll-image-fade-in">
             <div class="content">
-                <h2>教科ってどんな色？</h2>
+                <h2>教科って<wbr>どんな色？</h2>
                 <ul class="actions stacked">
                     <li><a href="#" class="button">このお題を選択</a></li>
                 </ul>

@@ -166,7 +166,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 }
 
 /* レスポンシブ：幅に応じて列数を増やす（最大5列） */
-@media (min-width:420px){
+@media (min-width:360px){
   .controls-grid{ grid-template-columns: repeat(2, 1fr); }
 }
 @media (min-width:720px){
@@ -443,8 +443,22 @@ function drawPreview(){
 }
 
 document.getElementById('saveBtn').addEventListener('click',()=>{saveToURL(); document.getElementById('saveModal').style.display='block';});
-document.getElementById('resetBtn').addEventListener('click',()=>{uiOrder.forEach(k=>colorMap[k]=[DEFAULT_SINGLE_COLOR]); makeControls(); drawPreview(); saveToURL();});
-document.getElementById('shareBtn').addEventListener('click',()=>{const text="私の数字の色はこれ！"; const url=location.href; const share=`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=SynestheShare`; window.open(share,'_blank');});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  try {
+    const confirmed = confirm("全ての色をデフォルトに戻して良いですか？");
+    if (confirmed === false) return;
+  } catch(e) {
+    // confirm ダイアログが利用できない環境（例: iPhone の「ダイアログを表示しない」設定など）の場合は
+    // 確認なしで処理を実行する（仕様に基づく）
+  }
+  uiOrder.forEach(k=>colorMap[k]=[DEFAULT_SINGLE_COLOR]);
+  makeControls(); drawPreview(); saveToURL();
+});
+document.getElementById('shareBtn').addEventListener('click',()=>{
+  const text = "#SynestheShare https://mo3ym.github.io/synestheshare/";
+  const share = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(share,'_blank');
+});
 document.getElementById('saveClose').addEventListener('click',()=>{document.getElementById('saveModal').style.display='none';});
 window.addEventListener('click',e=>{if(e.target===document.getElementById('saveModal')){document.getElementById('saveModal').style.display='none';}});
 

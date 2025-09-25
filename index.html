@@ -18,18 +18,15 @@
 
     <!-- 全体を Noto Sans JP に強制適用 -->
     <style>
-        /* html, body だけでなく全ての要素に強制適用 */
         * {
             font-family: 'Noto Sans JP', sans-serif !important;
-            font-weight: normal !important; /* 必要に応じて太さを調整 */
+            font-weight: normal !important;
         }
 
-        /* ボタンやリンクのテキストも強制適用 */
         button, input, select, textarea, a {
             font-family: 'Noto Sans JP', sans-serif !important;
         }
 
-        /* SynestheShare のタイトルだけ Outfit にする */
         h1 {
             font-family: 'Outfit', sans-serif !important;
             display: flex;
@@ -39,34 +36,28 @@
             text-align: left;
         }
         h1 img {
-            height: 1em; /* 文字サイズに合わせて縦を揃える */
+            height: 1em;
             width: auto;
             display: inline-block;
         }
 
-        /* banner 内の content */
         .banner .content {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: flex-start; /* デフォルトは左寄せ */
+            align-items: flex-start;
         }
 
-        /* 横幅824px以下で中央寄せに切り替え */
         @media screen and (max-width: 824px) {
             .banner .content {
                 align-items: center;
                 text-align: center;
             }
-            /* トップの SynestheShare のタイトルだけを少し大きめに調整 */
-            .banner .content h1 {
+            h1 {
                 justify-content: center;
                 text-align: center;
                 flex-wrap: wrap;
-                font-size: 3.0rem; /* 元の2.4remより少し大きめ */
-            }
-            .banner .content h1 img {
-                height: 1.15em; /* ロゴを少し大きく */
+                font-size: 2.4rem;
             }
         }
 
@@ -74,11 +65,17 @@
         @media screen and (max-width: 480px) {
             /* スマホ表示（banner.pngが縦に並ぶなど）のとき、さらにトップタイトルを大きく */
             .banner .content h1 {
-                font-size: 2.2rem; /* 元の1.8remより大きめにして見やすく */
+                font-size: 3.2rem; /* 元の1.8remより大きめにして見やすく */
             }
             .banner .content h1 img {
-                height: 1.3em; /* ロゴを文字サイズに合わせてさらに大きめに */
+                height: 1.0em; /* ロゴを文字サイズに合わせてさらに大きめに */
             }
+        }
+
+        /* 👇 改行許容を有効化するための追加 */
+        h2 {
+            white-space: normal !important;
+            word-break: keep-all;
         }
     </style>
 </head>
@@ -118,7 +115,7 @@
             <div class="content">
                 <h2>数字って<wbr>どんな色？</h2>
                 <ul class="actions stacked">
-                    <li><a href="#" class="button">このお題を選択</a></li>
+                    <li><a href="number.html" class="button">このお題を選択</a></li>
                 </ul>
             </div>
             <div class="image">

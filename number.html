@@ -78,38 +78,31 @@ html, body {
 }
 h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 
-/* controls グリッド（レスポンシブ：画面幅に応じて1〜5列、最大5列）
-   各セル（枠）はグリッドの幅に合わせて横いっぱいに広がるようにしています。
-   グリッドの gap は枠同士の「適度な間隔」を担保します。 */
+/* controls グリッド（レスポンシブ：画面幅に応じて1〜5列、最大5列） */
 .controls-grid{
   display:grid;
-  gap:12px; /* 枠同士の適度な間隔（調整可） */
+  gap:12px;
   margin-bottom:10px;
   width:100%;
-  grid-template-columns: repeat(1, 1fr); /* デフォルト: 1列（小さいスマホ） */
+  grid-template-columns: repeat(1, 1fr);
   align-items: start;
 }
 
-/* カード（枠）--- 枠線は残しつつ中央揃え、内側はコンパクトに */
-/* 重要: width:100% にしてグリッドセルの幅を埋めるようにする */
 .kana-card{
   border:1px solid #eee;
-  padding:6px 8px;           /* 小さめにしてコンパクトに */
+  padding:6px 8px;
   border-radius:6px;
   background:#fff;
-
-  display:flex;              /* 中身を中央揃えするための flex */
+  display:flex;
   justify-content:center;
   align-items:center;
-
   box-sizing:border-box;
-  width:100%;                /* グリッドセルの横幅を埋める */
+  width:100%;
   min-height:44px;
-  /* max-width を設定しないことで、各セルで余白が残らないようにします */
 }
 .kana-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .kana-row label{
-  width:auto;                /* 固定幅を解除して中央揃えしやすく */
+  width:auto;
   font-weight:700;
   text-align:center;
   display:inline-block;
@@ -165,7 +158,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   margin:20px 0 10px 0;
 }
 
-/* レスポンシブ：幅に応じて列数を増やす（最大5列） */
+/* レスポンシブ列数 */
 @media (min-width:360px){
   .controls-grid{ grid-template-columns: repeat(2, 1fr); }
 }
@@ -176,7 +169,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   .controls-grid{ grid-template-columns: repeat(4, 1fr); }
 }
 @media (min-width:1200px){
-  .controls-grid{ grid-template-columns: repeat(5, 1fr); } /* PC等の最大時も1行5個まで */
+  .controls-grid{ grid-template-columns: repeat(5, 1fr); }
 }
 
 /* モーダル */
@@ -198,7 +191,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   text-align:center;
 }
 .modal-content p {
-  text-align: left; /* ポップアップ内の文章だけ左詰めに変更 */
+  text-align: left;
 }
 .modal-content img{
   max-width:100%;
@@ -216,7 +209,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 </head>
 
 <body>
-<!-- ロゴ（wrapの外に移動済み） -->
+<!-- ロゴ -->
 <div class="logo">
   <a href="index.html" target="_blank">
     <img src="images_sub/logo.png" alt="SynestheShare ロゴ">
@@ -272,48 +265,24 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 
 <script>
 /*
-  変更点（仕様に基づく）
-  - カラーピッカーは各数字につき1つにしました（複数追加機能を削除）
-  - "+色追加" ボタン、"×" 削除ボタンの処理を削除しました
-  - 生成される丸は10個（1〜0）、各数字の「左の丸」のみ描画します
-  - 丸の配置は添付画像を参考に（2行×5列）配置しています
-  - 「色を選択」のカラーピッカーで選択した色が、対応する数字の丸に反映されます
-  - 丸と丸の横間隔を調整できるようにしました（CIRCLE_HORIZONTAL_GAP）
-  - カード（枠）は残しつつ中身を中央揃えにし、枠を少し小さめにしました
-  - カード数は画面サイズに応じて1〜5列で表示（最大5列）
+  変更点
+  - 薄い色を選んだとき、縁取りはその色を「明度だけ下げた濃い色」にする
 */
 
- // 設定
-// 文字の大きさ（丸との比較値）
+// 設定
 const FONT_SIZE_RATIO = 0.8;
-// 文字と丸に縁取りがされるしきい値
 const BRIGHTNESS_THRESHOLD = 0.8;
-// 文字の縁取りの色
-const TEXT_STROKE_COLOR = '#B0B0B0';
-// 文字の縁取りの太さ
 const TEXT_STROKE_WIDTH = 1;
-// 丸の縁取りの色
-const CIRCLE_STROKE_COLOR = '#B0B0B0';
-// 丸の縁取りの太さ
 const CIRCLE_STROKE_WIDTH = 0.5;
-
-// お題の枠線の太さ
 const BORDER_LINE_WIDTH = 4;
-
-// 丸のサイズ
 const CIRCLE_RADIUS = 100;
-// 丸の縦間隔
 const CIRCLE_GAP = 232;
-// 丸の横間隔
 const CIRCLE_HORIZONTAL_GAP = 232;
-// 丸の縦の開始位置
 const CENTER_VERTICAL_GAP = 602;
 
-// デフォルト配色
 const defaultColors = ["#000000","#3D3D3D","#797979"];
 const DEFAULT_SINGLE_COLOR = defaultColors[1] || "#3D3D3D";
 
-// UI順序
 const uiOrder2col = ["1","2","3","4","5","6","7","8","9","0"];
 const uiOrder1col = ["1","2","3","4","5","6","7","8","9","0"];
 let uiOrder = uiOrder2col.slice();
@@ -346,72 +315,55 @@ function luminance(hex){
   return 0.2126*srgb[0]+0.7152*srgb[1]+0.0722*srgb[2];
 }
 
-/* 新規追加関数：指定色を濃くする（縁取り用）
-   - hex: "#RRGGBB" 形式を想定（カラー入力は通常これ）
-   - amount: 0〜1 の割合で Lightness を減らす（例: 0.35 -> 明度を35%減）
-   この実装は RGB -> HSL -> 調整 -> RGB の流れで色相/彩度を保持して明度だけ下げます。
-*/
-function hexToRgb(hex){
+// 色味を保ったまま明度を下げる
+function darkenColor(hex, amount = 30) {
   const h = hex.replace('#','');
-  return {
-    r: parseInt(h.substring(0,2),16),
-    g: parseInt(h.substring(2,4),16),
-    b: parseInt(h.substring(4,6),16)
-  };
-}
-function rgbToHex(r,g,b){
-  const toHex = (n) => ('0' + n.toString(16)).slice(-2);
-  return '#' + toHex(r) + toHex(g) + toHex(b);
-}
-function rgbToHsl(r,g,b){
-  r/=255; g/=255; b/=255;
+  let r = parseInt(h.substring(0,2),16);
+  let g = parseInt(h.substring(2,4),16);
+  let b = parseInt(h.substring(4,6),16);
+
+  r /= 255; g /= 255; b /= 255;
   const max = Math.max(r,g,b), min = Math.min(r,g,b);
-  let h=0, s=0, l=(max+min)/2;
-  if(max !== min){
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch(max){
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-  return {h: h, s: s, l: l};
-}
-function hslToRgb(h,s,l){
-  let r,g,b;
-  if(s === 0){
-    r = g = b = l; // achromatic
+  let hsl_h, hsl_s, hsl_l = (max+min)/2;
+
+  if(max===min){
+    hsl_h = hsl_s = 0;
   } else {
-    const hue2rgb = (p,q,t) => {
-      if(t < 0) t += 1;
-      if(t > 1) t -= 1;
-      if(t < 1/6) return p + (q - p) * 6 * t;
-      if(t < 1/2) return q;
-      if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-      return p;
-    };
-    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    const p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1/3);
-    g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
+    const d = max-min;
+    hsl_s = hsl_l > 0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: hsl_h = (g-b)/d + (g<b?6:0); break;
+      case g: hsl_h = (b-r)/d + 2; break;
+      case b: hsl_h = (r-g)/d + 4; break;
+    }
+    hsl_h /= 6;
   }
-  return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
-}
-function darkenHex(hex, amount){
-  try{
-    const {r,g,b} = hexToRgb(hex);
-    const hsl = rgbToHsl(r,g,b);
-    // 明度を減らす（0〜1で clamp）
-    hsl.l = Math.max(0, hsl.l - amount);
-    const rgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-    return rgbToHex(rgb.r, rgb.g, rgb.b);
-  }catch(e){
-    // 何か失敗したら既定のグレーにフォールバック
-    return '#8a8a8a';
+
+  hsl_l = Math.max(0, hsl_l - amount/100);
+
+  function hue2rgb(p,q,t){
+    if(t<0) t+=1;
+    if(t>1) t-=1;
+    if(t<1/6) return p+(q-p)*6*t;
+    if(t<1/2) return q;
+    if(t<2/3) return p+(q-p)*(2/3-t)*6;
+    return p;
   }
+
+  let r2,g2,b2;
+  if(hsl_s===0){
+    r2=g2=b2=hsl_l;
+  } else {
+    const q = hsl_l < 0.5 ? hsl_l*(1+hsl_s) : hsl_l+hsl_s-hsl_l*hsl_s;
+    const p = 2*hsl_l-q;
+    r2 = hue2rgb(p,q,hsl_h+1/3);
+    g2 = hue2rgb(p,q,hsl_h);
+    b2 = hue2rgb(p,q,hsl_h-1/3);
+  }
+
+  return `#${Math.round(r2*255).toString(16).padStart(2,'0')}`
+       + `${Math.round(g2*255).toString(16).padStart(2,'0')}`
+       + `${Math.round(b2*255).toString(16).padStart(2,'0')}`;
 }
 
 function loadFromURL(){
@@ -437,126 +389,91 @@ function makeControls(){
     const row=document.createElement('div'); row.className='kana-row';
     const lab=document.createElement('label'); lab.textContent=uiLabels[k];
     row.appendChild(lab);
-    if(!colorMap[k]) colorMap[k] = [DEFAULT_SINGLE_COLOR];
+    if(!colorMap[k]) colorMap[k] = [      DEFAULT_SINGLE_COLOR];
     const inp=document.createElement('input');
-    inp.type='color'; inp.value=colorMap[k][0]; inp.className='color-input';
-    inp.addEventListener('input',()=>{ colorMap[k][0]=inp.value; drawPreview(); saveToURL(); });
+    inp.type='color'; 
+    inp.className='color-input';
+    inp.value=colorMap[k][0];
+    inp.addEventListener('input', e=>{
+      colorMap[k][0] = e.target.value;
+      saveToURL();
+      render();
+    });
     row.appendChild(inp);
     card.appendChild(row);
     grid.appendChild(card);
   });
 }
 
-function drawCircleWithText(cx, cy, r, col, kana){
+function drawCircleWithText(x,y,text,col){
+  ctx.save();
   ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI*2);
-  ctx.fillStyle = col; ctx.fill();
-
-  // 明るい色の場合は縁取りを行う（縁取り色は選択色を濃くしたものにする）
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){
-    const strokeColor = darkenHex(col, 0.35); // 明度を35%下げた色を縁取り色に
-    ctx.lineWidth = CIRCLE_STROKE_WIDTH;
-    ctx.strokeStyle = strokeColor;
-    ctx.stroke();
-  }
+  ctx.arc(x,y,CIRCLE_RADIUS,0,Math.PI*2);
+  ctx.fillStyle=col;
+  ctx.fill();
+  ctx.lineWidth=CIRCLE_STROKE_WIDTH;
+  ctx.strokeStyle=darkenColor(col,30);  // 縁取りは少し濃い色
+  ctx.stroke();
   ctx.closePath();
-  // 生成画像内の数字はカスタムフォント "font" を使用する
-  ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px "font"`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  if(luminance(col) > BRIGHTNESS_THRESHOLD){
-    const textStrokeColor = darkenHex(col, 0.35); // 同じく選択色を濃くした色を文字縁取りに
-    ctx.lineWidth = TEXT_STROKE_WIDTH;
-    ctx.strokeStyle = textStrokeColor;
-    ctx.strokeText(kana, cx, cy+r*0.05);
-  }
-  ctx.fillStyle = '#fff';
-  ctx.fillText(kana, cx, cy+r*0.05);
+
+  ctx.font=`${CIRCLE_RADIUS*FONT_SIZE_RATIO}px "Noto Sans JP",sans-serif`;
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  const lum=luminance(col);
+  ctx.fillStyle= lum>BRIGHTNESS_THRESHOLD ? '#000':'#fff';
+  ctx.lineWidth=TEXT_STROKE_WIDTH;
+  ctx.strokeStyle= lum>BRIGHTNESS_THRESHOLD ? '#fff':'#000';
+  ctx.strokeText(text,x,y);
+  ctx.fillText(text,x,y);
+  ctx.restore();
 }
 
-function drawFooterHash() {
-  const text = "#SynestheShare";
-  ctx.font = '600 35px "Outfit", sans-serif';
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = '#000000';
-  ctx.fillText(text, canvas.width - 24, canvas.height - 24);
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.restore();
+  ctx.save();
+  ctx.translate(200,0);
+  circlePositions.forEach(p=>{
+    drawCircleWithText(p.x,p.y,p.label,colorMap[p.label][0]);
+  });
+  ctx.restore();
+  previewImage.src=canvas.toDataURL('image/png');
 }
 
-function drawPreview(){
-  try{
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    const rectX = 60, rectY = 75, rectW = 1180, rectH = 150, radius = 36;
-    ctx.beginPath();
-    ctx.moveTo(rectX+radius, rectY);
-    ctx.lineTo(rectX+rectW-radius, rectY);
-    ctx.quadraticCurveTo(rectX+rectW, rectY, rectX+rectW, rectY+radius);
-    ctx.lineTo(rectX+rectW, rectY+rectH-radius);
-    ctx.quadraticCurveTo(rectX+rectW, rectY+rectH, rectX+rectW-radius, rectY+rectH);
-    ctx.lineTo(rectX+radius, rectY+rectH);
-    ctx.quadraticCurveTo(rectX, rectY+rectH, rectX, rectY+rectH-radius);
-    ctx.lineTo(rectX, rectY+radius);
-    ctx.quadraticCurveTo(rectX, rectY, rectX+radius, rectY);
-    ctx.closePath();
-    ctx.strokeStyle='#000';
-    ctx.lineWidth=BORDER_LINE_WIDTH;
-    ctx.stroke();
-    ctx.font='700 42px "Noto Sans JP"';
-    ctx.fillStyle='#000'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText("数字ってどんな色のイメージ？", rectX+rectW/2, rectY+rectH/2+2);
-    circlePositions.forEach(pos=>{
-      const col = (colorMap[pos.label] && colorMap[pos.label][0]) || DEFAULT_SINGLE_COLOR;
-      drawCircleWithText(pos.x, pos.y, CIRCLE_RADIUS, col, pos.label);
-    });
-    drawFooterHash();
-    previewImage.src = canvas.toDataURL('image/png');
-  }catch(e){console.error(e);}
-}
-
-document.getElementById('saveBtn').addEventListener('click',()=>{saveToURL(); document.getElementById('saveModal').style.display='block';});
-document.getElementById('resetBtn').addEventListener('click',()=>{
-  try {
-    const confirmed = confirm("全ての色をデフォルトに戻して良いですか？");
-    if (confirmed === false) return;
-  } catch(e) {
-    // confirm ダイアログが利用できない環境（例: iPhone の「ダイアログを表示しない」設定など）の場合は
-    // 確認なしで処理を実行する（仕様に基づく）
-  }
-  uiOrder.forEach(k=>colorMap[k]=[DEFAULT_SINGLE_COLOR]);
-  makeControls(); drawPreview(); saveToURL();
-});
-document.getElementById('shareBtn').addEventListener('click',()=>{
-  const text = "#SynestheShare https://mo3ym.github.io/synestheshare/";
-  const share = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
-  window.open(share,'_blank');
-});
-document.getElementById('saveClose').addEventListener('click',()=>{document.getElementById('saveModal').style.display='none';});
-window.addEventListener('click',e=>{if(e.target===document.getElementById('saveModal')){document.getElementById('saveModal').style.display='none';}});
-
-// レイアウト（列数）調整：表示幅に合わせて uiOrder を決める（必要なら）
-function updateUIOrder(){
-  // ここではUI内の並び自体は変えず、controls-grid の列数はCSSメディアクエリで制御します。
-  // しかし将来的に JS 側で並び替えが必要ならここで対応可能です。
-  if(window.innerWidth < 600) uiOrder = uiOrder1col.slice();
-  else uiOrder = uiOrder2col.slice();
-}
-window.addEventListener('resize',()=>{ updateUIOrder(); makeControls(); drawPreview(); });
-
+// URL読み込みと初期描画
 loadFromURL();
 makeControls();
+render();
 
-// カスタムフォントが読み込まれてからキャンバスに描画することで、生成画像内の数字が確実に "font/03スマートフォントUI.otf" を使用するようにする
-if (document.fonts && document.fonts.load) {
-  // フォントを確実にロードしてから描画（複数指定で安全を見ます）
-  Promise.all([
-    document.fonts.load('12px "font"'),
-    document.fonts.load('bold 12px "font"'),
-    document.fonts.load('600 35px "Outfit"')
-  ]).then(()=>{ drawPreview(); }).catch(()=>{ drawPreview(); });
-} else {
-  drawPreview();
-}
+// 保存ボタン
+document.getElementById('saveBtn').addEventListener('click',()=>{
+  saveToURL();
+  document.getElementById('saveModal').style.display='block';
+});
+
+// モーダル閉じる
+document.getElementById('saveClose').addEventListener('click',()=>{
+  document.getElementById('saveModal').style.display='none';
+});
+
+// 初期化ボタン
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  uiOrder.forEach(k=>{colorMap[k]=[DEFAULT_SINGLE_COLOR];});
+  saveToURL();
+  makeControls();
+  render();
+});
+
+// シェアボタン
+document.getElementById('shareBtn').addEventListener('click',()=>{
+  const url=location.href;
+  const text="私の数字の色感覚はこんな感じ！";
+  const shareUrl=`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+  window.open(shareUrl,'_blank');
+});
 </script>
 </body>
 </html>

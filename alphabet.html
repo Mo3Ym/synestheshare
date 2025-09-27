@@ -313,10 +313,10 @@ const defaultSingleColors = {
 };
 
 // UI順序
-const uiOrder2col = ["A","B","C","D","E","F","G","H","I","J"];
-const uiOrder1col = ["A","B","C","D","E","F","G","H","I","J"];
+const uiOrder2col = ["A","B","C","D","E","F","G","X","Y","Z"];
+const uiOrder1col = ["A","B","C","D","E","F","G","X","Y","Z"];
 let uiOrder = uiOrder2col.slice();
-const uiLabels = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","H":"H","I":"I","J":"J"};
+const uiLabels = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","X":"X","Y":"Y","Z":"Z"};
 let colorMap = {};
 
 const canvas = document.getElementById('preview');
@@ -331,9 +331,9 @@ const circlePositions = [
   {x:-102 + CIRCLE_HORIZONTAL_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"E"},
   {x:-102 + CIRCLE_HORIZONTAL_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"F"},
   {x:-102 + CIRCLE_HORIZONTAL_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"G"},
-  {x:-102 + CIRCLE_HORIZONTAL_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"H"},
-  {x:-102 + CIRCLE_HORIZONTAL_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"I"},
-  {x:-102 + CIRCLE_HORIZONTAL_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"J"},
+  {x:-102 + CIRCLE_HORIZONTAL_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"X"},
+  {x:-102 + CIRCLE_HORIZONTAL_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"Y"},
+  {x:-102 + CIRCLE_HORIZONTAL_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"Z"},
 ];
 
 function luminance(hex){

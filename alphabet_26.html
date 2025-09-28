@@ -507,7 +507,18 @@ window.addEventListener('resize',()=>{ updateUIOrder(); makeControls(); drawPrev
 
 loadFromURL();
 makeControls();
+
+// カスタムフォントが読み込まれてからキャンバスに描画することで、生成画像内の数字が確実に "font/03スマートフォントUI.otf" を使用するようにする
+if (document.fonts && document.fonts.load) {
+  // フォントを確実にロードしてから描画（複数指定で安全を見ます）
+  Promise.all([
+    document.fonts.load('12px "Outfit"'),
+    document.fonts.load('bold 12px "Outfit"'),
+    document.fonts.load('600 35px "Outfit"')
+  ]).then(()=>{ drawPreview(); }).catch(()=>{ drawPreview(); });
+} else {
   drawPreview();
+}
 
 document.getElementById('alphabet_10Btn').addEventListener('click', () => {
   const currentParams = new URLSearchParams(window.location.search);

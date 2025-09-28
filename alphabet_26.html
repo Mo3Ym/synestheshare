@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SynestheShare 「アルファベットってどんな色？(10文字モード)」</title>
+<title>SynestheShare 「アルファベットってどんな色？(26文字モード)」</title>
 <link rel="icon" href="./assets/icons/favicon.ico">
 <!-- Google Fonts 経由で Noto Sans JP を読み込み -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
@@ -176,7 +176,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   .controls-grid{ grid-template-columns: repeat(4, 1fr); }
 }
 @media (min-width:1200px){
-  .controls-grid{ grid-template-columns: repeat(5, 1fr); } /* PC等の最大時も1行5個まで */
+  .controls-grid{ grid-template-columns: repeat(6, 1fr); } /* PC等の最大時も1行5個まで */
 }
 
 /* モーダル */
@@ -236,8 +236,8 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
       <button id="saveBtn" class="button big wide smooth-scroll-middle"><img src="images_sub/save.png" alt="" style="width:18px;height:18px;"><span>入力内容を一時保存</span></button>
       <button id="resetBtn" class="button big wide smooth-scroll-middle"><img src="images_sub/reset.png" alt="" style="width:18px;height:18px;">色を初期化</button>
 
-    <!-- 26文字モード -->
-      <button id="alphabet_26Btn" class="button big wide smooth-scroll-middle"><img src="images_sub/plus.png" alt="" style="width:18px;height:18px;">26文字モード</button>
+    <!-- 10文字モード -->
+      <button id="alphabet_10Btn" class="button big wide smooth-scroll-middle"><img src="images_sub/minus.png" alt="" style="width:18px;height:18px;">10文字モード</button>
     </div>
 
     <br><br><br><br><br>
@@ -292,36 +292,49 @@ const CIRCLE_STROKE_WIDTH = 0.5;
 const BORDER_LINE_WIDTH = 4;
 
 // 丸のサイズ
-const CIRCLE_RADIUS = 100;
-// 丸の縦間隔
-const CIRCLE_GAP = 232;
-// 丸の横間隔
-const CIRCLE_HORIZONTAL_GAP = 232;
+const CIRCLE_RADIUS = 80;
+// 丸の間隔
+const CIRCLE_GAP = 192;
 // 丸の縦の開始位置
-const CENTER_VERTICAL_GAP = 602;
+const CENTER_VERTICAL_GAP = 360;
 // 丸の左の開始位置
-const LEFT_CIRCLE = -102;
+const LEFT_CIRCLE = -79;
 
 // デフォルト配色
-// 指定のマッピングに従います（1と6：#000000、2と7：#404040、3と8：#7F7F7F、4と9：#BFBFBF、5と0：#E0E0E0）
 const defaultSingleColors = {
   "A": "#000000",
-  "F": "#000000",
   "B": "#404040",
-  "G": "#404040",
   "C": "#7F7F7F",
-  "X": "#7F7F7F",
-  "D": "#BFBFBF",
-  "Y": "#BFBFBF",
-  "E": "#E0E0E0",
-  "Z": "#E0E0E0"
+  "D": "#A6A6A6",
+  "E": "#BFBFBF",
+  "F": "#E0E0E0",
+  "G": "#000000",
+  "H": "#404040",
+  "I": "#7F7F7F",
+  "J": "#A6A6A6",
+  "K": "#BFBFBF",
+  "L": "#E0E0E0",
+  "M": "#000000",
+  "N": "#404040",
+  "O": "#7F7F7F",
+  "P": "#A6A6A6",
+  "Q": "#BFBFBF",
+  "R": "#E0E0E0",
+  "S": "#000000",
+  "T": "#404040",
+  "U": "#7F7F7F",
+  "V": "#A6A6A6",
+  "W": "#BFBFBF",
+  "X": "#E0E0E0",
+  "Y": "#000000",
+  "Z": "#404040"
 };
 
 // UI順序
-const uiOrder2col = ["A","B","C","D","E","F","G","X","Y","Z"];
-const uiOrder1col = ["A","B","C","D","E","F","G","X","Y","Z"];
+const uiOrder2col = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+const uiOrder1col = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 let uiOrder = uiOrder2col.slice();
-const uiLabels = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","X":"X","Y":"Y","Z":"Z"};
+const uiLabels = {"A":"A","B":"B","C":"C","D":"D","E":"E","F":"F","G":"G","H":"H","I":"I","J":"J","K":"K","L":"L","M":"M","N":"N","O":"O","P":"P","Q":"Q","R":"R","S":"S","T":"T","U":"U","V":"V","W":"W","X":"X","Y":"Y","Z":"Z"};
 let colorMap = {};
 
 const canvas = document.getElementById('preview');
@@ -329,16 +342,32 @@ const ctx = canvas.getContext('2d');
 const previewImage = document.getElementById('previewImage');
 
 const circlePositions = [
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"A"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"B"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"C"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"D"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"E"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"F"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"G"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"X"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"Y"},
-  {x:LEFT_CIRCLE + CIRCLE_HORIZONTAL_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"Z"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"A"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"B"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"C"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"D"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"E"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 6 + 56, y:CENTER_VERTICAL_GAP + 0 * CIRCLE_GAP, label:"F"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"G"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"H"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"I"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"J"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"K"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 6 + 56, y:CENTER_VERTICAL_GAP + 1 * CIRCLE_GAP, label:"L"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 2 * CIRCLE_GAP, label:"M"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 2 * CIRCLE_GAP, label:"N"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 2 * CIRCLE_GAP, label:"O"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 2 * CIRCLE_GAP, label:"P"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 2 * CIRCLE_GAP, label:"Q"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 6 + 56, y:CENTER_VERTICAL_GAP + 2 * CIRCLE_GAP, label:"R"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 3 * CIRCLE_GAP, label:"S"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 3 * CIRCLE_GAP, label:"T"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 3 + 56, y:CENTER_VERTICAL_GAP + 3 * CIRCLE_GAP, label:"U"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 4 + 56, y:CENTER_VERTICAL_GAP + 3 * CIRCLE_GAP, label:"V"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 5 + 56, y:CENTER_VERTICAL_GAP + 3 * CIRCLE_GAP, label:"W"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 6 + 56, y:CENTER_VERTICAL_GAP + 3 * CIRCLE_GAP, label:"X"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 1 + 56, y:CENTER_VERTICAL_GAP + 4 * CIRCLE_GAP, label:"Y"},
+  {x:LEFT_CIRCLE + CIRCLE_GAP * 2 + 56, y:CENTER_VERTICAL_GAP + 4 * CIRCLE_GAP, label:"Z"},
 ];
 
 function luminance(hex){
@@ -480,14 +509,18 @@ loadFromURL();
 makeControls();
   drawPreview();
 
-// 26文字モードボタン
-document.getElementById('alphabet_26Btn').addEventListener('click', () => {
-  // 現在の URL のクエリ文字列を取得
-  const query = window.location.search;
-  // 新しいURLを生成
-  const newUrl = 'alphabet_26.html' + query;
-  // 新規タブで開く
-  window.open(newUrl, '_blank');
+document.getElementById('alphabet_10Btn').addEventListener('click', () => {
+  const currentParams = new URLSearchParams(window.location.search);
+  const allowedKeys = ["A","B","C","D","E","F","G","X","Y","Z"];
+  const newParams = new URLSearchParams();
+
+  allowedKeys.forEach(key => {
+    const val = currentParams.get(key);
+    if (val) newParams.set(key, val);
+  });
+
+  const url = "alphabet.html" + (newParams.toString() ? "?" + newParams.toString() : "");
+  window.open(url, "_blank");  // 新しいタブで開く
 });
 
 </script>

@@ -363,10 +363,13 @@ function makeControls(){
         const rem=document.createElement('button');
         rem.textContent='×'; rem.className='small-btn';
         rem.addEventListener('click',()=>{
-          // iPhone等でダイアログを表示しない設定でも削除されるよう変更
-          try { if(!confirm("選択した色を削除して良いですか？")){} } catch(e){}
-          colorMap[k].splice(i,1); 
-          makeControls(); drawPreview(); saveToURL();
+          // 削除確認（iPhone等で「ダイアログを表示しない」が選択された場合は confirm が常に true 扱いとなり、確認なしで実行される）
+          let confirmed = true;
+          try { confirmed = confirm("選択した色を削除して良いですか？"); } catch(e){ confirmed = true; }
+          if (confirmed) {
+            colorMap[k].splice(i,1); 
+            makeControls(); drawPreview(); saveToURL();
+          }
         });
         wrap.appendChild(rem);
       }

@@ -42,11 +42,13 @@
 	color: #000000 !important;
 }
 
+/* ポップアップ内のポストボタンの画像を文字と縦中央揃え */
 .button.big.wide.smooth-scroll-middle img {
 	width: 22px;
 	height: 22px;
-	display: inline-block; /* 必要なら指定 */
-	vertical-align: middle; /* 念のため */
+	margin: 0;           /* 不要なマージンをリセット */
+	padding: 0;          /* 不要なパディングをリセット */
+	flex-shrink: 0;      /* 画像が縮まないように固定 */
 }
 
 /* ホバー時のスタイル */

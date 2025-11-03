@@ -3,28 +3,27 @@
 <head>
     <title>SynestheShare</title>
 
-    <!-- PC用（タブやアドレスバー） -->
+    <!-- PC -->
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/favicon-16.png">
-    <!-- Android用 -->
+    <!-- Android -->
     <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/favicon-192.png">
-    <!-- iOS用 -->
+    <!-- iOS -->
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/favicon-180.png">
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-    <!-- 元のスタイルシート -->
     <link rel="stylesheet" href="assets/css/main.css" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 
-    <!-- Noto Sans JP を読み込む -->
+    <!-- Noto Sans JP -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-    <!-- Google Fonts Outfit を読み込む -->
+    <!-- Outfit -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- 全体を Noto Sans JP に強制適用 -->
+    <!-- Noto Sans JP -->
     <style>
         * {
             font-family: 'Noto Sans JP', sans-serif !important;
@@ -56,7 +55,6 @@
             align-items: flex-start;
         }
 
-        /* タブレット向けの幅 */
         @media screen and (max-width: 824px) {
             .banner .content {
                 align-items: center;
@@ -66,37 +64,28 @@
                 justify-content: center;
                 text-align: center;
                 flex-wrap: wrap;
-                font-size: 2.6rem; /* タブレットのタイトル(SynestheShare)の大きさ */
+                font-size: 2.6rem; /* タイトル（タブレット） */
             }
             .banner .content h1 img {
-                height: 0.95em; /* タブレットのタイトルロゴ(S)の大きさ */
+                height: 0.95em; /* ロゴ（タブレット） */
             }
         }
 
         /* スマホ向けの幅 */
         @media screen and (max-width: 480px) {
             .banner .content h1 {
-                font-size: 2.6rem; /* スマホのタイトル(SynestheShare)の大きさ */
+                font-size: 2.6rem; /* タイトル（スマホ） */
             }
             .banner .content h1 img {
-                height: 0.95em; /* スマホのタイトルロゴ(S)の大きさ */
+                height: 0.95em; /* ロゴ（スマホ） */
             }
         }
 
-        /* 改行許容の有効化 */
         h2 {
             white-space: normal !important;
             word-break: keep-all;
         }
     </style>
-<!-- Twitter conversion tracking base code -->
-<script>
-!function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-},s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
-a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
-twq('config','qk8lh');
-</script>
-<!-- End Twitter conversion tracking base code -->
 
 </head>
 <body class="is-preload">

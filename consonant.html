@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>SynestheShare 「あ行、か行…ってどんな色？」</title>
 
-<!-- PC用（タブやアドレスバー） -->
+<!-- PC -->
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/favicon-16.png">
-<!-- Android用 -->
+<!-- Android -->
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/favicon-192.png">
-<!-- iOS用 -->
+<!-- iOS -->
 <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/favicon-180.png">
 
-<!-- Google Fonts 経由で Noto Sans JP を読み込み -->
+<!-- Noto Sans JP -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
-<!-- Google Fonts Outfit を読み込み -->
+<!-- Google Fonts Outfit -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-<!-- Google Fonts Outfit ExtraLight 200を読み込み -->
+<!-- Google Fonts Outfit ExtraLight 200 -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main_sub.css" />
 <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
@@ -64,7 +64,7 @@ html, body {
   height: auto;
 }
 
-/* デバイスごとのロゴサイズ */
+/* ロゴ */
 @media (min-width:1024px) {  /* PC */
   .logo img { max-width: 25%; }
 }
@@ -75,7 +75,6 @@ html, body {
   .logo img { max-width: 70%; }
 }
 
-/* 以下は元のCSS（必要部分のみ抜粋） */
 .wrap{
   max-width:800px;
   margin:0 auto;
@@ -144,16 +143,15 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   margin:20px 0 10px 0;
 }
 
-/* PC（幅600px以上）では2列 */
+/* 2列（PC） */
 @media (min-width:600px){
   .controls-grid{ grid-template-columns:repeat(2,1fr); }
 }
 
-/* スマホ（幅599px以下）では1列 */
+/* 1列（スマホ） */
 @media (max-width:599px){
   .controls-grid{ grid-template-columns:1fr; }
 }
-/* モーダル */
 .modal {
   display:none; 
   position:fixed;
@@ -172,7 +170,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   text-align:center;
 }
 .modal-content p {
-  text-align: left; /* ポップアップ内の文章だけ左詰めに変更 */
+  text-align: left;
 }
 .modal-content img{
   max-width:100%;
@@ -191,7 +189,6 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 </head>
 
 <body>
-<!-- ロゴ（wrapの外に移動済み） -->
 <div class="logo">
   <a href="index.html" target="_blank">
     <img src="images_sub/logo.png" alt="SynestheShare ロゴ">
@@ -426,8 +423,8 @@ function drawCircleWithText(cx, cy, r, col, kana){
 }
 
 // ハッシュタグ描画
-const FOOTER_X_OFFSET = -24; // ← 水平方向の位置調整
-const FOOTER_Y_OFFSET = -24; // ← 垂直方向の位置調整
+const FOOTER_X_OFFSET = -24;
+const FOOTER_Y_OFFSET = -24;
 
 function drawFooterHash() {
   const text = "#SynestheShare";
@@ -503,7 +500,6 @@ function drawPreview(){
   }
 }
 
-// 画面幅に応じて uiOrder を更新する関数
 function updateUIOrder() {
   if(window.innerWidth >= 600) uiOrder = uiOrder2col;
   else uiOrder = uiOrder1col;
@@ -516,7 +512,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   await ensureFont('font','font.otf');
   await ensureFont('ar-gothic','AR-ADGothicJP-Medium.otf');
 
-  updateUIOrder(); // 初回ロード時
+  updateUIOrder();
 
   window.addEventListener('resize', ()=>{ updateUIOrder(); });
 

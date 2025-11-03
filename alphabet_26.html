@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>SynestheShare 「アルファベットってどんな色？(26文字モード)」</title>
 
-<!-- PC用（タブやアドレスバー） -->
+<!-- PC -->
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/favicon-16.png">
-<!-- Android用 -->
+<!-- Android -->
 <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/favicon-192.png">
-<!-- iOS用 -->
+<!-- iOS -->
 <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/favicon-180.png">
 
-<!-- Google Fonts 経由で Noto Sans JP を読み込み -->
+<!-- Noto Sans JP -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@600;800&display=swap" rel="stylesheet">
-<!-- Google Fonts Outfit を読み込み -->
+<!-- Google Fonts Outfit -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
-<!-- Google Fonts Outfit ExtraLight 200を読み込み -->
+<!-- Google Fonts Outfit ExtraLight 200 -->
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main_sub.css" />
 <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
@@ -64,7 +64,7 @@ html, body {
   height: auto;
 }
 
-/* デバイスごとのロゴサイズ */
+/* ロゴ */
 @media (min-width:1024px) {  /* PC */
   .logo img { max-width: 25%; }
 }
@@ -75,7 +75,6 @@ html, body {
   .logo img { max-width: 70%; }
 }
 
-/* 以下は元のCSS（必要部分のみ抜粋） */
 .wrap{
   max-width:800px;
   margin:0 auto;
@@ -86,38 +85,32 @@ html, body {
 }
 h1{font-size:18px;margin:0 0 8px;font-weight:800;text-align:center}
 
-/* controls グリッド（レスポンシブ：画面幅に応じて1〜5列、最大5列）  
-   各セル（枠）はグリッドの幅に合わせて横いっぱいに広がるようにしています。  
-   グリッドの gap は枠同士の「適度な間隔」を担保します。 */
 .controls-grid{
   display:grid;
-  gap:12px; /* 枠同士の適度な間隔（調整可） */
+  gap:12px;
   margin-bottom:10px;
   width:100%;
-  grid-template-columns: repeat(1, 1fr); /* デフォルト: 1列（小さいスマホ） */
+  grid-template-columns: repeat(1, 1fr);
   align-items: start;
 }
 
-/* カード（枠）--- 枠線は残しつつ中央揃え、内側はコンパクトに */  
-/* 重要: width:100% にしてグリッドセルの幅を埋めるようにする */
 .kana-card{
   border:1px solid #eee;
-  padding:6px 8px;           /* 小さめにしてコンパクトに */
+  padding:6px 8px;
   border-radius:6px;
   background:#fff;
 
-  display:flex;              /* 中身を中央揃えするための flex */
+  display:flex;
   justify-content:center;
   align-items:center;
 
   box-sizing:border-box;
-  width:100%;                /* グリッドセルの横幅を埋める */
+  width:100%;
   min-height:44px;
-  /* max-width を設定しないことで、各セルで余白が残らないようにします */
 }
 .kana-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .kana-row label{
-  width:auto;                /* 固定幅を解除して中央揃えしやすく */
+  width:auto;
   font-weight:700;
   text-align:center;
   display:inline-block;
@@ -173,7 +166,6 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   margin:20px 0 10px 0;
 }
 
-/* レスポンシブ：幅に応じて列数を増やす（最大5列） */
 @media (min-width:360px){
   .controls-grid{ grid-template-columns: repeat(2, 1fr); }
 }
@@ -184,10 +176,9 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   .controls-grid{ grid-template-columns: repeat(4, 1fr); }
 }
 @media (min-width:1200px){
-  .controls-grid{ grid-template-columns: repeat(6, 1fr); } /* PC等の最大時も1行5個まで */
+  .controls-grid{ grid-template-columns: repeat(6, 1fr); } /* 最大で1行6個 */
 }
 
-/* モーダル */
 .modal {
   display:none; 
   position:fixed;
@@ -206,7 +197,7 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
   text-align:center;
 }
 .modal-content p {
-  text-align: left; /* ポップアップ内の文章だけ左詰めに変更 */
+  text-align: left;
 }
 .modal-content img{
   max-width:100%;
@@ -224,7 +215,6 @@ footer{display:flex;justify-content:center;padding-top:10px;font-size:14px;color
 </head>
 
 <body>
-<!-- ロゴ（wrapの外に移動済み） -->
 <div class="logo">
   <a href="index.html" target="_blank">
     <img src="images_sub/logo.png" alt="SynestheShare ロゴ">
@@ -393,7 +383,7 @@ function loadFromURL(){
   const p=new URLSearchParams(location.search);
   uiOrder.forEach(k=>{
     const v = p.get(k);
-    // URLに値があればそれを使い、無ければデフォルトマップを使う
+    // URLに値があれば利用
     colorMap[k] = [ v ? v : (defaultSingleColors[k] || "#3D3D3D") ];
   });
 }
@@ -433,7 +423,6 @@ function drawCircleWithText(cx, cy, r, col, kana){
     ctx.stroke();
   }
   ctx.closePath();
-  // 生成画像内のアルファベットは "outfit" を使用する
   ctx.font = `bold ${Math.round(r*FONT_SIZE_RATIO)}px Outfit`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -492,8 +481,6 @@ document.getElementById('resetBtn').addEventListener('click',()=>{
     const confirmed = confirm("全ての色をデフォルトに戻して良いですか？");
     if (confirmed === false) return;
   } catch(e) {
-    // confirm ダイアログが利用できない環境（例: iPhone の「ダイアログを表示しない」設定など）の場合は
-    // 確認なしで処理を実行する（仕様に基づく）
   }
   uiOrder.forEach(k=>colorMap[k]=[ defaultSingleColors[k] || "#3D3D3D" ]);
   makeControls(); drawPreview(); saveToURL();
@@ -506,10 +493,7 @@ document.getElementById('shareBtn').addEventListener('click',()=>{
 document.getElementById('saveClose').addEventListener('click',()=>{document.getElementById('saveModal').style.display='none';});
 window.addEventListener('click',e=>{if(e.target===document.getElementById('saveModal')){document.getElementById('saveModal').style.display='none';}});
 
-// レイアウト（列数）調整：表示幅に合わせて uiOrder を決める（必要なら）
 function updateUIOrder(){
-  // ここではUI内の並び自体は変えず、controls-grid の列数はCSSメディアクエリで制御します。
-  // しかし将来的に JS 側で並び替えが必要ならここで対応可能です。
   if(window.innerWidth < 600) uiOrder = uiOrder1col.slice();
   else uiOrder = uiOrder2col.slice();
 }
@@ -518,9 +502,7 @@ window.addEventListener('resize',()=>{ updateUIOrder(); makeControls(); drawPrev
 loadFromURL();
 makeControls();
 
-// カスタムフォントが読み込まれてからキャンバスに描画することで、生成画像内の数字が確実に "font/03スマートフォントUI.otf" を使用するようにする
 if (document.fonts && document.fonts.load) {
-  // フォントを確実にロードしてから描画（複数指定で安全を見ます）
   Promise.all([
     document.fonts.load('12px "Outfit"'),
     document.fonts.load('bold 12px "Outfit"'),
@@ -541,7 +523,7 @@ document.getElementById('alphabet_10Btn').addEventListener('click', () => {
   });
 
   const url = "alphabet.html" + (newParams.toString() ? "?" + newParams.toString() : "");
-  window.open(url, "_blank");  // 新しいタブで開く
+  window.open(url, "_blank");
 });
 
 </script>

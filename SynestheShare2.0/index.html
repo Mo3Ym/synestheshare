@@ -43,14 +43,20 @@ body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflo
 ══════════════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center; /* ①中央揃え */
   padding: 0.9rem 2.5rem;
   background: rgba(247,247,245,0.75);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(224,224,220,0.8);
 }
-.nav-logo { display: flex; align-items: center; text-decoration: none; height: 32px; }
+/* ①ロゴを左端に固定してulが真ん中に来るよう absolute 配置 */
+.nav-logo {
+  position: absolute; left: 2.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 32px;
+}
 .nav-logo img { height: 100%; width: auto; display: block; }
+/* ①右端ボタンも absolute 配置 */
+.nav-right { position: absolute; right: 2.5rem; }
 nav ul { list-style: none; display: flex; gap: 2rem; }
 nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
@@ -163,29 +169,41 @@ nav ul a:hover { color: var(--ink); }
 .bubble-cell .letter-bubble { position: absolute; inset: 0; width: 100%; height: 100%; }
 .letter-bubble {
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700; color: white;
+  font-family: var(--outfit); font-weight: 700;
   font-size: 1rem; transition: transform 0.28s cubic-bezier(.34,1.56,.64,1);
   cursor: default; overflow: hidden;
 }
 .letter-bubble span { display: block; line-height: 1; text-align: center; white-space: nowrap; }
 .letter-bubble:hover { transform: scale(1.12); z-index: 2; }
 
+/* ⑦ アウトライン◯: 白背景・色ボーダー・色文字 */
+.bubble-outline {
+  background: var(--white);
+  /* border-colorはJS側でstyle.borderColorを設定 */
+  box-sizing: border-box;
+}
+/* ⑦ 塗り◯: 色背景・白文字 */
+.bubble-fill {
+  /* background はJS側で設定 */
+  color: white;
+}
+
 /* ══════════════════════════════════════
    THEMES — グラデーション背景付き
 ══════════════════════════════════════ */
 .themes-wrap { position: relative; overflow: hidden; background: var(--bg); }
 
-/* テーマセクション背景blob（黄〜緑系でヒーローと差別化） */
+/* ④テーマ背景blob（黄〜緑系でヒーローと差別化）*/
 .themes-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
 .themes-blob-1 {
   width: max(500px, 60vw); height: max(500px, 60vw);
-  background: radial-gradient(circle, rgba(212,184,0,0.14) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(212,184,0,0.18) 0%, transparent 70%);
   top: -10%; right: -10%;
   animation: blobdrift 12s ease-in-out infinite alternate;
 }
 .themes-blob-2 {
   width: max(400px, 50vw); height: max(400px, 50vw);
-  background: radial-gradient(circle, rgba(42,158,96,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(42,158,96,0.15) 0%, transparent 70%);
   bottom: -5%; left: -8%;
   animation: blobdrift 10s ease-in-out infinite alternate-reverse;
 }
@@ -209,7 +227,6 @@ nav ul a:hover { color: var(--ink); }
 }
 .sec-title strong { font-weight: 700; }
 
-/* 「このテーマで診断」リード文 */
 .themes-lead {
   font-size: 0.88rem; color: var(--ink2); font-weight: 300;
   margin-bottom: 2.5rem; line-height: 1.7;
@@ -218,23 +235,22 @@ nav ul a:hover { color: var(--ink); }
 .theme-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; }
 
 .theme-card {
-  background: rgba(255,255,255,0.80);
+  background: rgba(255,255,255,0.82);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--border); border-radius: 6px;
-  padding: 1.75rem 1.5rem 2.5rem;
-  text-decoration: none; color: var(--ink); display: block;
+  padding: 1.5rem 1.5rem 1.5rem; /* ③下部にボタン追加のためpaddingを調整 */
+  text-decoration: none; color: var(--ink); display: flex; flex-direction: column;
   transition: box-shadow 0.2s, transform 0.2s;
   position: relative; overflow: hidden;
 }
-.theme-card::after {
-  content: '→'; position: absolute; bottom: 1.25rem; right: 1.25rem;
-  font-family: var(--outfit); font-size: 1rem; color: var(--ink3);
-  transition: transform 0.2s, color 0.2s;
-}
 .theme-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
-.theme-card:hover::after { transform: translate(3px,-3px); color: var(--ink); }
 
-.theme-badge-area { height: 22px; display: flex; align-items: center; margin-bottom: 0.5rem; }
+/* ⑧ No.とバッジを同じ行に */
+.theme-header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.theme-no { font-family: var(--outfit); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink3); }
 .badge-popular {
   display: inline-flex; align-items: center; gap: 0.3rem;
   background: rgba(224,58,42,0.10); border: 1px solid rgba(224,58,42,0.28);
@@ -243,10 +259,8 @@ nav ul a:hover { color: var(--ink); }
   padding: 0.2rem 0.55rem; border-radius: 100px; white-space: nowrap;
 }
 .badge-popular::before { content: '★'; font-size: 0.6rem; }
-.badge-empty { display: inline-block; height: 20px; visibility: hidden; }
 
 .theme-accent-bar { height: 3px; border-radius: 2px; margin-bottom: 1.25rem; }
-.theme-no { font-family: var(--outfit); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink3); margin-bottom: 0.5rem; }
 .theme-bubble-row { display: flex; gap: 7px; margin-bottom: 1.25rem; align-items: flex-start; }
 .tbubble-cell { position: relative; width: 36px; flex-shrink: 0; }
 .tbubble-cell::before { content:''; display:block; padding-top:100%; }
@@ -255,8 +269,31 @@ nav ul a:hover { color: var(--ink); }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.85rem; color: white; overflow: hidden;
 }
+/* ⑧ テーマカード内アウトライン◯ */
+.tbubble-outline {
+  background: var(--white) !important;
+  box-sizing: border-box;
+}
 .theme-name { font-family: var(--jp); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
-.theme-desc { font-size: 0.78rem; color: var(--ink2); line-height: 1.6; font-weight: 300; }
+.theme-desc { font-size: 0.78rem; color: var(--ink2); line-height: 1.6; font-weight: 300; flex: 1; }
+
+/* ③ 「このテーマで診断」ボタン */
+.theme-cta {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
+  margin-top: 1.25rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--border);
+  font-family: var(--jp); font-size: 0.78rem; font-weight: 700;
+  color: var(--ink2);
+  transition: color 0.15s;
+  letter-spacing: 0.03em;
+}
+.theme-card:hover .theme-cta { color: var(--c1); }
+.theme-cta-arrow {
+  font-family: var(--outfit); font-size: 0.9rem;
+  transition: transform 0.2s;
+}
+.theme-card:hover .theme-cta-arrow { transform: translateX(3px); }
 
 /* ══════════════════════════════════════
    HOW — グラデーション背景付き（CTA系だが青紫寄りで差別化）
@@ -318,11 +355,22 @@ nav ul a:hover { color: var(--ink); }
   background: rgba(255,255,255,0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(224,224,220,0.9); border-radius: 6px;
   padding: 1.75rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;
+  position: relative; overflow: hidden;
 }
-.fact-icon { font-size: 1.8rem; line-height: 1; }
-.fact-num { font-family: var(--outfit); font-weight: 700; font-size: 1.6rem; line-height: 1; letter-spacing: -0.02em; }
-.fact-label { font-family: var(--jp); font-weight: 700; font-size: 0.85rem; }
-.fact-sub { font-size: 0.76rem; color: var(--ink3); line-height: 1.55; font-weight: 300; }
+/* ⑤ 各カードに右下から薄いカラーのグラデーション */
+.fact-card::before {
+  content: ''; position: absolute;
+  width: 160px; height: 160px; border-radius: 50%;
+  bottom: -40px; right: -40px; filter: blur(40px);
+  opacity: 0.18; pointer-events: none;
+}
+.fact-card:nth-child(1)::before { background: var(--c1); }
+.fact-card:nth-child(2)::before { background: var(--c5); }
+.fact-card:nth-child(3)::before { background: var(--c4); }
+.fact-icon { font-size: 1.8rem; line-height: 1; position: relative; }
+.fact-num { font-family: var(--outfit); font-weight: 700; font-size: 1.6rem; line-height: 1; letter-spacing: -0.02em; position: relative; }
+.fact-label { font-family: var(--jp); font-weight: 700; font-size: 0.85rem; position: relative; }
+.fact-sub { font-size: 0.76rem; color: var(--ink3); line-height: 1.55; font-weight: 300; position: relative; }
 
 /* ══════════════════════════════════════
    CTA BAND — 赤中心のblob
@@ -405,7 +453,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .hero h1 { font-size: clamp(2rem, 7.5vw, 2.8rem); margin-bottom: 1.25rem; }
 
   /* ◯グリッド */
-  .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 0 auto; }
+  .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 1.5rem auto 0; } /* ⑥ margin-top追加 */
 
   /* ── THEMES: 2×2グリッド ── */
   .themes { padding: 4rem 1.25rem; }
@@ -447,14 +495,15 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <a class="nav-logo" href="index.html">
     <img src="images_sub/logo.png" alt="SynestheShare">
   </a>
+  <!-- ①ロゴに関わらず中央揃え -->
   <ul>
     <li><a href="#themes">テーマ</a></li>
     <li><a href="#how">使い方</a></li>
     <li><a href="#about">共感覚とは</a></li>
   </ul>
-  <!-- スマホではCSSで非表示 / PC・タブレットでは表示 -->
-  <!-- クリックでテーマ選択セクションへスクロール -->
-  <a class="nav-cta" href="#themes">今すぐ診断（2分）</a>
+  <div class="nav-right">
+    <a class="nav-cta" href="#themes">今すぐ診断</a>
+  </div>
 </nav>
 
 <!-- ══ HERO ══ -->
@@ -478,7 +527,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       </p>
       <div class="hero-ctas">
         <!-- クリックでテーマ選択セクションへスクロール。ボタン内に2分を記載 -->
-        <a href="#themes" class="btn-primary">今すぐ診断する（約2分）→</a>
+        <a href="#themes" class="btn-primary">2分で今すぐ診断→</a>
       </div>
     </div>
 
@@ -492,27 +541,34 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="themes-blob themes-blob-2"></div>
   <section class="themes" id="themes">
     <div class="sec-eyebrow">テーマを選んで診断</div>
-    <h2 class="sec-title">あなたは<strong>どれ</strong>を選びますか</h2>
+    <!-- ②タイトル変更 -->
+    <h2 class="sec-title">あなたの<strong>カラー</strong>を見つけよう</h2>
     <p class="themes-lead">以下のテーマから1つ選んで、あなただけの共感覚カラーを作ってみましょう。</p>
     <div class="theme-grid">
 
       <a href="alphabet.html" class="theme-card">
         <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c1),var(--c2))"></div>
-        <div class="theme-badge-area"><span class="badge-popular">人気</span></div>
-        <div class="theme-no">No. 01</div>
+        <!-- ⑧ No.とバッジを同行に -->
+        <div class="theme-header-row">
+          <span class="theme-no">No. 01</span>
+          <span class="badge-popular">人気</span>
+        </div>
         <div class="theme-bubble-row">
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">A</div></div>
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">B</div></div>
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">C</div></div>
         </div>
         <div class="theme-name">アルファベット</div>
-        <div class="theme-desc">A,B,C…それぞれどんな色？</div>
+        <div class="theme-desc">A〜Z、26文字それぞれどんな色？</div>
+        <!-- ③「このテーマで診断」ボタン -->
+        <div class="theme-cta">このテーマで診断<span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="number.html" class="theme-card">
         <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c3),var(--c2))"></div>
-        <div class="theme-badge-area"><span class="badge-empty">_</span></div>
-        <div class="theme-no">No. 02</div>
+        <div class="theme-header-row">
+          <span class="theme-no">No. 02</span>
+        </div>
         <div class="theme-bubble-row">
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c2)">1</div></div>
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">2</div></div>
@@ -520,12 +576,14 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         </div>
         <div class="theme-name">数字</div>
         <div class="theme-desc">1〜9、あなたには何色に見える？</div>
+        <div class="theme-cta">このテーマで診断<span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="consonant.html" class="theme-card">
         <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c4),var(--c5))"></div>
-        <div class="theme-badge-area"><span class="badge-empty">_</span></div>
-        <div class="theme-no">No. 03</div>
+        <div class="theme-header-row">
+          <span class="theme-no">No. 03</span>
+        </div>
         <div class="theme-bubble-row">
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c7)">あ</div></div>
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">い</div></div>
@@ -533,12 +591,14 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         </div>
         <div class="theme-name">あいうえお</div>
         <div class="theme-desc">あ～お、文字ごとのイメージカラーを</div>
+        <div class="theme-cta">このテーマで診断<span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="subject.html" class="theme-card">
         <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c6),var(--c7))"></div>
-        <div class="theme-badge-area"><span class="badge-empty">_</span></div>
-        <div class="theme-no">No. 04</div>
+        <div class="theme-header-row">
+          <span class="theme-no">No. 04</span>
+        </div>
         <div class="theme-bubble-row">
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">国</div></div>
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">数</div></div>
@@ -546,6 +606,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         </div>
         <div class="theme-name">教科</div>
         <div class="theme-desc">国語・数学・理科…科目にも色がある</div>
+        <div class="theme-cta">このテーマで診断<span class="theme-cta-arrow">→</span></div>
       </a>
 
     </div>
@@ -624,15 +685,14 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="cta-actions">
     <!-- テーマ選択ページは存在しないためthemes セクションへスクロール -->
     <a href="#themes" class="btn-primary-dark" style="font-size:1rem;padding:0.9rem 2.2rem;">
-      テーマを選んで始める →
+      2分で今すぐ診断 →
     </a>
   </div>
 </div>
 
 <!-- ══ FOOTER ══ -->
 <footer>
-  <span class="footer-logo">SynestheShare</span>
-  <span>フォント: <a href="https://flopdesign.booth.pm/items/2296502" target="_blank">スマートフォントUI</a> &nbsp;/&nbsp; Design: HTML5 UP</span>
+  <span class="footer-logo">SynestheShare v2.0</span>
 </footer>
 
 <script>
@@ -642,17 +702,25 @@ const PALETTE = [
   '#7028c0','#d8306a','#1aaeaa','#e03a2a','#e87820',
 ];
 
-/* ── ヒーロー◯ ── */
+/* ── ヒーロー◯: ⑦ 塗り/アウトライン交互 ── */
 const heroVisual = document.getElementById('heroVisual');
 const heroBubbleData = [];
 HERO_LETTERS.forEach((l, i) => {
   const cell = document.createElement('div');
   cell.className = 'bubble-cell';
   const bubble = document.createElement('div');
-  bubble.className = 'letter-bubble';
-  bubble.style.background = PALETTE[i];
+  const color = PALETTE[i];
+  const isFill = (i % 2 === 0); // 偶数: 塗り, 奇数: アウトライン
+  bubble.className = 'letter-bubble ' + (isFill ? 'bubble-fill' : 'bubble-outline');
+  if (isFill) {
+    bubble.style.background = color;
+  } else {
+    bubble.style.background = 'white';
+    bubble.style.border = '2.5px solid ' + color;
+  }
   const span = document.createElement('span');
   span.textContent = l;
+  span.style.color = isFill ? 'white' : color;
   bubble.appendChild(span);
   cell.appendChild(bubble);
   heroVisual.appendChild(cell);

@@ -36,13 +36,7 @@
 }
 
 html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--jp);
-  overflow-x: hidden;
-  line-height: 1.6;
-}
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
 
 /* ══════════════════════════════════════
    NAV
@@ -52,33 +46,22 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.9rem 2.5rem;
   background: rgba(247,247,245,0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(224,224,220,0.8);
 }
 .nav-logo { display: flex; align-items: center; text-decoration: none; height: 32px; }
 .nav-logo img { height: 100%; width: auto; display: block; }
 nav ul { list-style: none; display: flex; gap: 2rem; }
-nav ul a {
-  color: var(--ink2); text-decoration: none; font-size: 0.82rem;
-  font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s;
-  font-family: var(--jp);
-}
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
 
-/* ──────────────────────────────────────
-   ブラーボタン共通
-   白い半透明ガラスに暗いテキスト → ライトページでブラーが"見える"
-────────────────────────────────────── */
+/* ── ボタン共通: 赤ブラー ── */
 .btn-primary, .nav-cta {
-  position: relative;
-  /* 赤+半透明でブラーが見える鮮やかなボタン */
-  background: rgba(220, 50, 32, 0.88);
+  background: rgba(220,50,32,0.88);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   border: 1.5px solid rgba(255,255,255,0.22);
-  border-radius: 100px;
-  color: #fff;
+  border-radius: 100px; color: #fff;
   font-family: var(--jp); font-weight: 700;
   text-decoration: none; letter-spacing: 0.04em;
   transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
@@ -88,280 +71,218 @@ nav ul a:hover { color: var(--ink); }
 }
 .btn-primary { padding: 0.82rem 1.85rem; font-size: 0.9rem; }
 .nav-cta     { padding: 0.48rem 1.25rem; font-size: 0.82rem; }
-
 .btn-primary:hover, .nav-cta:hover {
-  background: rgba(200, 35, 18, 0.96);
-  transform: translateY(-2px);
+  background: rgba(200,35,18,0.96); transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(220,50,32,0.45), inset 0 1px 0 rgba(255,255,255,0.18);
 }
 
-/* CTAバンド内ボタンは暗い背景の上なので反転 */
+/* CTAバンド内ボタン（暗背景） */
 .btn-primary-dark {
-  position: relative;
   background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  border: 1.5px solid rgba(255,255,255,0.35);
-  border-radius: 100px;
-  color: var(--white);
-  font-family: var(--jp); font-weight: 700; font-size: 0.9rem;
-  text-decoration: none; letter-spacing: 0.04em;
-  padding: 0.82rem 1.85rem;
+  backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1.5px solid rgba(255,255,255,0.35); border-radius: 100px;
+  color: var(--white); font-family: var(--jp); font-weight: 700; font-size: 0.9rem;
+  text-decoration: none; letter-spacing: 0.04em; padding: 0.82rem 1.85rem;
   display: inline-flex; align-items: center; gap: 0.4rem;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
-  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  transition: background 0.15s, transform 0.12s;
 }
-.btn-primary-dark:hover {
-  background: rgba(255,255,255,0.28);
-  transform: translateY(-1px);
-}
-
-.btn-text {
-  color: var(--ink2); font-size: 0.85rem; text-decoration: none;
-  display: flex; align-items: center; gap: 0.35rem;
-  transition: color 0.15s;
-}
-.btn-text:hover { color: var(--ink); }
+.btn-primary-dark:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
 
 /* ══════════════════════════════════════
    HERO — Blob背景グラデーション
 ══════════════════════════════════════ */
-.hero-wrap {
-  position: relative;
-  overflow: hidden;
-  /* blobがページ全体に広がらないようにクリップ */
-}
+.hero-wrap { position: relative; overflow: hidden; }
 
-/* Blobたち: ライトモード向けに彩度・透明度を抑えた薄いグラデーション */
-.hero-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(72px);
-  pointer-events: none;
-  z-index: 0;
-}
+.hero-blob { position: absolute; border-radius: 50%; filter: blur(72px); pointer-events: none; z-index: 0; }
+/* スマホで見えやすくするため opacity を上げ、サイズをvwベースに */
 .hero-blob-1 {
-  width: min(520px, 55vw);
-  height: min(520px, 55vw);
-  background: radial-gradient(circle, rgba(224,58,42,0.22) 0%, transparent 70%);
-  top: -10%; left: -8%;
+  width: max(420px, 85vw); height: max(420px, 85vw);
+  background: radial-gradient(circle, rgba(224,58,42,0.30) 0%, transparent 70%);
+  top: -15%; left: -15%;
   animation: blobdrift 9s ease-in-out infinite alternate;
 }
 .hero-blob-2 {
-  width: min(440px, 48vw);
-  height: min(440px, 48vw);
-  background: radial-gradient(circle, rgba(26,174,170,0.18) 0%, transparent 70%);
-  top: 15%; right: -6%;
+  width: max(360px, 70vw); height: max(360px, 70vw);
+  background: radial-gradient(circle, rgba(26,174,170,0.26) 0%, transparent 70%);
+  top: 20%; right: -15%;
   animation: blobdrift 11s ease-in-out infinite alternate-reverse;
 }
 .hero-blob-3 {
-  width: min(380px, 42vw);
-  height: min(380px, 42vw);
-  background: radial-gradient(circle, rgba(112,40,192,0.13) 0%, transparent 70%);
-  bottom: -5%; left: 35%;
+  width: max(300px, 60vw); height: max(300px, 60vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.20) 0%, transparent 70%);
+  bottom: 0; left: 25%;
   animation: blobdrift 13s ease-in-out infinite alternate;
 }
 @keyframes blobdrift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(24px, 18px) scale(1.06); }
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(24px,18px) scale(1.06); }
 }
 
 .hero {
   position: relative; z-index: 1;
   min-height: 100svh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 3rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: 3rem;
   padding: 8rem 2.5rem 4rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1200px; margin: 0 auto;
 }
 
 .hero-label {
-  font-family: var(--outfit);
-  font-size: 0.72rem; font-weight: 600;
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink3); margin-bottom: 1.75rem;
+  color: var(--ink3); margin-bottom: 1.5rem;
   display: flex; align-items: center; gap: 0.6rem;
 }
 .hero-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
 
 .hero h1 {
-  font-family: var(--jp);
-  font-weight: 300;
+  font-family: var(--jp); font-weight: 300;
   font-size: clamp(2.6rem, 5vw, 4.5rem);
-  line-height: 1.25; letter-spacing: -0.01em;
-  margin-bottom: 1.75rem;
+  line-height: 1.25; letter-spacing: -0.01em; margin-bottom: 1.5rem;
 }
 .hero h1 strong { font-weight: 700; }
-.hero h1 .hl-red  { color: var(--c1); font-weight: 700; }   /* A → 赤 */
-.hero h1 .hl-mint { color: var(--mint); font-weight: 700; } /* 色 → ミント */
-
-/* 2分バッジ */
-.time-badge {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  background: rgba(26,174,170,0.10);
-  border: 1px solid rgba(26,174,170,0.28);
-  color: var(--mint);
-  font-family: var(--outfit); font-size: 0.75rem; font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.28rem 0.75rem; border-radius: 100px;
-  margin-bottom: 1.2rem;
-  width: fit-content;
-}
-.time-badge svg { width: 13px; height: 13px; flex-shrink: 0; }
+.hero h1 .hl-red  { color: var(--c1); font-weight: 700; }
+.hero h1 .hl-mint { color: var(--mint); font-weight: 700; }
 
 .hero-body {
   font-size: 0.92rem; color: var(--ink2);
   line-height: 1.9; max-width: 340px;
-  margin-bottom: 2.5rem; font-weight: 300;
+  margin-bottom: 2rem; font-weight: 300;
 }
-
 .hero-ctas { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
 
-/* ══ HERO VISUAL ── ◯グリッド ══ */
-/*
-  サイズ戦略:
-  - PC横長 (>960px): 右カラム内に5列×2行
-  - タブレット縦 (600〜960px): 1カラム中央、max-widthで制限
-  - スマホ (〜600px): さらに小さくmax-width制限
-  - 常にwidth:100%を持ち、max-widthでキャップ → 消えない
-*/
+/* ◯グリッド */
 .hero-visual {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  padding: 0.5rem;
-  width: 100%;        /* 必須: グリッドセル内で幅を確保 */
-  max-width: 440px;   /* PC: 右カラム内で適切なサイズ */
-  align-self: center;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 10px; padding: 0.5rem;
+  width: 100%; max-width: 440px; align-self: center;
 }
-
-/* 正方形セル: padding-top:100% トリック */
-.bubble-cell {
-  position: relative;
-}
-.bubble-cell::before {
-  content: '';
-  display: block;
-  padding-top: 100%;
-}
-.bubble-cell .letter-bubble {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-}
-
+.bubble-cell { position: relative; }
+.bubble-cell::before { content: ''; display: block; padding-top: 100%; }
+.bubble-cell .letter-bubble { position: absolute; inset: 0; width: 100%; height: 100%; }
 .letter-bubble {
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700;
-  color: white;
-  font-size: 1rem; /* JSで上書き */
-  transition: transform 0.28s cubic-bezier(.34,1.56,.64,1);
-  cursor: default;
-  overflow: hidden;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; color: white;
+  font-size: 1rem; transition: transform 0.28s cubic-bezier(.34,1.56,.64,1);
+  cursor: default; overflow: hidden;
 }
 .letter-bubble span { display: block; line-height: 1; text-align: center; white-space: nowrap; }
 .letter-bubble:hover { transform: scale(1.12); z-index: 2; }
 
 /* ══════════════════════════════════════
-   THEMES
+   THEMES — グラデーション背景付き
 ══════════════════════════════════════ */
-.themes {
-  padding: 8rem 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+.themes-wrap { position: relative; overflow: hidden; background: var(--bg); }
+
+/* テーマセクション背景blob（黄〜緑系でヒーローと差別化） */
+.themes-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
+.themes-blob-1 {
+  width: max(500px, 60vw); height: max(500px, 60vw);
+  background: radial-gradient(circle, rgba(212,184,0,0.14) 0%, transparent 70%);
+  top: -10%; right: -10%;
+  animation: blobdrift 12s ease-in-out infinite alternate;
 }
+.themes-blob-2 {
+  width: max(400px, 50vw); height: max(400px, 50vw);
+  background: radial-gradient(circle, rgba(42,158,96,0.12) 0%, transparent 70%);
+  bottom: -5%; left: -8%;
+  animation: blobdrift 10s ease-in-out infinite alternate-reverse;
+}
+
+.themes {
+  position: relative; z-index: 1;
+  padding: 8rem 2.5rem; max-width: 1200px; margin: 0 auto;
+}
+
 .sec-eyebrow {
-  font-family: var(--outfit);
-  font-size: 0.72rem; font-weight: 600;
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink3); margin-bottom: 0.75rem;
   display: flex; align-items: center; gap: 0.6rem;
 }
 .sec-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
+
 .sec-title {
-  font-family: var(--jp);
-  font-weight: 300; font-size: clamp(2rem, 3.5vw, 2.8rem);
-  letter-spacing: -0.01em; line-height: 1.2;
-  margin-bottom: 3rem;
+  font-family: var(--jp); font-weight: 300; font-size: clamp(2rem, 3.5vw, 2.8rem);
+  letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 0.75rem;
 }
 .sec-title strong { font-weight: 700; }
+
+/* 「このテーマで診断」リード文 */
+.themes-lead {
+  font-size: 0.88rem; color: var(--ink2); font-weight: 300;
+  margin-bottom: 2.5rem; line-height: 1.7;
+}
 
 .theme-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; }
 
 .theme-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 1.75rem 1.5rem 2.5rem; /* 下部に矢印のスペース */
-  text-decoration: none; color: var(--ink);
-  display: block;
+  background: rgba(255,255,255,0.80);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 1.75rem 1.5rem 2.5rem;
+  text-decoration: none; color: var(--ink); display: block;
   transition: box-shadow 0.2s, transform 0.2s;
   position: relative; overflow: hidden;
 }
 .theme-card::after {
-  content: '→';
-  position: absolute; bottom: 1.25rem; right: 1.25rem;
+  content: '→'; position: absolute; bottom: 1.25rem; right: 1.25rem;
   font-family: var(--outfit); font-size: 1rem; color: var(--ink3);
   transition: transform 0.2s, color 0.2s;
 }
 .theme-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
 .theme-card:hover::after { transform: translate(3px,-3px); color: var(--ink); }
 
-/* 人気バッジ: 全カード共通の固定高さ領域 */
-.theme-badge-area {
-  height: 22px; /* バッジ有無に関わらず同じ高さを確保 */
-  display: flex; align-items: center;
-  margin-bottom: 0.5rem;
-}
+.theme-badge-area { height: 22px; display: flex; align-items: center; margin-bottom: 0.5rem; }
 .badge-popular {
   display: inline-flex; align-items: center; gap: 0.3rem;
-  background: rgba(224,58,42,0.10);
-  border: 1px solid rgba(224,58,42,0.28);
-  color: var(--c1);
-  font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
+  background: rgba(224,58,42,0.10); border: 1px solid rgba(224,58,42,0.28);
+  color: var(--c1); font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 0.2rem 0.55rem; border-radius: 100px;
-  white-space: nowrap;
+  padding: 0.2rem 0.55rem; border-radius: 100px; white-space: nowrap;
 }
 .badge-popular::before { content: '★'; font-size: 0.6rem; }
-/* バッジなしカード用の透明スペーサー（高さだけ合わせる） */
-.badge-empty {
-  display: inline-block;
-  height: 20px; /* badge-popularとほぼ同じ高さ */
-  visibility: hidden;
-}
+.badge-empty { display: inline-block; height: 20px; visibility: hidden; }
 
 .theme-accent-bar { height: 3px; border-radius: 2px; margin-bottom: 1.25rem; }
 .theme-no { font-family: var(--outfit); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink3); margin-bottom: 0.5rem; }
-
-/* テーマカード◯: 正方形セル方式 */
 .theme-bubble-row { display: flex; gap: 7px; margin-bottom: 1.25rem; align-items: flex-start; }
 .tbubble-cell { position: relative; width: 36px; flex-shrink: 0; }
 .tbubble-cell::before { content:''; display:block; padding-top:100%; }
 .tbubble {
-  position: absolute; inset: 0;
-  border-radius: 50%;
+  position: absolute; inset: 0; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700;
-  font-size: 0.85rem; /* JSで上書き */
-  color: white; overflow: hidden;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.85rem; color: white; overflow: hidden;
 }
 .theme-name { font-family: var(--jp); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
 .theme-desc { font-size: 0.78rem; color: var(--ink2); line-height: 1.6; font-weight: 300; }
 
 /* ══════════════════════════════════════
-   HOW
+   HOW — グラデーション背景付き（CTA系だが青紫寄りで差別化）
 ══════════════════════════════════════ */
 .how {
-  background: var(--ink);
-  color: var(--white);
-  padding: 7rem 2.5rem;
+  position: relative; overflow: hidden;
+  background: var(--ink); color: var(--white); padding: 7rem 2.5rem;
 }
-.how-inner { max-width: 1100px; margin: 0 auto; }
+/* CTAは赤中心、HOWは青紫寄りのblobで差別化 */
+.how::before {
+  content: '';
+  position: absolute;
+  width: max(600px, 80vw); height: max(600px, 80vw);
+  background: radial-gradient(circle, rgba(26,136,200,0.15) 0%, rgba(112,40,192,0.10) 45%, transparent 70%);
+  top: 50%; left: 30%; transform: translate(-50%,-50%);
+  border-radius: 50%; filter: blur(80px); pointer-events: none;
+}
+.how::after {
+  content: '';
+  position: absolute;
+  width: max(300px, 40vw); height: max(300px, 40vw);
+  background: radial-gradient(circle, rgba(26,174,170,0.12) 0%, transparent 70%);
+  bottom: -10%; right: -5%;
+  border-radius: 50%; filter: blur(60px); pointer-events: none;
+}
+.how-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
 .how .sec-eyebrow { color: rgba(255,255,255,0.3); }
 .how .sec-eyebrow::before { background: rgba(255,255,255,0.2); }
 .how .sec-title { color: var(--white); margin-bottom: 3.5rem; }
@@ -375,51 +296,28 @@ nav ul a:hover { color: var(--ink); }
 .step-desc { font-size: 0.76rem; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 300; }
 
 /* ══════════════════════════════════════
-   ABOUT — Blob背景グラデーション（ヒーローと同系統、淡めに）
+   ABOUT — Blob背景グラデーション
 ══════════════════════════════════════ */
-.about-wrap {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg);
-}
-.about-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
-}
+.about-wrap { position: relative; overflow: hidden; background: var(--bg); }
+.about-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
 .about-blob-1 {
-  width: min(480px, 52vw);
-  height: min(480px, 52vw);
+  width: min(480px, 52vw); height: min(480px, 52vw);
   background: radial-gradient(circle, rgba(26,174,170,0.14) 0%, transparent 70%);
-  top: -20%; right: -5%;
-  animation: blobdrift 10s ease-in-out infinite alternate;
+  top: -20%; right: -5%; animation: blobdrift 10s ease-in-out infinite alternate;
 }
 .about-blob-2 {
-  width: min(360px, 40vw);
-  height: min(360px, 40vw);
+  width: min(360px, 40vw); height: min(360px, 40vw);
   background: radial-gradient(circle, rgba(112,40,192,0.11) 0%, transparent 70%);
-  bottom: 0; left: -5%;
-  animation: blobdrift 12s ease-in-out infinite alternate-reverse;
+  bottom: 0; left: -5%; animation: blobdrift 12s ease-in-out infinite alternate-reverse;
 }
-
-.about {
-  position: relative; z-index: 1;
-  padding: 7rem 2.5rem;
-  max-width: 1200px; margin: 0 auto;
-}
+.about { position: relative; z-index: 1; padding: 7rem 2.5rem; max-width: 1200px; margin: 0 auto; }
 .about .sec-title { margin-bottom: 2.5rem; }
 
 .fact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
 .fact-card {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(224,224,220,0.9);
-  border-radius: 6px;
-  padding: 1.75rem 1.5rem;
-  display: flex; flex-direction: column; gap: 0.6rem;
+  background: rgba(255,255,255,0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(224,224,220,0.9); border-radius: 6px;
+  padding: 1.75rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;
 }
 .fact-icon { font-size: 1.8rem; line-height: 1; }
 .fact-num { font-family: var(--outfit); font-weight: 700; font-size: 1.6rem; line-height: 1; letter-spacing: -0.02em; }
@@ -427,49 +325,42 @@ nav ul a:hover { color: var(--ink); }
 .fact-sub { font-size: 0.76rem; color: var(--ink3); line-height: 1.55; font-weight: 300; }
 
 /* ══════════════════════════════════════
-   CTA BAND — 暗背景
+   CTA BAND — 赤中心のblob
 ══════════════════════════════════════ */
 .cta-band {
   border-top: 1px solid var(--border);
-  background: var(--ink);
-  padding: 6rem 2.5rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+  background: var(--ink); padding: 6rem 2.5rem; text-align: center;
+  position: relative; overflow: hidden;
 }
-/* CTAにも控えめなblob */
 .cta-band::before {
-  content: '';
-  position: absolute;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(224,58,42,0.12) 0%, transparent 65%);
+  content: ''; position: absolute;
+  width: max(600px,80vw); height: max(600px,80vw);
+  background: radial-gradient(circle, rgba(224,58,42,0.18) 0%, transparent 65%);
   top: 50%; left: 50%; transform: translate(-50%,-50%);
-  border-radius: 50%; filter: blur(60px);
-  pointer-events: none;
+  border-radius: 50%; filter: blur(60px); pointer-events: none;
+}
+.cta-band::after {
+  content: ''; position: absolute;
+  width: max(300px,40vw); height: max(300px,40vw);
+  background: radial-gradient(circle, rgba(216,48,106,0.12) 0%, transparent 70%);
+  top: -20%; right: -10%;
+  border-radius: 50%; filter: blur(50px); pointer-events: none;
 }
 .cta-band h2 {
   font-family: var(--jp); font-weight: 300;
-  font-size: clamp(2rem,4vw,3rem);
-  color: var(--white);
-  letter-spacing: -0.01em; line-height: 1.25;
-  margin-bottom: 0.6rem;
+  font-size: clamp(2rem,4vw,3rem); color: var(--white);
+  letter-spacing: -0.01em; line-height: 1.25; margin-bottom: 0.6rem;
   position: relative; z-index: 1;
 }
 .cta-band h2 strong { font-weight: 700; }
 .cta-band p { font-size: 0.88rem; color: rgba(255,255,255,0.5); margin-bottom: 2.5rem; font-weight: 300; position: relative; z-index: 1; }
-.cta-bubbles {
-  display: flex; gap: 8px; justify-content: center; margin-bottom: 2rem;
-  flex-wrap: wrap; position: relative; z-index: 1;
-}
-/* CTAバブルも正方形セル */
+.cta-bubbles { display: flex; gap: 8px; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; position: relative; z-index: 1; }
 .cta-bubble-cell { position: relative; width: 44px; flex-shrink: 0; }
 .cta-bubble-cell::before { content:''; display:block; padding-top:100%; }
 .cta-bubble {
-  position: absolute; inset: 0;
-  border-radius: 50%;
+  position: absolute; inset: 0; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700;
-  font-size: 1rem; color: white;
+  font-family: var(--outfit); font-weight: 700; font-size: 1rem; color: white;
 }
 .cta-actions { position: relative; z-index: 1; }
 
@@ -478,8 +369,7 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 footer {
   background: var(--ink); color: rgba(255,255,255,0.35);
-  padding: 2rem 2.5rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 2rem 2.5rem; border-top: 1px solid rgba(255,255,255,0.06);
   display: flex; justify-content: space-between; align-items: center;
   font-size: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
 }
@@ -491,17 +381,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 960px) {
-  .hero {
-    grid-template-columns: 1fr;
-    min-height: auto;
-    padding: 7rem 1.75rem 3rem;
-    gap: 2.5rem;
-  }
-  .hero-visual {
-    max-width: 320px;
-    margin: 0 auto;
-    gap: 8px;
-  }
+  .hero { grid-template-columns: 1fr; min-height: auto; padding: 7rem 1.75rem 3rem; gap: 2.5rem; }
+  .hero-visual { max-width: 320px; margin: 0 auto; gap: 8px; }
   .theme-grid { grid-template-columns: repeat(2,1fr); }
   .steps { grid-template-columns: repeat(2,1fr); }
   .fact-grid { grid-template-columns: repeat(3,1fr); }
@@ -511,36 +392,28 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 @media (max-width: 600px) {
   /* ── NAV ── */
   nav { padding: 0.8rem 1.25rem; }
+  /* スマホ: nav右上ボタン非表示 */
+  .nav-cta { display: none; }
 
-  /* ── HERO: 中央揃えに切り替え ── */
-  .hero {
-    padding: 5.5rem 1.5rem 3rem;
-    gap: 2rem;
-    text-align: center;
-  }
+  /* ── HERO: 中央揃え ── */
+  .hero { padding: 5.5rem 1.5rem 3rem; gap: 1.75rem; text-align: center; min-height: auto; }
   .hero-text { display: flex; flex-direction: column; align-items: center; }
-  .hero-label { justify-content: center; }
-  .hero-label::before { display: none; } /* 左線は中央揃えと相性悪いので非表示 */
-  .time-badge { margin-left: auto; margin-right: auto; }
-  .hero-body { max-width: 100%; text-align: center; }
+  /* スマホでCOLOR SYNESTHESIAラベル非表示 */
+  .hero-label { display: none; }
+  .hero-body { max-width: 100%; text-align: center; font-size: 0.88rem; margin-bottom: 1.75rem; }
   .hero-ctas { justify-content: center; }
-  .hero h1 { font-size: clamp(2rem, 7.5vw, 2.8rem); }
+  .hero h1 { font-size: clamp(2rem, 7.5vw, 2.8rem); margin-bottom: 1.25rem; }
 
-  /* ◯グリッド: 中央寄せ・小さく */
-  .hero-visual {
-    max-width: 250px;
-    gap: 6px;
-    padding: 0;
-    margin: 0 auto;
-  }
+  /* ◯グリッド */
+  .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 0 auto; }
 
-  /* ── THEMES ── */
+  /* ── THEMES: 2×2グリッド ── */
   .themes { padding: 4rem 1.25rem; }
   .themes .sec-eyebrow { justify-content: center; }
   .themes .sec-eyebrow::before { display: none; }
   .themes .sec-title { text-align: center; }
-  /* スマホはテーマを縦1列に */
-  .theme-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+  .themes-lead { text-align: center; }
+  .theme-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; } /* 2×2 */
 
   /* ── HOW ── */
   .how { padding: 4rem 1.25rem; text-align: center; }
@@ -579,27 +452,21 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <li><a href="#how">使い方</a></li>
     <li><a href="#about">共感覚とは</a></li>
   </ul>
-  <a class="nav-cta" href="alphabet.html">今すぐ診断（2分）</a>
+  <!-- スマホではCSSで非表示 / PC・タブレットでは表示 -->
+  <!-- クリックでテーマ選択セクションへスクロール -->
+  <a class="nav-cta" href="#themes">今すぐ診断（2分）</a>
 </nav>
 
 <!-- ══ HERO ══ -->
 <div class="hero-wrap">
-  <!-- Blobグラデーション背景 -->
   <div class="hero-blob hero-blob-1"></div>
   <div class="hero-blob hero-blob-2"></div>
   <div class="hero-blob hero-blob-3"></div>
 
   <section class="hero">
     <div class="hero-text">
+      <!-- スマホでは非表示（CSSで .hero-label { display:none } ） -->
       <div class="hero-label">Color Synesthesia</div>
-
-      <!-- 2分バッジ -->
-      <div class="time-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        約2分で診断完了
-      </div>
 
       <h1>
         あなたの<strong class="hl-red">A</strong>は<br>
@@ -610,76 +477,80 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         直感で色を選ぶだけ。世界中の人と比べてみよう。
       </p>
       <div class="hero-ctas">
-        <a href="alphabet.html" class="btn-primary">今すぐ診断する →</a>
-        <a href="#themes" class="btn-text">テーマを選ぶ ↓</a>
+        <!-- クリックでテーマ選択セクションへスクロール。ボタン内に2分を記載 -->
+        <a href="#themes" class="btn-primary">今すぐ診断する（約2分）→</a>
       </div>
     </div>
 
-    <!-- ◯グリッド -->
     <div class="hero-visual" id="heroVisual"></div>
   </section>
 </div>
 
 <!-- ══ THEMES ══ -->
-<section class="themes" id="themes">
-  <div class="sec-eyebrow">テーマを選んで診断</div>
-  <h2 class="sec-title">あなたは<strong>どれ</strong>を選びますか</h2>
-  <div class="theme-grid">
+<div class="themes-wrap">
+  <div class="themes-blob themes-blob-1"></div>
+  <div class="themes-blob themes-blob-2"></div>
+  <section class="themes" id="themes">
+    <div class="sec-eyebrow">テーマを選んで診断</div>
+    <h2 class="sec-title">あなたは<strong>どれ</strong>を選びますか</h2>
+    <p class="themes-lead">以下のテーマから1つ選んで、あなただけの共感覚カラーを作ってみましょう。</p>
+    <div class="theme-grid">
 
-    <a href="alphabet.html" class="theme-card">
-      <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c1),var(--c2))"></div>
-      <div class="theme-badge-area"><span class="badge-popular">人気</span></div>
-      <div class="theme-no">No. 01</div>
-      <div class="theme-bubble-row">
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">A</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">B</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">C</div></div>
-      </div>
-      <div class="theme-name">アルファベット</div>
-      <div class="theme-desc">A,B,C…それぞれどんな色？</div>
-    </a>
+      <a href="alphabet.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c1),var(--c2))"></div>
+        <div class="theme-badge-area"><span class="badge-popular">人気</span></div>
+        <div class="theme-no">No. 01</div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">A</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">B</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">C</div></div>
+        </div>
+        <div class="theme-name">アルファベット</div>
+        <div class="theme-desc">A,B,C…それぞれどんな色？</div>
+      </a>
 
-    <a href="number.html" class="theme-card">
-      <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c3),var(--c2))"></div>
-      <div class="theme-badge-area"><span class="badge-empty">_</span></div>
-      <div class="theme-no">No. 02</div>
-      <div class="theme-bubble-row">
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c2)">1</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">2</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">3</div></div>
-      </div>
-      <div class="theme-name">数字</div>
-      <div class="theme-desc">1〜9、あなたには何色に見える？</div>
-    </a>
+      <a href="number.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c3),var(--c2))"></div>
+        <div class="theme-badge-area"><span class="badge-empty">_</span></div>
+        <div class="theme-no">No. 02</div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c2)">1</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">2</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">3</div></div>
+        </div>
+        <div class="theme-name">数字</div>
+        <div class="theme-desc">1〜9、あなたには何色に見える？</div>
+      </a>
 
-    <a href="consonant.html" class="theme-card">
-      <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c4),var(--c5))"></div>
-      <div class="theme-badge-area"><span class="badge-empty">_</span></div>
-      <div class="theme-no">No. 03</div>
-      <div class="theme-bubble-row">
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c7)">あ</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">い</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">う</div></div>
-      </div>
-      <div class="theme-name">あいうえお</div>
-      <div class="theme-desc">あ～お、文字ごとのイメージカラーを</div>
-    </a>
+      <a href="consonant.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c4),var(--c5))"></div>
+        <div class="theme-badge-area"><span class="badge-empty">_</span></div>
+        <div class="theme-no">No. 03</div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c7)">あ</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">い</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">う</div></div>
+        </div>
+        <div class="theme-name">あいうえお</div>
+        <div class="theme-desc">あ～お、文字ごとのイメージカラーを</div>
+      </a>
 
-    <a href="subject.html" class="theme-card">
-      <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c6),var(--c7))"></div>
-      <div class="theme-badge-area"><span class="badge-empty">_</span></div>
-      <div class="theme-no">No. 04</div>
-      <div class="theme-bubble-row">
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">国</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">数</div></div>
-        <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">理</div></div>
-      </div>
-      <div class="theme-name">教科</div>
-      <div class="theme-desc">国語・数学・理科…科目にも色がある</div>
-    </a>
+      <a href="subject.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c6),var(--c7))"></div>
+        <div class="theme-badge-area"><span class="badge-empty">_</span></div>
+        <div class="theme-no">No. 04</div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">国</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">数</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">理</div></div>
+        </div>
+        <div class="theme-name">教科</div>
+        <div class="theme-desc">国語・数学・理科…科目にも色がある</div>
+      </a>
 
-  </div>
-</section>
+    </div>
+  </section>
+</div>
 
 <!-- ══ HOW ══ -->
 <section class="how" id="how">
@@ -751,8 +622,9 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <h2>さあ、<strong>診断</strong>してみよう</h2>
   <p>所要時間 約2分。あなただけの共感覚カラーを発見しよう。</p>
   <div class="cta-actions">
-    <a href="alphabet.html" class="btn-primary-dark" style="font-size:1rem;padding:0.9rem 2.2rem;">
-      アルファベットで始める →
+    <!-- テーマ選択ページは存在しないためthemes セクションへスクロール -->
+    <a href="#themes" class="btn-primary-dark" style="font-size:1rem;padding:0.9rem 2.2rem;">
+      テーマを選んで始める →
     </a>
   </div>
 </div>
@@ -764,21 +636,15 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 </footer>
 
 <script>
-// ══════════════════════════════════════
-// 定数
-// ══════════════════════════════════════
 const HERO_LETTERS = ['A','B','C','D','E','F','G','X','Y','Z'];
 const PALETTE = [
   '#e03a2a','#e87820','#d4b800','#2a9e60','#1888c8',
   '#7028c0','#d8306a','#1aaeaa','#e03a2a','#e87820',
 ];
 
-// ══════════════════════════════════════
-// ヒーロー◯生成
-// ══════════════════════════════════════
+/* ── ヒーロー◯ ── */
 const heroVisual = document.getElementById('heroVisual');
 const heroBubbleData = [];
-
 HERO_LETTERS.forEach((l, i) => {
   const cell = document.createElement('div');
   cell.className = 'bubble-cell';
@@ -793,44 +659,19 @@ HERO_LETTERS.forEach((l, i) => {
   heroBubbleData.push({ bubble, span });
 });
 
-// ──────────────────────────────────────
-// フォントサイズ同期: iOS対応の確実な実装
-// iOSではResizeObserverの初回コールバックが
-// レイアウト確定前に発火する場合があるため
-// 複数タイミングで実行して確実に反映させる
-// ──────────────────────────────────────
-function syncFontSize(bubbles, ratio) {
-  bubbles.forEach(({ bubble, span, b }) => {
-    const el = bubble || b;
-    const textEl = span || b;
-    const d = el.offsetWidth;
-    if (d > 0) textEl.style.fontSize = (d * ratio) + 'px';
+function syncFontSize(items, ratio) {
+  items.forEach(({ bubble, span }) => {
+    const d = bubble.offsetWidth;
+    if (d > 0) span.style.fontSize = (d * ratio) + 'px';
   });
 }
 
-// ヒーロー◯のフォントサイズ同期
 function syncHero() { syncFontSize(heroBubbleData, 0.44); }
-
-// ResizeObserver
 new ResizeObserver(syncHero).observe(heroVisual);
+requestAnimationFrame(() => { syncHero(); requestAnimationFrame(() => { syncHero(); setTimeout(syncHero, 100); setTimeout(syncHero, 400); }); });
+window.addEventListener('load', () => { syncHero(); setTimeout(syncHero, 200); });
 
-// iOSでの確実な初期化: 段階的に複数タイミングで実行
-requestAnimationFrame(() => {
-  syncHero();
-  requestAnimationFrame(() => {
-    syncHero();
-    setTimeout(syncHero, 100);
-    setTimeout(syncHero, 400);
-  });
-});
-window.addEventListener('load', () => {
-  syncHero();
-  setTimeout(syncHero, 200);
-});
-
-// ══════════════════════════════════════
-// テーマカード◯
-// ══════════════════════════════════════
+/* ── テーマカード◯ ── */
 function syncTbubble() {
   document.querySelectorAll('.tbubble-cell').forEach(cell => {
     const d = cell.offsetWidth;
@@ -843,9 +684,7 @@ if (themeGrid) new ResizeObserver(syncTbubble).observe(themeGrid);
 requestAnimationFrame(() => { syncTbubble(); requestAnimationFrame(syncTbubble); });
 window.addEventListener('load', () => { syncTbubble(); setTimeout(syncTbubble, 200); });
 
-// ══════════════════════════════════════
-// CTA バブル生成＋同期
-// ══════════════════════════════════════
+/* ── CTA バブル ── */
 const ctaBubblesEl = document.getElementById('ctaBubbles');
 const ctaBubbleData = [];
 'ABCDEFG'.split('').forEach((l, i) => {
@@ -857,7 +696,7 @@ const ctaBubbleData = [];
   b.textContent = l;
   cell.appendChild(b);
   ctaBubblesEl.appendChild(cell);
-  ctaBubbleData.push({ bubble: cell, span: b }); // syncFontSizeと同じ形式
+  ctaBubbleData.push({ bubble: cell, span: b });
 });
 function syncCta() { syncFontSize(ctaBubbleData, 0.44); }
 new ResizeObserver(syncCta).observe(ctaBubblesEl);

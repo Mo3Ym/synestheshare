@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SynestheShare — アルファベットってどんな色？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c27;
+  --border: rgba(255,255,255,0.08);
+  --text: #f0f0f5;
+  --muted: #888899;
+  --accent: #c8f045;
+  --accent2: #ff6b9d;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Noto Sans JP', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100svh;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: rgba(10,10,15,0.92);
+  backdrop-filter: blur(12px);
+  z-index: 50;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+.nav-theme {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* MAIN LAYOUT */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 5rem;
+}
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.mode-btn {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn.active {
+  background: rgba(200,240,69,0.12);
+  border-color: rgba(200,240,69,0.4);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* GRID */
+.letter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.letter-cell {
+  aspect-ratio: 1;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s, box-shadow 0.15s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.letter-cell.empty-color {
+  background: var(--surface2);
+  color: var(--muted);
+  border-color: var(--border);
+}
+.letter-cell.has-color {
+  color: rgba(0,0,0,0.6);
+  border-color: rgba(255,255,255,0.15);
+}
+.letter-cell.selected {
+  transform: scale(1.08);
+  border-color: white !important;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+.letter-cell:hover { transform: scale(1.05); }
+
+/* COLOR PICKER PANEL */
+.picker-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: none;
+}
+.picker-panel.visible { display: block; }
+.picker-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.picker-letter-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* Hue strip + lightness strip */
+.gradient-strip {
+  width: 100%;
+  height: 28px;
+  border-radius: 8px;
+  cursor: crosshair;
+  margin-bottom: 0.75rem;
+  position: relative;
+  touch-action: none;
+}
+#hueStrip {
+  background: linear-gradient(to right,
+    hsl(0,100%,50%), hsl(30,100%,50%), hsl(60,100%,50%),
+    hsl(90,100%,50%), hsl(120,100%,50%), hsl(150,100%,50%),
+    hsl(180,100%,50%), hsl(210,100%,50%), hsl(240,100%,50%),
+    hsl(270,100%,50%), hsl(300,100%,50%), hsl(330,100%,50%), hsl(360,100%,50%));
+}
+#lightnessStrip {
+  background: linear-gradient(to right, #000, #fff);
+}
+.strip-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  pointer-events: none;
+  transition: left 0s;
+}
+
+/* QUICK PALETTE */
+.quick-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 0.6rem;
+}
+.quick-color {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.quick-color:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.5); }
+.quick-color.selected-q { border-color: white; transform: scale(1.2); }
+
+.clear-btn {
+  background: rgba(255,100,100,0.15);
+  border: 1px solid rgba(255,100,100,0.3);
+  color: #ff8080;
+  padding: 0.35rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  margin-top: 0.4rem;
+}
+.clear-btn:hover { background: rgba(255,100,100,0.25); }
+
+/* RESULT / ACTIONS */
+.result-section {
+  margin-top: 2rem;
+}
+.result-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+.result-canvas-wrap {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+canvas#resultCanvas { display: block; width: 100%; }
+
+.action-btns {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.btn-share {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.btn-share:hover { transform: scale(1.03); opacity: 0.92; }
+.btn-share-x {
+  background: var(--text);
+  color: #0a0a0f;
+}
+.btn-share-copy {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-save {
+  background: rgba(200,240,69,0.15);
+  color: var(--accent);
+  border: 1px solid rgba(200,240,69,0.35);
+  flex: 1;
+  min-width: 120px;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.btn-save:hover { transform: scale(1.03); }
+
+/* VOTE SECTION */
+.vote-section {
+  margin-top: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+.vote-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 0.3rem;
+}
+.vote-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem; }
+.vote-letter-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.vote-tab {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  transition: all 0.12s;
+  font-family: var(--font-display);
+}
+.vote-tab.active {
+  border-color: rgba(200,240,69,0.4);
+  background: rgba(200,240,69,0.1);
+  color: var(--accent);
+}
+
+.vote-bars { }
+.vote-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.vote-bar-label {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.vote-bar-track {
+  flex: 1;
+  height: 10px;
+  background: var(--surface2);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.vote-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.vote-bar-pct {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-width: 36px;
+  text-align: right;
+}
+.vote-you-marker {
+  font-size: 0.72rem;
+  background: var(--accent);
+  color: #0a0a0f;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.vote-loading {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 1.5rem 0;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--text);
+  color: #0a0a0f;
+  padding: 0.65rem 1.4rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 200;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 500px) {
+  .letter-grid { grid-template-columns: repeat(auto-fill, minmax(58px,1fr)); gap:8px; }
+  .letter-cell { font-size: 1.1rem; border-radius: 10px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">Synesthе<span>Share</span></a>
+  <span class="nav-theme">🔤 アルファベット</span>
+</nav>
+
+<div class="container">
+
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn10" onclick="setMode(10)">10文字モード</button>
+    <button class="mode-btn" id="btn26" onclick="setMode(26)">26文字モード</button>
+  </div>
+
+  <!-- LETTER GRID -->
+  <div class="letter-grid" id="letterGrid"></div>
+
+  <!-- COLOR PICKER -->
+  <div class="picker-panel" id="pickerPanel">
+    <div class="picker-label">
+      <div class="picker-letter-badge" id="pickerBadge">A</div>
+      の色を選ぼう
+    </div>
+
+    <!-- Quick palette -->
+    <div class="quick-palette" id="quickPalette"></div>
+
+    <!-- Hue slider -->
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px;">色相</div>
+    <div class="gradient-strip" id="hueStrip">
+      <div class="strip-thumb" id="hueThumb"></div>
+    </div>
+
+    <!-- Lightness slider -->
+    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px;">明度</div>
+    <div class="gradient-strip" id="lightnessStrip">
+      <div class="strip-thumb" id="lightnessThumb"></div>
+    </div>
+
+    <button class="clear-btn" onclick="clearCurrentColor()">この文字の色を消す</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-section">
+    <div class="result-title">完成した共感覚カラー</div>
+    <div class="result-canvas-wrap">
+      <canvas id="resultCanvas" width="800" height="320"></canvas>
+    </div>
+    <div class="action-btns">
+      <button class="btn-share btn-share-x" id="btnShareX" onclick="shareToX()">𝕏 でシェア</button>
+      <button class="btn-share btn-share-copy" onclick="copyUrl()">🔗 URLをコピー</button>
+      <button class="btn-save" onclick="saveImage()">💾 画像を保存</button>
+    </div>
+  </div>
+
+  <!-- VOTE SECTION -->
+  <div class="vote-section" id="voteSection">
+    <div class="vote-title">みんなの共感覚と比べる</div>
+    <div class="vote-sub">あなたは多数派？少数派？ — 投票して確認しよう</div>
+    <div class="vote-letter-tabs" id="voteTabs"></div>
+    <div id="voteBars"><div class="vote-loading">読み込み中...</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">コピーしました！</div>
+
+<script>
+// ══════════════════════════════════════════
+// Supabase 設定
+// ══════════════════════════════════════════
+// ▼▼▼ ここにあなたのSupabase URLとAnonKeyを貼り付けてください ▼▼▼
+const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+// ▲▲▲ 設定ここまで ▲▲▲
+
+let supabase = null;
+try {
+  if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  }
+} catch(e) { console.warn('Supabase not configured'); }
+
+// ══════════════════════════════════════════
+// State
+// ══════════════════════════════════════════
+const LETTERS_10 = ['A','B','C','D','E','F','G','H','I','J'];
+const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+let mode = 10;
+let letters = [...LETTERS_10];
+let colors = {}; // { 'A': '#e74c3c', ... }
+let selectedLetter = null;
+let currentHue = 0;
+let currentLightness = 50;
+
+const QUICK_COLORS = [
+  '#e74c3c','#e67e22','#f39c12','#f1c40f','#d4ac0d',
+  '#2ecc71','#1abc9c','#27ae60','#3498db','#2980b9',
+  '#9b59b6','#8e44ad','#ff6b9d','#c8f045','#6bc5ff',
+  '#ff8c42','#a8e063','#ffffff','#cccccc','#888888',
+];
+
+// URLから色を読み込む
+function loadFromUrl() {
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+  try {
+    const data = JSON.parse(decodeURIComponent(hash));
+    if (data.m) { mode = data.m; letters = mode === 26 ? LETTERS_26 : LETTERS_10; }
+    if (data.c) colors = data.c;
+  } catch(e) {}
+}
+loadFromUrl();
+
+// ══════════════════════════════════════════
+// UI Building
+// ══════════════════════════════════════════
+function setMode(m) {
+  mode = m;
+  letters = m === 26 ? LETTERS_26 : LETTERS_10;
+  document.getElementById('btn10').classList.toggle('active', m===10);
+  document.getElementById('btn26').classList.toggle('active', m===26);
+  renderGrid();
+  renderCanvas();
+  if (selectedLetter && !letters.includes(selectedLetter)) {
+    selectedLetter = null;
+    document.getElementById('pickerPanel').classList.remove('visible');
+  }
+  renderVoteTabs();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('letterGrid');
+  grid.innerHTML = '';
+  letters.forEach(l => {
+    const cell = document.createElement('div');
+    cell.className = 'letter-cell ' + (colors[l] ? 'has-color' : 'empty-color');
+    cell.id = 'cell-' + l;
+    cell.textContent = l;
+    if (colors[l]) {
+      cell.style.background = colors[l];
+      const rgb = hexToRgb(colors[l]);
+      const lum = rgb ? (0.299*rgb.r + 0.587*rgb.g + 0.114*rgb.b) : 128;
+      cell.style.color = lum > 150 ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.9)';
+    }
+    if (l === selectedLetter) cell.classList.add('selected');
+    cell.addEventListener('click', () => selectLetter(l));
+    grid.appendChild(cell);
+  });
+}
+
+function selectLetter(l) {
+  if (selectedLetter) {
+    document.getElementById('cell-'+selectedLetter)?.classList.remove('selected');
+  }
+  selectedLetter = l;
+  document.getElementById('cell-'+l).classList.add('selected');
+  openPicker(l);
+}
+
+// ══════════════════════════════════════════
+// Color Picker
+// ══════════════════════════════════════════
+function renderQuickPalette() {
+  const wrap = document.getElementById('quickPalette');
+  wrap.innerHTML = '';
+  QUICK_COLORS.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'quick-color';
+    el.style.background = c;
+    if (selectedLetter && colors[selectedLetter] === c) el.classList.add('selected-q');
+    el.addEventListener('click', () => { setColor(c); updateStripsFromHex(c); });
+    wrap.appendChild(el);
+  });
+}
+
+function openPicker(l) {
+  const panel = document.getElementById('pickerPanel');
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const badge = document.getElementById('pickerBadge');
+  badge.textContent = l;
+  if (colors[l]) {
+    badge.style.background = colors[l];
+    const rgb = hexToRgb(colors[l]);
+    const lum = rgb ? (0.299*rgb.r + 0.587*rgb.g + 0.114*rgb.b) : 128;
+    badge.style.color = lum > 150 ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)';
+    updateStripsFromHex(colors[l]);
+  } else {
+    badge.style.background = 'var(--surface2)';
+    badge.style.color = 'var(--muted)';
+  }
+  renderQuickPalette();
+}
+
+function setColor(hex) {
+  if (!selectedLetter) return;
+  colors[selectedLetter] = hex;
+  renderGrid();
+  renderCanvas();
+  // 投票に使用するためDBへ送信
+  submitVote(selectedLetter, hex);
+  renderQuickPalette();
+  updateUrl();
+}
+
+function clearCurrentColor() {
+  if (!selectedLetter) return;
+  delete colors[selectedLetter];
+  renderGrid();
+  renderCanvas();
+  renderQuickPalette();
+  updateUrl();
+}
+
+// ── HUE STRIP ──
+function setupStrip(stripId, thumbId, onUpdate) {
+  const strip = document.getElementById(stripId);
+  const thumb = document.getElementById(thumbId);
+  let dragging = false;
+
+  function getX(e) {
+    const rect = strip.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  }
+  function update(e) { const t = getX(e); onUpdate(t); }
+  strip.addEventListener('mousedown',  e => { dragging=true; update(e); e.preventDefault(); });
+  strip.addEventListener('touchstart', e => { dragging=true; update(e); e.preventDefault(); }, {passive:false});
+  window.addEventListener('mousemove',  e => { if(dragging) update(e); });
+  window.addEventListener('touchmove',  e => { if(dragging) update(e); }, {passive:false});
+  window.addEventListener('mouseup',   () => dragging=false);
+  window.addEventListener('touchend',  () => dragging=false);
+}
+
+setupStrip('hueStrip', 'hueThumb', t => {
+  currentHue = Math.round(t * 360);
+  document.getElementById('hueThumb').style.left = (t*100)+'%';
+  updateColorFromHSL();
+  updateLightnessStrip();
+});
+
+setupStrip('lightnessStrip', 'lightnessThumb', t => {
+  currentLightness = Math.round(t * 100);
+  document.getElementById('lightnessThumb').style.left = (t*100)+'%';
+  updateColorFromHSL();
+});
+
+function updateLightnessStrip() {
+  const h = currentHue;
+  document.getElementById('lightnessStrip').style.background =
+    `linear-gradient(to right, #000, hsl(${h},100%,50%), #fff)`;
+}
+
+function updateColorFromHSL() {
+  const hex = hslToHex(currentHue, 90, currentLightness);
+  setColor(hex);
+}
+
+function updateStripsFromHex(hex) {
+  const {h, s, l} = hexToHsl(hex);
+  currentHue = h;
+  currentLightness = l;
+  document.getElementById('hueThumb').style.left = (h/360*100)+'%';
+  document.getElementById('lightnessThumb').style.left = (l/100*100)+'%';
+  updateLightnessStrip();
+}
+
+// ══════════════════════════════════════════
+// Canvas
+// ══════════════════════════════════════════
+function renderCanvas() {
+  const canvas = document.getElementById('resultCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = 800, H = 320;
+  canvas.width = W; canvas.height = H;
+
+  // Background
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  // Title
+  ctx.fillStyle = '#888899';
+  ctx.font = '500 14px "Noto Sans JP", sans-serif';
+  ctx.fillText('SynestheShare — アルファベットの共感覚', 28, 36);
+
+  const cols = mode === 26 ? 13 : 10;
+  const rows = mode === 26 ? 2 : 1;
+  const tileW = mode === 26 ? 52 : 68;
+  const tileH = 64;
+  const gapX = mode === 26 ? 8 : 12;
+  const startX = (W - (cols * tileW + (cols-1)*gapX)) / 2;
+  const startY = mode === 26 ? 56 : 96;
+
+  letters.forEach((l, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = startX + col * (tileW + gapX);
+    const y = startY + row * (tileH + 10);
+    const color = colors[l] || '#1c1c27';
+
+    // Tile
+    ctx.beginPath();
+    ctx.roundRect(x, y, tileW, tileH - 8, 10);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // Letter
+    const rgb = hexToRgb(color);
+    const lum = rgb ? (0.299*rgb.r + 0.587*rgb.g + 0.114*rgb.b) : 0;
+    ctx.fillStyle = lum > 150 ? 'rgba(0,0,0,0.65)' : (color === '#1c1c27' ? '#555566' : 'rgba(255,255,255,0.9)');
+    ctx.font = `800 ${mode===26?18:22}px Syne, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(l, x + tileW/2, y + (tileH-8)/2);
+  });
+
+  // Footer
+  ctx.fillStyle = '#444455';
+  ctx.font = '400 12px "Noto Sans JP", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('#SynestheShare  mo3ym.github.io/synestheshare/', 28, H - 16);
+}
+
+// ══════════════════════════════════════════
+// SHARE
+// ══════════════════════════════════════════
+async function getCanvasBlob() {
+  return new Promise(resolve => {
+    document.getElementById('resultCanvas').toBlob(resolve, 'image/png');
+  });
+}
+
+async function shareToX() {
+  const text = buildShareText();
+  const blob = await getCanvasBlob();
+
+  if (navigator.share && navigator.canShare) {
+    try {
+      const file = new File([blob], 'synestheshare.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: 'SynestheShare', text, files: [file] });
+        return;
+      }
+    } catch(e) { /* fallback */ }
+  }
+
+  // Fallback: Xウェブ
+  const encoded = encodeURIComponent(text + '\n' + buildUrl());
+  window.open('https://twitter.com/intent/tweet?text=' + encoded, '_blank');
+}
+
+function buildShareText() {
+  const top3 = Object.entries(colors).slice(0,3).map(([l,c]) => `${l}=${c}`).join('、');
+  return `私の共感覚カラー: ${top3}… あなたのは？ #SynestheShare`;
+}
+
+function buildUrl() {
+  const state = { m: mode, c: colors };
+  return location.origin + location.pathname + '#' + encodeURIComponent(JSON.stringify(state));
+}
+
+function updateUrl() {
+  const hash = encodeURIComponent(JSON.stringify({ m: mode, c: colors }));
+  history.replaceState(null, '', '#' + hash);
+}
+
+async function copyUrl() {
+  try {
+    await navigator.clipboard.writeText(buildUrl());
+    showToast('URLをコピーしました！');
+  } catch(e) { showToast('コピーに失敗しました'); }
+}
+
+function saveImage() {
+  const a = document.createElement('a');
+  a.download = 'synestheshare.png';
+  a.href = document.getElementById('resultCanvas').toDataURL('image/png');
+  a.click();
+  showToast('画像を保存しました！');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ══════════════════════════════════════════
+// VOTING (Supabase)
+// ══════════════════════════════════════════
+function colorToGroup(hex) {
+  if (!hex) return 'なし';
+  const {h, s, l} = hexToHsl(hex);
+  if (l < 12) return 'ブラック系';
+  if (l > 88) return 'ホワイト系';
+  if (s < 20) return 'グレー系';
+  if (h < 15 || h >= 345) return '赤系';
+  if (h < 45)  return 'オレンジ系';
+  if (h < 75)  return '黄色系';
+  if (h < 150) return '緑系';
+  if (h < 195) return '水色系';
+  if (h < 255) return '青系';
+  if (h < 300) return '紫系';
+  return 'ピンク系';
+}
+
+async function submitVote(letter, hex) {
+  if (!supabase) return;
+  const group = colorToGroup(hex);
+  try {
+    await supabase.from('votes').insert({ letter, color_hex: hex, color_group: group });
+  } catch(e) {}
+}
+
+async function loadVotes(letter) {
+  if (!supabase) {
+    renderVoteBarsDemo(letter);
+    return;
+  }
+  document.getElementById('voteBars').innerHTML = '<div class="vote-loading">集計中...</div>';
+  try {
+    const { data, error } = await supabase
+      .from('votes')
+      .select('color_group')
+      .eq('letter', letter);
+
+    if (error) throw error;
+
+    const counts = {};
+    data.forEach(r => { counts[r.color_group] = (counts[r.color_group]||0) + 1; });
+    const total = data.length;
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 6);
+
+    renderVoteBars(letter, sorted, total);
+  } catch(e) {
+    renderVoteBarsDemo(letter);
+  }
+}
+
+function renderVoteBars(letter, sorted, total) {
+  const myGroup = colors[letter] ? colorToGroup(colors[letter]) : null;
+  const wrap = document.getElementById('voteBars');
+  if (total === 0) { wrap.innerHTML = '<div class="vote-loading">まだ投票がありません。最初に投票しよう！</div>'; return; }
+
+  const groupColors = {
+    '赤系':'#e74c3c','オレンジ系':'#e67e22','黄色系':'#f1c40f','緑系':'#2ecc71',
+    '水色系':'#6bc5ff','青系':'#3498db','紫系':'#9b59b6','ピンク系':'#ff6b9d',
+    'グレー系':'#888','ホワイト系':'#ddd','ブラック系':'#333','なし':'#555',
+  };
+
+  wrap.innerHTML = sorted.map(([group, count]) => {
+    const pct = Math.round(count / total * 100);
+    const bg = groupColors[group] || '#666';
+    const isYou = group === myGroup;
+    return `
+    <div class="vote-bar-row">
+      <div class="vote-bar-label" style="background:${bg}"></div>
+      <span style="font-size:0.78rem;min-width:64px;color:var(--text)">${group}</span>
+      <div class="vote-bar-track" style="flex:1">
+        <div class="vote-bar-fill" style="width:${pct}%;background:${bg}"></div>
+      </div>
+      <span class="vote-bar-pct">${pct}%</span>
+      ${isYou ? '<span class="vote-you-marker">あなた</span>' : ''}
+    </div>`;
+  }).join('');
+
+  const sub = document.querySelector('.vote-sub');
+  if (sub) sub.textContent = `全 ${total} 票の集計結果`;
+}
+
+function renderVoteBarsDemo(letter) {
+  // Supabase未設定時のデモ表示
+  const demo = [
+    ['赤系', 35], ['青系', 22], ['オレンジ系', 15],
+    ['緑系', 12], ['黄色系', 9], ['紫系', 7]
+  ];
+  const myGroup = colors[letter] ? colorToGroup(colors[letter]) : null;
+  const wrap = document.getElementById('voteBars');
+  const groupColors = { '赤系':'#e74c3c','青系':'#3498db','オレンジ系':'#e67e22','緑系':'#2ecc71','黄色系':'#f1c40f','紫系':'#9b59b6' };
+  wrap.innerHTML = '<div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px">※ デモデータ表示中（Supabase設定後に実データが表示されます）</div>' +
+    demo.map(([group, pct]) => {
+      const bg = groupColors[group] || '#666';
+      const isYou = group === myGroup;
+      return `<div class="vote-bar-row">
+        <div class="vote-bar-label" style="background:${bg}"></div>
+        <span style="font-size:0.78rem;min-width:64px;color:var(--text)">${group}</span>
+        <div class="vote-bar-track" style="flex:1"><div class="vote-bar-fill" style="width:${pct}%;background:${bg}"></div></div>
+        <span class="vote-bar-pct">${pct}%</span>
+        ${isYou ? '<span class="vote-you-marker">あなた</span>' : ''}
+      </div>`;
+    }).join('');
+}
+
+// Vote tabs
+function renderVoteTabs() {
+  const wrap = document.getElementById('voteTabs');
+  wrap.innerHTML = '';
+  const displayLetters = mode === 10 ? LETTERS_10 : LETTERS_26.slice(0,10);
+  displayLetters.forEach((l, i) => {
+    const tab = document.createElement('div');
+    tab.className = 'vote-tab' + (i===0?' active':'');
+    tab.textContent = l;
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.vote-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      loadVotes(l);
+    });
+    wrap.appendChild(tab);
+  });
+  loadVotes(displayLetters[0]);
+}
+
+// ══════════════════════════════════════════
+// Color Utilities
+// ══════════════════════════════════════════
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => {
+    const k = (n + h/30) % 12;
+    const color = l - a * Math.max(Math.min(k-3, 9-k, 1), -1);
+    return Math.round(255*color).toString(16).padStart(2,'0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return isNaN(r) ? null : {r,g,b};
+}
+
+function hexToHsl(hex) {
+  let {r,g,b} = hexToRgb(hex) || {r:0,g:0,b:0};
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}
+  else{
+    const d=max-min;
+    s=l>0.5?d/(2-max-min):d/(max+min);
+    switch(max){
+      case r:h=((g-b)/d+(g<b?6:0))/6;break;
+      case g:h=((b-r)/d+2)/6;break;
+      default:h=((r-g)/d+4)/6;
+    }
+  }
+  return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};
+}
+
+// ══════════════════════════════════════════
+// Init
+// ══════════════════════════════════════════
+renderGrid();
+renderCanvas();
+renderVoteTabs();
+updateLightnessStrip();
+</script>
+</body>
+</html>

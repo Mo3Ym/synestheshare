@@ -450,9 +450,23 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .hero-text { display: flex; flex-direction: column; align-items: center; }
   /* スマホでCOLOR SYNESTHESIAラベル非表示 */
   .hero-label { display: none; }
-  .hero-body { max-width: 100%; text-align: center; font-size: 0.88rem; margin-bottom: 1.75rem; }
+  /* ② スマホ: h1を主役として際立たせる */
+  .hero h1 {
+    font-size: clamp(2.4rem, 10vw, 3.2rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  /* ② スマホ: hero-bodyをサブとして控えめに */
+  .hero-body {
+    max-width: 100%; text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.75;
+    color: var(--ink3);
+    font-weight: 400;
+    margin-bottom: 1.75rem;
+  }
   .hero-ctas { justify-content: center; }
-  .hero h1 { font-size: clamp(2rem, 7.5vw, 2.8rem); margin-bottom: 1.25rem; }
 
   /* ◯グリッド */
   .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 3rem auto 0; } /* ② 1.5rem→3rem */
@@ -520,12 +534,12 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <div class="hero-label">Color Synesthesia</div>
 
       <h1>
-        あなたの<strong class="hl-red">A</strong>は<br>
+        あなたの<strong class="hl-red">A</strong>は<wbr><br>
         何<strong class="hl-mint">色</strong>ですか？
       </h1>
       <p class="hero-body">
-        文字や数字に「色」を感じる——それが共感覚。<br>
-        直感で色を選ぶだけ。世界中の人と比べてみよう。
+        文字や数字に「色」を感じる——<wbr>それが共感覚。<br>
+        直感で色を選ぶだけ。<wbr>世界中の人と比べてみよう。
       </p>
       <div class="hero-ctas">
         <!-- クリックでテーマ選択セクションへスクロール。ボタン内に2分を記載 -->
@@ -547,19 +561,19 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         <div class="step-icon">🎨</div>
         <div class="step-num">Step 01</div>
         <div class="step-title">テーマを選ぶ</div>
-        <div class="step-desc">アルファベット・数字・教科など4種類から選ぼう</div>
+        <div class="step-desc">アルファベット・数字・教科など<wbr>4種類から選ぼう</div>
       </div>
       <div class="step">
         <div class="step-icon">🖌️</div>
         <div class="step-num">Step 02</div>
         <div class="step-title">色を割り当てる</div>
-        <div class="step-desc">「Aは赤」など直感で選ぶだけ。全部でなくてもOK</div>
+        <div class="step-desc">「Aは赤」など直感で選ぶだけ。<wbr>全部でなくてもOK</div>
       </div>
       <div class="step">
         <div class="step-icon">📊</div>
         <div class="step-num">Step 03</div>
         <div class="step-title">みんなと比べる</div>
-        <div class="step-desc">多数派・少数派がすぐわかるグラフを確認</div>
+        <div class="step-desc">多数派・少数派が<wbr>すぐわかるグラフを確認</div>
       </div>
       <div class="step">
         <div class="step-icon">📤</div>
@@ -641,7 +655,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
           <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">理</div></div>
         </div>
         <div class="theme-name">教科</div>
-        <div class="theme-desc">国語や数学はどんな色？</div>
+        <div class="theme-desc">国語や数学は<wbr>どんな色？</div>
         <div class="theme-cta">このテーマで診断<span class="theme-cta-arrow">→</span></div>
       </a>
 
@@ -661,19 +675,19 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         <div class="fact-icon">🔴</div>
         <div class="fact-num" style="color:var(--c1)">A = 赤</div>
         <div class="fact-label">最も多い回答</div>
-        <div class="fact-sub">多くの人がAに赤系を感じる傾向があります</div>
+        <div class="fact-sub">多くの人がAに<wbr>赤系を感じる傾向があります</div>
       </div>
       <div class="fact-card">
         <div class="fact-icon">👥</div>
         <div class="fact-num" style="color:var(--c5)">〜4%</div>
         <div class="fact-label">色字共感覚を持つ人数</div>
-        <div class="fact-sub">100人に1〜4人。思ったより身近な感覚です</div>
+        <div class="fact-sub">100人に1〜4人。<wbr>思ったより身近な感覚です</div>
       </div>
       <div class="fact-card">
         <div class="fact-icon">🌈</div>
         <div class="fact-num" style="color:var(--c4)">無限大∞</div>
         <div class="fact-label">組み合わせの数</div>
-        <div class="fact-sub">まったく同じ共感覚を持つ人は2人といません</div>
+        <div class="fact-sub">まったく同じ共感覚を持つ<wbr>人は2人といません</div>
       </div>
     </div>
   </section>
@@ -683,7 +697,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 <div class="cta-band">
   <div class="cta-bubbles" id="ctaBubbles"></div>
   <h2>さあ、<strong>診断</strong>してみよう</h2>
-  <p>所要時間 約2分。あなただけの共感覚カラーを発見しよう。</p>
+  <p>所要時間 約2分。<wbr>あなただけの共感覚カラーを発見しよう。</p>
   <div class="cta-actions">
     <!-- テーマ選択ページは存在しないためthemes セクションへスクロール -->
     <a href="#themes" class="btn-primary-dark" style="font-size:1rem;padding:0.9rem 2.2rem;">

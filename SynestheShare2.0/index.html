@@ -440,6 +440,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 @media (max-width: 600px) {
   /* ── NAV ── */
   nav { padding: 0.8rem 1.25rem; }
+  /* ①スマホ: ロゴをnavの高さに収まるよう縮小 */
+  .nav-logo { left: 1.25rem; height: 24px; }
   /* スマホ: nav右上ボタン非表示 */
   .nav-cta { display: none; }
 
@@ -453,7 +455,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .hero h1 { font-size: clamp(2rem, 7.5vw, 2.8rem); margin-bottom: 1.25rem; }
 
   /* ◯グリッド */
-  .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 1.5rem auto 0; } /* ⑥ margin-top追加 */
+  .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 3rem auto 0; } /* ② 1.5rem→3rem */
 
   /* ── THEMES: 2×2グリッド ── */
   .themes { padding: 4rem 1.25rem; }
@@ -539,7 +541,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 <section class="how" id="how">
   <div class="how-inner">
     <div class="sec-eyebrow">使い方</div>
-    <h2 class="sec-title">4ステップ、<strong>約2分</strong>で完成</h2>
+    <h2 class="sec-title">4ステップ、<strong>2分</strong>で完成</h2>
     <div class="steps">
       <div class="step">
         <div class="step-icon">🎨</div>
@@ -551,7 +553,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         <div class="step-icon">🖌️</div>
         <div class="step-num">Step 02</div>
         <div class="step-title">色を割り当てる</div>
-        <div class="step-desc">グラデーションから直感で選ぶだけ。全部でなくてもOK</div>
+        <div class="step-desc">「Aは赤」など直感で選ぶだけ。全部でなくてもOK</div>
       </div>
       <div class="step">
         <div class="step-icon">📊</div>
@@ -562,8 +564,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <div class="step">
         <div class="step-icon">📤</div>
         <div class="step-num">Step 04</div>
-        <div class="step-title">Xでシェア</div>
-        <div class="step-desc">ワンタップで画像＋URLを投稿して拡散</div>
+        <div class="step-title">SNSでシェア</div>
+        <div class="step-desc">ワンタップで結果を投稿</div>
       </div>
     </div>
   </div>
@@ -702,7 +704,7 @@ const PALETTE = [
   '#7028c0','#d8306a','#1aaeaa','#e03a2a','#e87820',
 ];
 
-/* ── ヒーロー◯: ⑦ 塗り/アウトライン交互 ── */
+/* ── ヒーロー◯: ③ 全て白背景・色ボーダー・色文字 ── */
 const heroVisual = document.getElementById('heroVisual');
 const heroBubbleData = [];
 HERO_LETTERS.forEach((l, i) => {
@@ -710,17 +712,12 @@ HERO_LETTERS.forEach((l, i) => {
   cell.className = 'bubble-cell';
   const bubble = document.createElement('div');
   const color = PALETTE[i];
-  const isFill = (i % 2 === 0); // 偶数: 塗り, 奇数: アウトライン
-  bubble.className = 'letter-bubble ' + (isFill ? 'bubble-fill' : 'bubble-outline');
-  if (isFill) {
-    bubble.style.background = color;
-  } else {
-    bubble.style.background = 'white';
-    bubble.style.border = '2.5px solid ' + color;
-  }
+  bubble.className = 'letter-bubble bubble-outline';
+  bubble.style.background = 'white';
+  bubble.style.border = '2.5px solid ' + color;
   const span = document.createElement('span');
   span.textContent = l;
-  span.style.color = isFill ? 'white' : color;
+  span.style.color = color;
   bubble.appendChild(span);
   cell.appendChild(bubble);
   heroVisual.appendChild(cell);

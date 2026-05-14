@@ -434,60 +434,6 @@ footer a { color: rgba(255,255,255,0.35); text-decoration: none; transition: col
 footer a:hover { color: rgba(255,255,255,0.65); }
 
 /* ══════════════════════════════════════
-   SCROLL INDICATOR
-══════════════════════════════════════ */
-.scroll-indicator {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  text-decoration: none;
-  animation: scrollIndicatorFade 0.8s ease 1.2s both;
-}
-@keyframes scrollIndicatorFade {
-  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-.scroll-indicator-line {
-  width: 1px;
-  height: 28px;
-  background: linear-gradient(to bottom, transparent, rgba(100,100,96,0.35));
-}
-.scroll-indicator-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid rgba(100,100,96,0.18);
-  background: rgba(247,247,245,0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s, background 0.2s, transform 0.2s;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-}
-.scroll-indicator:hover .scroll-indicator-icon {
-  border-color: rgba(100,100,96,0.4);
-  background: rgba(247,247,245,0.85);
-  transform: translateY(2px);
-}
-.scroll-indicator-icon svg {
-  display: block;
-  animation: arrowBounce 2.4s cubic-bezier(.45,.05,.55,.95) infinite;
-}
-@keyframes arrowBounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(4px); }
-}
-
-/* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 960px) {
@@ -578,6 +524,70 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 @media (max-width: 390px) {
   .hero-visual { max-width: 200px; gap: 5px; }
 }
+
+/* ══════════════════════════════════════
+   SCROLL INDICATOR
+══════════════════════════════════════ */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-decoration: none;
+  opacity: 0;
+  animation: si-fadein 0.7s ease 1.4s forwards;
+  pointer-events: auto;
+}
+@keyframes si-fadein {
+  to { opacity: 1; }
+}
+/* スクロールしたら自然にフェードアウト */
+.scroll-indicator.hidden {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.si-line {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(90,90,85,0.28) 100%);
+}
+.si-ring {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(90,90,85,0.16);
+  background: rgba(247,247,245,0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.55);
+  transition: border-color 0.2s, background 0.2s, transform 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.scroll-indicator:hover .si-ring {
+  border-color: rgba(90,90,85,0.38);
+  background: rgba(247,247,245,0.88);
+  transform: translateY(3px);
+}
+.si-arrow {
+  animation: si-bounce 2.2s cubic-bezier(.45,.05,.55,.95) infinite 2.1s;
+}
+@keyframes si-bounce {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(5px); }
+}
+@media (max-width: 600px) {
+  .scroll-indicator { bottom: 1.6rem; }
+  .si-ring { width: 36px; height: 36px; }
+  .si-line { height: 24px; }
+}
 </style>
 </head>
 <body>
@@ -623,6 +633,15 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
     <div class="hero-visual" id="heroVisual"></div>
   </section>
+  <!-- スクロールインジケーター -->
+  <a href="#how" class="scroll-indicator" id="scrollIndicator" aria-label="下にスクロール">
+    <div class="si-line"></div>
+    <div class="si-ring">
+      <svg class="si-arrow" width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M1.5 4L6.5 9L11.5 4" stroke="rgba(60,60,55,0.65)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </a>
 </div>
 
 <!-- ══ HOW ══ -->
@@ -904,6 +923,22 @@ window.addEventListener('load', () => { syncCta(); setTimeout(syncCta, 200); });
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+
+/* ── スクロールインジケーター: スクロール後に非表示 ── */
+(function() {
+  const si = document.getElementById('scrollIndicator');
+  if (!si) return;
+  let hidden = false;
+  window.addEventListener('scroll', function() {
+    if (!hidden && window.scrollY > 60) {
+      si.classList.add('hidden');
+      hidden = true;
+    } else if (hidden && window.scrollY <= 60) {
+      si.classList.remove('hidden');
+      hidden = false;
+    }
+  }, { passive: true });
 })();
 </script>
 </body>

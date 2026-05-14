@@ -104,19 +104,16 @@ nav ul a:hover { color: var(--ink); }
 /* スマホで見えやすくするため opacity を上げ、サイズをvwベースに */
 .hero-blob-1 {
   width: max(420px, 85vw); height: max(420px, 85vw);
-  background: radial-gradient(circle, rgba(224,58,42,0.30) 0%, transparent 70%);
   top: -15%; left: -15%;
   animation: blobdrift 9s ease-in-out infinite alternate;
 }
 .hero-blob-2 {
   width: max(360px, 70vw); height: max(360px, 70vw);
-  background: radial-gradient(circle, rgba(26,174,170,0.26) 0%, transparent 70%);
   top: 20%; right: -15%;
   animation: blobdrift 11s ease-in-out infinite alternate-reverse;
 }
 .hero-blob-3 {
   width: max(300px, 60vw); height: max(300px, 60vw);
-  background: radial-gradient(circle, rgba(112,40,192,0.20) 0%, transparent 70%);
   bottom: 0; left: 25%;
   animation: blobdrift 13s ease-in-out infinite alternate;
 }
@@ -335,7 +332,11 @@ nav ul a:hover { color: var(--ink); }
 /* ══════════════════════════════════════
    ABOUT — Blob背景グラデーション
 ══════════════════════════════════════ */
-.about-wrap { position: relative; overflow: hidden; background: var(--bg); }
+.about-wrap {
+  position: relative; overflow: hidden;
+  background: #efefed;
+  border-top: 1px solid var(--border);
+}
 .about-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
 .about-blob-1 {
   width: min(480px, 52vw); height: min(480px, 52vw);
@@ -352,7 +353,7 @@ nav ul a:hover { color: var(--ink); }
 
 .fact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
 .fact-card {
-  background: rgba(255,255,255,0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(224,224,220,0.9); border-radius: 6px;
   padding: 1.75rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;
   position: relative; overflow: hidden;
@@ -795,6 +796,57 @@ function syncCta() { syncFontSize(ctaBubbleData, 0.44); }
 new ResizeObserver(syncCta).observe(ctaBubblesEl);
 requestAnimationFrame(() => { syncCta(); requestAnimationFrame(syncCta); });
 window.addEventListener('load', () => { syncCta(); setTimeout(syncCta, 200); });
+
+/* ══ HERO BLOB カラーアニメーション ══
+   3つのblobがそれぞれ独立したスピードで色相を巡回する。
+   hslToRgb で RGBA 文字列を生成し radial-gradient を上書き。
+   ─────────────────────────────────── */
+(function() {
+  const b1 = document.querySelector('.hero-blob-1');
+  const b2 = document.querySelector('.hero-blob-2');
+  const b3 = document.querySelector('.hero-blob-3');
+  if (!b1 || !b2 || !b3) return;
+
+  // 各blobの初期色相（度）とアニメーション速度（度/秒）
+  const blobs = [
+    { el: b1, hue: 0,   speed: 72, alpha: 0.30 },   // 赤から始まる・5秒で一巡
+    { el: b2, hue: 170, speed: 60, alpha: 0.26 },   // シアンから始まる・6秒で一巡
+    { el: b3, hue: 270, speed: 90, alpha: 0.20 },   // 紫から始まる・4秒で一巡
+  ];
+
+  function hslToRgba(h, s, l, a) {
+    h = h % 360;
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const f = n => l - Math.min(l, 1 - l) * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const r = Math.round(f(0) * 255);
+    const g = Math.round(f(8) * 255);
+    const b = Math.round(f(4) * 255);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function setBlobColor(blob) {
+    const rgba = hslToRgba(blob.hue, 85, 58, blob.alpha);
+    blob.el.style.background = `radial-gradient(circle, ${rgba} 0%, transparent 70%)`;
+  }
+
+  // 初期描画
+  blobs.forEach(setBlobColor);
+
+  let last = null;
+  function tick(ts) {
+    if (last !== null) {
+      const dt = (ts - last) / 1000; // 秒
+      blobs.forEach(b => {
+        b.hue = (b.hue + b.speed * dt) % 360;
+        setBlobColor(b);
+      });
+    }
+    last = ts;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
 </script>
 </body>
 </html>

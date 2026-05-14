@@ -122,6 +122,43 @@ nav ul a:hover { color: var(--ink); }
   to   { transform: translate(24px,18px) scale(1.06); }
 }
 
+/* ══════════════════════════════════════
+   HERO MARQUEE（スマホ専用）
+══════════════════════════════════════ */
+.hero-marquee-wrap {
+  display: none;
+  position: relative; z-index: 1;
+  width: 100%; overflow: hidden;
+  padding: 0.5rem 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+.hero-marquee-track {
+  display: flex; gap: 10px;
+  width: max-content;
+  will-change: transform;
+}
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(var(--marquee-shift)); }
+}
+.hero-marquee-track.running {
+  animation: marqueeScroll var(--marquee-dur, 18s) linear infinite;
+}
+.mq-cell {
+  flex-shrink: 0;
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1.25rem;
+  cursor: default;
+  animation: mqPulse 3.2s ease-in-out infinite;
+  animation-delay: var(--mq-delay, 0s);
+}
+@keyframes mqPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+
 .hero {
   position: relative; z-index: 1;
   min-height: 100svh;
@@ -430,7 +467,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 960px) {
-  .hero { grid-template-columns: 1fr; min-height: auto; padding: 7rem 1.75rem 3rem; gap: 2.5rem; }
+  .hero { grid-template-columns: 1fr; padding: 7rem 1.75rem 3rem; gap: 2.5rem; }
   .hero-visual { max-width: 320px; margin: 0 auto; gap: 8px; }
   .theme-grid { grid-template-columns: repeat(2,1fr); }
   .steps { grid-template-columns: repeat(2,1fr); }
@@ -479,11 +516,12 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   }
   .hero-ctas { justify-content: center; }
 
-  /* ◯グリッド: 残りスペースを上下で吸収して自然に下寄り */
-  .hero-visual {
-    max-width: 240px; gap: 6px; padding: 0;
-    margin: auto auto 0;
-    flex-shrink: 0;
+  /* ◯グリッド: スマホではマーキーに切り替え */
+  .hero-visual { display: none; }
+  .hero-marquee-wrap {
+    display: block;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
   }
 
   /* ── THEMES: 2×2グリッド ── */
@@ -516,6 +554,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
 @media (max-width: 390px) {
   .hero-visual { max-width: 200px; gap: 5px; }
+  .mq-cell { width: 44px; height: 44px; font-size: 1.05rem; }
 }
 </style>
 </head>
@@ -549,8 +588,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <div class="hero-label">Color Synesthesia</div>
 
       <h1>
-        <strong>あなたの</strong><strong class="hl-red">A</strong><strong>は</strong><br>
-        <strong>何</strong><strong class="hl-mint">色</strong><strong>ですか？</strong>
+        あなたの<strong class="hl-red">A</strong>は<br>
+        何<strong class="hl-mint">色</strong>ですか？
       </h1>
       <p class="hero-body">
         文字や数字に「色」を感じる——それが共感覚。<br>
@@ -564,6 +603,11 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
     <div class="hero-visual" id="heroVisual"></div>
   </section>
+
+  <!-- スマホ専用: 横スクロールマーキー -->
+  <div class="hero-marquee-wrap" id="heroMarqueeWrap" aria-hidden="true">
+    <div class="hero-marquee-track" id="heroMarqueeTrack"></div>
+  </div>
 </div>
 
 <!-- ══ HOW ══ -->
@@ -573,7 +617,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <h2 class="sec-title">4ステップ、<strong>2分</strong>で完成</h2>
     <div class="steps">
       <div class="step">
-        <div class="step-icon">💬</div>
+        <div class="step-icon">🎯</div>
         <div class="step-num">Step 01</div>
         <div class="step-title">テーマを選ぶ</div>
         <div class="step-desc">アルファベット・数字・教科など4種類から選ぼう</div>
@@ -607,8 +651,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <section class="themes" id="themes">
     <div class="sec-eyebrow">テーマ選択</div>
     <!-- ②タイトル変更 -->
-    <h2 class="sec-title"><strong>テーマ</strong>を選んで診断開始！
-    <p class="themes-lead"></p>
+    <h2 class="sec-title"><strong>テーマ</strong>を選んで診断開始！</h2>
+    <p class="themes-lead">気になるテーマを選んで、あなたの共感覚を確かめてみよう。</p>
     <div class="theme-grid">
 
       <a href="alphabet.html" class="theme-card">
@@ -716,7 +760,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="cta-actions">
     <!-- テーマ選択ページは存在しないためthemes セクションへスクロール -->
     <a href="#themes" class="btn-primary-dark" style="font-size:1rem;padding:0.9rem 2.2rem;">
-      2分で今すぐ診断 →
+      テーマを選ぶ →
     </a>
   </div>
 </div>
@@ -724,6 +768,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 <!-- ══ FOOTER ══ -->
 <footer>
   <span class="footer-logo">SynestheShare v2.0</span>
+  <span style="color:rgba(255,255,255,0.25);font-size:0.72rem;letter-spacing:0.06em;">#SynestheShare</span>
+  <a href="https://x.com/search?q=%23SynestheShare" target="_blank" rel="noopener" style="font-size:0.75rem;">X でシェアを見る</a>
 </footer>
 
 <script>
@@ -846,6 +892,62 @@ window.addEventListener('load', () => { syncCta(); setTimeout(syncCta, 200); });
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
+})();
+
+/* ══ スマホ専用 ヒーローマーキー ══ */
+(function() {
+  const wrap  = document.getElementById('heroMarqueeWrap');
+  const track = document.getElementById('heroMarqueeTrack');
+  if (!wrap || !track) return;
+  const ALL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const FULL_PALETTE = [
+    '#e03a2a','#e87820','#d4b800','#2a9e60','#1888c8','#7028c0','#d8306a',
+    '#1aaeaa','#e03a2a','#e87820','#d4b800','#2a9e60','#1888c8','#7028c0',
+    '#d8306a','#1aaeaa','#e03a2a','#e87820','#d4b800','#2a9e60','#1888c8',
+    '#7028c0','#d8306a','#1aaeaa','#e03a2a','#e87820',
+  ];
+  function createCell(letter, index) {
+    const cell = document.createElement('div');
+    cell.className = 'mq-cell';
+    const color = FULL_PALETTE[index % FULL_PALETTE.length];
+    const isFill = index % 2 === 0;
+    if (isFill) {
+      cell.style.background = color;
+      cell.style.color = '#fff';
+      cell.style.boxShadow = `0 4px 16px ${color}55`;
+    } else {
+      cell.style.background = 'rgba(255,255,255,0.82)';
+      cell.style.border = `2.5px solid ${color}`;
+      cell.style.color = color;
+      cell.style.backdropFilter = 'blur(6px)';
+      cell.style.webkitBackdropFilter = 'blur(6px)';
+    }
+    cell.style.setProperty('--mq-delay', (index * 0.12) + 's');
+    cell.textContent = letter;
+    return cell;
+  }
+  function buildTrack() {
+    track.innerHTML = '';
+    for (let set = 0; set < 2; set++) {
+      ALL_LETTERS.forEach((l, i) => track.appendChild(createCell(l, i)));
+    }
+  }
+  function startMarquee() {
+    buildTrack();
+    requestAnimationFrame(() => {
+      const cells = track.querySelectorAll('.mq-cell');
+      if (cells.length < 26) return;
+      let oneSetW = 0;
+      for (let i = 0; i < 26; i++) oneSetW += cells[i].getBoundingClientRect().width;
+      oneSetW += 10 * 26;
+      track.style.setProperty('--marquee-shift', `-${oneSetW}px`);
+      track.style.setProperty('--marquee-dur', `${oneSetW / 62}s`);
+      track.classList.add('running');
+    });
+  }
+  function init() { if (window.innerWidth <= 600) startMarquee(); }
+  if (document.readyState === 'complete') init();
+  else window.addEventListener('load', init);
 })();
 </script>
 </body>

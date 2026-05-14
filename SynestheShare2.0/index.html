@@ -43,8 +43,8 @@ body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflo
 ══════════════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: center;
-  padding: 1.44rem 2.5rem;
+  display: flex; align-items: center; justify-content: center; /* ①中央揃え */
+  padding: 0.9rem 2.5rem;
   background: rgba(247,247,245,0.75);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(224,224,220,0.8);
@@ -146,7 +146,6 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--jp); font-weight: 300;
   font-size: clamp(2.6rem, 5vw, 4.5rem);
   line-height: 1.25; letter-spacing: -0.01em; margin-bottom: 1.5rem;
-  word-break: keep-all; overflow-wrap: break-word;
 }
 .hero h1 strong { font-weight: 700; }
 .hero h1 .hl-red  { color: var(--c1); font-weight: 700; }
@@ -156,7 +155,6 @@ nav ul a:hover { color: var(--ink); }
   font-size: 0.92rem; color: var(--ink2);
   line-height: 1.9; max-width: 340px;
   margin-bottom: 2rem; font-weight: 300;
-  word-break: keep-all; overflow-wrap: break-word;
 }
 .hero-ctas { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
 
@@ -441,7 +439,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
 @media (max-width: 600px) {
   /* ── NAV ── */
-  nav { padding: 1.28rem 1.25rem; }
+  nav { padding: 0.8rem 1.25rem; }
   /* ①スマホ: ロゴをnavの高さに収まるよう縮小 */
   .nav-logo { left: 1.25rem; height: 24px; }
   /* スマホ: nav右上ボタン非表示 */
@@ -449,23 +447,43 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
   /* ── HERO: 中央揃え ── */
   .hero {
-    padding: 7rem 1.5rem 3.5rem;
-    gap: 1.75rem;
+    padding: 0 1.5rem;
+    padding-top: max(5.5rem, 18svh);
+    padding-bottom: 3rem;
+    gap: 0;
     text-align: center;
     min-height: 90svh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    justify-content: flex-start;
+    grid-template-columns: unset; /* 960px上書きリセット */
   }
-  .hero-text { display: flex; flex-direction: column; align-items: center; }
+  .hero-text {
+    display: flex; flex-direction: column; align-items: center;
+  }
   /* スマホでCOLOR SYNESTHESIAラベル非表示 */
   .hero-label { display: none; }
-  .hero-body { max-width: 100%; text-align: center; font-size: 0.88rem; margin-bottom: 1.75rem; }
-  .hero-ctas { justify-content: center; }
-  .hero h1 { font-size: clamp(2rem, 7.5vw, 2.8rem); margin-bottom: 1.25rem; }
 
-  /* ◯グリッド */
-  .hero-visual { max-width: 250px; gap: 6px; padding: 0; margin: 3rem auto 0; } /* ② 1.5rem→3rem */
+  /* フォントは元のwght300/700を維持（上書きしない） */
+  .hero h1 {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+    margin-bottom: 1.1rem;
+  }
+  .hero-body {
+    max-width: 92%;
+    text-align: center;
+    font-size: 0.86rem;
+    margin-bottom: 1.6rem;
+  }
+  .hero-ctas { justify-content: center; }
+
+  /* ◯グリッド: 残りスペースを上下で吸収して自然に下寄り */
+  .hero-visual {
+    max-width: 240px; gap: 6px; padding: 0;
+    margin: auto auto 0;
+    flex-shrink: 0;
+  }
 
   /* ── THEMES: 2×2グリッド ── */
   .themes { padding: 4rem 1.25rem; }
@@ -496,7 +514,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 }
 
 @media (max-width: 390px) {
-  .hero-visual { max-width: 210px; gap: 5px; }
+  .hero-visual { max-width: 200px; gap: 5px; }
 }
 </style>
 </head>
@@ -530,10 +548,12 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <div class="hero-label">Color Synesthesia</div>
 
       <h1>
-        あなたの<strong class="hl-red">A</strong>は<wbr>何<strong class="hl-mint">色</strong>ですか？
+        あなたの<strong class="hl-red">A</strong>は<br>
+        何<strong class="hl-mint">色</strong>ですか？
       </h1>
       <p class="hero-body">
-        文字や数字に「色」を感じる——<wbr>それが共感覚。<wbr>直感で色を選ぶだけ。<wbr>世界中の人と比べてみよう。
+        文字や数字に「色」を感じる——それが共感覚。<br>
+        直感で色を選ぶだけ。世界中の人と比べてみよう。
       </p>
       <div class="hero-ctas">
         <!-- クリックでテーマ選択セクションへスクロール。ボタン内に2分を記載 -->

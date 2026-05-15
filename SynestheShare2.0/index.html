@@ -438,7 +438,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 ══════════════════════════════════════ */
 .scroll-indicator {
   position: absolute;
-  bottom: 2rem;
+  bottom: 1.75rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -450,6 +450,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   opacity: 0;
   animation: si-fadein 0.6s ease 1.6s forwards;
   transition: opacity 0.4s ease;
+  pointer-events: auto;
 }
 .scroll-indicator.si-hidden {
   opacity: 0 !important;
@@ -460,23 +461,21 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 }
 .si-line {
   width: 1px;
-  height: 36px;
-  background: linear-gradient(to bottom, transparent 0%, rgba(80,80,76,0.25) 100%);
+  height: 32px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(80,80,76,0.28) 100%);
 }
 .si-ring {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 1px solid rgba(80,80,76,0.14);
-  background: rgba(247,247,245,0.5);
+  border: 1px solid rgba(80,80,76,0.15);
+  background: rgba(247,247,245,0.52);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow:
-    0 2px 20px rgba(0,0,0,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.6);
+  box-shadow: 0 2px 18px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6);
   transition:
     border-color 0.22s ease,
     background   0.22s ease,
@@ -495,7 +494,11 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   50%      { transform: translateY(5px); }
 }
 @media (max-width: 600px) {
-  .scroll-indicator { display: none; }
+  .scroll-indicator {
+    bottom: 1.25rem;
+  }
+  .si-ring { width: 36px; height: 36px; }
+  .si-line { height: 22px; }
 }
 
 /* ══════════════════════════════════════
@@ -627,12 +630,11 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <div class="hero-visual" id="heroVisual"></div>
   </section>
 
-  <!-- スクロールインジケーター（PC表示のみ・スマホはCSS非表示） -->
   <a href="#how" class="scroll-indicator" id="scrollIndicator" aria-label="下にスクロール">
     <div class="si-line"></div>
     <div class="si-ring">
-      <svg class="si-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M2 5L7 10L12 5" stroke="rgba(55,55,50,0.6)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg class="si-chevron" width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 4.5L6.5 9.5L11 4.5" stroke="rgba(55,55,50,0.62)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
   </a>
@@ -919,7 +921,7 @@ window.addEventListener('load', () => { syncCta(); setTimeout(syncCta, 200); });
   requestAnimationFrame(tick);
 })();
 
-/* ── スクロールインジケーター: 60px超えたら非表示 ── */
+/* ── スクロールインジケーター: 60px超で非表示 ── */
 (function(){
   var si = document.getElementById('scrollIndicator');
   if (!si) return;

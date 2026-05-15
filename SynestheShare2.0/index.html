@@ -507,11 +507,11 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   /* スマホ: nav右上ボタン非表示 */
   .nav-cta { display: none; }
 
-  /* ── HERO: 上下中央寄せ・余白コンパクト ── */
+  /* ── HERO: 中央揃え ── */
   .hero {
     padding: 0 1.5rem;
-    padding-top: max(4.5rem, 13svh);
-    padding-bottom: max(4rem, 10svh);
+    padding-top: 15.0rem;
+    padding-bottom: 11.0rem;
     gap: 0;
     text-align: center;
     min-height: unset;
@@ -524,22 +524,18 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .hero-text {
     display: flex; flex-direction: column; align-items: center;
   }
-  /* スマホでCOLOR SYNESTHESIAラベル非表示 */
   .hero-label { display: none; }
-
-  /* ◯グリッド: スマホでは非表示 */
   .hero-visual { display: none !important; }
 
-  /* フォントは元のwght300/700を維持（上書きしない） */
   .hero h1 {
     font-size: clamp(2rem, 8vw, 2.6rem);
-    margin-bottom: 0.85rem;
+    margin-bottom: 2.0rem;
   }
   .hero-body {
     max-width: 92%;
     text-align: center;
     font-size: 0.86rem;
-    margin-bottom: 1.4rem;
+    margin-bottom: 4.0rem;
   }
   .hero-ctas { justify-content: center; }
 

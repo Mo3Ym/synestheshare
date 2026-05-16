@@ -87,11 +87,35 @@ nav ul a:hover { color: var(--ink); }
 }
 
 /* ══════════════════════════════════════
+   パンくず（ロゴ直下・fixed）
+══════════════════════════════════════ */
+.breadcrumb-bar {
+  position: fixed;
+  /* navの高さ = 上下padding(0.9rem×2≒28.8px) + ロゴ高さ(32px) ≒ 61px */
+  top: calc(32px + 0.9rem * 2);
+  left: 2.5rem; /* ロゴと同じ横座標 */
+  z-index: 99;
+}
+.breadcrumb-bar .page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.45rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.breadcrumb-bar .page-breadcrumb::before { content: '←'; }
+.breadcrumb-bar .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
+
+@media (max-width: 600px) {
+  .breadcrumb-bar { left: 1.25rem; top: calc(24px + 1.08rem * 2); }
+}
+
+/* ══════════════════════════════════════
    PAGE HERO (診断ページ用コンパクト版)
 ══════════════════════════════════════ */
 .page-hero-wrap {
   position: relative; overflow: hidden;
-  padding-top: 5rem;
+  padding-top: 6.5rem; /* nav + パンくず分 */
   background: #16161a;
 }
 .page-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
@@ -121,15 +145,6 @@ nav ul a:hover { color: var(--ink); }
   padding: 3.5rem 2.5rem 2.5rem;
   display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
 }
-.page-breadcrumb {
-  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
-  letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink3);
-  display: flex; align-items: center; gap: 0.5rem;
-  text-decoration: none;
-}
-.page-breadcrumb:hover { color: var(--ink2); }
-.page-breadcrumb::before { content: '←'; font-family: var(--outfit); }
-
 .page-eyebrow {
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
   letter-spacing: 0.18em; text-transform: uppercase;
@@ -154,8 +169,15 @@ nav ul a:hover { color: var(--ink); }
 }
 
 /* ── HEROエリア ダークテーマ上書き ── */
-.page-hero-wrap .page-breadcrumb { color: rgba(255,255,255,0.38); }
-.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.7); }
+.page-hero-wrap .page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.5rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.page-hero-wrap .page-breadcrumb::before { content: '←'; font-family: var(--outfit); }
+.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
 .page-hero-wrap .page-eyebrow { color: rgba(255,255,255,0.35); }
 .page-hero-wrap .page-eyebrow::before { background: rgba(255,255,255,0.25); }
 .page-hero-wrap .page-title { color: rgba(255,255,255,0.92); }
@@ -468,8 +490,10 @@ nav ul a:hover { color: var(--ink); }
   border: 1px solid var(--border); border-radius: 8px;
   font-size: 0.78rem; color: var(--ink3); line-height: 1.6;
   display: flex; align-items: flex-start; gap: 0.6rem;
+  min-width: 0;
 }
 .hint-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+.hint span { min-width: 0; overflow-wrap: break-word; }
 
 /* ══════════════════════════════════════
    FOOTER
@@ -546,6 +570,11 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   </div>
 </nav>
 
+<!-- ══ パンくず（ロゴ直下・fixed） ══ -->
+<div class="breadcrumb-bar">
+  <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
+</div>
+
 <!-- ══ PAGE HERO ══ -->
 <div class="page-hero-wrap">
   <div class="page-blob page-blob-1" id="pageBlob1"></div>
@@ -553,7 +582,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="page-blob page-blob-3" id="pageBlob3"></div>
 
   <div class="page-hero">
-    <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
     <div class="page-eyebrow">No. 01 — Alphabet</div>
     <h1 class="page-title">
       <strong class="hl-red">A〜Z</strong>は<wbr>何色ですか？

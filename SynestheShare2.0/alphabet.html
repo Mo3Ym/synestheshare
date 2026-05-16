@@ -38,6 +38,13 @@
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
 
+/* wbr対応 */
+h1, h2, h3, p, .page-title, .page-lead, .mode-label,
+.picker-title, .hint, .result-title, .result-meta,
+nav ul a, .page-eyebrow, .page-breadcrumb {
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
 /* ══════════════════════════════════════
    NAV
 ══════════════════════════════════════ */
@@ -84,18 +91,24 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 .page-hero-wrap {
   position: relative; overflow: hidden;
-  padding-top: 5rem; /* nav分 */
+  padding-top: 5rem;
+  background: #16161a;
 }
-.page-blob { position: absolute; border-radius: 50%; filter: blur(72px); pointer-events: none; z-index: 0; }
+.page-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
 .page-blob-1 {
-  width: max(500px, 90vw); height: max(500px, 90vw);
-  top: -20%; left: -15%;
+  width: max(480px, 80vw); height: max(480px, 80vw);
+  top: -25%; left: -12%;
   animation: blobdrift 9s ease-in-out infinite alternate;
 }
 .page-blob-2 {
-  width: max(380px, 65vw); height: max(380px, 65vw);
-  top: 10%; right: -18%;
+  width: max(360px, 60vw); height: max(360px, 60vw);
+  top: 5%; right: -15%;
   animation: blobdrift 12s ease-in-out infinite alternate-reverse;
+}
+.page-blob-3 {
+  width: max(300px, 50vw); height: max(300px, 50vw);
+  bottom: -10%; left: 30%;
+  animation: blobdrift 10s ease-in-out infinite alternate;
 }
 @keyframes blobdrift {
   from { transform: translate(0,0) scale(1); }
@@ -140,7 +153,17 @@ nav ul a:hover { color: var(--ink); }
   word-break: keep-all; overflow-wrap: break-word;
 }
 
-/* 進捗バー */
+/* ── HEROエリア ダークテーマ上書き ── */
+.page-hero-wrap .page-breadcrumb { color: rgba(255,255,255,0.38); }
+.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.7); }
+.page-hero-wrap .page-eyebrow { color: rgba(255,255,255,0.35); }
+.page-hero-wrap .page-eyebrow::before { background: rgba(255,255,255,0.25); }
+.page-hero-wrap .page-title { color: rgba(255,255,255,0.92); }
+.page-hero-wrap .page-lead { color: rgba(255,255,255,0.5); }
+.page-hero-wrap .progress-label { color: rgba(255,255,255,0.3); }
+.page-hero-wrap .progress-count { color: rgba(255,255,255,0.55); }
+.page-hero-wrap .progress-track { background: rgba(255,255,255,0.1); }
+.page-hero-wrap .progress-bar-wrap { border-top: none; }
 .progress-bar-wrap {
   width: 100%; max-width: 900px;
   margin: 0 auto 0;
@@ -169,26 +192,26 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 .main-outer {
   position: relative; overflow: hidden;
-  background: #efefed;
-  border-top: 1px solid var(--border);
+  background: #e4e4e0;
+  border-top: 1px solid #d4d4d0;
 }
 /* ABOUTセクション風blob */
 .main-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
 .main-blob-1 {
   width: min(520px, 55vw); height: min(520px, 55vw);
-  background: radial-gradient(circle, rgba(26,174,170,0.13) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(26,174,170,0.18) 0%, transparent 70%);
   top: -10%; right: -5%;
   animation: blobdrift 10s ease-in-out infinite alternate;
 }
 .main-blob-2 {
   width: min(400px, 42vw); height: min(400px, 42vw);
-  background: radial-gradient(circle, rgba(112,40,192,0.10) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(112,40,192,0.14) 0%, transparent 70%);
   bottom: 5%; left: -5%;
   animation: blobdrift 13s ease-in-out infinite alternate-reverse;
 }
 .main-blob-3 {
   width: min(350px, 38vw); height: min(350px, 38vw);
-  background: radial-gradient(circle, rgba(232,120,32,0.09) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(232,120,32,0.13) 0%, transparent 70%);
   top: 40%; left: 30%;
   animation: blobdrift 11s ease-in-out infinite alternate;
 }
@@ -273,16 +296,18 @@ nav ul a:hover { color: var(--ink); }
   z-index: 200;
   display: flex; align-items: flex-end; justify-content: center;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.22s ease;
+  /* opacityをpanelにかけない → backdropのblur遅延を防ぐ */
 }
-.picker-panel.active { pointer-events: auto; opacity: 1; }
+.picker-panel.active { pointer-events: auto; }
 
 .picker-backdrop {
   position: absolute; inset: 0;
   background: rgba(24,24,24,0.32);
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
 }
+.picker-panel.active .picker-backdrop { opacity: 1; }
 
 .picker-sheet {
   position: relative; z-index: 1;
@@ -292,7 +317,7 @@ nav ul a:hover { color: var(--ink); }
   border-radius: 20px 20px 0 0;
   padding: 1.5rem 1.75rem 2.5rem;
   width: 100%; max-width: 520px;
-  transform: translateY(20px);
+  transform: translateY(100%);
   transition: transform 0.32s cubic-bezier(.34,1.4,.64,1);
   box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
 }
@@ -326,12 +351,13 @@ nav ul a:hover { color: var(--ink); }
 .swatches-section { margin-bottom: 1.25rem; }
 .swatches-label { font-family: var(--outfit); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.6rem; }
 .swatches {
-  display: flex; flex-wrap: wrap; gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
 }
 .swatch {
-  width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent;
+  width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent;
   cursor: pointer; transition: transform 0.18s cubic-bezier(.34,1.56,.64,1), border-color 0.15s;
-  flex-shrink: 0;
 }
 .swatch:hover { transform: scale(1.15); }
 .swatch.active { border-color: var(--ink); transform: scale(1.1); }
@@ -496,7 +522,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .alpha-grid.mode-26 { grid-template-columns: repeat(5, 1fr); gap: 8px; }
 
   .picker-sheet { border-radius: 16px 16px 0 0; padding: 1.25rem 1.25rem 2rem; }
-  .swatch { width: 28px; height: 28px; }
 
   .result-palette { gap: 5px; }
   .palette-dot { width: 30px; height: 30px; }
@@ -525,6 +550,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 <div class="page-hero-wrap">
   <div class="page-blob page-blob-1" id="pageBlob1"></div>
   <div class="page-blob page-blob-2" id="pageBlob2"></div>
+  <div class="page-blob page-blob-3" id="pageBlob3"></div>
 
   <div class="page-hero">
     <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
@@ -636,11 +662,21 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
 const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const PRESET_COLORS = [
-  '#e03a2a','#e87820','#d4b800','#f0e040','#2a9e60',
-  '#1aaeaa','#1888c8','#7028c0','#d8306a','#181818',
-  '#888880','#ffffff',
+  '#e03a2a', // 赤
+  '#e87820', // 橙
+  '#f0e040', // 黄
+  '#a8d020', // 黄緑
+  '#2a9e60', // 緑
+  '#1888c8', // 青
+  '#70cbff', // 水色
+  '#7028c0', // 紫
+  '#ff90b8', // ピンク
+  '#8b4513', // 茶色
+  '#181818', // 黒
+  '#888880', // グレー
+  '#ffffff', // 白
 ];
-const PRESET_LABELS = ['赤','橙','黄緑','黄','緑','ミント','青','紫','ピンク','黒','グレー','白'];
+const PRESET_LABELS = ['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'];
 
 /* ══ 状態 ══ */
 let colorMap = {};
@@ -873,11 +909,9 @@ function isBright(hex) {
 // 選択色を暗くした「縁取り用カラー」を生成（黒にならないよう下限あり）
 function getDarkenedColor(hex) {
   const { h, s, l } = rgbToHsl(hex);
-  // L値は元の40〜55%に抑える（黄色など高輝度色でも暗くなりすぎない）
-  // 下限を0.18に設けて黒化を防ぐ
   const newL = Math.max(0.18, l * 0.48);
-  // 彩度は高めに保つ（くすまない）
-  const newS = Math.min(1, Math.max(s, 0.65));
+  // 無彩色（白・グレー）は彩度を上げずそのままグレー系にする
+  const newS = isAchromatic(hex) ? Math.min(s, 0.08) : Math.min(1, Math.max(s, 0.65));
   function hslToHex(hh, ss, ll) {
     const k = n => (n + hh/30) % 12;
     const a = ss * Math.min(ll, 1-ll);
@@ -1035,11 +1069,13 @@ function showToast(msg) {
 (function() {
   const b1 = document.getElementById('pageBlob1');
   const b2 = document.getElementById('pageBlob2');
+  const b3 = document.getElementById('pageBlob3');
   if (!b1 || !b2) return;
   const blobs = [
-    { el: b1, hue: 0,   speed: 72, alpha: 0.28 },
-    { el: b2, hue: 200, speed: 55, alpha: 0.22 },
-  ];
+    { el: b1, hue: 240, speed: 14, alpha: 0.55, sat: 55, lit: 28 }, // 深い青紫
+    { el: b2, hue: 340, speed: 10, alpha: 0.42, sat: 60, lit: 24 }, // 深い赤
+    { el: b3, hue: 180, speed: 18, alpha: 0.32, sat: 50, lit: 22 }, // 深いティール
+  ].filter(b => b.el);
   function hslToRgba(h, s, l, a) {
     h = h % 360; s /= 100; l /= 100;
     const k = n => (n + h / 30) % 12;
@@ -1047,7 +1083,7 @@ function showToast(msg) {
     return `rgba(${Math.round(f(0)*255)},${Math.round(f(8)*255)},${Math.round(f(4)*255)},${a})`;
   }
   function setColor(b) {
-    b.el.style.background = `radial-gradient(circle, ${hslToRgba(b.hue, 85, 58, b.alpha)} 0%, transparent 70%)`;
+    b.el.style.background = `radial-gradient(circle, ${hslToRgba(b.hue, b.sat, b.lit, b.alpha)} 0%, transparent 68%)`;
   }
   blobs.forEach(setColor);
   let last = null;

@@ -765,7 +765,7 @@ function updatePickerPreview(color) {
     const dark = getDarkenedColor(color);
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#ffffff';
-    pickerPreview.style.border = `3px solid ${dark}`;
+    pickerPreview.style.border = `1.5px solid ${dark}`;
     pickerPreview.style.textShadow = `0 0 3px ${dark}, 0 0 6px ${dark}aa`;
   } else {
     pickerPreview.style.background = color;
@@ -866,9 +866,9 @@ function rgbToHsl(hex) {
 function isAchromatic(hex) {
   return rgbToHsl(hex).s < 0.12;
 }
-// 淡色判定（縁取りが必要なレベルに明るい）
+// 淡色判定（白に近いレベルのみ縁取りが必要）
 function isBright(hex) {
-  return getLuminance(hex) > 0.30;
+  return getLuminance(hex) > 0.88;
 }
 // 選択色を暗くした「縁取り用カラー」を生成（黒にならないよう下限あり）
 function getDarkenedColor(hex) {
@@ -900,7 +900,7 @@ function applyColor(letter, color) {
     if (isBright(color)) {
       // 淡色：常に白文字 + 選択色の濃いバージョンで縁取り
       const dark = getDarkenedColor(color);
-      bubble.style.border = `3px solid ${dark}`;
+      bubble.style.border = `1.5px solid ${dark}`;
       bubble.style.boxShadow = `inset 0 0 0 2px ${dark}20`;
       span.style.color = '#ffffff';
       span.style.textShadow = `0 0 3px ${dark}, 0 0 6px ${dark}aa`;

@@ -203,10 +203,21 @@ nav ul a:hover { color: var(--ink); }
 .vote-list { display: flex; flex-direction: column; gap: 1.4rem; }
 .vote-item { display: flex; flex-direction: column; gap: 0.4rem; }
 
-/* バッジ＋バー行：バッジ中心 = バーtrack中心になるよう下揃え→paddingで調整 */
+/*
+  ③④ バッジ中心線 = trackの中心線を完全に揃える設計：
+  - マーカー(あなた▼)の高さを --marker-h として定義
+  - vote-stacked-outer は padding-top: var(--marker-h) を持つ（マーカー分の空間）
+  - vote-letter-badge も同じ padding-top を持つ
+  - align-items: flex-end でtrack下端を揃えると、
+    バッジ中心(padding-top + 30px/2) と track中心(padding-top + 18px/2) がずれる
+  → align-items: flex-end ではなく、outerとバッジの「trackの中心」を揃えるために
+     バッジに margin-top: var(--marker-h) + (18px-30px)/2 を付与する
+*/
+:root { --marker-h: 26px; } /* "あなた"テキスト＋▼の合計高さ */
+
 .vote-item-row {
   display: flex;
-  align-items: flex-end; /* バーtrackの下端を基準に揃える */
+  align-items: flex-start; /* outerとバッジを上端基準で揃える */
   gap: 0.65rem;
 }
 .vote-letter-badge {
@@ -214,37 +225,19 @@ nav ul a:hover { color: var(--ink); }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.82rem;
   flex-shrink: 0;
-  /* trackの高さ18pxに対してバッジ30px → 差は12px、中心を揃えるには6px下にずらす */
-  margin-bottom: calc((18px - 30px) / 2 * -1); /* = 6px 下にオフセット */
+  /*
+    outerのpadding-top(=marker-h)分下げたうえで、
+    trackの中心(9px)とバッジの中心(15px)の差(6px)を引く
+    → margin-top = marker-h + (18/2 - 30/2) = marker-h - 6px
+  */
+  margin-top: calc(var(--marker-h) - 6px);
 }
 
-/* 積み上げバー：マーカー分の上余白を外から確保 */
+/* outerはpadding-topでマーカーのスペースを確保 */
 .vote-stacked-outer {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-/* マーカー行（バーの上） */
-.vote-marker-row {
-  height: 22px; /* ▼ + "あなた" テキスト分の高さ */
   position: relative;
-  pointer-events: none;
-}
-/* ▼マーカー本体 */
-.vote-mine-marker {
-  position: absolute;
-  bottom: 0; /* バーの直上に▼がくるよう下揃え */
-  font-family: var(--outfit); font-size: 0.55rem; font-weight: 700;
-  color: var(--ink); white-space: nowrap;
-  display: flex; flex-direction: column; align-items: center;
-  transform: translateX(-50%);
-  line-height: 1.2;
-}
-.vote-mine-marker::after {
-  content: '▼';
-  font-size: 0.5rem;
-  color: var(--ink);
+  padding-top: var(--marker-h);
 }
 
 /* 積み上げバー本体 */
@@ -254,30 +247,61 @@ nav ul a:hover { color: var(--ink); }
 }
 .vote-stacked-seg {
   height: 100%; flex-shrink: 0;
-  width: 0%; /* アニメーション初期値 */
+  width: 0%;
 }
-/* overflow:hiddenのため角丸は最初と最後だけ視覚的に出る */
 .vote-stacked-seg:first-child { border-radius: 100px 0 0 100px; }
 .vote-stacked-seg:last-child  { border-radius: 0 100px 100px 0; }
 .vote-stacked-seg:only-child  { border-radius: 100px; }
 
+/* ② ▼マーカー：outerのpadding-top領域内にabsoluteで配置 */
+.vote-mine-marker {
+  position: absolute;
+  top: 0;          /* outerの上端 = padding-topの開始位置 */
+  height: var(--marker-h);
+  font-family: var(--outfit); font-size: 0.55rem; font-weight: 700;
+  color: var(--ink); white-space: nowrap;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  transform: translateX(-50%);
+  line-height: 1.3;
+  pointer-events: none;
+  padding-bottom: 2px;
+}
+.vote-mine-marker::after {
+  content: '▼'; /* ② ▲→▼に変更 */
+  font-size: 0.5rem;
+  color: var(--ink);
+  line-height: 1;
+}
+
 /* 凡例（バーの下） */
 .vote-legend {
   display: flex; flex-wrap: wrap; gap: 0.25rem 0.85rem;
-  padding-left: calc(30px + 0.65rem); /* ④ バッジ幅分インデント */
+  padding-left: calc(30px + 0.65rem);
 }
 .vote-legend-item {
-  display: flex; align-items: center; gap: 0.3rem;
+  display: flex; align-items: baseline; gap: 0.3rem;
 }
 .vote-legend-dot {
   width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.08);
+  align-self: center;
 }
-.vote-legend-label { font-size: 0.7rem; color: var(--ink3); }
-.vote-legend-pct { font-family: var(--outfit); font-size: 0.7rem; font-weight: 700; color: var(--ink2); }
+.vote-legend-label { font-size: 0.7rem; color: var(--ink3); line-height: 1; }
+.vote-legend-pct { font-family: var(--outfit); font-size: 0.7rem; font-weight: 700; color: var(--ink2); line-height: 1; }
 
 /* 選択なしの文字 */
 .vote-skipped { font-size: 0.78rem; color: var(--ink3); font-style: italic; }
+
+/* 少数派（グラフ外）テキスト */
+.vote-outlier {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding-left: calc(30px + 0.65rem);
+  font-size: 0.72rem; color: var(--ink3); line-height: 1.5;
+}
+.vote-outlier-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.vote-outlier strong { color: var(--ink2); font-weight: 700; }
 
 /* ══ 診断スコア ══ */
 .diagnosis-grid {
@@ -507,7 +531,7 @@ const DUMMY_VOTES = {
   B: [{color:'#1888c8',name:'青',pct:62},{color:'#7028c0',name:'紫',pct:20},{color:'#181818',name:'黒',pct:11},{color:'#70cbff',name:'水色',pct:7}],
   C: [{color:'#f0e040',name:'黄',pct:44},{color:'#e87820',name:'橙',pct:28},{color:'#a8d020',name:'黄緑',pct:16},{color:'#e03a2a',name:'赤',pct:12}],
   D: [{color:'#2a9e60',name:'緑',pct:38},{color:'#a8d020',name:'黄緑',pct:30},{color:'#1888c8',name:'青',pct:20},{color:'#181818',name:'黒',pct:12}],
-  E: [{color:'#2a9e60',name:'緑',pct:46},{color:'#f0e040',name:'黄',pct:26},{color:'#1aaeaa',name:'ティール',pct:18},{color:'#e03a2a',name:'赤',pct:10}],
+  E: [{color:'#2a9e60',name:'緑',pct:52},{color:'#f0e040',name:'黄',pct:30},{color:'#e03a2a',name:'赤',pct:18}],
   F: [{color:'#e87820',name:'橙',pct:35},{color:'#e03a2a',name:'赤',pct:28},{color:'#f0e040',name:'黄',pct:22},{color:'#ff90b8',name:'ピンク',pct:15}],
   G: [{color:'#a8d020',name:'黄緑',pct:40},{color:'#2a9e60',name:'緑',pct:35},{color:'#f0e040',name:'黄',pct:15},{color:'#888880',name:'グレー',pct:10}],
   H: [{color:'#e03a2a',name:'赤',pct:30},{color:'#e87820',name:'橙',pct:28},{color:'#7028c0',name:'紫',pct:24},{color:'#1888c8',name:'青',pct:18}],
@@ -522,7 +546,7 @@ const DUMMY_VOTES = {
   Q: [{color:'#888880',name:'グレー',pct:36},{color:'#181818',name:'黒',pct:32},{color:'#7028c0',name:'紫',pct:20},{color:'#1888c8',name:'青',pct:12}],
   R: [{color:'#e03a2a',name:'赤',pct:72},{color:'#e87820',name:'橙',pct:16},{color:'#f0e040',name:'黄',pct:8},{color:'#7028c0',name:'紫',pct:4}],
   S: [{color:'#f0e040',name:'黄',pct:36},{color:'#1888c8',name:'青',pct:26},{color:'#e03a2a',name:'赤',pct:22},{color:'#2a9e60',name:'緑',pct:16}],
-  T: [{color:'#1888c8',name:'青',pct:40},{color:'#70cbff',name:'水色',pct:28},{color:'#1aaeaa',name:'ティール',pct:20},{color:'#888880',name:'グレー',pct:12}],
+  T: [{color:'#1888c8',name:'青',pct:48},{color:'#70cbff',name:'水色',pct:36},{color:'#888880',name:'グレー',pct:16}],
   U: [{color:'#7028c0',name:'紫',pct:38},{color:'#1888c8',name:'青',pct:30},{color:'#ff90b8',name:'ピンク',pct:20},{color:'#e87820',name:'橙',pct:12}],
   V: [{color:'#7028c0',name:'紫',pct:44},{color:'#e03a2a',name:'赤',pct:26},{color:'#1888c8',name:'青',pct:18},{color:'#181818',name:'黒',pct:12}],
   W: [{color:'#ffffff',name:'白',pct:42},{color:'#888880',name:'グレー',pct:32},{color:'#1888c8',name:'青',pct:16},{color:'#70cbff',name:'水色',pct:10}],
@@ -530,6 +554,39 @@ const DUMMY_VOTES = {
   Y: [{color:'#f0e040',name:'黄',pct:66},{color:'#a8d020',name:'黄緑',pct:18},{color:'#e87820',name:'橙',pct:10},{color:'#2a9e60',name:'緑',pct:6}],
   Z: [{color:'#1888c8',name:'青',pct:36},{color:'#181818',name:'黒',pct:30},{color:'#888880',name:'グレー',pct:20},{color:'#7028c0',name:'紫',pct:14}],
 };
+
+/* ══ alphabetのプリセット13色（ティールなし） ══ */
+const ALPHABET_PRESETS = [
+  {color:'#e03a2a', name:'赤'},
+  {color:'#e87820', name:'橙'},
+  {color:'#f0e040', name:'黄'},
+  {color:'#a8d020', name:'黄緑'},
+  {color:'#2a9e60', name:'緑'},
+  {color:'#1888c8', name:'青'},
+  {color:'#70cbff', name:'水色'},
+  {color:'#7028c0', name:'紫'},
+  {color:'#ff90b8', name:'ピンク'},
+  {color:'#8b4513', name:'茶色'},
+  {color:'#181818', name:'黒'},
+  {color:'#888880', name:'グレー'},
+  {color:'#ffffff', name:'白'},
+];
+
+/* カスタム色 → 最近傍プリセット色に変換（Lab近似としてrgbユークリッド距離） */
+function snapToPreset(hex) {
+  if (!hex) return hex;
+  // すでにプリセットなら即返す
+  if (ALPHABET_PRESETS.some(p => p.color === hex)) return hex;
+  const { r: r0, g: g0, b: b0 } = hexToRgb(hex);
+  let best = ALPHABET_PRESETS[0].color, bestDist = Infinity;
+  ALPHABET_PRESETS.forEach(p => {
+    const { r, g, b } = hexToRgb(p.color);
+    // 明度重み付きユークリッド距離（人間の色知覚に近い近似）
+    const dist = 2*(r-r0)**2 + 4*(g-g0)**2 + 3*(b-b0)**2;
+    if (dist < bestDist) { bestDist = dist; best = p.color; }
+  });
+  return best;
+}
 
 /* ══ URLパラメータ解析 ══ */
 const params = new URLSearchParams(location.search);
@@ -541,7 +598,7 @@ const letters = isFullMode ? LETTERS_26 : LETTERS_10;
 const colorMap = {};
 letters.forEach(l => {
   const c = params.get(l);
-  if (c) colorMap[l] = c;
+  if (c) colorMap[l] = snapToPreset(c); // カスタム色は最近傍プリセットに変換
 });
 
 /* ══ 色名を取得（プリセット照合、なければ概算） ══ */
@@ -609,6 +666,7 @@ function buildHeroPalette() {
     dot.className = 'hero-dot';
     if (c) {
       dot.style.background = c;
+      if (isBright(c)) dot.style.boxShadow = 'inset 0 0 0 1.5px rgba(0,0,0,0.15)';
       dot.innerHTML = `<div class="hero-dot-label" style="color:${textColorFor(c)}">${l}</div>`;
     } else {
       dot.style.background = 'rgba(255,255,255,0.08)';
@@ -676,57 +734,58 @@ function buildVoteSection(coloredLetters) {
     const votes = DUMMY_VOTES[l] || [];
     if (!votes.length) return;
 
-    // 自分の色が何位か（完全一致→近似hue）
-    const myH = rgbToHsl(myColor).h;
-    let myMatchIdx = votes.findIndex(v => v.color === myColor);
-    if (myMatchIdx === -1) {
-      let minDiff = 999;
-      votes.forEach((v, i) => {
-        const diff = Math.min(Math.abs(rgbToHsl(v.color).h - myH), 360 - Math.abs(rgbToHsl(v.color).h - myH));
-        if (diff < minDiff) { minDiff = diff; myMatchIdx = i; }
-      });
+    // 自分の色が完全一致で何位か（一致なし → outlier）
+    const myMatchIdx = votes.findIndex(v => v.color === myColor);
+    const isOutlier = myMatchIdx === -1;
+
+    // マーカー位置（完全一致時のみ）
+    let markerLeftPct = 0;
+    if (!isOutlier) {
+      let accBefore = 0;
+      for (let i = 0; i < myMatchIdx; i++) accBefore += votes[i].pct;
+      markerLeftPct = accBefore + votes[myMatchIdx].pct / 2;
     }
 
-    // ② ▼の位置 = 自分セグメントの左端累積 + セグメント幅の半分（中央）
-    let accBefore = 0;
-    for (let i = 0; i < myMatchIdx; i++) accBefore += votes[i].pct;
-    const mySegPct = votes[myMatchIdx].pct;
-    const markerLeftPct = accBefore + mySegPct / 2; // セグメント中央
-
-    // ① 積み上げセグメントHTML（全色）
+    // 積み上げセグメントHTML（全色）
     let segsHtml = '';
-    votes.forEach((v, i) => {
+    votes.forEach((v) => {
       segsHtml += `<div class="vote-stacked-seg"
         style="background:${v.color}"
         data-pct="${v.pct}"></div>`;
     });
 
-    // ③ 凡例：「←あなた」なし、色ドット＋名前＋%のみ
+    // 凡例：色ドット＋名前＋%のみ
     let legendHtml = '<div class="vote-legend">';
     votes.forEach((v) => {
       legendHtml += `<div class="vote-legend-item">
-        <div class="vote-legend-dot" style="background:${v.color}"></div>
+        <div class="vote-legend-dot" style="background:${v.color}${isBright(v.color)?';box-shadow:inset 0 0 0 1px rgba(0,0,0,0.12)':''}"></div>
         <span class="vote-legend-label">${v.name}</span>
         <span class="vote-legend-pct">${v.pct}%</span>
       </div>`;
     });
     legendHtml += '</div>';
 
-    // ④ 構造：vote-item-rowでバッジとstacked-outerをalign-items:centerで並べる
-    //    stacked-outerの中にmarker-row（高さ固定）+ trackを縦に並べ
-    //    バッジの中心 = trackの中心になるようCSS側でalign-items:centerを使用
+    // outlier時：「あなた」マーカーなし、代わりに少数派テキスト
+    const markerHtml = isOutlier
+      ? '' // マーカーなし（vote-marker-rowは高さ確保のため残す）
+      : `<div class="vote-mine-marker" style="left:${markerLeftPct}%"><span>あなた</span></div>`;
+
+    const outlierHtml = isOutlier
+      ? `<div class="vote-outlier">
+          <div class="vote-outlier-dot" style="background:${myColor};${isBright(myColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':''}"></div>
+          <span>あなたの選んだ<strong>${getColorName(myColor)}</strong>は、上位に入らない希少な選択です</span>
+        </div>`
+      : '';
+
     html += `<div class="vote-item">
       <div class="vote-item-row">
-        <div class="vote-letter-badge" style="background:${myColor};color:${textColorFor(myColor)}">${l}</div>
+        <div class="vote-letter-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':''}">${l}</div>
         <div class="vote-stacked-outer">
-          <div class="vote-marker-row">
-            <div class="vote-mine-marker" style="left:${markerLeftPct}%">
-              <span>あなた</span>
-            </div>
-          </div>
+          <div class="vote-marker-row">${markerHtml}</div>
           <div class="vote-stacked-track">${segsHtml}</div>
         </div>
       </div>
+      ${outlierHtml}
       ${legendHtml}
     </div>`;
   });
@@ -772,7 +831,7 @@ function buildShareSection(diag) {
 
   // シェアカードのドット
   const dots = coloredLetters.map(l =>
-    `<div class="share-card-dot" style="background:${colorMap[l]};border:1px solid rgba(255,255,255,0.12)"></div>`
+    `<div class="share-card-dot" style="background:${colorMap[l]};${isBright(colorMap[l])?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'border:1px solid rgba(255,255,255,0.12)'}"></div>`
   ).join('');
 
   // Xシェアテキスト

@@ -39,27 +39,37 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h);
   display: flex; align-items: center; justify-content: center;
   padding: 0 1.5rem;
-  background: rgba(22,22,26,0.82);
+  background: rgba(247,247,245,0.82);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
+  transition: background 0.3s, border-color 0.3s;
+}
+nav.nav-dark {
+  background: rgba(22,22,26,0.88);
+  border-bottom-color: rgba(255,255,255,0.06);
 }
 .nav-logo {
   position: absolute; left: 1.5rem;
   display: flex; align-items: center; text-decoration: none; height: 26px;
 }
-.nav-logo img { height: 100%; width: auto; display: block; filter: brightness(0) invert(1) opacity(0.8); }
+.nav-logo img { height: 100%; width: auto; display: block; transition: filter 0.3s; }
+nav.nav-dark .nav-logo img { filter: brightness(0) invert(1) opacity(0.8); }
 .nav-right { position: absolute; right: 1.5rem; }
 nav ul { list-style: none; display: flex; gap: 1.8rem; }
-nav ul a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
-nav ul a:hover { color: rgba(255,255,255,0.85); }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+nav ul a:hover { color: var(--ink); }
+nav.nav-dark ul a { color: rgba(255,255,255,0.45); }
+nav.nav-dark ul a:hover { color: rgba(255,255,255,0.85); }
 
 .nav-back {
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
-  letter-spacing: 0.1em; color: rgba(255,255,255,0.4);
+  letter-spacing: 0.1em; color: var(--ink3);
   text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
   transition: color 0.15s;
 }
-.nav-back:hover { color: rgba(255,255,255,0.8); }
+.nav-back:hover { color: var(--ink); }
+nav.nav-dark .nav-back { color: rgba(255,255,255,0.4); }
+nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 @keyframes blobdrift {
   from { transform: translate(0,0) scale(1); }
@@ -71,15 +81,15 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
 .page-outer {
   min-height: 100vh;
   padding-top: var(--nav-h);
-  background: #16161a;
 }
 
-/* ══ タイプカード（ファーストビュー主役） ══ */
+/* ══ タイプカード（ファーストビュー・明るい背景） ══ */
 .type-hero {
   position: relative; overflow: hidden;
-  padding: 2.5rem 1.5rem 2rem;
+  padding: 2.5rem 1.5rem 5rem;
   min-height: calc(100svh - var(--nav-h));
   display: flex; flex-direction: column; justify-content: center;
+  background: var(--bg);
 }
 .type-hero-blob {
   position: absolute; border-radius: 50%; filter: blur(70px);
@@ -105,16 +115,16 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
 .type-eyebrow {
   font-family: var(--outfit); font-size: 0.65rem; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(255,255,255,0.28);
+  color: var(--ink3);
   display: flex; align-items: center; gap: 0.5rem;
 }
-.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; background: rgba(255,255,255,0.2); }
+.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; background: var(--ink3); }
 
 /* あなたの共感覚タイプ ラベル */
 .type-label {
   font-family: var(--jp); font-weight: 300;
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.4); line-height: 1;
+  color: var(--ink3); line-height: 1;
   letter-spacing: 0.02em;
 }
 
@@ -122,24 +132,24 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
 .type-name {
   font-family: var(--jp); font-weight: 700;
   font-size: clamp(1.7rem, 5.5vw, 2.6rem);
-  color: rgba(255,255,255,0.95); line-height: 1.2;
+  color: var(--ink); line-height: 1.2;
   letter-spacing: -0.02em;
 }
 .type-name-sep {
   font-weight: 300;
-  color: rgba(255,255,255,0.3);
+  color: var(--ink3);
   margin: 0 0.15em;
 }
 
-/* 一致率・レア度・タイプ診断 — 3列横並び */
+/* 一致率・レア度 */
 .type-stats {
   display: flex; gap: 0; margin-top: 0.2rem;
 }
 .type-stat {
   display: flex; flex-direction: column; gap: 0.15rem;
   padding: 0.75rem 0.85rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.08);
   flex: 1;
 }
 .type-stat:first-child { border-radius: 12px 0 0 12px; }
@@ -148,24 +158,24 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
 .type-stat-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3); line-height: 1;
+  color: var(--ink3); line-height: 1;
 }
 .type-stat-value {
   font-family: var(--outfit); font-weight: 700;
   font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1;
-  color: rgba(255,255,255,0.92);
+  color: var(--ink);
 }
-.type-stat-sub { font-size: 0.62rem; color: rgba(255,255,255,0.28); line-height: 1.3; }
+.type-stat-sub { font-size: 0.62rem; color: var(--ink3); line-height: 1.3; }
 /* タイプ診断欄（日本語は視覚的に圧力が強いため数値より少し小さく） */
 .type-stat-type {
   font-family: var(--jp); font-weight: 700;
   font-size: clamp(1.15rem, 3.5vw, 1.55rem); line-height: 1.15;
-  color: rgba(255,255,255,0.88);
+  color: var(--ink);
   margin-top: 0.05rem;
 }
 .type-stat-denom {
   font-size: 0.55em; font-weight: 400;
-  color: rgba(255,255,255,0.35);
+  color: var(--ink3);
   letter-spacing: 0;
   vertical-align: baseline;
   margin-left: 1px;
@@ -193,12 +203,70 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
   color: rgba(255,255,255,0.18);
 }
 
-/* ══ コンテンツエリア ══ */
+/* ══ スクロールインジケーター ══ */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem; left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  cursor: pointer; text-decoration: none;
+  animation: scrollIndicatorFade 0.8s ease 1.2s both;
+}
+@keyframes scrollIndicatorFade {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.scroll-indicator-line {
+  width: 1px; height: 28px;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.15));
+}
+.scroll-indicator-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(247,247,245,0.8);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.scroll-indicator:hover .scroll-indicator-icon {
+  border-color: rgba(0,0,0,0.25);
+  background: rgba(247,247,245,1);
+  transform: translateY(2px);
+}
+.scroll-indicator-icon svg {
+  display: block;
+  animation: arrowBounce 2.4s cubic-bezier(.45,.05,.55,.95) infinite;
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
 .content-outer {
-  background: var(--bg);
+  background: #16161a;
   border-top: 1px solid rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+}
+/* content-outer内のblobグラデーション */
+.content-blob {
+  position: absolute; border-radius: 50%; filter: blur(80px);
+  pointer-events: none; z-index: 0;
+}
+.content-blob-1 {
+  width: min(520px,55vw); height: min(520px,55vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.18) 0%, transparent 70%);
+  top: 5%; right: -5%;
+  animation: blobdrift 13s ease-in-out infinite alternate;
+}
+.content-blob-2 {
+  width: min(400px,42vw); height: min(400px,42vw);
+  background: radial-gradient(circle, rgba(26,136,200,0.14) 0%, transparent 70%);
+  bottom: 10%; left: -5%;
+  animation: blobdrift 10s ease-in-out infinite alternate-reverse;
 }
 .content-wrap {
+  position: relative; z-index: 1;
   max-width: 640px; margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
   display: flex; flex-direction: column; gap: 1.5rem;
@@ -492,7 +560,7 @@ footer {
 /* ══ RESPONSIVE ══ */
 @media (max-width: 960px) { nav ul { display: none; } }
 @media (max-width: 600px) {
-  .type-hero { padding: 2rem 1.25rem 1.75rem; min-height: calc(100svh - var(--nav-h)); }
+  .type-hero { padding: 2rem 1.25rem 5rem; min-height: calc(100svh - var(--nav-h)); }
   .content-wrap { padding: 1.5rem 1.25rem 3rem; }
   .card { padding: 1.25rem; }
   footer { padding: 1.25rem; }
@@ -526,7 +594,9 @@ footer {
   </div>
 
   <!-- スクロール後：グラフ・診断・シェア -->
-  <div class="content-outer">
+  <div class="content-outer" id="contentOuter">
+    <div class="content-blob content-blob-1"></div>
+    <div class="content-blob content-blob-2"></div>
     <div class="content-wrap" id="mainWrap"></div>
   </div>
 </div>
@@ -869,11 +939,22 @@ function buildTypeHero(coloredLetters, diag) {
     : 'rgba(255,255,255,0.7)';
 
   // タイプ名の色
-  const typeColor = type.color || 'rgba(255,255,255,0.88)';
+  const typeColor = type.color || '#181818';
+
+  // ユーザー選択色の上位2色からblobカラーを生成
+  const counts = {};
+  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
+  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+  const blob1Color = topColors[0] || '#e03a2a';
+  const blob2Color = topColors[1] || topColors[0] || '#1888c8';
+  const { r: r1, g: g1, b: b1 } = hexToRgb(blob1Color);
+  const { r: r2, g: g2, b: b2 } = hexToRgb(blob2Color);
+  const blobStyle1 = `radial-gradient(circle, rgba(${r1},${g1},${b1},0.25) 0%, transparent 70%)`;
+  const blobStyle2 = `radial-gradient(circle, rgba(${r2},${g2},${b2},0.18) 0%, transparent 70%)`;
 
   return `<div class="type-hero">
-    <div class="type-hero-blob type-hero-blob-1" style="background:radial-gradient(circle,${type.blobColors[0]} 0%,transparent 70%)"></div>
-    <div class="type-hero-blob type-hero-blob-2" style="background:radial-gradient(circle,${type.blobColors[1]} 0%,transparent 70%)"></div>
+    <div class="type-hero-blob type-hero-blob-1" style="background:${blobStyle1}"></div>
+    <div class="type-hero-blob type-hero-blob-2" style="background:${blobStyle2}"></div>
     <div class="type-hero-inner">
       <div class="type-eyebrow">Color Personality — Alphabet</div>
       <div class="type-label">あなたの共感覚タイプ</div>
@@ -891,8 +972,15 @@ function buildTypeHero(coloredLetters, diag) {
         </div>
       </div>
       <div class="type-palette-strip">${dots}</div>
-      <div class="type-scroll-hint">↓ あなた vs みんな を見る</div>
     </div>
+    <a class="scroll-indicator" href="#contentOuter">
+      <div class="scroll-indicator-line"></div>
+      <div class="scroll-indicator-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2,4 7,10 12,4"/>
+        </svg>
+      </div>
+    </a>
   </div>`;
 }
 
@@ -1195,6 +1283,18 @@ function showToast(msg) {
 
 /* ══ 初期化 ══ */
 render();
+
+/* ══ NAV スクロール切り替え ══ */
+(function() {
+  const nav = document.querySelector('nav');
+  const hero = document.getElementById('typeHeroArea');
+  if (!nav || !hero) return;
+  const obs = new IntersectionObserver(entries => {
+    // typeHeroAreaが見えなくなったらnav-darkを付与
+    nav.classList.toggle('nav-dark', !entries[0].isIntersecting);
+  }, { threshold: 0.05 });
+  obs.observe(hero);
+})();
 </script>
 </body>
 </html>

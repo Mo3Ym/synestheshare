@@ -183,7 +183,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 /* タグライン */
 .type-tagline {
-  font-size: 0.8rem; color: rgba(255,255,255,0.4);
+  font-size: 0.8rem; color: var(--ink2);
   line-height: 1.9; font-weight: 300;
 }
 
@@ -200,7 +200,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(255,255,255,0.18);
+  color: var(--ink3);
 }
 
 /* ══ スクロールインジケーター ══ */
@@ -927,16 +927,16 @@ function buildTypeHero(coloredLetters, diag) {
   const taglineHtml = type.tagline.replace(/\n/g, '<br>');
 
   // 一致率：高いほど青寄り（多数派）、低いほど緑（希少）
-  const majColor = diag.majorityRate >= 70 ? '#70cbff'
-    : diag.majorityRate >= 50 ? '#a0d8ff'
-    : diag.majorityRate >= 30 ? 'rgba(255,255,255,0.85)'
-    : '#a8d020';
+  const majColor = diag.majorityRate >= 70 ? '#1888c8'
+    : diag.majorityRate >= 50 ? '#2a7ab8'
+    : diag.majorityRate >= 30 ? '#555550'
+    : '#2a9e60';
 
   // レア度：高いほど紫（希少）、低いほど青
-  const rareColor = diag.rareScore >= 65 ? '#c080ff'
-    : diag.rareScore >= 40 ? '#9060e0'
-    : diag.rareScore >= 20 ? '#70cbff'
-    : 'rgba(255,255,255,0.7)';
+  const rareColor = diag.rareScore >= 65 ? '#7028c0'
+    : diag.rareScore >= 40 ? '#9060c0'
+    : diag.rareScore >= 20 ? '#1888c8'
+    : '#555550';
 
   // タイプ名の色
   const typeColor = type.color || '#181818';

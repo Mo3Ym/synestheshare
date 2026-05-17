@@ -461,18 +461,18 @@ nav ul a:hover { color: var(--ink); }
 .action-row {
   display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
 }
-.btn-share {
+.btn-result {
   background: rgba(220,50,32,0.88);
   backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: 1.5px solid rgba(255,255,255,0.22); border-radius: 100px; color: #fff;
+  border-radius: 100px; color: #fff;
   font-family: var(--jp); font-weight: 700; font-size: 0.88rem;
-  text-decoration: none; letter-spacing: 0.04em;
+  letter-spacing: 0.04em;
   transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.72rem 1.6rem; cursor: pointer; border: none;
   box-shadow: 0 4px 18px rgba(220,50,32,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
 }
-.btn-share:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.btn-result:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
 .btn-reset {
   padding: 0.72rem 1.4rem; border-radius: 100px;
   border: 1.5px solid var(--border); background: transparent; cursor: pointer;
@@ -628,7 +628,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <div class="result-palette" id="resultPalette"></div>
 
     <div class="action-row">
-      <button class="btn-share" id="btnShare">📤 結果をシェア</button>
+      <button class="btn-result" id="btnResult">🔍 結果を見る・投票する</button>
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
 
@@ -724,7 +724,7 @@ const progressFill    = document.getElementById('progressFill');
 const doneCount       = document.getElementById('doneCount');
 const resultPalette   = document.getElementById('resultPalette');
 const resultMeta      = document.getElementById('resultMeta');
-const btnShare        = document.getElementById('btnShare');
+const btnResult       = document.getElementById('btnResult');
 const btnReset        = document.getElementById('btnReset');
 const toastEl         = document.getElementById('toast');
 const btnModeToggle   = document.getElementById('btnModeToggle');
@@ -1071,23 +1071,16 @@ btnReset.addEventListener('click', () => {
   showToast('リセットしました');
 });
 
-/* ══ シェア ══ */
-btnShare.addEventListener('click', async () => {
+/* ══ 結果ページへ遷移 ══ */
+btnResult.addEventListener('click', () => {
   const letters = isFullMode ? LETTERS_26 : LETTERS_10;
   const done = letters.filter(l => colorMap[l]).length;
-  const total = letters.length;
-  if (done === 0) { showToast('色を1つ以上設定してからシェアしよう'); return; }
-
-  const coloredLetters = letters.filter(l => colorMap[l]);
-  const sample = coloredLetters.slice(0, 5).map(l => `${l}=${colorMap[l]}`).join(', ');
-  const text = `アルファベット診断完了！${done}/${total}文字に色を設定しました。\n例: ${sample}\n#SynestheShare\nhttps://mo3ym.github.io/synestheshare/alphabet.html`;
-
-  if (navigator.share) {
-    try { await navigator.share({ text }); } catch(e) {}
-  } else {
-    await navigator.clipboard.writeText(text).catch(() => {});
-    showToast('テキストをコピーしました！');
-  }
+  if (done === 0) { showToast('色を1つ以上設定してから結果を見よう'); return; }
+  // colorMapをURLパラメータにエンコードして遷移
+  const params = new URLSearchParams();
+  params.set('mode', isFullMode ? '26' : '10');
+  letters.forEach(l => { if (colorMap[l]) params.set(l, colorMap[l]); });
+  window.location.href = 'result.html?' + params.toString();
 });
 
 /* ══ Toast通知 ══ */

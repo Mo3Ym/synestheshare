@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="診断結果 — SynestheShare">
+<meta property="og:description" content="あなたの共感覚パレットと世間とのギャップを確認しよう。">
+<meta property="og:url" content="https://mo3ym.github.io/synestheshare/result.html">
+<meta name="twitter:card" content="summary_large_image">
+<title>診断結果 — SynestheShare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:  #ffffff;
+  --bg:     #f7f7f5;
+  --ink:    #181818;
+  --ink2:   #555550;
+  --ink3:   #aaaaaa;
+  --border: #e0e0dc;
+  --c1: #e03a2a;
+  --c2: #e87820;
+  --mint: #1aaeaa;
+  --outfit: 'Outfit', sans-serif;
+  --jp: "HiraginoUDSansN-W3", "ヒラギノUD角ゴ ProN W3",
+        "Hiragino Sans", "ヒラギノ角ゴシック",
+        "Meiryo UI", "Meiryo", sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
+
+h1, h2, h3, p, .page-title, .page-lead, .section-title {
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
+/* ══ NAV ══ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0.9rem 2.5rem;
+  background: rgba(247,247,245,0.75);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(224,224,220,0.8);
+}
+.nav-logo {
+  position: absolute; left: 2.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 32px;
+}
+.nav-logo img { height: 100%; width: auto; display: block; }
+.nav-right { position: absolute; right: 2.5rem; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+nav ul a:hover { color: var(--ink); }
+
+.nav-cta {
+  background: rgba(220,50,32,0.88);
+  backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1.5px solid rgba(255,255,255,0.22); border-radius: 100px; color: #fff;
+  font-family: var(--jp); font-weight: 700; font-size: 0.82rem;
+  text-decoration: none; letter-spacing: 0.04em; padding: 0.48rem 1.25rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  box-shadow: 0 4px 18px rgba(220,50,32,0.35);
+  transition: background 0.15s, transform 0.12s;
+}
+.nav-cta:hover { background: rgba(200,35,18,0.96); transform: translateY(-1px); }
+
+/* ══ パンくず ══ */
+.breadcrumb-bar {
+  position: absolute; top: calc(5rem - 0.4rem); left: 2.5rem; z-index: 2;
+}
+.page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.45rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.page-breadcrumb::before { content: '←'; }
+.page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
+
+@media (max-width: 600px) { .breadcrumb-bar { left: 1.25rem; } }
+
+/* ══ PAGE HERO ══ */
+.page-hero-wrap {
+  position: relative; overflow: hidden;
+  padding-top: 6.5rem;
+  background: #16161a;
+}
+.page-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
+.page-blob-1 {
+  width: max(480px, 80vw); height: max(480px, 80vw);
+  top: -25%; left: -12%;
+  animation: blobdrift 9s ease-in-out infinite alternate;
+}
+.page-blob-2 {
+  width: max(360px, 60vw); height: max(360px, 60vw);
+  top: 5%; right: -15%;
+  animation: blobdrift 12s ease-in-out infinite alternate-reverse;
+}
+.page-blob-3 {
+  width: max(300px, 50vw); height: max(300px, 50vw);
+  bottom: -10%; left: 30%;
+  animation: blobdrift 10s ease-in-out infinite alternate;
+}
+@keyframes blobdrift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(24px,18px) scale(1.06); }
+}
+
+.page-hero {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 3.5rem 2.5rem 2.5rem;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
+}
+.page-eyebrow {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.page-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: rgba(255,255,255,0.25); }
+.page-title {
+  font-family: var(--jp); font-weight: 300;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.2; letter-spacing: -0.01em;
+  color: rgba(255,255,255,0.92);
+}
+.page-title strong { font-weight: 700; }
+.page-lead { font-size: 0.88rem; color: rgba(255,255,255,0.5); line-height: 1.85; max-width: 480px; font-weight: 300; }
+
+/* パレットサマリー in HERO */
+.hero-palette {
+  display: flex; gap: 5px; flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.hero-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  flex-shrink: 0;
+  position: relative;
+}
+.hero-dot-label {
+  font-family: var(--outfit); font-size: 0.5rem; font-weight: 700;
+  color: white; text-align: center; line-height: 28px;
+}
+
+/* ══ メインエリア ══ */
+.main-outer {
+  position: relative; overflow: hidden;
+  background: #e4e4e0;
+  border-top: 1px solid #d4d4d0;
+}
+.main-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+.main-blob-1 {
+  width: min(520px, 55vw); height: min(520px, 55vw);
+  background: radial-gradient(circle, rgba(26,174,170,0.18) 0%, transparent 70%);
+  top: -10%; right: -5%;
+  animation: blobdrift 10s ease-in-out infinite alternate;
+}
+.main-blob-2 {
+  width: min(400px, 42vw); height: min(400px, 42vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.14) 0%, transparent 70%);
+  bottom: 5%; left: -5%;
+  animation: blobdrift 13s ease-in-out infinite alternate-reverse;
+}
+.main-blob-3 {
+  width: min(350px, 38vw); height: min(350px, 38vw);
+  background: radial-gradient(circle, rgba(232,120,32,0.13) 0%, transparent 70%);
+  top: 40%; left: 30%;
+  animation: blobdrift 11s ease-in-out infinite alternate;
+}
+.main-wrap {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
+  display: flex; flex-direction: column; gap: 3rem;
+}
+
+/* ══ セクション共通 ══ */
+.card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(224,224,220,0.85);
+  border-radius: 16px;
+  padding: 2rem 2rem;
+}
+.section-eyebrow {
+  font-family: var(--outfit); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink3);
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: var(--jp); font-weight: 700; font-size: 1.1rem;
+  margin-bottom: 1.5rem; color: var(--ink);
+}
+
+/* ══ 投票グラフ（積み上げ横棒） ══ */
+.vote-list { display: flex; flex-direction: column; gap: 1.4rem; }
+.vote-item { display: flex; flex-direction: column; gap: 0.4rem; }
+
+/* バッジ＋バー行：バッジ中心 = バーtrack中心になるよう下揃え→paddingで調整 */
+.vote-item-row {
+  display: flex;
+  align-items: flex-end; /* バーtrackの下端を基準に揃える */
+  gap: 0.65rem;
+}
+.vote-letter-badge {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.82rem;
+  flex-shrink: 0;
+  /* trackの高さ18pxに対してバッジ30px → 差は12px、中心を揃えるには6px下にずらす */
+  margin-bottom: calc((18px - 30px) / 2 * -1); /* = 6px 下にオフセット */
+}
+
+/* 積み上げバー：マーカー分の上余白を外から確保 */
+.vote-stacked-outer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+/* マーカー行（バーの上） */
+.vote-marker-row {
+  height: 22px; /* ▲ + "あなた" テキスト分の高さ */
+  position: relative;
+  pointer-events: none;
+}
+/* ▲マーカー本体 */
+.vote-mine-marker {
+  position: absolute;
+  bottom: 0; /* バーの直上に▲がくるよう下揃え */
+  font-family: var(--outfit); font-size: 0.55rem; font-weight: 700;
+  color: var(--ink); white-space: nowrap;
+  display: flex; flex-direction: column; align-items: center;
+  transform: translateX(-50%);
+  line-height: 1.2;
+}
+.vote-mine-marker::after {
+  content: '▲';
+  font-size: 0.5rem;
+  color: var(--ink);
+}
+
+/* 積み上げバー本体 */
+.vote-stacked-track {
+  height: 18px; border-radius: 100px; overflow: hidden;
+  display: flex; background: rgba(0,0,0,0.06);
+}
+.vote-stacked-seg {
+  height: 100%; flex-shrink: 0;
+  width: 0%; /* アニメーション初期値 */
+}
+/* overflow:hiddenのため角丸は最初と最後だけ視覚的に出る */
+.vote-stacked-seg:first-child { border-radius: 100px 0 0 100px; }
+.vote-stacked-seg:last-child  { border-radius: 0 100px 100px 0; }
+.vote-stacked-seg:only-child  { border-radius: 100px; }
+
+/* 凡例（バーの下） */
+.vote-legend {
+  display: flex; flex-wrap: wrap; gap: 0.25rem 0.85rem;
+  padding-left: calc(30px + 0.65rem); /* ④ バッジ幅分インデント */
+}
+.vote-legend-item {
+  display: flex; align-items: center; gap: 0.3rem;
+}
+.vote-legend-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.vote-legend-label { font-size: 0.7rem; color: var(--ink3); }
+.vote-legend-pct { font-family: var(--outfit); font-size: 0.7rem; font-weight: 700; color: var(--ink2); }
+
+/* 選択なしの文字 */
+.vote-skipped { font-size: 0.78rem; color: var(--ink3); font-style: italic; }
+
+/* ══ 診断スコア ══ */
+.diagnosis-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+.diag-card {
+  background: rgba(247,247,245,0.8);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  display: flex; flex-direction: column; gap: 0.3rem;
+}
+.diag-label { font-family: var(--outfit); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); }
+.diag-value {
+  font-family: var(--outfit); font-weight: 700; font-size: 1.8rem; line-height: 1;
+  color: var(--ink);
+}
+.diag-value.good { color: #1aae6a; }
+.diag-value.rare { color: #7028c0; }
+.diag-value.common { color: #1888c8; }
+.diag-sub { font-size: 0.75rem; color: var(--ink3); }
+
+/* 診断コメント */
+.diag-comment {
+  background: rgba(255,255,255,0.9);
+  border-left: 3px solid var(--c1);
+  border-radius: 0 8px 8px 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.85rem; line-height: 1.75; color: var(--ink2);
+}
+.diag-type-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--ink); color: white;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.1em;
+  padding: 0.3rem 0.8rem; border-radius: 100px;
+  margin-bottom: 0.75rem;
+}
+
+/* ══ シェア ══ */
+.share-section { display: flex; flex-direction: column; gap: 1rem; }
+
+/* シェアカードプレビュー */
+.share-card-preview {
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--border);
+  background: #16161a;
+  padding: 1.5rem;
+  position: relative;
+}
+.share-card-inner {
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+.share-card-eyebrow {
+  font-family: var(--outfit); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: rgba(255,255,255,0.4);
+}
+.share-card-title {
+  font-family: var(--jp); font-weight: 700; font-size: 1.1rem;
+  color: rgba(255,255,255,0.9); line-height: 1.35;
+}
+.share-card-palette {
+  display: flex; gap: 4px; flex-wrap: wrap; margin-top: 0.2rem;
+}
+.share-card-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.share-card-stats {
+  font-family: var(--outfit); font-size: 0.7rem; color: rgba(255,255,255,0.35);
+  margin-top: 0.3rem;
+}
+.share-card-tag {
+  font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
+  color: rgba(255,255,255,0.25); letter-spacing: 0.1em;
+}
+
+/* シェアボタン */
+.share-btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.btn-x-share {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem; border-radius: 100px;
+  background: #000; color: white; border: none; cursor: pointer;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, transform 0.12s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
+.btn-x-share:hover { background: #111; transform: translateY(-2px); }
+.btn-copy-share {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem; border-radius: 100px;
+  background: transparent; color: var(--ink2);
+  border: 1.5px solid var(--border); cursor: pointer;
+  font-family: var(--jp); font-weight: 700; font-size: 0.82rem;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-copy-share:hover { background: var(--border); color: var(--ink); }
+.btn-back {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem; border-radius: 100px;
+  background: transparent; color: var(--ink3);
+  border: 1.5px solid var(--border); cursor: pointer;
+  font-family: var(--jp); font-weight: 700; font-size: 0.82rem;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-back:hover { background: var(--border); color: var(--ink); }
+
+/* X ロゴ SVG */
+.x-logo { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
+
+/* ══ FOOTER ══ */
+footer {
+  background: var(--ink); color: rgba(255,255,255,0.35);
+  padding: 2rem 2.5rem; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
+}
+.footer-logo { font-family: var(--outfit); font-weight: 600; font-size: 0.95rem; color: rgba(255,255,255,0.6); }
+
+/* ══ TOAST ══ */
+.toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--white);
+  padding: 0.7rem 1.4rem; border-radius: 100px;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 700;
+  opacity: 0; transition: opacity 0.2s, transform 0.3s;
+  pointer-events: none; white-space: nowrap; z-index: 500;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ══ ローディング ══ */
+.loading-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  padding: 4rem 2rem; color: var(--ink3); font-size: 0.85rem;
+}
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--border);
+  border-top-color: var(--c1); border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══ RESPONSIVE ══ */
+@media (max-width: 960px) {
+  nav ul { display: none; }
+}
+@media (max-width: 600px) {
+  nav { padding: 1.08rem 1.25rem; }
+  .nav-logo { left: 1.25rem; height: 24px; }
+  .nav-cta { display: none; }
+  .page-hero { padding: 2.5rem 1.25rem 1.5rem; }
+  .main-wrap { padding: 2rem 1.25rem 4rem; }
+  .card { padding: 1.5rem 1.25rem; }
+  .diagnosis-grid { grid-template-columns: 1fr 1fr; }
+  footer { padding: 1.5rem 1.25rem; }
+}
+@media (max-width: 400px) {
+  .diagnosis-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images_sub/logo.png" alt="SynestheShare">
+  </a>
+  <ul>
+    <li><a href="index.html#how">使い方</a></li>
+    <li><a href="index.html#themes">テーマ</a></li>
+    <li><a href="index.html#about">共感覚とは</a></li>
+  </ul>
+  <div class="nav-right">
+    <a class="nav-cta" href="alphabet.html">← 診断に戻る</a>
+  </div>
+</nav>
+
+<!-- ══ PAGE HERO ══ -->
+<div class="page-hero-wrap">
+  <div class="breadcrumb-bar">
+    <a class="page-breadcrumb" href="alphabet.html">診断に戻る</a>
+  </div>
+  <div class="page-blob page-blob-1" id="pageBlob1"></div>
+  <div class="page-blob page-blob-2" id="pageBlob2"></div>
+  <div class="page-blob page-blob-3" id="pageBlob3"></div>
+
+  <div class="page-hero">
+    <div class="page-eyebrow">Result — Alphabet</div>
+    <h1 class="page-title">
+      あなたの<strong>共感覚パレット</strong>
+    </h1>
+    <p class="page-lead">世間と比べて、あなたの感覚はどこに位置するでしょう？</p>
+    <div class="hero-palette" id="heroPalette"></div>
+  </div>
+</div>
+
+<!-- ══ メインコンテンツ ══ -->
+<div class="main-outer">
+  <div class="main-blob main-blob-1"></div>
+  <div class="main-blob main-blob-2"></div>
+  <div class="main-blob main-blob-3"></div>
+  <div class="main-wrap" id="mainWrap">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <span>結果を集計中...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <span class="footer-logo">SynestheShare v2.0</span>
+</footer>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   ダミーデータ（Supabase実装後に差し替え）
+   各文字→[{color, pct}] 合計100%
+══════════════════════════════════════ */
+const DUMMY_VOTES = {
+  A: [{color:'#e03a2a',name:'赤',pct:58},{color:'#e87820',name:'橙',pct:22},{color:'#f0e040',name:'黄',pct:12},{color:'#7028c0',name:'紫',pct:8}],
+  B: [{color:'#1888c8',name:'青',pct:62},{color:'#7028c0',name:'紫',pct:20},{color:'#181818',name:'黒',pct:11},{color:'#70cbff',name:'水色',pct:7}],
+  C: [{color:'#f0e040',name:'黄',pct:44},{color:'#e87820',name:'橙',pct:28},{color:'#a8d020',name:'黄緑',pct:16},{color:'#e03a2a',name:'赤',pct:12}],
+  D: [{color:'#2a9e60',name:'緑',pct:38},{color:'#a8d020',name:'黄緑',pct:30},{color:'#1888c8',name:'青',pct:20},{color:'#181818',name:'黒',pct:12}],
+  E: [{color:'#2a9e60',name:'緑',pct:46},{color:'#f0e040',name:'黄',pct:26},{color:'#1aaeaa',name:'ティール',pct:18},{color:'#e03a2a',name:'赤',pct:10}],
+  F: [{color:'#e87820',name:'橙',pct:35},{color:'#e03a2a',name:'赤',pct:28},{color:'#f0e040',name:'黄',pct:22},{color:'#ff90b8',name:'ピンク',pct:15}],
+  G: [{color:'#a8d020',name:'黄緑',pct:40},{color:'#2a9e60',name:'緑',pct:35},{color:'#f0e040',name:'黄',pct:15},{color:'#888880',name:'グレー',pct:10}],
+  H: [{color:'#e03a2a',name:'赤',pct:30},{color:'#e87820',name:'橙',pct:28},{color:'#7028c0',name:'紫',pct:24},{color:'#1888c8',name:'青',pct:18}],
+  I: [{color:'#ffffff',name:'白',pct:50},{color:'#f0e040',name:'黄',pct:28},{color:'#70cbff',name:'水色',pct:14},{color:'#888880',name:'グレー',pct:8}],
+  J: [{color:'#7028c0',name:'紫',pct:36},{color:'#1888c8',name:'青',pct:32},{color:'#ff90b8',name:'ピンク',pct:20},{color:'#e03a2a',name:'赤',pct:12}],
+  K: [{color:'#888880',name:'グレー',pct:30},{color:'#181818',name:'黒',pct:28},{color:'#1888c8',name:'青',pct:24},{color:'#7028c0',name:'紫',pct:18}],
+  L: [{color:'#f0e040',name:'黄',pct:42},{color:'#e87820',name:'橙',pct:26},{color:'#e03a2a',name:'赤',pct:20},{color:'#a8d020',name:'黄緑',pct:12}],
+  M: [{color:'#e03a2a',name:'赤',pct:34},{color:'#7028c0',name:'紫',pct:28},{color:'#181818',name:'黒',pct:22},{color:'#e87820',name:'橙',pct:16}],
+  N: [{color:'#1888c8',name:'青',pct:38},{color:'#181818',name:'黒',pct:30},{color:'#888880',name:'グレー',pct:20},{color:'#7028c0',name:'紫',pct:12}],
+  O: [{color:'#e87820',name:'橙',pct:64},{color:'#f0e040',name:'黄',pct:18},{color:'#e03a2a',name:'赤',pct:10},{color:'#a8d020',name:'黄緑',pct:8}],
+  P: [{color:'#7028c0',name:'紫',pct:52},{color:'#ff90b8',name:'ピンク',pct:28},{color:'#1888c8',name:'青',pct:12},{color:'#e03a2a',name:'赤',pct:8}],
+  Q: [{color:'#888880',name:'グレー',pct:36},{color:'#181818',name:'黒',pct:32},{color:'#7028c0',name:'紫',pct:20},{color:'#1888c8',name:'青',pct:12}],
+  R: [{color:'#e03a2a',name:'赤',pct:72},{color:'#e87820',name:'橙',pct:16},{color:'#f0e040',name:'黄',pct:8},{color:'#7028c0',name:'紫',pct:4}],
+  S: [{color:'#f0e040',name:'黄',pct:36},{color:'#1888c8',name:'青',pct:26},{color:'#e03a2a',name:'赤',pct:22},{color:'#2a9e60',name:'緑',pct:16}],
+  T: [{color:'#1888c8',name:'青',pct:40},{color:'#70cbff',name:'水色',pct:28},{color:'#1aaeaa',name:'ティール',pct:20},{color:'#888880',name:'グレー',pct:12}],
+  U: [{color:'#7028c0',name:'紫',pct:38},{color:'#1888c8',name:'青',pct:30},{color:'#ff90b8',name:'ピンク',pct:20},{color:'#e87820',name:'橙',pct:12}],
+  V: [{color:'#7028c0',name:'紫',pct:44},{color:'#e03a2a',name:'赤',pct:26},{color:'#1888c8',name:'青',pct:18},{color:'#181818',name:'黒',pct:12}],
+  W: [{color:'#ffffff',name:'白',pct:42},{color:'#888880',name:'グレー',pct:32},{color:'#1888c8',name:'青',pct:16},{color:'#70cbff',name:'水色',pct:10}],
+  X: [{color:'#181818',name:'黒',pct:48},{color:'#e03a2a',name:'赤',pct:28},{color:'#888880',name:'グレー',pct:14},{color:'#7028c0',name:'紫',pct:10}],
+  Y: [{color:'#f0e040',name:'黄',pct:66},{color:'#a8d020',name:'黄緑',pct:18},{color:'#e87820',name:'橙',pct:10},{color:'#2a9e60',name:'緑',pct:6}],
+  Z: [{color:'#1888c8',name:'青',pct:36},{color:'#181818',name:'黒',pct:30},{color:'#888880',name:'グレー',pct:20},{color:'#7028c0',name:'紫',pct:14}],
+};
+
+/* ══ URLパラメータ解析 ══ */
+const params = new URLSearchParams(location.search);
+const isFullMode = params.get('mode') === '26';
+const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
+const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+
+const colorMap = {};
+letters.forEach(l => {
+  const c = params.get(l);
+  if (c) colorMap[l] = c;
+});
+
+/* ══ 色名を取得（プリセット照合、なければ概算） ══ */
+const PRESET_COLORS = ['#e03a2a','#e87820','#f0e040','#a8d020','#2a9e60','#1888c8','#70cbff','#7028c0','#ff90b8','#8b4513','#181818','#888880','#ffffff'];
+const PRESET_LABELS = ['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'];
+function getColorName(hex) {
+  const idx = PRESET_COLORS.indexOf(hex?.toLowerCase());
+  if (idx >= 0) return PRESET_LABELS[idx];
+  // 近似hueで概算
+  if (!hex) return '不明';
+  const { h, s, l } = rgbToHsl(hex);
+  if (s < 0.12) {
+    if (l > 0.85) return '白系'; if (l < 0.25) return '黒系'; return 'グレー系';
+  }
+  if (h < 20 || h >= 345) return '赤系';
+  if (h < 45) return '橙系';
+  if (h < 70) return '黄系';
+  if (h < 150) return '緑系';
+  if (h < 190) return 'ティール系';
+  if (h < 250) return '青系';
+  if (h < 290) return '紫系';
+  return 'ピンク系';
+}
+
+/* ══ ユーティリティ ══ */
+function hexToRgb(hex) {
+  let h = hex.replace('#', '');
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  const n = parseInt(h, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function getLuminance(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const t = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  return 0.2126*t(r) + 0.7152*t(g) + 0.0722*t(b);
+}
+function rgbToHsl(hex) {
+  let { r, g, b } = hexToRgb(hex);
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h=0, s=0, l=(max+min)/2;
+  if (max!==min) {
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=((g-b)/d+(g<b?6:0))/6; break;
+      case g: h=((b-r)/d+2)/6; break;
+      case b: h=((r-g)/d+4)/6; break;
+    }
+  }
+  return { h:h*360, s, l };
+}
+function isBright(hex) { return getLuminance(hex) > 0.88; }
+function textColorFor(bg) {
+  if (!bg) return 'var(--ink3)';
+  return isBright(bg) ? 'var(--ink)' : '#ffffff';
+}
+
+/* ══ HEROパレット描画 ══ */
+function buildHeroPalette() {
+  const el = document.getElementById('heroPalette');
+  letters.forEach(l => {
+    const c = colorMap[l];
+    const dot = document.createElement('div');
+    dot.className = 'hero-dot';
+    if (c) {
+      dot.style.background = c;
+      dot.innerHTML = `<div class="hero-dot-label" style="color:${textColorFor(c)}">${l}</div>`;
+    } else {
+      dot.style.background = 'rgba(255,255,255,0.08)';
+      dot.innerHTML = `<div class="hero-dot-label" style="color:rgba(255,255,255,0.2)">${l}</div>`;
+    }
+    el.appendChild(dot);
+  });
+}
+
+/* ══ 診断スコア計算 ══ */
+function calcDiagnosis() {
+  const coloredLetters = letters.filter(l => colorMap[l]);
+  const total = coloredLetters.length;
+  if (total === 0) return null;
+
+  let majorityCount = 0; // 自分の色が1位と一致した数
+  let raritySum = 0;     // 自分の色の順位（小さいほどレア）
+
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+
+    // 自分の色がvotesに何位にあるか
+    // 完全一致なければ近似色で探す
+    let myRank = votes.findIndex(v => v.color === myColor);
+    if (myRank === -1) {
+      // 近似: hueが最も近いものを採用
+      const myH = rgbToHsl(myColor).h;
+      let minDiff = 999; let bestIdx = 0;
+      votes.forEach((v, i) => {
+        const diff = Math.abs(rgbToHsl(v.color).h - myH);
+        if (Math.min(diff, 360-diff) < minDiff) { minDiff = Math.min(diff, 360-diff); bestIdx = i; }
+      });
+      myRank = bestIdx;
+    }
+    if (myRank === 0) majorityCount++;
+    raritySum += myRank;
+  });
+
+  const majorityRate = Math.round(majorityCount / total * 100);
+  const avgRank = raritySum / total; // 0=全部1位（多数派）、高いほどレア
+  const rareScore = Math.min(100, Math.round(avgRank * 28));
+
+  return { majorityRate, rareScore, total, majorityCount };
+}
+
+/* ══ 診断タイプ判定 ══ */
+function getDiagType(majorityRate, rareScore) {
+  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', desc: 'あなたの色覚は非常にユニーク。同じ感覚を持つ人は少数派です。その鋭い感性は、アートや創造的な分野で力を発揮するかもしれません。' };
+  if (rareScore >= 40)  return { label: '◈ 個性派センサー', desc: 'ほどよくユニーク。一般的な傾向は踏まえつつも、あなたらしい独自の色使いが光っています。' };
+  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', desc: 'あなたの色覚は多くの人と共通しています。共感覚の「スタンダード」に近い感性の持ち主です。' };
+  return { label: '◇ バランス型', desc: '多数派の色と少数派の色が混在しています。広い感性でさまざまな色世界を持ち合わせています。' };
+}
+
+/* ══ 投票グラフ HTML生成（積み上げ横棒） ══ */
+function buildVoteSection(coloredLetters) {
+  let html = `<div class="card">
+    <div class="section-eyebrow">Vote</div>
+    <div class="section-title">各文字の色 — 世間との比較</div>
+    <div class="vote-list">`;
+
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+
+    // 自分の色が何位か（完全一致→近似hue）
+    const myH = rgbToHsl(myColor).h;
+    let myMatchIdx = votes.findIndex(v => v.color === myColor);
+    if (myMatchIdx === -1) {
+      let minDiff = 999;
+      votes.forEach((v, i) => {
+        const diff = Math.min(Math.abs(rgbToHsl(v.color).h - myH), 360 - Math.abs(rgbToHsl(v.color).h - myH));
+        if (diff < minDiff) { minDiff = diff; myMatchIdx = i; }
+      });
+    }
+
+    // ② ▲の位置 = 自分セグメントの左端累積 + セグメント幅の半分（中央）
+    let accBefore = 0;
+    for (let i = 0; i < myMatchIdx; i++) accBefore += votes[i].pct;
+    const mySegPct = votes[myMatchIdx].pct;
+    const markerLeftPct = accBefore + mySegPct / 2; // セグメント中央
+
+    // ① 積み上げセグメントHTML（全色）
+    let segsHtml = '';
+    votes.forEach((v, i) => {
+      segsHtml += `<div class="vote-stacked-seg"
+        style="background:${v.color}"
+        data-pct="${v.pct}"></div>`;
+    });
+
+    // ③ 凡例：「←あなた」なし、色ドット＋名前＋%のみ
+    let legendHtml = '<div class="vote-legend">';
+    votes.forEach((v) => {
+      legendHtml += `<div class="vote-legend-item">
+        <div class="vote-legend-dot" style="background:${v.color}"></div>
+        <span class="vote-legend-label">${v.name}</span>
+        <span class="vote-legend-pct">${v.pct}%</span>
+      </div>`;
+    });
+    legendHtml += '</div>';
+
+    // ④ 構造：vote-item-rowでバッジとstacked-outerをalign-items:centerで並べる
+    //    stacked-outerの中にmarker-row（高さ固定）+ trackを縦に並べ
+    //    バッジの中心 = trackの中心になるようCSS側でalign-items:centerを使用
+    html += `<div class="vote-item">
+      <div class="vote-item-row">
+        <div class="vote-letter-badge" style="background:${myColor};color:${textColorFor(myColor)}">${l}</div>
+        <div class="vote-stacked-outer">
+          <div class="vote-marker-row">
+            <div class="vote-mine-marker" style="left:${markerLeftPct}%">
+              <span>あなた</span>
+            </div>
+          </div>
+          <div class="vote-stacked-track">${segsHtml}</div>
+        </div>
+      </div>
+      ${legendHtml}
+    </div>`;
+  });
+
+  html += `</div></div>`;
+  return html;
+}
+
+/* ══ 診断セクション HTML生成 ══ */
+function buildDiagSection(diag) {
+  const { majorityRate, rareScore, total, majorityCount } = diag;
+  const type = getDiagType(majorityRate, rareScore);
+
+  const rareClass = rareScore >= 65 ? 'rare' : rareScore >= 40 ? '' : 'common';
+  const majClass  = majorityRate >= 60 ? 'common' : majorityRate >= 40 ? '' : 'good';
+
+  return `<div class="card">
+    <div class="section-eyebrow">Diagnosis</div>
+    <div class="section-title">あなたの共感覚タイプ</div>
+    <div class="diagnosis-grid">
+      <div class="diag-card">
+        <span class="diag-label">多数派一致率</span>
+        <div class="diag-value ${majClass}">${majorityRate}%</div>
+        <div class="diag-sub">${majorityCount}/${total}文字が世間の1位と一致</div>
+      </div>
+      <div class="diag-card">
+        <span class="diag-label">レア度スコア</span>
+        <div class="diag-value ${rareClass}">${rareScore}</div>
+        <div class="diag-sub">100に近いほどユニーク</div>
+      </div>
+    </div>
+    <div class="diag-comment">
+      <div class="diag-type-badge">${type.label}</div>
+      <p>${type.desc}</p>
+    </div>
+  </div>`;
+}
+
+/* ══ シェアセクション HTML生成 ══ */
+function buildShareSection(diag) {
+  const coloredLetters = letters.filter(l => colorMap[l]);
+  const type = getDiagType(diag.majorityRate, diag.rareScore);
+
+  // シェアカードのドット
+  const dots = coloredLetters.map(l =>
+    `<div class="share-card-dot" style="background:${colorMap[l]};border:1px solid rgba(255,255,255,0.12)"></div>`
+  ).join('');
+
+  // Xシェアテキスト
+  const shareText = `【SynestheShare アルファベット診断】\n${type.label}\n多数派一致率: ${diag.majorityRate}% / レア度: ${diag.rareScore}\n\n#SynestheShare #共感覚\nhttps://mo3ym.github.io/synestheshare/alphabet.html`;
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+
+  return `<div class="card">
+    <div class="section-eyebrow">Share</div>
+    <div class="section-title">結果をシェアする</div>
+    <div class="share-section">
+      <div class="share-card-preview">
+        <div class="share-card-inner">
+          <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
+          <div class="share-card-title">${type.label}</div>
+          <div class="share-card-palette">${dots}</div>
+          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}% ／ レア度 ${diag.rareScore}</div>
+          <div class="share-card-tag">#SynestheShare</div>
+        </div>
+      </div>
+      <div class="share-btn-row">
+        <button class="btn-x-share" id="btnXShare" data-url="${xUrl}">
+          <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.623L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+          Xにシェア
+        </button>
+        <button class="btn-copy-share" id="btnCopyShare" data-text="${shareText.replace(/"/g,'&quot;')}">
+          📋 テキストをコピー
+        </button>
+        <a class="btn-back" href="alphabet.html">← 診断に戻る</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ══ メイン描画 ══ */
+function render() {
+  buildHeroPalette();
+
+  const mainWrap = document.getElementById('mainWrap');
+  const coloredLetters = letters.filter(l => colorMap[l]);
+
+  if (coloredLetters.length === 0) {
+    mainWrap.innerHTML = `<div class="card" style="text-align:center;padding:3rem">
+      <p style="color:var(--ink3);margin-bottom:1rem">色が設定されていません</p>
+      <a class="btn-back" href="alphabet.html" style="margin:auto">← 診断ページに戻る</a>
+    </div>`;
+    return;
+  }
+
+  const diag = calcDiagnosis();
+
+  // ちょっと待ってからアニメーション付きで描画（ローディング演出）
+  setTimeout(() => {
+    mainWrap.innerHTML =
+      buildVoteSection(coloredLetters) +
+      buildDiagSection(diag) +
+      buildShareSection(diag);
+
+    // バー幅アニメーション（積み上げセグメント）
+    document.querySelectorAll('.vote-stacked-seg').forEach((el, i) => {
+      const pct = el.dataset.pct;
+      // transitionを先にセットしてからwidthを変更
+      el.style.transition = `width 0.75s cubic-bezier(.34,1.1,.64,1) ${i * 40}ms`;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { el.style.width = pct + '%'; });
+      });
+    });
+
+    // Xシェアボタン
+    document.getElementById('btnXShare')?.addEventListener('click', () => {
+      window.open(document.getElementById('btnXShare').dataset.url, '_blank');
+    });
+
+    // コピーボタン
+    document.getElementById('btnCopyShare')?.addEventListener('click', async () => {
+      const text = document.getElementById('btnCopyShare').dataset.text.replace(/&quot;/g, '"');
+      await navigator.clipboard.writeText(text).catch(() => {});
+      showToast('コピーしました！');
+    });
+  }, 600);
+}
+
+/* ══ Toast ══ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ══ BLOBアニメーション ══ */
+(function() {
+  const b1 = document.getElementById('pageBlob1');
+  const b2 = document.getElementById('pageBlob2');
+  const b3 = document.getElementById('pageBlob3');
+  if (!b1 || !b2) return;
+  const blobs = [
+    { el: b1, hue: 240, speed: 14, alpha: 0.55, sat: 55, lit: 28 },
+    { el: b2, hue: 340, speed: 10, alpha: 0.42, sat: 60, lit: 24 },
+    { el: b3, hue: 180, speed: 18, alpha: 0.32, sat: 50, lit: 22 },
+  ].filter(b => b.el);
+  function hslToRgba(h, s, l, a) {
+    h = h % 360; s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const f = n => l - Math.min(l, 1-l) * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+    return `rgba(${Math.round(f(0)*255)},${Math.round(f(8)*255)},${Math.round(f(4)*255)},${a})`;
+  }
+  function setColor(b) {
+    b.el.style.background = `radial-gradient(circle, ${hslToRgba(b.hue, b.sat, b.lit, b.alpha)} 0%, transparent 68%)`;
+  }
+  blobs.forEach(setColor);
+  let last = null;
+  function tick(ts) {
+    if (last !== null) {
+      const dt = (ts - last) / 1000;
+      blobs.forEach(b => { b.hue = (b.hue + b.speed * dt) % 360; setColor(b); });
+    }
+    last = ts;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ══ 初期化 ══ */
+render();
+</script>
+</body>
+</html>

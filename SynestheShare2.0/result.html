@@ -250,20 +250,26 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 }
 /* content-outer内のblobグラデーション */
 .content-blob {
-  position: absolute; border-radius: 50%; filter: blur(80px);
+  position: absolute; border-radius: 50%; filter: blur(90px);
   pointer-events: none; z-index: 0;
 }
 .content-blob-1 {
-  width: min(520px,55vw); height: min(520px,55vw);
-  background: radial-gradient(circle, rgba(112,40,192,0.18) 0%, transparent 70%);
-  top: 5%; right: -5%;
+  width: max(500px, 85vw); height: max(500px, 85vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.38) 0%, transparent 65%);
+  top: -5%; right: -20%;
   animation: blobdrift 13s ease-in-out infinite alternate;
 }
 .content-blob-2 {
-  width: min(400px,42vw); height: min(400px,42vw);
-  background: radial-gradient(circle, rgba(26,136,200,0.14) 0%, transparent 70%);
-  bottom: 10%; left: -5%;
+  width: max(420px, 75vw); height: max(420px, 75vw);
+  background: radial-gradient(circle, rgba(26,136,200,0.3) 0%, transparent 65%);
+  bottom: 5%; left: -20%;
   animation: blobdrift 10s ease-in-out infinite alternate-reverse;
+}
+.content-blob-3 {
+  width: max(350px, 65vw); height: max(350px, 65vw);
+  background: radial-gradient(circle, rgba(232,120,32,0.18) 0%, transparent 65%);
+  top: 40%; left: 20%;
+  animation: blobdrift 16s ease-in-out infinite alternate;
 }
 .content-wrap {
   position: relative; z-index: 1;
@@ -274,9 +280,8 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 /* ══ カード共通 ══ */
 .card {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(224,224,220,0.8);
+  background: rgba(255,255,255,0.97);
+  border: 1px solid rgba(224,224,220,0.6);
   border-radius: 14px;
   padding: 1.5rem;
 }
@@ -292,10 +297,9 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 /* ══ 最も割れた文字ハイライト ══ */
 .highlight-card {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(224,224,220,0.8);
-  border-radius: 14px;
+  background: rgba(247,247,245,0.97);
+  border: 1px solid rgba(224,224,220,0.6);
+  border-radius: 10px;
   padding: 1.25rem 1.5rem;
   display: flex; align-items: center; gap: 1.25rem;
 }
@@ -403,7 +407,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 80px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.95));
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.97));
   pointer-events: none;
   border-radius: 0 0 14px 14px;
   transition: opacity 0.3s;
@@ -597,6 +601,7 @@ footer {
   <div class="content-outer" id="contentOuter">
     <div class="content-blob content-blob-1"></div>
     <div class="content-blob content-blob-2"></div>
+    <div class="content-blob content-blob-3"></div>
     <div class="content-wrap" id="mainWrap"></div>
   </div>
 </div>

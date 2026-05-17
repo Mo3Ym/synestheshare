@@ -1041,6 +1041,9 @@ function buildDiagSection(diag) {
       <div class="diag-type-main">${type.label}</div>
       <div class="diag-type-desc">${type.desc}</div>
     </div>
+    <div class="diag-basis">
+      多数派一致率 <strong>${diag.majorityRate}%</strong>、レア度 <strong>${diag.rareScore}/100</strong> をもとに判定
+    </div>
   </div>`;
 }
 
@@ -1065,6 +1068,9 @@ function buildColorTypeSection(coloredLetters, diag) {
     <div class="diag-body">
       <div class="diag-type-main" style="color:${typeColor}">${type.name}</div>
       <div class="diag-type-desc">${type.tagline.replace(/\n/g, ' ')}</div>
+    </div>
+    <div class="diag-basis">
+      選んだ色の傾向：${basisDots}
     </div>
   </div>`;
 }

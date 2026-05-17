@@ -110,12 +110,25 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
 }
 .type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; background: rgba(255,255,255,0.2); }
 
-/* タイプ名 */
+/* あなたの共感覚タイプ ラベル */
+.type-label {
+  font-family: var(--jp); font-weight: 300;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4); line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+/* 個性派センサー / 大地タイプ — 主役 */
 .type-name {
   font-family: var(--jp); font-weight: 700;
-  font-size: clamp(2rem, 6vw, 3rem);
-  color: rgba(255,255,255,0.93); line-height: 1.1;
+  font-size: clamp(1.7rem, 5.5vw, 2.6rem);
+  color: rgba(255,255,255,0.95); line-height: 1.2;
   letter-spacing: -0.02em;
+}
+.type-name-sep {
+  font-weight: 300;
+  color: rgba(255,255,255,0.3);
+  margin: 0 0.15em;
 }
 
 /* 一致率・レア度・タイプ診断 — 3列横並び */
@@ -356,6 +369,26 @@ nav ul a:hover { color: rgba(255,255,255,0.85); }
   font-size: 0.8rem; color: var(--ink3);
   line-height: 1.8; border-left: 2.5px solid var(--border);
   padding-left: 0.85rem; margin-top: 0.1rem;
+}
+/* 根拠行 */
+.diag-basis {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--ink3); line-height: 1.7;
+  display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
+}
+.diag-basis strong { color: var(--ink2); font-weight: 700; }
+.diag-basis-label {
+  font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink3); background: var(--border);
+  padding: 0.1rem 0.5rem; border-radius: 4px; flex-shrink: 0;
+}
+.diag-basis-dot {
+  display: inline-block;
+  width: 9px; height: 9px; border-radius: 50%;
+  vertical-align: middle; margin-right: 2px;
 }
 
 /* ══ シェア ══ */
@@ -827,7 +860,8 @@ function buildTypeHero(coloredLetters, diag) {
     <div class="type-hero-blob type-hero-blob-2" style="background:radial-gradient(circle,${type.blobColors[1]} 0%,transparent 70%)"></div>
     <div class="type-hero-inner">
       <div class="type-eyebrow">Color Personality — Alphabet</div>
-      <div class="type-name">あなたの共感覚タイプ</div>
+      <div class="type-label">あなたの共感覚タイプ</div>
+      <div class="type-name">${diagType.label}<span class="type-name-sep">/</span><span style="color:${typeColor}">${type.name}</span></div>
       <div class="type-stats">
         <div class="type-stat">
           <span class="type-stat-label">多数派一致率</span>
@@ -838,11 +872,6 @@ function buildTypeHero(coloredLetters, diag) {
           <span class="type-stat-label">レア度</span>
           <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}<span class="type-stat-denom">/100</span></span>
           <span class="type-stat-sub">高いほど希少な感覚</span>
-        </div>
-        <div class="type-stat">
-          <span class="type-stat-label">タイプ診断</span>
-          <span class="type-stat-type" style="color:${typeColor}">${type.name}</span>
-          <span class="type-stat-sub">${type.tagline.replace(/\n/g, ' ')}</span>
         </div>
       </div>
       <div class="type-palette-strip">${dots}</div>
@@ -969,15 +998,48 @@ function buildVoteSection(coloredLetters) {
   return html;
 }
 
-/* ══ 診断セクション HTML生成 ══ */
+/* ══ 診断セクション①：共感覚タイプ（レア度ベース） ══ */
 function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
   return `<div class="card">
-    <div class="section-eyebrow">Diagnosis</div>
+    <div class="section-eyebrow">Diagnosis — 1 / 2</div>
     <div class="section-title">あなたの共感覚タイプ</div>
     <div class="diag-body">
       <div class="diag-type-main">${type.label}</div>
       <div class="diag-type-desc">${type.desc}</div>
+    </div>
+    <div class="diag-basis">
+      <span class="diag-basis-label">根拠</span>
+      多数派一致率 <strong>${diag.majorityRate}%</strong>、レア度 <strong>${diag.rareScore}/100</strong> をもとに判定
+    </div>
+  </div>`;
+}
+
+/* ══ 診断セクション②：色傾向タイプ（色の分布ベース） ══ */
+function buildColorTypeSection(coloredLetters, diag) {
+  const typeId = detectColorType(coloredLetters);
+  const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
+  const typeColor = type.color || 'rgba(24,24,24,0.88)';
+
+  // 主な色グループの集計（上位3色）
+  const counts = {};
+  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const basisDots = sorted.map(([c, n]) => {
+    const shadow = isBright(c) ? 'box-shadow:inset 0 0 0 1px rgba(0,0,0,0.12)' : '';
+    return `<span class="diag-basis-dot" style="background:${c};${shadow}"></span>${getColorName(c)}（${n}文字）`;
+  }).join('、');
+
+  return `<div class="card">
+    <div class="section-eyebrow">Diagnosis — 2 / 2</div>
+    <div class="section-title">タイプ診断</div>
+    <div class="diag-body">
+      <div class="diag-type-main" style="color:${typeColor}">${type.name}</div>
+      <div class="diag-type-desc">${type.tagline.replace(/\n/g, ' ')}</div>
+    </div>
+    <div class="diag-basis">
+      <span class="diag-basis-label">根拠</span>
+      選んだ色の傾向：${basisDots}
     </div>
   </div>`;
 }
@@ -1047,10 +1109,11 @@ function render() {
 
     // ② スクロール後コンテンツ（ハイライト・グラフ・診断・シェア）
     mainWrap.innerHTML =
-      buildHighlightCard(coloredLetters) +
-      buildVoteSection(coloredLetters) +
-      buildDiagSection(diag) +
-      buildShareSection(diag, coloredLetters);
+      buildDiagSection(diag) +                      // ① 共感覚タイプ
+      buildColorTypeSection(coloredLetters, diag) + // ② タイプ診断
+      buildVoteSection(coloredLetters) +             // ③ 各文字の色
+      buildHighlightCard(coloredLetters) +           // ④ 最も意見が割れた文字
+      buildShareSection(diag, coloredLetters);       // ⑤ シェア
 
     // バーアニメーション（最初の3件）
     document.querySelectorAll('.vote-list:not(.vote-hidden-list) .vote-stacked-seg').forEach((el, i) => {

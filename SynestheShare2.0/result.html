@@ -227,14 +227,14 @@ nav ul a:hover { color: var(--ink); }
 }
 /* マーカー行（バーの上） */
 .vote-marker-row {
-  height: 22px; /* ▲ + "あなた" テキスト分の高さ */
+  height: 22px; /* ▼ + "あなた" テキスト分の高さ */
   position: relative;
   pointer-events: none;
 }
-/* ▲マーカー本体 */
+/* ▼マーカー本体 */
 .vote-mine-marker {
   position: absolute;
-  bottom: 0; /* バーの直上に▲がくるよう下揃え */
+  bottom: 0; /* バーの直上に▼がくるよう下揃え */
   font-family: var(--outfit); font-size: 0.55rem; font-weight: 700;
   color: var(--ink); white-space: nowrap;
   display: flex; flex-direction: column; align-items: center;
@@ -242,7 +242,7 @@ nav ul a:hover { color: var(--ink); }
   line-height: 1.2;
 }
 .vote-mine-marker::after {
-  content: '▲';
+  content: '▼';
   font-size: 0.5rem;
   color: var(--ink);
 }
@@ -687,7 +687,7 @@ function buildVoteSection(coloredLetters) {
       });
     }
 
-    // ② ▲の位置 = 自分セグメントの左端累積 + セグメント幅の半分（中央）
+    // ② ▼の位置 = 自分セグメントの左端累積 + セグメント幅の半分（中央）
     let accBefore = 0;
     for (let i = 0; i < myMatchIdx; i++) accBefore += votes[i].pct;
     const mySegPct = votes[myMatchIdx].pct;

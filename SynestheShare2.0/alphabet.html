@@ -87,14 +87,13 @@ nav ul a:hover { color: var(--ink); }
 }
 
 /* ══════════════════════════════════════
-   パンくず（ロゴ直下・fixed）
+   パンくず（HERO内・absolute）
 ══════════════════════════════════════ */
 .breadcrumb-bar {
-  position: fixed;
-  /* navの高さ = 上下padding(0.9rem×2≒28.8px) + ロゴ高さ(32px) ≒ 61px */
-  top: calc(32px + 0.9rem * 2);
-  left: 2.5rem; /* ロゴと同じ横座標 */
-  z-index: 99;
+  position: absolute;
+  top: calc(5rem - 0.4rem); /* nav高さ分 - 少し上 */
+  left: 2.5rem;
+  z-index: 2;
 }
 .breadcrumb-bar .page-breadcrumb {
   font-family: var(--outfit); font-size: 0.68rem; font-weight: 600;
@@ -107,7 +106,7 @@ nav ul a:hover { color: var(--ink); }
 .breadcrumb-bar .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
 
 @media (max-width: 600px) {
-  .breadcrumb-bar { left: 1.25rem; top: calc(24px + 1.08rem * 2); }
+  .breadcrumb-bar { left: 1.25rem; }
 }
 
 /* ══════════════════════════════════════
@@ -570,13 +569,11 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   </div>
 </nav>
 
-<!-- ══ パンくず（ロゴ直下・fixed） ══ -->
-<div class="breadcrumb-bar">
-  <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
-</div>
-
 <!-- ══ PAGE HERO ══ -->
 <div class="page-hero-wrap">
+  <div class="breadcrumb-bar">
+    <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
+  </div>
   <div class="page-blob page-blob-1" id="pageBlob1"></div>
   <div class="page-blob page-blob-2" id="pageBlob2"></div>
   <div class="page-blob page-blob-3" id="pageBlob3"></div>
@@ -830,7 +827,7 @@ function updatePickerPreview(color) {
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#ffffff';
     pickerPreview.style.border = `1.5px solid ${dark}`;
-    pickerPreview.style.textShadow = `0 0 3px ${dark}, 0 0 6px ${dark}aa`;
+    pickerPreview.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
   } else {
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#ffffff';
@@ -960,18 +957,20 @@ function applyColor(letter, color) {
     cell.classList.add('selected');
     bubble.style.background = color;
     if (isBright(color)) {
-      // 淡色：常に白文字 + 選択色の濃いバージョンで縁取り
+      // 淡色：白文字＋4方向shadowで袋文字
       const dark = getDarkenedColor(color);
       bubble.style.border = `1.5px solid ${dark}`;
-      bubble.style.boxShadow = `inset 0 0 0 2px ${dark}20`;
+      bubble.style.boxShadow = 'none';
       span.style.color = '#ffffff';
-      span.style.textShadow = `0 0 3px ${dark}, 0 0 6px ${dark}aa`;
+      span.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
+      span.style.webkitTextStroke = '0';
     } else {
       // 濃色：白文字、縁取りなし
       bubble.style.border = 'none';
       bubble.style.boxShadow = 'none';
       span.style.color = '#ffffff';
       span.style.textShadow = 'none';
+      span.style.webkitTextStroke = '0';
     }
   } else {
     cell.classList.remove('selected');
@@ -980,6 +979,7 @@ function applyColor(letter, color) {
     bubble.style.boxShadow = 'none';
     span.style.color = 'var(--ink3)';
     span.style.textShadow = 'none';
+    span.style.webkitTextStroke = '0';
   }
 }
 
@@ -988,9 +988,13 @@ function updateProgress() {
   const letters = isFullMode ? LETTERS_26 : LETTERS_10;
   const total = letters.length;
   const done = letters.filter(l => colorMap[l]).length;
-  // 分母を動的更新
+  // 分母を動的更新（MAX時は分母分子ともに白に）
   const countEl = document.querySelector('.progress-count');
-  countEl.innerHTML = `<span>${done}</span> / ${total}`;
+  if (done === total) {
+    countEl.innerHTML = `<span style="color:#ffffff">${done}</span> / <span style="color:#ffffff">${total}</span>`;
+  } else {
+    countEl.innerHTML = `<span>${done}</span> / ${total}`;
+  }
   progressFill.style.width = (done / total * 100) + '%';
 
   // ── グラデーション生成 ──

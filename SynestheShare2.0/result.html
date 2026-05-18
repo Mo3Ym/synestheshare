@@ -637,7 +637,7 @@ footer {
     <li><a href="#shareOuter">シェア</a></li>
   </ul>
   <div class="nav-right">
-    <a class="nav-back" href="index.html">← TOPに戻る</a>
+    <a class="nav-back" href="alphabet.html">← 診断に戻る</a>
   </div>
 </nav>
 
@@ -1063,15 +1063,16 @@ function buildHighlightCard(coloredLetters) {
     }
   });
 
-  // 全部世間と一致していた場合：1位との%差が最大の文字にフォールバック
+  // 全部世間と一致していた場合のフラグ
+  const isAllMajority = !mostUnique;
+
+  // 全部世間と一致していた場合：最多得票率の文字を代表として表示
   if (!mostUnique) {
-    let maxDiff = -1;
+    let maxPct = -1;
     coloredLetters.forEach(l => {
       const votes = DUMMY_VOTES[l] || [];
       if (!votes.length) return;
-      const myMatchIdx = votes.findIndex(v => v.color === colorMap[l]);
-      const diff = myMatchIdx <= 0 ? 0 : votes[0].pct - (votes[myMatchIdx]?.pct || 0);
-      if (diff > maxDiff) { maxDiff = diff; mostUnique = l; }
+      if (votes[0].pct > maxPct) { maxPct = votes[0].pct; mostUnique = l; }
     });
   }
 
@@ -1100,13 +1101,17 @@ function buildHighlightCard(coloredLetters) {
     `<div class="highlight-bar-seg" style="background:${v.color}" data-pct="${v.pct}"></div>`
   ).join('');
 
-  // コピーテキスト
-  const gapText = isOutlier
-    ? `世間の${topPct}%が選ぶ${votes[0].name}に対し、あなたは圏外の色を選んでいました。`
-    : `世間の${topPct}%が選ぶ${votes[0].name}に対し、あなたの${getColorName(myColor)}は${myPct}%。`;
+  const sectionTitle = 'あなたが最も少数派だった文字';
 
-  // 感情的なコメント
-  const comment = isOutlier
+  const gapText = isAllMajority
+    ? 'すべての文字で世間と一致'
+    : isOutlier
+    ? `世間の${topPct}%は${mostUnique}に${votes[0].name}を選ぶのに対し、あなたは圏外の色を選んでいました。`
+    : `世間の${topPct}%は${mostUnique}に${votes[0].name}を選ぶのに対し、あなたの${getColorName(myColor)}は${myPct}%。`;
+
+  const comment = isAllMajority
+    ? 'あなたの共感覚は、多くの人と共鳴しています。'
+    : isOutlier
     ? '誰とも重ならない、あなただけの色。'
     : myPct <= 10
     ? 'ほとんどの人とは違う感覚を持っています。'
@@ -1114,18 +1119,25 @@ function buildHighlightCard(coloredLetters) {
     ? '少数派の感覚。その見え方は、あなたならでは。'
     : '世間とは少し違う、独自の感覚。';
 
+  const badgeHtml = isAllMajority
+    ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
+    : `<div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
+
+  const barHtml = isAllMajority ? '' : `
+    <div class="highlight-bar-wrap">
+      ${markerHtml}
+      <div class="highlight-bar">${barSegs}</div>
+    </div>`;
+
   return `<div class="card">
     <div class="section-eyebrow">Your Uniqueness</div>
-    <div class="section-title">あなたが最も少数派だった文字</div>
+    <div class="section-title">${sectionTitle}</div>
     <div class="highlight-card">
-      <div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>
+      ${badgeHtml}
       <div class="highlight-body">
         <div class="highlight-text">${gapText}</div>
         <div class="highlight-comment">${comment}</div>
-        <div class="highlight-bar-wrap">
-          ${markerHtml}
-          <div class="highlight-bar">${barSegs}</div>
-        </div>
+        ${barHtml}
       </div>
     </div>
   </div>`;

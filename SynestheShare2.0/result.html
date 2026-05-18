@@ -362,6 +362,38 @@ nav ul a:hover { color: var(--ink); }
 }
 .highlight-mine-marker::after { content: '▼'; font-size: 0.48rem; color: var(--ink); line-height: 1; }
 
+/* ══ 共感カード（対になるデザイン） ══ */
+.empathy-card {
+  background: transparent;
+  display: flex; align-items: center; gap: 1rem;
+}
+.empathy-badge {
+  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1.3rem;
+}
+.empathy-body { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
+.empathy-pct {
+  font-family: var(--outfit); font-weight: 700;
+  font-size: clamp(1.2rem, 4vw, 1.5rem); line-height: 1;
+  color: var(--ink);
+}
+.empathy-pct-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.5; }
+.empathy-comment { font-size: 0.72rem; color: var(--ink3); font-style: italic; line-height: 1.5; margin-top: 0.1rem; }
+
+/* 2列グリッド */
+.sense-grid {
+  display: flex; flex-direction: column; gap: 1.25rem;
+}
+.sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
+.sense-col-label {
+  font-family: var(--jp); font-weight: 700; font-size: 1rem;
+  color: var(--ink);
+}
+.sense-divider {
+  height: 1px; background: var(--border);
+}
+
 /* ══ 投票グラフ ══ */
 .vote-list { display: flex; flex-direction: column; gap: 1.25rem; }
 .vote-item { display: flex; flex-direction: column; gap: 0.35rem; }
@@ -1071,6 +1103,62 @@ function calcMostUnique(coloredLetters) {
   return { mostUnique, isAllMajority };
 }
 
+/* ══ 共感カード：最も共感された文字 ══ */
+function buildEmpathyCard(coloredLetters) {
+  // 自分の色が世間1位と一致している文字の中で、一致率が最も高いものを探す
+  let mostEmpathy = null, highestPct = -1;
+
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+    const myMatchIdx = votes.findIndex(v => v.color === myColor);
+    if (myMatchIdx !== 0) return; // 世間1位と一致している文字のみ
+    if (votes[0].pct > highestPct) {
+      highestPct = votes[0].pct;
+      mostEmpathy = l;
+    }
+  });
+
+  // 誰とも一致しなかった場合
+  if (!mostEmpathy) {
+    return `<div class="card">
+      <div class="section-eyebrow">Shared Sense</div>
+      <div class="section-title">あなたが最も<wbr>共感された文字</div>
+      <div class="empathy-card">
+        <div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>
+        <div class="empathy-body">
+          <div class="empathy-pct-label">すべての文字で世間と異なる色を選んでいました。</div>
+          <div class="empathy-comment">あなたの感覚は、誰とも違う独自の宇宙を持っています。</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const myColor = colorMap[mostEmpathy];
+  const votes = DUMMY_VOTES[mostEmpathy];
+
+  // 詩的なコメント
+  const comment = highestPct >= 70
+    ? 'その感覚は、多くの人の心と静かに重なっています。'
+    : highestPct >= 50
+    ? '2人に1人以上が、あなたと同じ色を感じていました。'
+    : 'それぞれの感じ方の中に、確かな共鳴がありました。';
+
+  return `<div class="card">
+    <div class="section-eyebrow">Shared Sense</div>
+    <div class="section-title">あなたが最も<wbr>共感された文字</div>
+    <div class="empathy-card">
+      <div class="empathy-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostEmpathy}</div>
+      <div class="empathy-body">
+        <div class="empathy-pct">${highestPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>
+        <div class="empathy-pct-label">の人が、<wbr>あなたと同じ色を<wbr>感じていました。</div>
+        <div class="empathy-comment">${comment}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 /* ══ 最も意見が割れた文字ハイライト ══ */
 function buildHighlightCard(coloredLetters) {
   const { mostUnique: _mu, isAllMajority } = calcMostUnique(coloredLetters);
@@ -1137,6 +1225,95 @@ function buildHighlightCard(coloredLetters) {
         <div class="highlight-text">${gapText}</div>
         <div class="highlight-comment">${comment}</div>
         ${barHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ══ 個性・共感 統合カード ══ */
+function buildSenseCard(coloredLetters) {
+  // ── 個性：最も少数派だった文字 ──
+  const { mostUnique: _mu, isAllMajority } = calcMostUnique(coloredLetters);
+  let mostUnique = _mu;
+
+  const uColor = mostUnique ? colorMap[mostUnique] : null;
+  const uVotes = mostUnique ? DUMMY_VOTES[mostUnique] : [];
+  const uMatchIdx = uColor ? uVotes.findIndex(v => v.color === uColor) : -1;
+  const isOutlier = uMatchIdx === -1;
+  const uMyPct = (uMatchIdx >= 0) ? uVotes[uMatchIdx]?.pct || 0 : 0;
+  const uTopPct = uVotes[0]?.pct || 0;
+
+  // バッジ：isAllMajorityのみ🎯、それ以外は常にアルファベット円
+  const uniqueBadge = isAllMajority
+    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
+    : `<div class="empathy-badge" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
+
+  // %表示（個性側）
+  const uniquePctHtml = isAllMajority
+    ? `<div class="empathy-pct" style="color:var(--ink3)">—</div>`
+    : `<div class="empathy-pct">${uTopPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>`;
+
+  const uniqueLabelHtml = isAllMajority
+    ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と一致</div>`
+    : `<div class="empathy-pct-label">の人が<wbr>${mostUnique}に${getColorName(uVotes[0]?.color||'')}を感じる中、<wbr>あなたは${getColorName(uColor)}を<wbr>選んでいました。</div>`;
+
+  const uniqueCommentHtml = `<div class="empathy-comment">${
+    isAllMajority ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
+    : isOutlier ? '誰とも重ならない、<wbr>あなただけの色。'
+    : uMyPct <= 10 ? 'ほとんどの人とは<wbr>違う感覚を持っています。'
+    : uMyPct <= 20 ? '少数派の感覚。<wbr>その見え方は、<wbr>あなたならでは。'
+    : '世間とは少し違う、<wbr>独自の感覚。'
+  }</div>`;
+
+  const uniqueText = `${uniquePctHtml}${uniqueLabelHtml}${uniqueCommentHtml}`;
+
+  // ── 共感：最も共感された文字 ──
+  let mostEmpathy = null, highestPct = -1;
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+    if (votes.findIndex(v => v.color === myColor) !== 0) return;
+    if (votes[0].pct > highestPct) { highestPct = votes[0].pct; mostEmpathy = l; }
+  });
+
+  const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
+  const empathyBadge = !mostEmpathy
+    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>`
+    : `<div class="empathy-badge" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostEmpathy}</div>`;
+
+  const empathyComment = !mostEmpathy ? 'あなたの感覚は、<wbr>誰とも違う独自の宇宙を<wbr>持っています。'
+    : highestPct >= 70 ? 'その感覚は、<wbr>多くの人の心と<wbr>静かに重なっています。'
+    : highestPct >= 50 ? '2人に1人以上が、<wbr>あなたと同じ色を<wbr>感じていました。'
+    : 'それぞれの感じ方の中に、<wbr>確かな共鳴がありました。';
+
+  const empathyPctHtml = !mostEmpathy
+    ? ``
+    : `<div class="empathy-pct">${highestPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>`;
+
+  const empathyLabelHtml = !mostEmpathy
+    ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と異なる色を<wbr>選んでいました。</div>`
+    : `<div class="empathy-pct-label">の人が、<wbr>あなたと同じ色を<wbr>感じていました。</div>`;
+
+  const empathyText = `${empathyPctHtml}${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
+
+  return `<div class="card">
+    <div class="section-eyebrow">Your Sense</div>
+    <div class="sense-grid">
+      <div class="sense-col">
+        <div class="sense-col-label">最も個性的だった文字</div>
+        <div class="empathy-card">
+          ${uniqueBadge}
+          <div class="empathy-body">${uniqueText}</div>
+        </div>
+      </div>
+      <div class="sense-divider"></div>
+      <div class="sense-col">
+        <div class="sense-col-label">最も共感された文字</div>
+        <div class="empathy-card">
+          ${empathyBadge}
+          <div class="empathy-body">${empathyText}</div>
+        </div>
       </div>
     </div>
   </div>`;
@@ -1346,7 +1523,7 @@ function render() {
     mainWrap.innerHTML =
       buildDiagSection(diag).replace('<div class="card">', '<div class="card" id="diagnosis">') +
       buildColorTypeSection(coloredLetters, diag).replace('<div class="card">', '<div class="card" id="colortype">') +
-      buildHighlightCard(coloredLetters).replace('<div class="card">', '<div class="card" id="uniqueness">') +
+      buildSenseCard(coloredLetters).replace('<div class="card">', '<div class="card" id="uniqueness">') +
       buildVoteSection(coloredLetters).replace('<div class="card">', '<div class="card" id="vote">');
 
     // ③ シェアエリア（明るい背景）

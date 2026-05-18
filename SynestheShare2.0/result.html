@@ -376,7 +376,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* 1行レイアウト：左＝色エリア、右＝テキスト */
 .sense-row {
-  display: flex; align-items: center; gap: 0.85rem;
+  display: flex; align-items: flex-start; gap: 0.85rem;
 }
 
 /* 色エリア（左） */
@@ -392,8 +392,8 @@ nav ul a:hover { color: var(--ink); }
   width: 38px; height: 38px;
 }
 .sense-circle-label {
-  font-family: var(--outfit); font-size: 0.5rem; font-weight: 600;
-  color: var(--ink3); text-align: center; line-height: 1.3;
+  font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
+  color: var(--ink2); text-align: center; line-height: 1.3;
   white-space: nowrap;
 }
 /* vs / = 記号 */
@@ -405,7 +405,7 @@ nav ul a:hover { color: var(--ink); }
 }
 
 /* テキストエリア（右） */
-.sense-text { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 0; }
+.sense-text { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 0; padding-top: 0.15rem; }
 .sense-sentence {
   font-size: 0.72rem; color: var(--ink2); line-height: 1.65;
   word-break: keep-all; overflow-wrap: break-word;
@@ -1296,9 +1296,7 @@ function buildSenseCard(coloredLetters) {
   const uTopColorHex  = uVotes[0]?.color || '#888880';
 
   // %表示（個性側）
-  const uniquePctHtml = isAllMajority
-    ? `<div class="empathy-pct" style="color:var(--ink3)">—</div>`
-    : '';
+  const uniquePctHtml = isAllMajority ? '' : '';
 
   const uniqueLabelHtml = isAllMajority
     ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と一致</div>`
@@ -1362,7 +1360,7 @@ function buildSenseCard(coloredLetters) {
        <div class="sense-op">vs</div>
        <div class="sense-circle-wrap">
          <div class="sense-circle theirs" style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)};${isBright(uTopColorHex2)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
-         <span class="sense-circle-label">みんな（${uTopPct}%）</span>
+         <span class="sense-circle-label">みんな</span>
        </div>`;
 
   // ── 共感：色円HTML ──
@@ -1377,7 +1375,7 @@ function buildSenseCard(coloredLetters) {
        <div class="sense-op">=</div>
        <div class="sense-circle-wrap">
          <div class="sense-circle theirs" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
-         <span class="sense-circle-label">みんな（${highestPct}%）</span>
+         <span class="sense-circle-label">みんな</span>
        </div>`;
 
   return `<div class="card">
@@ -1385,18 +1383,30 @@ function buildSenseCard(coloredLetters) {
     <div class="sense-grid">
       <div class="sense-col">
         <div class="sense-col-label">最も個性的だった文字</div>
-        <div class="sense-row">
-          <div class="sense-circles">${uCirclesHtml}</div>
-          <div class="sense-text">${uniqueText}</div>
-        </div>
+        ${isAllMajority
+          ? `<div class="sense-row">
+               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center">🎯</div>
+               <div class="sense-text">${uniqueText}</div>
+             </div>`
+          : `<div class="sense-row">
+               <div class="sense-circles">${uCirclesHtml}</div>
+               <div class="sense-text">${uniqueText}</div>
+             </div>`
+        }
       </div>
       <div class="sense-divider"></div>
       <div class="sense-col">
         <div class="sense-col-label">最も共感された文字</div>
-        <div class="sense-row">
-          <div class="sense-circles">${eCirclesHtml}</div>
-          <div class="sense-text">${empathyText}</div>
-        </div>
+        ${!mostEmpathy
+          ? `<div class="sense-row">
+               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center">🌀</div>
+               <div class="sense-text">${empathyText}</div>
+             </div>`
+          : `<div class="sense-row">
+               <div class="sense-circles">${eCirclesHtml}</div>
+               <div class="sense-text">${empathyText}</div>
+             </div>`
+        }
       </div>
     </div>
   </div>`;
@@ -1494,7 +1504,7 @@ function buildDiagSection(diag) {
       <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率 <strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>レア度 <strong>${diag.rareScore}</strong> をもとに判定
+      多数派一致率：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>レア度：<strong>${diag.rareScore}</strong>
     </div>
   </div>`;
 }

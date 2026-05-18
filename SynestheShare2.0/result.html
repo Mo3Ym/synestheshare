@@ -621,8 +621,6 @@ nav ul a:hover { color: var(--ink); }
 }
 .btn-back:hover { background: var(--border); color: var(--ink); }
 .x-logo { width: 13px; height: 13px; fill: white; flex-shrink: 0; }
-
-/* ══ TOAST ══ */
 .toast {
   position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: var(--white);
@@ -805,11 +803,27 @@ const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
 const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const letters = isFullMode ? LETTERS_26 : LETTERS_10;
 
+/* 色IDマップ */
+const COLOR_IDS = '0123456789ABC';
+
 const colorMap = {};
-letters.forEach(l => {
-  const c = params.get(l);
-  if (c) colorMap[l] = snapToPreset(c); // カスタム色は最近傍プリセットに変換
-});
+const rParam = params.get('r');
+if (rParam) {
+  // 新方式：?mode=10&r=05A2-...
+  letters.forEach((l, i) => {
+    const id = rParam[i];
+    if (!id || id === '-') return;
+    const idx = COLOR_IDS.indexOf(id);
+    if (idx >= 0) colorMap[l] = ALPHABET_PRESETS[idx]?.color || null;
+    if (colorMap[l] === null) delete colorMap[l];
+  });
+} else {
+  // 旧方式との後方互換：?A=%23e03a2a&B=...
+  letters.forEach(l => {
+    const c = params.get(l);
+    if (c) colorMap[l] = snapToPreset(c);
+  });
+}
 
 /* ══ 色名を取得（プリセット照合、なければ概算） ══ */
 const PRESET_COLORS = ['#e03a2a','#e87820','#f0e040','#a8d020','#2a9e60','#1888c8','#70cbff','#7028c0','#ff90b8','#8b4513','#181818','#888880','#ffffff'];
@@ -1342,12 +1356,12 @@ function buildSenseCard(coloredLetters) {
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
        </div>`
     : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostUnique}</div>
+         <div class="sense-circle mine" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
          <span class="sense-circle-label">あなた</span>
        </div>
        <div class="sense-op">vs</div>
        <div class="sense-circle-wrap">
-         <div class="sense-circle theirs" style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)};${isBright(uTopColorHex2)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostUnique}</div>
+         <div class="sense-circle theirs" style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)};${isBright(uTopColorHex2)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
          <span class="sense-circle-label">みんな（${uTopPct}%）</span>
        </div>`;
 
@@ -1357,12 +1371,12 @@ function buildSenseCard(coloredLetters) {
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🌀</div>
        </div>`
     : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostEmpathy}</div>
+         <div class="sense-circle mine" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
          <span class="sense-circle-label">あなた</span>
        </div>
        <div class="sense-op">=</div>
        <div class="sense-circle-wrap">
-         <div class="sense-circle theirs" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostEmpathy}</div>
+         <div class="sense-circle theirs" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
          <span class="sense-circle-label">みんな（${highestPct}%）</span>
        </div>`;
 

@@ -96,13 +96,13 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   pointer-events: none; z-index: 0;
 }
 .type-hero-blob-1 {
-  width: max(400px,70vw); height: max(400px,70vw);
-  top: -20%; right: -15%;
+  width: max(500px,90vw); height: max(500px,90vw);
+  top: -25%; right: -20%;
   animation: blobdrift 9s ease-in-out infinite alternate;
 }
 .type-hero-blob-2 {
-  width: max(300px,55vw); height: max(300px,55vw);
-  bottom: -15%; left: -10%;
+  width: max(400px,75vw); height: max(400px,75vw);
+  bottom: -20%; left: -15%;
   animation: blobdrift 13s ease-in-out infinite alternate-reverse;
 }
 .type-hero-inner {
@@ -278,7 +278,15 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   display: flex; flex-direction: column; gap: 1.5rem;
 }
 
-/* ══ カード共通 ══ */
+/* ══ シェアエリア（明るい背景） ══ */
+.share-outer {
+  background: var(--bg);
+  position: relative; overflow: hidden;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.share-outer .content-wrap {
+  position: relative; z-index: 1;
+}
 .card {
   background: rgba(255,255,255,0.97);
   border: 1px solid rgba(224,224,220,0.6);
@@ -316,6 +324,11 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 }
 .highlight-text { font-size: 0.82rem; color: var(--ink2); line-height: 1.5; }
 .highlight-text strong { color: var(--ink); }
+.highlight-comment {
+  font-size: 0.75rem; color: var(--ink3);
+  font-style: italic; line-height: 1.5;
+  margin-top: 0.1rem;
+}
 /* ハイライトのミニバー（▼あなた付き） */
 .highlight-bar-wrap {
   margin-top: 0.5rem;
@@ -483,22 +496,28 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 .share-section { display: flex; flex-direction: column; gap: 0.9rem; }
 .share-card-preview {
   border-radius: 10px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: #16161a; padding: 1.25rem;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: var(--bg); padding: 1.25rem;
+  position: relative;
 }
-.share-card-inner { display: flex; flex-direction: column; gap: 0.5rem; }
+.share-card-inner { display: flex; flex-direction: column; gap: 0.5rem; position: relative; z-index: 1; }
 .share-card-eyebrow {
   font-family: var(--outfit); font-size: 0.58rem; font-weight: 600; letter-spacing: 0.2em;
-  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  text-transform: uppercase; color: var(--ink3);
 }
 .share-card-title {
   font-family: var(--jp); font-weight: 700; font-size: 1rem;
-  color: rgba(255,255,255,0.9); line-height: 1.3;
+  color: var(--ink); line-height: 1.3;
 }
 .share-card-palette { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 0.15rem; }
 .share-card-dot { width: 20px; height: 20px; border-radius: 50%; }
-.share-card-stats { font-family: var(--outfit); font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 0.25rem; }
-.share-card-tag { font-family: var(--outfit); font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; }
+.share-card-stats { font-family: var(--outfit); font-size: 0.65rem; color: var(--ink3); margin-top: 0.25rem; }
+.share-card-tag { font-family: var(--outfit); font-size: 0.6rem; font-weight: 700; color: var(--ink3); letter-spacing: 0.1em; }
+/* share-card内のblobグラデーション */
+.share-card-blob {
+  position: absolute; border-radius: 50%; filter: blur(50px);
+  pointer-events: none; z-index: 0;
+}
 
 .share-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .btn-x-share {
@@ -597,13 +616,16 @@ footer {
     </div>
   </div>
 
-  <!-- スクロール後：グラフ・診断・シェア -->
+  <!-- スクロール後：グラフ・診断 -->
   <div class="content-outer" id="contentOuter">
     <div class="content-blob content-blob-1"></div>
     <div class="content-blob content-blob-2"></div>
     <div class="content-blob content-blob-3"></div>
     <div class="content-wrap" id="mainWrap"></div>
   </div>
+
+  <!-- シェアエリア：明るい背景 -->
+  <div class="share-outer" id="shareOuter"></div>
 </div>
 
 <!-- ══ FOOTER ══ -->
@@ -811,9 +833,9 @@ function calcDiagnosis() {
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
   if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', desc: 'あなたの色覚は非常にユニーク。同じ感覚を持つ人は少数派です。その鋭い感性は、アートや創造的な分野で力を発揮するかもしれません。' };
-  if (rareScore >= 40)  return { label: '◈ 個性派センサー', desc: 'ほどよくユニーク。一般的な傾向は踏まえつつも、あなたらしい独自の色使いが光っています。' };
+  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', desc: 'ほどよくユニーク。一般的な傾向は踏まえつつも、あなたらしい独自の色使いが光っています。' };
   if (majorityRate >= 70) return { label: '◎ 共感覚の王道', desc: 'あなたの色覚は多くの人と共通しています。共感覚の「スタンダード」に近い感性の持ち主です。' };
-  return { label: '◇ バランス型', desc: '多数派の色と少数派の色が混在しています。広い感性でさまざまな色世界を持ち合わせています。' };
+  return { label: '◇ バランス感受者', desc: '多数派の色と少数派の色が混在しています。広い感性でさまざまな色世界を持ち合わせています。' };
 }
 
 /* ══ 色傾向タイプ判定 ══ */
@@ -822,96 +844,90 @@ const COLOR_TYPES = [
     id: 'warm',
     name: '暖色タイプ',
     color: '#e87820',
-    tagline: '赤・橙・黄が織りなす温かな世界。\nあなたの感覚には、光のような熱量が宿っている。',
+    tagline: '温かく燃えるような色彩の感覚。\nあなたの中には、光のような熱量が宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
   {
     id: 'cool',
     name: '深海タイプ',
     color: '#70cbff',
-    tagline: '青・水色・紫が沈む静かな深淵。\n言葉より先に、色が感情を語りかけてくる。',
+    tagline: '静かな深さをたたえた色彩の感覚。\n言葉より先に、色が感情を語りかけてくる。',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
   {
     id: 'nature',
     name: '森林タイプ',
     color: '#a8d020',
-    tagline: '緑・黄緑が広がる生命の色彩。\n自然の呼吸に同調するような、静かで豊かな感覚。',
+    tagline: '生命の息吹を感じる、みずみずしい色彩の感覚。\n自然の呼吸に同調するような、静かで豊かな感性。',
     blobColors: ['rgba(42,158,96,0.5)', 'rgba(168,208,32,0.35)'],
   },
   {
     id: 'mono',
     name: 'モノクロタイプ',
     color: '#aaaaaa',
-    tagline: '黒・白・グレーが支配する無彩の宇宙。\n色を超えた先に、あなただけの深度がある。',
+    tagline: '色を超えた先にある、無彩の宇宙。\nあなただけが知っている深度が、そこにある。',
     blobColors: ['rgba(80,80,80,0.5)', 'rgba(136,136,128,0.3)'],
   },
   {
     id: 'pastel',
     name: 'パステルタイプ',
     color: '#ff90b8',
-    tagline: '白・水色・ピンク・黄が溶け合う夢の余白。\nどこか遠い午後の光を、文字の中に見ている。',
+    tagline: '夢のように淡く、やわらかな色彩の感覚。\nどこか遠い午後の光を、文字の中に見ている。',
     blobColors: ['rgba(255,144,184,0.45)', 'rgba(112,203,255,0.4)'],
   },
   {
     id: 'neon',
     name: 'ネオンタイプ',
     color: '#e03a2a',
-    tagline: '鮮やかな色が混在する、夜の看板のような感覚。\n感情と色が、鮮烈に交差する。',
+    tagline: '鮮烈な色が混在する、夜の感覚。\n感情と色が、境界なく交差している。',
     blobColors: ['rgba(224,58,42,0.45)', 'rgba(112,40,192,0.4)'],
   },
   {
     id: 'dream',
     name: '夢想タイプ',
     color: '#b060e8',
-    tagline: '紫・ピンク・青が混ざり合う、夢と現の境界線。\nあなたの共感覚は、どこか別の場所から来ている。',
+    tagline: '夢と現の境界に漂うような色彩の感覚。\nあなたの共感覚は、どこか別の場所から来ている。',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
   {
     id: 'earth',
     name: '大地タイプ',
     color: '#c07840',
-    tagline: '茶色・緑・黄緑が重なる、土と草の記憶。\n根のある感性が、文字に色を与えている。',
+    tagline: '土と草の記憶が混ざり合う、根のある色彩。\n静かな力強さが、文字の奥に宿っている。',
     blobColors: ['rgba(139,69,19,0.5)', 'rgba(42,158,96,0.38)'],
   },
 ];
 
 function detectColorType(coloredLetters) {
-  // 各色のカウント
   const counts = {};
   coloredLetters.forEach(l => {
     const c = colorMap[l];
     counts[c] = (counts[c] || 0) + 1;
   });
   const total = coloredLetters.length;
+  const hasBrown = (counts['#8b4513']||0) >= 1;
 
-  // グループ集計
-  const warm  = ((counts['#e03a2a']||0) + (counts['#e87820']||0) + (counts['#f0e040']||0)) / total;
-  const cool  = ((counts['#1888c8']||0) + (counts['#70cbff']||0) + (counts['#7028c0']||0)) / total;
-  const nature= ((counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
-  const mono  = ((counts['#181818']||0) + (counts['#888880']||0) + (counts['#ffffff']||0)) / total;
-  const pastel= ((counts['#ffffff']||0) + (counts['#70cbff']||0) + (counts['#ff90b8']||0) + (counts['#f0e040']||0)) / total;
-  const dream = ((counts['#7028c0']||0) + (counts['#ff90b8']||0) + (counts['#1888c8']||0)) / total;
-  const earth = ((counts['#8b4513']||0) + (counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
+  const warm   = ((counts['#e03a2a']||0) + (counts['#e87820']||0) + (counts['#f0e040']||0)) / total;
+  const cool   = ((counts['#1888c8']||0) + (counts['#70cbff']||0) + (counts['#7028c0']||0)) / total;
+  const nature = ((counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
+  const mono   = ((counts['#181818']||0) + (counts['#888880']||0) + (counts['#ffffff']||0)) / total;
+  const pastel = ((counts['#ffffff']||0) + (counts['#70cbff']||0) + (counts['#ff90b8']||0) + (counts['#f0e040']||0)) / total;
+  const dream  = ((counts['#7028c0']||0) + (counts['#ff90b8']||0) + (counts['#1888c8']||0)) / total;
+  // earth は茶色必須。茶色がなければカウントしない
+  const earth  = hasBrown
+    ? ((counts['#8b4513']||0) + (counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total
+    : 0;
 
-  // 無彩色率が高い
   if (mono >= 0.55) return 'mono';
-  // パステル系（明るい色が多い）
-  if (pastel >= 0.55 && warm < 0.3) return 'pastel';
-  // 夢想（紫・ピンク系）
-  if (dream >= 0.5) return 'dream';
-  // 深海（青系）
+  if (earth >= 0.4) return 'earth';                   // 茶色ありのときのみ
+  if (pastel >= 0.55 && warm < 0.3 && cool < 0.3) return 'pastel';
+  if (dream >= 0.5 && warm < 0.2) return 'dream';
   if (cool >= 0.5 && warm < 0.2) return 'cool';
-  // 大地（茶色あり）
-  if (earth >= 0.4 && (counts['#8b4513']||0) >= 1) return 'earth';
-  // 森林
-  if (nature >= 0.45) return 'nature';
-  // 暖色
+  if (nature >= 0.45 && warm < 0.3) return 'nature';
   if (warm >= 0.45) return 'warm';
-  // 暖色と寒色が拮抗 → ネオン
-  if (warm >= 0.25 && cool >= 0.25) return 'neon';
-  // 最多グループで決定
-  const scores = { warm, cool, nature, mono, dream, earth };
+  if (warm >= 0.22 && cool >= 0.22) return 'neon';
+  // フォールバック：earthを除いたスコアで最大を選ぶ
+  const scores = { warm, cool, nature, mono, dream, pastel };
   return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
 }
 
@@ -954,8 +970,8 @@ function buildTypeHero(coloredLetters, diag) {
   const blob2Color = topColors[1] || topColors[0] || '#1888c8';
   const { r: r1, g: g1, b: b1 } = hexToRgb(blob1Color);
   const { r: r2, g: g2, b: b2 } = hexToRgb(blob2Color);
-  const blobStyle1 = `radial-gradient(circle, rgba(${r1},${g1},${b1},0.25) 0%, transparent 70%)`;
-  const blobStyle2 = `radial-gradient(circle, rgba(${r2},${g2},${b2},0.18) 0%, transparent 70%)`;
+  const blobStyle1 = `radial-gradient(circle, rgba(${r1},${g1},${b1},0.55) 0%, transparent 65%)`;
+  const blobStyle2 = `radial-gradient(circle, rgba(${r2},${g2},${b2},0.42) 0%, transparent 65%)`;
 
   return `<div class="type-hero">
     <div class="type-hero-blob type-hero-blob-1" style="background:${blobStyle1}"></div>
@@ -991,26 +1007,50 @@ function buildTypeHero(coloredLetters, diag) {
 
 /* ══ 最も意見が割れた文字ハイライト ══ */
 function buildHighlightCard(coloredLetters) {
-  let mostDivided = null, lowestTop = 101;
+  // 「自分が世間の1位と異なる」文字の中で、自分の色の%が最も低い文字を探す
+  let mostUnique = null, lowestMyPct = 101;
+
   coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
     const votes = DUMMY_VOTES[l] || [];
     if (!votes.length) return;
-    if (votes[0].pct < lowestTop) { lowestTop = votes[0].pct; mostDivided = l; }
+
+    const myMatchIdx = votes.findIndex(v => v.color === myColor);
+    // 世間の1位と一致している文字はスキップ
+    if (myMatchIdx === 0) return;
+
+    // 自分の色の%（圏外なら0扱い）
+    const myPct = myMatchIdx === -1 ? 0 : votes[myMatchIdx].pct;
+    if (myPct < lowestMyPct) {
+      lowestMyPct = myPct;
+      mostUnique = l;
+    }
   });
-  if (!mostDivided) return '';
 
-  const myColor = colorMap[mostDivided];
-  const votes = DUMMY_VOTES[mostDivided];
+  // 全部世間と一致していた場合：1位との%差が最大の文字にフォールバック
+  if (!mostUnique) {
+    let maxDiff = -1;
+    coloredLetters.forEach(l => {
+      const votes = DUMMY_VOTES[l] || [];
+      if (!votes.length) return;
+      const myMatchIdx = votes.findIndex(v => v.color === colorMap[l]);
+      const diff = myMatchIdx <= 0 ? 0 : votes[0].pct - (votes[myMatchIdx]?.pct || 0);
+      if (diff > maxDiff) { maxDiff = diff; mostUnique = l; }
+    });
+  }
+
+  if (!mostUnique) return '';
+
+  const myColor = colorMap[mostUnique];
+  const votes = DUMMY_VOTES[mostUnique];
   const myMatchIdx = votes.findIndex(v => v.color === myColor);
+  const isOutlier = myMatchIdx === -1;
+  const myPct = isOutlier ? 0 : votes[myMatchIdx].pct;
+  const topPct = votes[0].pct;
 
-  const myRankText = myMatchIdx === 0 ? '世間の1位と一致' :
-    myMatchIdx === 1 ? '世間の2位' :
-    myMatchIdx === 2 ? '世間の3位' :
-    myMatchIdx === -1 ? '少数派（圏外）' : `世間の${myMatchIdx+1}位`;
-
-  // ▼マーカー位置（一致時はセグメント中央、不一致は非表示）
+  // 「あなた」マーカー位置
   let markerLeftPct = null;
-  if (myMatchIdx !== -1) {
+  if (!isOutlier) {
     let acc = 0;
     for (let i = 0; i < myMatchIdx; i++) acc += votes[i].pct;
     markerLeftPct = acc + votes[myMatchIdx].pct / 2;
@@ -1024,16 +1064,28 @@ function buildHighlightCard(coloredLetters) {
     `<div class="highlight-bar-seg" style="background:${v.color}" data-pct="${v.pct}"></div>`
   ).join('');
 
+  // コピーテキスト
+  const gapText = isOutlier
+    ? `世間の${topPct}%が選ぶ${votes[0].name}に対し、あなたは圏外の色を選んでいました。`
+    : `世間の${topPct}%が選ぶ${votes[0].name}に対し、あなたの${getColorName(myColor)}は${myPct}%。`;
+
+  // 感情的なコメント
+  const comment = isOutlier
+    ? '誰とも重ならない、あなただけの色。'
+    : myPct <= 10
+    ? 'ほとんどの人とは違う感覚を持っています。'
+    : myPct <= 20
+    ? '少数派の感覚。その見え方は、あなたならでは。'
+    : '世間とは少し違う、独自の感覚。';
+
   return `<div class="card">
-    <div class="section-eyebrow">Highlight</div>
-    <div class="section-title">最も意見が割れた文字</div>
+    <div class="section-eyebrow">Your Uniqueness</div>
+    <div class="section-title">あなたが最も少数派だった文字：<span style="font-family:var(--outfit);font-size:1.1em;letter-spacing:-0.01em">${mostUnique}</span></div>
     <div class="highlight-card">
-      <div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostDivided}</div>
+      <div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>
       <div class="highlight-body">
-        <div class="highlight-text">
-          世間の1位は<strong>${votes[0].name}（${votes[0].pct}%）</strong>。
-          あなたは<strong>${myRankText}</strong>。
-        </div>
+        <div class="highlight-text">${gapText}</div>
+        <div class="highlight-comment">${comment}</div>
         <div class="highlight-bar-wrap">
           ${markerHtml}
           <div class="highlight-bar">${barSegs}</div>
@@ -1174,6 +1226,11 @@ function buildShareSection(diag, coloredLetters) {
   const colorType = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
 
+  // blob用の上位2色
+  const counts = {};
+  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
+  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+
   // シェアカードのドット
   const dots = coloredLetters.map(l =>
     `<div class="share-card-dot" style="background:${colorMap[l]};${isBright(colorMap[l])?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'border:1px solid rgba(255,255,255,0.12)'}"></div>`
@@ -1188,6 +1245,8 @@ function buildShareSection(diag, coloredLetters) {
     <div class="section-title">結果をシェアする</div>
     <div class="share-section">
       <div class="share-card-preview">
+        <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#e03a2a');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>
+        <div class="share-card-blob" style="width:160px;height:160px;bottom:-30px;left:-30px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[1]||topColors[0]||'#1888c8');return `${r},${g},${b}`})()},0.15) 0%,transparent 70%)"></div>
         <div class="share-card-inner">
           <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
           <div class="share-card-title">${colorType.name} / ${diagType.label}</div>
@@ -1227,17 +1286,30 @@ function render() {
 
   const diag = calcDiagnosis();
 
+  // blob用の上位2色（typeHero・shareOuter共用）
+  const counts = {};
+  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
+  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+
   setTimeout(() => {
-    // ① ファーストビュー（タイプ名・統計・パレット）
+    // ① ファーストビュー
     typeHeroArea.innerHTML = buildTypeHero(coloredLetters, diag);
 
-    // ② スクロール後コンテンツ（ハイライト・グラフ・診断・シェア）
+    // ② ダークエリア（診断・グラフ・ハイライト）
     mainWrap.innerHTML =
-      buildDiagSection(diag) +                      // ① 共感覚タイプ
-      buildColorTypeSection(coloredLetters, diag) + // ② タイプ診断
-      buildVoteSection(coloredLetters) +             // ③ 各文字の色
-      buildHighlightCard(coloredLetters) +           // ④ 最も意見が割れた文字
-      buildShareSection(diag, coloredLetters);       // ⑤ シェア
+      buildDiagSection(diag) +
+      buildColorTypeSection(coloredLetters, diag) +
+      buildHighlightCard(coloredLetters) +
+      buildVoteSection(coloredLetters);
+
+    // ③ シェアエリア（明るい背景）
+    const shareOuter = document.getElementById('shareOuter');
+    const { r: r1, g: g1, b: b1 } = hexToRgb(topColors[0] || '#e03a2a');
+    const { r: r2, g: g2, b: b2 } = hexToRgb(topColors[1] || topColors[0] || '#1888c8');
+    shareOuter.innerHTML = `
+      <div class="share-blob" style="position:absolute;width:max(400px,90vw);height:max(400px,90vw);border-radius:50%;filter:blur(70px);pointer-events:none;top:-25%;right:-20%;background:radial-gradient(circle,rgba(${r1},${g1},${b1},0.5) 0%,transparent 65%)"></div>
+      <div class="share-blob" style="position:absolute;width:max(320px,75vw);height:max(320px,75vw);border-radius:50%;filter:blur(60px);pointer-events:none;bottom:-15%;left:-15%;background:radial-gradient(circle,rgba(${r2},${g2},${b2},0.38) 0%,transparent 65%)"></div>
+      <div class="content-wrap">${buildShareSection(diag, coloredLetters)}</div>`;
 
     // バーアニメーション（最初の3件）
     document.querySelectorAll('.vote-list:not(.vote-hidden-list) .vote-stacked-seg').forEach((el, i) => {

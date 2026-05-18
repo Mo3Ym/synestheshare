@@ -31,7 +31,7 @@
 }
 
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
 h1,h2,h3,p { word-break: keep-all; overflow-wrap: break-word; }
 
 /* ══ NAV（コンパクト） ══ */
@@ -865,10 +865,10 @@ function calcDiagnosis() {
 
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
-  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなたの色覚は非常にユニーク。同じ感覚を持つ人は少数派です。その鋭い感性は、アートや創造的な分野で力を発揮するかもしれません。' };
-  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#e87820', desc: 'ほどよくユニーク。一般的な傾向は踏まえつつも、あなたらしい独自の色使いが光っています。' };
-  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#1888c8', desc: 'あなたの色覚は多くの人と共通しています。共感覚の「スタンダード」に近い感性の持ち主です。' };
-  return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派の色と少数派の色が混在しています。広い感性でさまざまな色世界を持ち合わせています。' };
+  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなたの色覚は<wbr>非常にユニーク。<wbr>同じ感覚を持つ人は<wbr>少数派です。<wbr>その鋭い感性は、<wbr>アートや創造的な分野で<wbr>力を発揮するかもしれません。' };
+  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#e87820', desc: 'ほどよくユニーク。<wbr>一般的な傾向は<wbr>踏まえつつも、<wbr>あなたらしい独自の<wbr>色使いが光っています。' };
+  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#1888c8', desc: 'あなたの色覚は<wbr>多くの人と共通しています。<wbr>共感覚の「スタンダード」に<wbr>近い感性の持ち主です。' };
+  return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派の色と<wbr>少数派の色が混在しています。<wbr>広い感性で<wbr>さまざまな色世界を<wbr>持ち合わせています。' };
 }
 
 /* ══ 色傾向タイプ判定 ══ */
@@ -877,56 +877,56 @@ const COLOR_TYPES = [
     id: 'warm',
     name: '暖色タイプ',
     color: '#e87820',
-    tagline: '温かく燃えるような色彩の感覚。\nあなたの中には、光のような熱量が宿っている。',
+    tagline: '温かく燃えるような<wbr>色彩の感覚。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
   {
     id: 'cool',
     name: '深海タイプ',
     color: '#70cbff',
-    tagline: '静かな深さをたたえた色彩の感覚。\n言葉より先に、色が感情を語りかけてくる。',
+    tagline: '静かな深さをたたえた<wbr>色彩の感覚。\n言葉より先に、<wbr>色が感情を<wbr>語りかけてくる。',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
   {
     id: 'nature',
     name: '森林タイプ',
     color: '#a8d020',
-    tagline: '生命の息吹を感じる、みずみずしい色彩の感覚。\n自然の呼吸に同調するような、静かで豊かな感性。',
+    tagline: '生命の息吹を感じる、<wbr>みずみずしい色彩の感覚。\n自然の呼吸に<wbr>同調するような、<wbr>静かで豊かな感性。',
     blobColors: ['rgba(42,158,96,0.5)', 'rgba(168,208,32,0.35)'],
   },
   {
     id: 'mono',
     name: 'モノクロタイプ',
     color: '#aaaaaa',
-    tagline: '色を超えた先にある、無彩の宇宙。\nあなただけが知っている深度が、そこにある。',
+    tagline: '色を超えた先にある、<wbr>無彩の宇宙。\nあなただけが知っている<wbr>深度が、そこにある。',
     blobColors: ['rgba(80,80,80,0.5)', 'rgba(136,136,128,0.3)'],
   },
   {
     id: 'pastel',
     name: 'パステルタイプ',
     color: '#ff90b8',
-    tagline: '夢のように淡く、やわらかな色彩の感覚。\nどこか遠い午後の光を、文字の中に見ている。',
+    tagline: '夢のように淡く、<wbr>やわらかな色彩の感覚。\nどこか遠い午後の光を、<wbr>文字の中に見ている。',
     blobColors: ['rgba(255,144,184,0.45)', 'rgba(112,203,255,0.4)'],
   },
   {
     id: 'neon',
     name: 'ネオンタイプ',
     color: '#e03a2a',
-    tagline: '鮮烈な色が混在する、夜の感覚。\n感情と色が、境界なく交差している。',
+    tagline: '鮮烈な色が混在する、<wbr>夜の感覚。\n感情と色が、<wbr>境界なく交差している。',
     blobColors: ['rgba(224,58,42,0.45)', 'rgba(112,40,192,0.4)'],
   },
   {
     id: 'dream',
     name: '夢想タイプ',
     color: '#b060e8',
-    tagline: '夢と現の境界に漂うような色彩の感覚。\nあなたの共感覚は、どこか別の場所から来ている。',
+    tagline: '夢と現の境界に<wbr>漂うような色彩の感覚。\nあなたの共感覚は、<wbr>どこか別の場所から<wbr>来ている。',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
   {
     id: 'earth',
     name: '大地タイプ',
     color: '#c07840',
-    tagline: '土と草の記憶が混ざり合う、根のある色彩。\n静かな力強さが、文字の奥に宿っている。',
+    tagline: '土と草の記憶が<wbr>混ざり合う、<wbr>根のある色彩。\n静かな力強さが、<wbr>文字の奥に宿っている。',
     blobColors: ['rgba(139,69,19,0.5)', 'rgba(42,158,96,0.38)'],
   },
 ];
@@ -978,7 +978,8 @@ function buildTypeHero(coloredLetters, diag) {
     return `<div class="type-palette-dot" style="background:${c};${shadow};color:${tc}">${l}</div>`;
   }).join('');
 
-  const taglineHtml = type.tagline.replace(/\n/g, '<br>');
+  const taglineHtml = type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');
+  const uniqueResult = calcMostUnique(coloredLetters);
 
   // 一致率：高いほど青寄り（多数派）、低いほど緑（希少）
   const majColor = diag.majorityRate >= 70 ? '#1888c8'
@@ -1010,8 +1011,8 @@ function buildTypeHero(coloredLetters, diag) {
     <div class="type-hero-blob type-hero-blob-1" style="background:${blobStyle1}"></div>
     <div class="type-hero-blob type-hero-blob-2" style="background:${blobStyle2}"></div>
     <div class="type-hero-inner">
-      <div class="type-eyebrow">Color Personality — Alphabet</div>
-      <div class="type-label">あなたの共感覚タイプ</div>
+      <div class="type-eyebrow">Color Personality<wbr> — Alphabet</div>
+      <div class="type-label">あなたの<wbr>共感覚タイプ</div>
       <div class="type-name">
         <span class="type-name-diag" style="color:${diagType.color}">${diagType.label}</span>
         <span class="type-name-color" style="color:${typeColor}">${type.name}</span>
@@ -1020,12 +1021,20 @@ function buildTypeHero(coloredLetters, diag) {
         <div class="type-stat">
           <span class="type-stat-label">多数派一致率</span>
           <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}%</span>
-          <span class="type-stat-sub">${diag.majorityCount}/${diag.total}文字が世間と一致</span>
+          <span class="type-stat-sub">${diag.majorityCount}/${diag.total}文字が<wbr>世間と一致</span>
         </div>
         <div class="type-stat">
           <span class="type-stat-label">レア度</span>
-          <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}<span class="type-stat-denom">/100</span></span>
+          <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}</span>
           <span class="type-stat-sub">高いほど希少な感覚</span>
+        </div>
+        <div class="type-stat">
+          <span class="type-stat-label">最も個性的な文字</span>
+          ${uniqueResult.isAllMajority
+            ? `<span class="type-stat-value" style="font-size:1.6rem">🎯</span>`
+            : `<span class="type-stat-value" style="color:${isBright(colorMap[uniqueResult.mostUnique]) ? 'var(--ink)' : colorMap[uniqueResult.mostUnique]}">${uniqueResult.mostUnique}</span>`
+          }
+          <span class="type-stat-sub">${uniqueResult.isAllMajority ? '全文字で世間と一致' : '世間と最も違う選択'}</span>
         </div>
       </div>
       <div class="type-palette-strip">${dots}</div>
@@ -1041,32 +1050,19 @@ function buildTypeHero(coloredLetters, diag) {
   </div>`;
 }
 
-/* ══ 最も意見が割れた文字ハイライト ══ */
-function buildHighlightCard(coloredLetters) {
-  // 「自分が世間の1位と異なる」文字の中で、自分の色の%が最も低い文字を探す
+/* ══ 最も個性的な文字を計算（共用） ══ */
+function calcMostUnique(coloredLetters) {
   let mostUnique = null, lowestMyPct = 101;
-
   coloredLetters.forEach(l => {
     const myColor = colorMap[l];
     const votes = DUMMY_VOTES[l] || [];
     if (!votes.length) return;
-
     const myMatchIdx = votes.findIndex(v => v.color === myColor);
-    // 世間の1位と一致している文字はスキップ
     if (myMatchIdx === 0) return;
-
-    // 自分の色の%（圏外なら0扱い）
     const myPct = myMatchIdx === -1 ? 0 : votes[myMatchIdx].pct;
-    if (myPct < lowestMyPct) {
-      lowestMyPct = myPct;
-      mostUnique = l;
-    }
+    if (myPct < lowestMyPct) { lowestMyPct = myPct; mostUnique = l; }
   });
-
-  // 全部世間と一致していた場合のフラグ
   const isAllMajority = !mostUnique;
-
-  // 全部世間と一致していた場合：最多得票率の文字を代表として表示
   if (!mostUnique) {
     let maxPct = -1;
     coloredLetters.forEach(l => {
@@ -1075,7 +1071,13 @@ function buildHighlightCard(coloredLetters) {
       if (votes[0].pct > maxPct) { maxPct = votes[0].pct; mostUnique = l; }
     });
   }
+  return { mostUnique, isAllMajority };
+}
 
+/* ══ 最も意見が割れた文字ハイライト ══ */
+function buildHighlightCard(coloredLetters) {
+  const { mostUnique: _mu, isAllMajority } = calcMostUnique(coloredLetters);
+  let mostUnique = _mu;
   if (!mostUnique) return '';
 
   const myColor = colorMap[mostUnique];
@@ -1101,23 +1103,23 @@ function buildHighlightCard(coloredLetters) {
     `<div class="highlight-bar-seg" style="background:${v.color}" data-pct="${v.pct}"></div>`
   ).join('');
 
-  const sectionTitle = 'あなたが最も少数派だった文字';
+  const sectionTitle = 'あなたが最も個性的だった文字';
 
   const gapText = isAllMajority
-    ? 'すべての文字で世間と一致'
+    ? 'すべての文字で<wbr>世間と一致'
     : isOutlier
-    ? `世間の${topPct}%は${mostUnique}に${votes[0].name}を選ぶのに対し、あなたは圏外の色を選んでいました。`
-    : `世間の${topPct}%は${mostUnique}に${votes[0].name}を選ぶのに対し、あなたの${getColorName(myColor)}は${myPct}%。`;
+    ? `世間の${topPct}%が<wbr>${mostUnique}に${votes[0].name}を感じる中、<wbr>あなたは${getColorName(myColor)}を<wbr>選んでいました。`
+    : `世間の${topPct}%が<wbr>${mostUnique}に${votes[0].name}を感じる中、<wbr>あなたは${getColorName(myColor)}を<wbr>選んでいました。`;
 
   const comment = isAllMajority
-    ? 'あなたの共感覚は、多くの人と共鳴しています。'
+    ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
     : isOutlier
-    ? '誰とも重ならない、あなただけの色。'
+    ? '誰とも重ならない、<wbr>あなただけの色。'
     : myPct <= 10
-    ? 'ほとんどの人とは違う感覚を持っています。'
+    ? 'ほとんどの人とは<wbr>違う感覚を持っています。'
     : myPct <= 20
-    ? '少数派の感覚。その見え方は、あなたならでは。'
-    : '世間とは少し違う、独自の感覚。';
+    ? '少数派の感覚。<wbr>その見え方は、<wbr>あなたならでは。'
+    : '世間とは少し違う、<wbr>独自の感覚。';
 
   const badgeHtml = isAllMajority
     ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
@@ -1203,7 +1205,7 @@ function buildVoteSection(coloredLetters) {
 
   let html = `<div class="card">
     <div class="section-eyebrow">Vote</div>
-    <div class="section-title">各文字の色 — 世間との比較</div>
+    <div class="section-title">各文字の色<wbr> — 世間との比較</div>
     <div class="vote-collapse-wrap" id="voteCollapseWrap">
       <div class="vote-list">
         ${visible.map(buildItem).join('')}
@@ -1229,13 +1231,13 @@ function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
   return `<div class="card">
     <div class="section-eyebrow">Diagnosis — 1 / 2</div>
-    <div class="section-title">あなたの共感覚タイプ</div>
+    <div class="section-title">あなたの<wbr>共感覚タイプ</div>
     <div class="diag-body">
       <div class="diag-type-main" style="color:${type.color}">${type.label}</div>
-      <div class="diag-type-desc">${type.desc}</div>
+      <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率 <strong>${diag.majorityRate}%</strong>、レア度 <strong>${diag.rareScore}/100</strong> をもとに判定
+      多数派一致率 <strong>${diag.majorityRate}%</strong>、<wbr>レア度 <strong>${diag.rareScore}/100</strong> を<wbr>もとに判定
     </div>
   </div>`;
 }
@@ -1260,7 +1262,7 @@ function buildColorTypeSection(coloredLetters, diag) {
     <div class="section-title">タイプ診断</div>
     <div class="diag-body">
       <div class="diag-type-main" style="color:${typeColor}">${type.name}</div>
-      <div class="diag-type-desc">${type.tagline.replace(/\n/g, ' ')}</div>
+      <div class="diag-type-desc">${type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
       選んだ色の傾向：${basisDots}
@@ -1291,7 +1293,7 @@ function buildShareSection(diag, coloredLetters) {
 
   return `<div class="card">
     <div class="section-eyebrow">Share</div>
-    <div class="section-title">結果をシェアする</div>
+    <div class="section-title">結果を<wbr>シェアする</div>
     <div class="share-section">
       <div class="share-card-preview">
         <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#e03a2a');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>

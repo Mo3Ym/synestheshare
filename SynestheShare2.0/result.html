@@ -381,8 +381,21 @@ nav ul a:hover { color: var(--ink); }
 
 /* 色エリア（左） */
 .sense-circles {
-  display: flex; align-items: flex-start; gap: 0.5rem;
+  display: flex;
+  align-items: flex-start;
   flex-shrink: 0;
+}
+.sense-circle-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  width: 64px;
+}
+/* vs / = 記号 */
+.sense-op {
+  font-family: var(--outfit); font-size: 0.85rem; font-weight: 700;
+  color: var(--ink3); flex-shrink: 0;
+  line-height: 1;
+  width: 28px; text-align: center;
+  margin-top: calc(24px - 0.425rem);
 }
 .sense-circle-wrap {
   display: flex; flex-direction: column; align-items: center; gap: 0.3rem;

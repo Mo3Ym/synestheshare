@@ -362,36 +362,71 @@ nav ul a:hover { color: var(--ink); }
 }
 .highlight-mine-marker::after { content: '▼'; font-size: 0.48rem; color: var(--ink); line-height: 1; }
 
-/* ══ 共感カード（対になるデザイン） ══ */
-.empathy-card {
-  background: transparent;
-  display: flex; align-items: center; gap: 1rem;
-}
-.empathy-badge {
-  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700; font-size: 1.3rem;
-}
-.empathy-body { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
-.empathy-pct {
-  font-family: var(--outfit); font-weight: 700;
-  font-size: clamp(1.2rem, 4vw, 1.5rem); line-height: 1;
-  color: var(--ink);
-}
-.empathy-pct-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.5; }
-.empathy-comment { font-size: 0.72rem; color: var(--ink3); font-style: italic; line-height: 1.5; margin-top: 0.1rem; }
-
+/* ══ Your Sense カード ══ */
 /* 2列グリッド */
 .sense-grid {
-  display: flex; flex-direction: column; gap: 1.25rem;
+  display: flex; flex-direction: column; gap: 1.75rem;
 }
 .sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
 .sense-col-label {
   font-family: var(--jp); font-weight: 700; font-size: 1rem;
   color: var(--ink);
 }
-.sense-divider {
-  height: 1px; background: var(--border);
+.sense-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
+
+/* 1行レイアウト：左＝色エリア、右＝テキスト */
+.sense-row {
+  display: flex; align-items: center; gap: 1.25rem;
+}
+
+/* 色エリア（左） */
+.sense-circles {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  flex-shrink: 0;
+}
+.sense-circle-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+}
+.sense-circle {
+  border-radius: 50%;
+}
+.sense-circle.mine   { width: 48px; height: 48px; }
+.sense-circle.theirs { width: 48px; height: 48px; }
+.sense-circle-label {
+  font-family: var(--outfit); font-size: 0.58rem; font-weight: 600;
+  letter-spacing: 0.08em; color: var(--ink3);
+}
+.sense-circle-pct {
+  font-family: var(--outfit); font-size: 0.75rem; font-weight: 700; color: var(--ink2);
+}
+/* vs / = 記号 */
+.sense-op {
+  font-family: var(--outfit); font-size: 0.85rem; font-weight: 700;
+  color: var(--ink3); flex-shrink: 0;
+  line-height: 1;
+  margin-top: calc(24px - 0.425rem); /* 円の半径 - フォント半分 */
+}
+
+/* テキストエリア（右） */
+.sense-text { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; }
+.sense-sentence {
+  font-size: 0.8rem; color: var(--ink2); line-height: 1.7;
+}
+.sense-strong {
+  font-family: var(--outfit); font-weight: 700; font-size: 1em; color: var(--ink);
+}
+.sense-color-word { font-weight: 700; }
+.sense-comment {
+  font-size: 0.7rem; color: var(--ink3); font-style: italic; line-height: 1.6;
+}
+
+/* 文言行 */
+.empathy-pct-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.5; }
+.empathy-comment { font-size: 0.72rem; color: var(--ink3); font-style: italic; line-height: 1.5; margin-top: 0.1rem; }
+.empathy-badge {
+  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1.3rem;
 }
 
 /* ══ 投票グラフ ══ */
@@ -1248,14 +1283,23 @@ function buildSenseCard(coloredLetters) {
     ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
     : `<div class="empathy-badge" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
 
+  const uTopColorName = getColorName(uVotes[0]?.color || '');
+  const uMyColorName  = getColorName(uColor || '');
+  const uTopColorHex  = uVotes[0]?.color || '#888880';
+
   // %表示（個性側）
   const uniquePctHtml = isAllMajority
     ? `<div class="empathy-pct" style="color:var(--ink3)">—</div>`
-    : `<div class="empathy-pct">${uTopPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>`;
+    : '';
 
   const uniqueLabelHtml = isAllMajority
     ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と一致</div>`
-    : `<div class="empathy-pct-label">の人が<wbr>${mostUnique}に${getColorName(uVotes[0]?.color||'')}を感じる中、<wbr>あなたは${getColorName(uColor)}を<wbr>選んでいました。</div>`;
+    : `<div class="sense-sentence">
+        <span class="sense-strong">${uTopPct}%</span>の人が${mostUnique}に<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を感じる中、
+      </div>
+      <div class="sense-sentence">
+        <span class="sense-strong">あなた</span>は<span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>を選んでいました。
+      </div>`;
 
   const uniqueCommentHtml = `<div class="empathy-comment">${
     isAllMajority ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
@@ -1287,32 +1331,63 @@ function buildSenseCard(coloredLetters) {
     : highestPct >= 50 ? '2人に1人以上が、<wbr>あなたと同じ色を<wbr>感じていました。'
     : 'それぞれの感じ方の中に、<wbr>確かな共鳴がありました。';
 
-  const empathyPctHtml = !mostEmpathy
-    ? ``
-    : `<div class="empathy-pct">${highestPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>`;
+  const eColorName = eColor ? getColorName(eColor) : '';
 
   const empathyLabelHtml = !mostEmpathy
     ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と異なる色を<wbr>選んでいました。</div>`
-    : `<div class="empathy-pct-label">の人が、<wbr>あなたと同じ色を<wbr>感じていました。</div>`;
+    : `<div class="sense-sentence">
+        <span class="sense-strong">${highestPct}%</span>の人が、${mostEmpathy}にあなたと同じ<span class="sense-color-word" style="color:${isBright(eColor)?'var(--ink)':eColor}">${eColorName}</span>を感じていました。
+      </div>`;
 
-  const empathyText = `${empathyPctHtml}${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
+  const empathyText = `${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
+
+  // ── 個性：色円HTML ──
+  const uTopColorHex2 = uVotes[0]?.color || '#888880';
+  const uCirclesHtml = isAllMajority
+    ? `<div class="sense-circle-wrap">
+         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
+       </div>`
+    : `<div class="sense-circle-wrap">
+         <div class="sense-circle mine" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostUnique}</div>
+         <span class="sense-circle-label">あなた</span>
+       </div>
+       <div class="sense-op">vs</div>
+       <div class="sense-circle-wrap">
+         <div class="sense-circle theirs" style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)};${isBright(uTopColorHex2)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostUnique}</div>
+         <span class="sense-circle-label">みんな（${uTopPct}%）</span>
+       </div>`;
+
+  // ── 共感：色円HTML ──
+  const eCirclesHtml = !mostEmpathy
+    ? `<div class="sense-circle-wrap">
+         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🌀</div>
+       </div>`
+    : `<div class="sense-circle-wrap">
+         <div class="sense-circle mine" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostEmpathy}</div>
+         <span class="sense-circle-label">あなた</span>
+       </div>
+       <div class="sense-op">=</div>
+       <div class="sense-circle-wrap">
+         <div class="sense-circle theirs" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:0.85rem">${mostEmpathy}</div>
+         <span class="sense-circle-label">みんな（${highestPct}%）</span>
+       </div>`;
 
   return `<div class="card">
     <div class="section-eyebrow">Your Sense</div>
     <div class="sense-grid">
       <div class="sense-col">
         <div class="sense-col-label">最も個性的だった文字</div>
-        <div class="empathy-card">
-          ${uniqueBadge}
-          <div class="empathy-body">${uniqueText}</div>
+        <div class="sense-row">
+          <div class="sense-circles">${uCirclesHtml}</div>
+          <div class="sense-text">${uniqueText}</div>
         </div>
       </div>
       <div class="sense-divider"></div>
       <div class="sense-col">
         <div class="sense-col-label">最も共感された文字</div>
-        <div class="empathy-card">
-          ${empathyBadge}
-          <div class="empathy-body">${empathyText}</div>
+        <div class="sense-row">
+          <div class="sense-circles">${eCirclesHtml}</div>
+          <div class="sense-text">${empathyText}</div>
         </div>
       </div>
     </div>

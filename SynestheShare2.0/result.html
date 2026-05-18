@@ -489,7 +489,7 @@ nav ul a:hover { color: var(--ink); }
   padding-top: 0.85rem;
   border-top: 1px solid var(--border);
   font-size: 0.72rem; color: var(--ink3); line-height: 1.7;
-  display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
+  display: block;
 }
 .diag-basis strong { color: var(--ink2); font-weight: 700; }
 .diag-basis-label {
@@ -875,56 +875,56 @@ function getDiagType(majorityRate, rareScore) {
 const COLOR_TYPES = [
   {
     id: 'warm',
-    name: '暖色タイプ',
+    name: '🔥 暖色タイプ',
     color: '#e87820',
     tagline: '温かく燃えるような<wbr>色彩の感覚。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
   {
     id: 'cool',
-    name: '深海タイプ',
+    name: '🌊 深海タイプ',
     color: '#70cbff',
     tagline: '静かな深さをたたえた<wbr>色彩の感覚。\n言葉より先に、<wbr>色が感情を<wbr>語りかけてくる。',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
   {
     id: 'nature',
-    name: '森林タイプ',
+    name: '🌿 森林タイプ',
     color: '#a8d020',
     tagline: '生命の息吹を感じる、<wbr>みずみずしい色彩の感覚。\n自然の呼吸に<wbr>同調するような、<wbr>静かで豊かな感性。',
     blobColors: ['rgba(42,158,96,0.5)', 'rgba(168,208,32,0.35)'],
   },
   {
     id: 'mono',
-    name: 'モノクロタイプ',
+    name: '🖤 モノクロタイプ',
     color: '#aaaaaa',
     tagline: '色を超えた先にある、<wbr>無彩の宇宙。\nあなただけが知っている<wbr>深度が、そこにある。',
     blobColors: ['rgba(80,80,80,0.5)', 'rgba(136,136,128,0.3)'],
   },
   {
     id: 'pastel',
-    name: 'パステルタイプ',
+    name: '🌸 パステルタイプ',
     color: '#ff90b8',
     tagline: '夢のように淡く、<wbr>やわらかな色彩の感覚。\nどこか遠い午後の光を、<wbr>文字の中に見ている。',
     blobColors: ['rgba(255,144,184,0.45)', 'rgba(112,203,255,0.4)'],
   },
   {
     id: 'neon',
-    name: 'ネオンタイプ',
+    name: '⚡ ネオンタイプ',
     color: '#e03a2a',
     tagline: '鮮烈な色が混在する、<wbr>夜の感覚。\n感情と色が、<wbr>境界なく交差している。',
     blobColors: ['rgba(224,58,42,0.45)', 'rgba(112,40,192,0.4)'],
   },
   {
     id: 'dream',
-    name: '夢想タイプ',
+    name: '🌙 夢想タイプ',
     color: '#b060e8',
     tagline: '夢と現の境界に<wbr>漂うような色彩の感覚。\nあなたの共感覚は、<wbr>どこか別の場所から<wbr>来ている。',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
   {
     id: 'earth',
-    name: '大地タイプ',
+    name: '🌱 大地タイプ',
     color: '#c07840',
     tagline: '土と草の記憶が<wbr>混ざり合う、<wbr>根のある色彩。\n静かな力強さが、<wbr>文字の奥に宿っている。',
     blobColors: ['rgba(139,69,19,0.5)', 'rgba(42,158,96,0.38)'],
@@ -1021,20 +1021,17 @@ function buildTypeHero(coloredLetters, diag) {
         <div class="type-stat">
           <span class="type-stat-label">多数派一致率</span>
           <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}%</span>
-          <span class="type-stat-sub">${diag.majorityCount}/${diag.total}文字が<wbr>世間と一致</span>
         </div>
         <div class="type-stat">
           <span class="type-stat-label">レア度</span>
           <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}</span>
-          <span class="type-stat-sub">高いほど希少な感覚</span>
         </div>
         <div class="type-stat">
           <span class="type-stat-label">最も個性的な文字</span>
           ${uniqueResult.isAllMajority
-            ? `<span class="type-stat-value" style="font-size:1.6rem">🎯</span>`
+            ? `<span class="type-stat-value" style="color:var(--ink3)">-</span>`
             : `<span class="type-stat-value" style="color:${isBright(colorMap[uniqueResult.mostUnique]) ? 'var(--ink)' : colorMap[uniqueResult.mostUnique]}">${uniqueResult.mostUnique}</span>`
           }
-          <span class="type-stat-sub">${uniqueResult.isAllMajority ? '全文字で世間と一致' : '世間と最も違う選択'}</span>
         </div>
       </div>
       <div class="type-palette-strip">${dots}</div>
@@ -1237,7 +1234,7 @@ function buildDiagSection(diag) {
       <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率 <strong>${diag.majorityRate}%</strong>、<wbr>レア度 <strong>${diag.rareScore}</strong> を<wbr>もとに判定
+      多数派一致率 <strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>レア度 <strong>${diag.rareScore}</strong> をもとに判定
     </div>
   </div>`;
 }

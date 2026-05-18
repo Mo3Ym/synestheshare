@@ -39,27 +39,19 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h);
   display: flex; align-items: center; justify-content: center;
   padding: 0 1.5rem;
-  background: rgba(247,247,245,0.82);
+  background: rgba(247,247,245,0.88);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(224,224,220,0.7);
-  transition: background 0.3s, border-color 0.3s;
-}
-nav.nav-dark {
-  background: rgba(22,22,26,0.88);
-  border-bottom-color: rgba(255,255,255,0.06);
 }
 .nav-logo {
   position: absolute; left: 1.5rem;
   display: flex; align-items: center; text-decoration: none; height: 26px;
 }
-.nav-logo img { height: 100%; width: auto; display: block; transition: filter 0.3s; }
-nav.nav-dark .nav-logo img { filter: brightness(0) invert(1) opacity(0.8); }
+.nav-logo img { height: 100%; width: auto; display: block; }
 .nav-right { position: absolute; right: 1.5rem; }
 nav ul { list-style: none; display: flex; gap: 1.8rem; }
 nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
-nav.nav-dark ul a { color: rgba(255,255,255,0.45); }
-nav.nav-dark ul a:hover { color: rgba(255,255,255,0.85); }
 
 .nav-back {
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
@@ -68,8 +60,6 @@ nav.nav-dark ul a:hover { color: rgba(255,255,255,0.85); }
   transition: color 0.15s;
 }
 .nav-back:hover { color: var(--ink); }
-nav.nav-dark .nav-back { color: rgba(255,255,255,0.4); }
-nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 @keyframes blobdrift {
   from { transform: translate(0,0) scale(1); }
@@ -130,15 +120,25 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 /* 個性派センサー / 大地タイプ — 主役 */
 .type-name {
+  display: flex; flex-direction: column; gap: 0.1em;
+}
+.type-name-diag {
   font-family: var(--jp); font-weight: 700;
   font-size: clamp(1.7rem, 5.5vw, 2.6rem);
-  color: var(--ink); line-height: 1.2;
+  color: var(--ink); line-height: 1.15;
   letter-spacing: -0.02em;
 }
-.type-name-sep {
-  font-weight: 300;
-  color: var(--ink3);
-  margin: 0 0.15em;
+.type-name-color {
+  font-family: var(--jp); font-weight: 700;
+  font-size: clamp(1.7rem, 5.5vw, 2.6rem);
+  line-height: 1.15; letter-spacing: -0.02em;
+  display: flex; align-items: center; gap: 0.4em;
+}
+.type-name-color::before {
+  content: '';
+  display: inline-block; width: 2px; height: 1em;
+  background: var(--border); border-radius: 1px;
+  flex-shrink: 0;
 }
 
 /* 一致率・レア度 */
@@ -247,6 +247,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   background: #16161a;
   border-top: 1px solid rgba(255,255,255,0.06);
   position: relative; overflow: hidden;
+  scroll-margin-top: var(--nav-h);
 }
 /* content-outer内のblobグラデーション */
 .content-blob {
@@ -283,6 +284,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   background: var(--bg);
   position: relative; overflow: hidden;
   border-top: 1px solid rgba(0,0,0,0.06);
+  scroll-margin-top: var(--nav-h);
 }
 .share-outer .content-wrap {
   position: relative; z-index: 1;
@@ -292,6 +294,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   border: 1px solid rgba(224,224,220,0.6);
   border-radius: 14px;
   padding: 1.5rem;
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
 .section-eyebrow {
   font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;
@@ -598,9 +601,9 @@ footer {
     <img src="images_sub/logo.png" alt="SynestheShare">
   </a>
   <ul>
-    <li><a href="index.html#how">使い方</a></li>
-    <li><a href="index.html#themes">テーマ</a></li>
-    <li><a href="index.html#about">共感覚とは</a></li>
+    <li><a href="#typeHeroArea">TOP</a></li>
+    <li><a href="#contentOuter">詳細</a></li>
+    <li><a href="#shareOuter">シェア</a></li>
   </ul>
   <div class="nav-right">
     <a class="nav-back" href="alphabet.html">← 診断に戻る</a>
@@ -609,7 +612,7 @@ footer {
 
 <div class="page-outer">
   <!-- ファーストビュー：タイプ＋統計 -->
-  <div id="typeHeroArea">
+  <div id="typeHeroArea" style="scroll-margin-top:0">
     <div class="loading-wrap">
       <div class="spinner"></div>
       <span style="color:rgba(255,255,255,0.3)">結果を集計中...</span>
@@ -979,7 +982,10 @@ function buildTypeHero(coloredLetters, diag) {
     <div class="type-hero-inner">
       <div class="type-eyebrow">Color Personality — Alphabet</div>
       <div class="type-label">あなたの共感覚タイプ</div>
-      <div class="type-name">${diagType.label}<span class="type-name-sep">/</span><span style="color:${typeColor}">${type.name}</span></div>
+      <div class="type-name">
+        <span class="type-name-diag">${diagType.label}</span>
+        <span class="type-name-color" style="color:${typeColor}">${type.name}</span>
+      </div>
       <div class="type-stats">
         <div class="type-stat">
           <span class="type-stat-label">多数派一致率</span>
@@ -1297,10 +1303,10 @@ function render() {
 
     // ② ダークエリア（診断・グラフ・ハイライト）
     mainWrap.innerHTML =
-      buildDiagSection(diag) +
-      buildColorTypeSection(coloredLetters, diag) +
-      buildHighlightCard(coloredLetters) +
-      buildVoteSection(coloredLetters);
+      buildDiagSection(diag).replace('<div class="card">', '<div class="card" id="diagnosis">') +
+      buildColorTypeSection(coloredLetters, diag).replace('<div class="card">', '<div class="card" id="colortype">') +
+      buildHighlightCard(coloredLetters).replace('<div class="card">', '<div class="card" id="uniqueness">') +
+      buildVoteSection(coloredLetters).replace('<div class="card">', '<div class="card" id="vote">');
 
     // ③ シェアエリア（明るい背景）
     const shareOuter = document.getElementById('shareOuter');
@@ -1361,17 +1367,6 @@ function showToast(msg) {
 /* ══ 初期化 ══ */
 render();
 
-/* ══ NAV スクロール切り替え ══ */
-(function() {
-  const nav = document.querySelector('nav');
-  const hero = document.getElementById('typeHeroArea');
-  if (!nav || !hero) return;
-  const obs = new IntersectionObserver(entries => {
-    // typeHeroAreaが見えなくなったらnav-darkを付与
-    nav.classList.toggle('nav-dark', !entries[0].isIntersecting);
-  }, { threshold: 0.05 });
-  obs.observe(hero);
-})();
 </script>
 </body>
 </html>

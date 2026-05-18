@@ -50,21 +50,29 @@ nav ul a, .page-eyebrow, .page-breadcrumb {
 ══════════════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 54px;
   display: flex; align-items: center; justify-content: center;
-  padding: 0.9rem 2.5rem;
-  background: rgba(247,247,245,0.75);
+  padding: 0 1.5rem;
+  background: rgba(247,247,245,0.88);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(224,224,220,0.8);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
 }
 .nav-logo {
-  position: absolute; left: 2.5rem;
-  display: flex; align-items: center; text-decoration: none; height: 32px;
+  position: absolute; left: 1.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 26px;
 }
 .nav-logo img { height: 100%; width: auto; display: block; }
-.nav-right { position: absolute; right: 2.5rem; }
-nav ul { list-style: none; display: flex; gap: 2rem; }
-nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+.nav-right { position: absolute; right: 1.5rem; }
+nav ul { list-style: none; display: flex; gap: 1.8rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
+.nav-back {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--ink3);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
 
 .btn-primary, .nav-cta {
   background: rgba(220,50,32,0.88);
@@ -529,9 +537,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 }
 
 @media (max-width: 600px) {
-  nav { padding: 1.08rem 1.25rem; }
-  .nav-logo { left: 1.25rem; height: 24px; }
-  .nav-cta { display: none; }
+  nav { padding: 0 1.25rem; }
+  .nav-logo { left: 1.25rem; height: 26px; }
 
   .page-hero { padding: 2.5rem 1.25rem 1.5rem; align-items: center; text-align: center; }
   .page-eyebrow { justify-content: center; }
@@ -559,21 +566,14 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <a class="nav-logo" href="index.html">
     <img src="images_sub/logo.png" alt="SynestheShare">
   </a>
-  <ul>
-    <li><a href="index.html#how">使い方</a></li>
-    <li><a href="index.html#themes">テーマ</a></li>
-    <li><a href="index.html#about">共感覚とは</a></li>
-  </ul>
+  <ul></ul>
   <div class="nav-right">
-    <a class="nav-cta" href="index.html#themes">他のテーマ</a>
+    <a class="nav-back" href="index.html">← TOPに戻る</a>
   </div>
 </nav>
 
 <!-- ══ PAGE HERO ══ -->
 <div class="page-hero-wrap">
-  <div class="breadcrumb-bar">
-    <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
-  </div>
   <div class="page-blob page-blob-1" id="pageBlob1"></div>
   <div class="page-blob page-blob-2" id="pageBlob2"></div>
   <div class="page-blob page-blob-3" id="pageBlob3"></div>

@@ -43,22 +43,23 @@ body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflo
 ══════════════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: center; /* ①中央揃え */
-  padding: 0.9rem 2.5rem;
-  background: rgba(247,247,245,0.75);
+  height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 1.5rem;
+  background: rgba(247,247,245,0.88);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(224,224,220,0.8);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
 }
 /* ①ロゴを左端に固定してulが真ん中に来るよう absolute 配置 */
 .nav-logo {
-  position: absolute; left: 2.5rem;
-  display: flex; align-items: center; text-decoration: none; height: 32px;
+  position: absolute; left: 1.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 26px;
 }
 .nav-logo img { height: 100%; width: auto; display: block; }
 /* ①右端ボタンも absolute 配置 */
-.nav-right { position: absolute; right: 2.5rem; }
-nav ul { list-style: none; display: flex; gap: 2rem; }
-nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+.nav-right { position: absolute; right: 1.5rem; }
+nav ul { list-style: none; display: flex; gap: 1.8rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
 
 /* ── ボタン共通: 赤ブラー ── */
@@ -545,9 +546,9 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
 @media (max-width: 600px) {
   /* ── NAV ── */
-  nav { padding: 1.08rem 1.25rem; }
+  nav { padding: 0 1.25rem; }
   /* ①スマホ: ロゴをnavの高さに収まるよう縮小 */
-  .nav-logo { left: 1.25rem; height: 24px; }
+  .nav-logo { left: 1.25rem; height: 26px; }
   /* スマホ: nav右上ボタン非表示 */
   .nav-cta { display: none; }
 

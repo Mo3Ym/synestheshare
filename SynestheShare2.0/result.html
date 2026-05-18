@@ -878,7 +878,7 @@ function rgbToHsl(hex) {
 function isBright(hex) { return getLuminance(hex) > 0.88; }
 function textColorFor(bg) {
   if (!bg) return 'var(--ink3)';
-  return isBright(bg) ? 'var(--ink)' : '#ffffff';
+  return isBright(bg) ? '#888880' : '#ffffff';
 }
 
 /* ══ HEROパレット描画 ══ */
@@ -1532,7 +1532,7 @@ function buildColorTypeSection(coloredLetters, diag) {
       <div class="diag-type-desc">${type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      選んだ色の傾向：${basisDots}
+      選んだ色の傾向：<br>${basisDots}
     </div>
   </div>`;
 }

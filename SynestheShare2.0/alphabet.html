@@ -1072,20 +1072,16 @@ btnResult.addEventListener('click', () => {
   const resultUrl = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
 
   // ── 投票済みチェック（localStorage で永続管理）──
-  // 同じブラウザから2回目以降はフラグを立てずに遷移→投票されない
-  const lsKey = `ss_submitted`;
-  const alreadyVoted = localStorage.getItem(lsKey) === '1';
+  const alreadyVoted = localStorage.getItem('ss_submitted') === '1';
 
   const voteKey = `ss_voted_${encoded}`;
   sessionStorage.setItem('ss_vote_key', voteKey);
 
   if (!alreadyVoted) {
-    // 初回のみフラグを立てて投票を許可
     sessionStorage.setItem('ss_from_alphabet', '1');
     sessionStorage.removeItem(voteKey);
-    localStorage.setItem(lsKey, '1'); // 投票済みとして記録
+    // ※ localStorage への記録は result.html で投票成功後に行う
   } else {
-    // 2回目以降はフラグなし（ユーザーには気づかれない）
     sessionStorage.removeItem('ss_from_alphabet');
   }
 

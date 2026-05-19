@@ -1987,7 +1987,8 @@ function shouldVote() {
 function markVoteDone() {
   const voteKey = sessionStorage.getItem('ss_vote_key');
   if (voteKey) sessionStorage.setItem(voteKey, 'done');
-  sessionStorage.removeItem('ss_from_alphabet'); // 再遷移まで無効化
+  sessionStorage.removeItem('ss_from_alphabet');
+  localStorage.setItem('ss_submitted', '1'); // 同ブラウザからの再投票を永続ブロック
 }
 
 /* ────────────────────────────────────────────────

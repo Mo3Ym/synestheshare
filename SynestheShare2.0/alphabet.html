@@ -1069,7 +1069,16 @@ btnResult.addEventListener('click', () => {
   const done = letters.filter(l => colorMap[l]).length;
   if (done === 0) { showToast('色を1つ以上設定してから結果を見よう'); return; }
   const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
-  window.location.href = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
+  const resultUrl = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
+
+  // ── 診断完了フラグ（同一タブのみ有効なsessionStorage）──
+  // result.htmlがこのフラグを読んで「本人診断」と判断し投票を行う
+  const voteKey = `ss_voted_${encoded}`;
+  sessionStorage.setItem('ss_from_alphabet', '1');
+  sessionStorage.setItem('ss_vote_key', voteKey);
+  sessionStorage.removeItem(voteKey); // リセットして未投票状態にする
+
+  window.location.href = resultUrl;
 });
 
 /* ══ Toast通知 ══ */

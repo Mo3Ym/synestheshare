@@ -1992,8 +1992,15 @@ function markVoteDone() {
 }
 
 /* ────────────────────────────────────────────────
+   色名 → hex の逆引きマップ
+──────────────────────────────────────────────── */
+const NAME_TO_HEX = Object.fromEntries(
+  Object.entries(COLOR_NAME).map(([hex, name]) => [name, hex])
+);
+
+/* ────────────────────────────────────────────────
    統計ドキュメントを votes 形式に変換
-   Firestore: statistics/{letter} = { "#e03a2a": 120, "#1888c8": 50, ... }
+   Firestore: statistics/{letter} = { "赤": 120, "青": 50, ... }
 ──────────────────────────────────────────────── */
 function statsToVotes(statsData) {
   const votes = {};
@@ -2002,9 +2009,9 @@ function statsToVotes(statsData) {
     if (total === 0) return;
     votes[letter] = Object.entries(colorCounts)
       .sort((a, b) => b[1] - a[1])
-      .map(([hex, count]) => ({
-        color: hex,
-        name: COLOR_NAME[hex] || hex,
+      .map(([name, count]) => ({
+        color: NAME_TO_HEX[name] || name,
+        name,
         pct: Math.round(count / total * 100),
       }));
   });
@@ -2038,16 +2045,16 @@ function statsToVotes(statsData) {
         timestamp: serverTimestamp(),
       });
 
-      /* statistics/{letter} に各色の票数をインクリメント */
+      /* statistics/{letter} に各色の票数をインクリメント（キー=色名） */
       const updates = letters.map(async l => {
         const hex = colorMap[l];
         if (!hex) return;
+        const colorName = COLOR_NAME[hex] || hex;
         const ref = doc(db, 'statistics', l);
         try {
-          await updateDoc(ref, { [hex]: increment(1) });
+          await updateDoc(ref, { [colorName]: increment(1) });
         } catch {
-          // ドキュメントが存在しない場合は新規作成
-          await setDoc(ref, { [hex]: 1 });
+          await setDoc(ref, { [colorName]: 1 });
         }
       });
       await Promise.all(updates);

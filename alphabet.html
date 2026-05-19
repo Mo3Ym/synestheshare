@@ -50,21 +50,29 @@ nav ul a, .page-eyebrow, .page-breadcrumb {
 ══════════════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 54px;
   display: flex; align-items: center; justify-content: center;
-  padding: 0.9rem 2.5rem;
-  background: rgba(247,247,245,0.75);
+  padding: 0 1.5rem;
+  background: rgba(247,247,245,0.88);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(224,224,220,0.8);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
 }
 .nav-logo {
-  position: absolute; left: 2.5rem;
-  display: flex; align-items: center; text-decoration: none; height: 32px;
+  position: absolute; left: 1.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 26px;
 }
 .nav-logo img { height: 100%; width: auto; display: block; }
-.nav-right { position: absolute; right: 2.5rem; }
-nav ul { list-style: none; display: flex; gap: 2rem; }
-nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+.nav-right { position: absolute; right: 1.5rem; }
+nav ul { list-style: none; display: flex; gap: 1.8rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
+.nav-back {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--ink3);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
 
 .btn-primary, .nav-cta {
   background: rgba(220,50,32,0.88);
@@ -87,11 +95,34 @@ nav ul a:hover { color: var(--ink); }
 }
 
 /* ══════════════════════════════════════
+   パンくず（HERO内・absolute）
+══════════════════════════════════════ */
+.breadcrumb-bar {
+  position: absolute;
+  top: calc(5rem - 0.4rem); /* nav高さ分 - 少し上 */
+  left: 2.5rem;
+  z-index: 2;
+}
+.breadcrumb-bar .page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.45rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.breadcrumb-bar .page-breadcrumb::before { content: '←'; }
+.breadcrumb-bar .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
+
+@media (max-width: 600px) {
+  .breadcrumb-bar { left: 1.25rem; }
+}
+
+/* ══════════════════════════════════════
    PAGE HERO (診断ページ用コンパクト版)
 ══════════════════════════════════════ */
 .page-hero-wrap {
   position: relative; overflow: hidden;
-  padding-top: 5rem;
+  padding-top: 6.5rem; /* nav + パンくず分 */
   background: #16161a;
 }
 .page-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
@@ -121,15 +152,6 @@ nav ul a:hover { color: var(--ink); }
   padding: 3.5rem 2.5rem 2.5rem;
   display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
 }
-.page-breadcrumb {
-  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
-  letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink3);
-  display: flex; align-items: center; gap: 0.5rem;
-  text-decoration: none;
-}
-.page-breadcrumb:hover { color: var(--ink2); }
-.page-breadcrumb::before { content: '←'; font-family: var(--outfit); }
-
 .page-eyebrow {
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
   letter-spacing: 0.18em; text-transform: uppercase;
@@ -154,8 +176,15 @@ nav ul a:hover { color: var(--ink); }
 }
 
 /* ── HEROエリア ダークテーマ上書き ── */
-.page-hero-wrap .page-breadcrumb { color: rgba(255,255,255,0.38); }
-.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.7); }
+.page-hero-wrap .page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.5rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.page-hero-wrap .page-breadcrumb::before { content: '←'; font-family: var(--outfit); }
+.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
 .page-hero-wrap .page-eyebrow { color: rgba(255,255,255,0.35); }
 .page-hero-wrap .page-eyebrow::before { background: rgba(255,255,255,0.25); }
 .page-hero-wrap .page-title { color: rgba(255,255,255,0.92); }
@@ -440,18 +469,18 @@ nav ul a:hover { color: var(--ink); }
 .action-row {
   display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
 }
-.btn-share {
+.btn-result {
   background: rgba(220,50,32,0.88);
   backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: 1.5px solid rgba(255,255,255,0.22); border-radius: 100px; color: #fff;
+  border-radius: 100px; color: #fff;
   font-family: var(--jp); font-weight: 700; font-size: 0.88rem;
-  text-decoration: none; letter-spacing: 0.04em;
+  letter-spacing: 0.04em;
   transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.72rem 1.6rem; cursor: pointer; border: none;
   box-shadow: 0 4px 18px rgba(220,50,32,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
 }
-.btn-share:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.btn-result:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
 .btn-reset {
   padding: 0.72rem 1.4rem; border-radius: 100px;
   border: 1.5px solid var(--border); background: transparent; cursor: pointer;
@@ -508,9 +537,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 }
 
 @media (max-width: 600px) {
-  nav { padding: 1.08rem 1.25rem; }
-  .nav-logo { left: 1.25rem; height: 24px; }
-  .nav-cta { display: none; }
+  nav { padding: 0 1.25rem; }
+  .nav-logo { left: 1.25rem; height: 26px; }
 
   .page-hero { padding: 2.5rem 1.25rem 1.5rem; align-items: center; text-align: center; }
   .page-eyebrow { justify-content: center; }
@@ -538,13 +566,9 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <a class="nav-logo" href="index.html">
     <img src="images_sub/logo.png" alt="SynestheShare">
   </a>
-  <ul>
-    <li><a href="index.html#how">使い方</a></li>
-    <li><a href="index.html#themes">テーマ</a></li>
-    <li><a href="index.html#about">共感覚とは</a></li>
-  </ul>
+  <ul></ul>
   <div class="nav-right">
-    <a class="nav-cta" href="index.html#themes">他のテーマ</a>
+    <a class="nav-back" href="index.html">← TOPに戻る</a>
   </div>
 </nav>
 
@@ -555,13 +579,12 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="page-blob page-blob-3" id="pageBlob3"></div>
 
   <div class="page-hero">
-    <a class="page-breadcrumb" href="index.html">テーマ一覧に戻る</a>
     <div class="page-eyebrow">No. 01 — Alphabet</div>
     <h1 class="page-title">
       <strong class="hl-red">A〜Z</strong>は<wbr>何色ですか？
     </h1>
     <p class="page-lead">
-      直感で色を割り当てるだけ。<wbr>すべての文字に<wbr>設定しなくてもOKです。
+      直感で色を割り当てるだけ。<br>すべての文字に<wbr>設定しなくてもOKです。
     </p>
   </div>
 
@@ -605,13 +628,13 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <div class="result-palette" id="resultPalette"></div>
 
     <div class="action-row">
-      <button class="btn-share" id="btnShare">📤 結果をシェア</button>
+      <button class="btn-result" id="btnResult">🔍 結果を見る</button>
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
 
     <div class="hint">
       <span class="hint-icon">💡</span>
-      <span>色を感じない文字は設定しなくて大丈夫。直感を大切に。「クリア」を押すと選択を解除できます。</span>
+      <span>色を感じない文字は<wbr>設定しなくて大丈夫。<wbr>直感を大切に。</span>
     </div>
   </div><!-- /.result-section -->
 
@@ -635,13 +658,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <div class="swatches-section">
       <div class="swatches-label">よく使う色</div>
       <div class="swatches" id="swatches"></div>
-    </div>
-
-    <div class="custom-section">
-      <span class="custom-label">カスタム</span>
-      <div class="color-input-wrap">
-        <input type="color" id="customColorInput" value="#e03a2a">
-      </div>
     </div>
 
     <div class="picker-actions">
@@ -694,14 +710,13 @@ const pickerPreview   = document.getElementById('pickerPreview');
 const pickerTitle     = document.getElementById('pickerTitle');
 const pickerClose     = document.getElementById('pickerClose');
 const swatchesEl      = document.getElementById('swatches');
-const customInput     = document.getElementById('customColorInput');
 const btnClear        = document.getElementById('btnClear');
 const btnDecide       = document.getElementById('btnDecide');
 const progressFill    = document.getElementById('progressFill');
 const doneCount       = document.getElementById('doneCount');
 const resultPalette   = document.getElementById('resultPalette');
 const resultMeta      = document.getElementById('resultMeta');
-const btnShare        = document.getElementById('btnShare');
+const btnResult       = document.getElementById('btnResult');
 const btnReset        = document.getElementById('btnReset');
 const toastEl         = document.getElementById('toast');
 const btnModeToggle   = document.getElementById('btnModeToggle');
@@ -785,13 +800,8 @@ function selectPendingColor(color) {
   } else {
     const idx = PRESET_COLORS.indexOf(color);
     if (idx >= 0) swatchesEl.querySelectorAll('.swatch:not(.swatch-none)')[idx]?.classList.add('active');
-    customInput.value = color;
   }
 }
-
-customInput.addEventListener('input', () => {
-  selectPendingColor(customInput.value);
-});
 
 function updatePickerPreview(color) {
   if (color === null) {
@@ -804,7 +814,7 @@ function updatePickerPreview(color) {
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#ffffff';
     pickerPreview.style.border = `1.5px solid ${dark}`;
-    pickerPreview.style.textShadow = `0 0 3px ${dark}, 0 0 6px ${dark}aa`;
+    pickerPreview.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
   } else {
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#ffffff';
@@ -829,7 +839,6 @@ function openPicker(letter) {
   } else {
     const idx = PRESET_COLORS.indexOf(pendingColor);
     if (idx >= 0) swatchesEl.querySelectorAll('.swatch:not(.swatch-none)')[idx]?.classList.add('active');
-    customInput.value = pendingColor || '#e03a2a';
   }
 
   pickerPanel.classList.add('active');
@@ -934,18 +943,20 @@ function applyColor(letter, color) {
     cell.classList.add('selected');
     bubble.style.background = color;
     if (isBright(color)) {
-      // 淡色：常に白文字 + 選択色の濃いバージョンで縁取り
+      // 淡色：白文字＋4方向shadowで袋文字
       const dark = getDarkenedColor(color);
       bubble.style.border = `1.5px solid ${dark}`;
-      bubble.style.boxShadow = `inset 0 0 0 2px ${dark}20`;
+      bubble.style.boxShadow = 'none';
       span.style.color = '#ffffff';
-      span.style.textShadow = `0 0 3px ${dark}, 0 0 6px ${dark}aa`;
+      span.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
+      span.style.webkitTextStroke = '0';
     } else {
       // 濃色：白文字、縁取りなし
       bubble.style.border = 'none';
       bubble.style.boxShadow = 'none';
       span.style.color = '#ffffff';
       span.style.textShadow = 'none';
+      span.style.webkitTextStroke = '0';
     }
   } else {
     cell.classList.remove('selected');
@@ -954,6 +965,7 @@ function applyColor(letter, color) {
     bubble.style.boxShadow = 'none';
     span.style.color = 'var(--ink3)';
     span.style.textShadow = 'none';
+    span.style.webkitTextStroke = '0';
   }
 }
 
@@ -962,9 +974,13 @@ function updateProgress() {
   const letters = isFullMode ? LETTERS_26 : LETTERS_10;
   const total = letters.length;
   const done = letters.filter(l => colorMap[l]).length;
-  // 分母を動的更新
+  // 分母を動的更新（MAX時は分母分子ともに白に）
   const countEl = document.querySelector('.progress-count');
-  countEl.innerHTML = `<span>${done}</span> / ${total}`;
+  if (done === total) {
+    countEl.innerHTML = `<span style="color:#ffffff">${done}</span> / <span style="color:#ffffff">${total}</span>`;
+  } else {
+    countEl.innerHTML = `<span>${done}</span> / ${total}`;
+  }
   progressFill.style.width = (done / total * 100) + '%';
 
   // ── グラデーション生成 ──
@@ -1041,23 +1057,19 @@ btnReset.addEventListener('click', () => {
   showToast('リセットしました');
 });
 
-/* ══ シェア ══ */
-btnShare.addEventListener('click', async () => {
+/* ══ 結果ページへ遷移 ══ */
+const COLOR_IDS = '0123456789ABC';
+function colorToId(hex) {
+  const i = PRESET_COLORS.indexOf(hex);
+  return i >= 0 ? COLOR_IDS[i] : '-';
+}
+
+btnResult.addEventListener('click', () => {
   const letters = isFullMode ? LETTERS_26 : LETTERS_10;
   const done = letters.filter(l => colorMap[l]).length;
-  const total = letters.length;
-  if (done === 0) { showToast('色を1つ以上設定してからシェアしよう'); return; }
-
-  const coloredLetters = letters.filter(l => colorMap[l]);
-  const sample = coloredLetters.slice(0, 5).map(l => `${l}=${colorMap[l]}`).join(', ');
-  const text = `アルファベット診断完了！${done}/${total}文字に色を設定しました。\n例: ${sample}\n#SynestheShare\nhttps://mo3ym.github.io/synestheshare/alphabet.html`;
-
-  if (navigator.share) {
-    try { await navigator.share({ text }); } catch(e) {}
-  } else {
-    await navigator.clipboard.writeText(text).catch(() => {});
-    showToast('テキストをコピーしました！');
-  }
+  if (done === 0) { showToast('色を1つ以上設定してから結果を見よう'); return; }
+  const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
+  window.location.href = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
 });
 
 /* ══ Toast通知 ══ */

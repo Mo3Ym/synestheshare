@@ -11,6 +11,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":       "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+  }
+}
+</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -31,7 +40,7 @@
 }
 
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
 h1,h2,h3,p { word-break: keep-all; overflow-wrap: break-word; }
 
 /* ══ NAV（コンパクト） ══ */
@@ -39,27 +48,19 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h);
   display: flex; align-items: center; justify-content: center;
   padding: 0 1.5rem;
-  background: rgba(247,247,245,0.82);
+  background: rgba(247,247,245,0.88);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(224,224,220,0.7);
-  transition: background 0.3s, border-color 0.3s;
-}
-nav.nav-dark {
-  background: rgba(22,22,26,0.88);
-  border-bottom-color: rgba(255,255,255,0.06);
 }
 .nav-logo {
   position: absolute; left: 1.5rem;
   display: flex; align-items: center; text-decoration: none; height: 26px;
 }
-.nav-logo img { height: 100%; width: auto; display: block; transition: filter 0.3s; }
-nav.nav-dark .nav-logo img { filter: brightness(0) invert(1) opacity(0.8); }
+.nav-logo img { height: 100%; width: auto; display: block; }
 .nav-right { position: absolute; right: 1.5rem; }
 nav ul { list-style: none; display: flex; gap: 1.8rem; }
 nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
-nav.nav-dark ul a { color: rgba(255,255,255,0.45); }
-nav.nav-dark ul a:hover { color: rgba(255,255,255,0.85); }
 
 .nav-back {
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
@@ -68,14 +69,21 @@ nav.nav-dark ul a:hover { color: rgba(255,255,255,0.85); }
   transition: color 0.15s;
 }
 .nav-back:hover { color: var(--ink); }
-nav.nav-dark .nav-back { color: rgba(255,255,255,0.4); }
-nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 @keyframes blobdrift {
   from { transform: translate(0,0) scale(1); }
   to   { transform: translate(20px,14px) scale(1.05); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.type-art-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.type-art-canvas.is-ready { opacity: 1; }
 
 /* ══ ページ全体ラッパー ══ */
 .page-outer {
@@ -96,13 +104,13 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   pointer-events: none; z-index: 0;
 }
 .type-hero-blob-1 {
-  width: max(400px,70vw); height: max(400px,70vw);
-  top: -20%; right: -15%;
+  width: max(500px,90vw); height: max(500px,90vw);
+  top: -25%; right: -20%;
   animation: blobdrift 9s ease-in-out infinite alternate;
 }
 .type-hero-blob-2 {
-  width: max(300px,55vw); height: max(300px,55vw);
-  bottom: -15%; left: -10%;
+  width: max(400px,75vw); height: max(400px,75vw);
+  bottom: -20%; left: -15%;
   animation: blobdrift 13s ease-in-out infinite alternate-reverse;
 }
 .type-hero-inner {
@@ -111,34 +119,54 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   display: flex; flex-direction: column; gap: 1.1rem;
 }
 
+/* ══ hero テーマ切替 ══ */
+.type-hero[data-theme="dark"] { --hero-ink: #f0f0ec; --hero-ink2: rgba(240,240,236,0.65); --hero-ink3: rgba(240,240,236,0.38); --hero-border: rgba(255,255,255,0.14); --hero-stat-bg: rgba(255,255,255,0.08); --hero-stat-border: rgba(255,255,255,0.14); }
+.type-hero[data-theme="light"] { --hero-ink: #181818; --hero-ink2: rgba(24,24,24,0.6); --hero-ink3: rgba(24,24,24,0.35); --hero-border: rgba(0,0,0,0.12); --hero-stat-bg: rgba(0,0,0,0.04); --hero-stat-border: rgba(0,0,0,0.1); }
+
+.type-eyebrow { color: var(--hero-ink3); }
+.type-eyebrow::before { background: var(--hero-ink3); }
+.type-label { color: var(--hero-ink3); }
+.type-name-color::before { background: var(--hero-border); }
+.type-stat { background: var(--hero-stat-bg); border-color: var(--hero-stat-border); }
+.type-stat-label { color: var(--hero-ink3); }
+.scroll-indicator-label { color: var(--hero-ink3); }
+
 /* eyebrow */
 .type-eyebrow {
   font-family: var(--outfit); font-size: 0.65rem; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--ink3);
   display: flex; align-items: center; gap: 0.5rem;
 }
-.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; background: var(--ink3); }
+.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; }
 
 /* あなたの共感覚タイプ ラベル */
 .type-label {
   font-family: var(--jp); font-weight: 300;
-  font-size: 0.8rem;
-  color: var(--ink3); line-height: 1;
+  font-size: 0.8rem; line-height: 1;
   letter-spacing: 0.02em;
 }
 
 /* 個性派センサー / 大地タイプ — 主役 */
 .type-name {
+  display: flex; flex-direction: column; gap: 0.1em;
+}
+.type-name-diag {
   font-family: var(--jp); font-weight: 700;
   font-size: clamp(1.7rem, 5.5vw, 2.6rem);
-  color: var(--ink); line-height: 1.2;
+  color: var(--ink); line-height: 1.15;
   letter-spacing: -0.02em;
 }
-.type-name-sep {
-  font-weight: 300;
-  color: var(--ink3);
-  margin: 0 0.15em;
+.type-name-color {
+  font-family: var(--jp); font-weight: 700;
+  font-size: clamp(1.7rem, 5.5vw, 2.6rem);
+  line-height: 1.15; letter-spacing: -0.02em;
+  display: flex; align-items: center; gap: 0.4em;
+}
+.type-name-color::before {
+  content: '';
+  display: inline-block; width: 2px; height: 1em;
+  background: var(--border); border-radius: 1px;
+  flex-shrink: 0;
 }
 
 /* 一致率・レア度 */
@@ -148,8 +176,10 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 .type-stat {
   display: flex; flex-direction: column; gap: 0.15rem;
   padding: 0.75rem 0.85rem;
-  background: rgba(0,0,0,0.03);
-  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   flex: 1;
 }
 .type-stat:first-child { border-radius: 12px 0 0 12px; }
@@ -158,12 +188,12 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 .type-stat-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink3); line-height: 1;
+  color: #888880; line-height: 1;
 }
 .type-stat-value {
   font-family: var(--outfit); font-weight: 700;
   font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1;
-  color: var(--ink);
+  color: #181818;
 }
 .type-stat-sub { font-size: 0.62rem; color: var(--ink3); line-height: 1.3; }
 /* タイプ診断欄（日本語は視覚的に圧力が強いため数値より少し小さく） */
@@ -188,11 +218,11 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 }
 
 /* パレットドット帯 */
-.type-palette-strip { display: flex; gap: 5px; flex-wrap: wrap; }
+.type-palette-strip { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
 .type-palette-dot {
-  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700; font-size: 0.7rem;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
 
 /* 下スクロール誘導 */
@@ -206,7 +236,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 /* ══ スクロールインジケーター ══ */
 .scroll-indicator {
   position: absolute;
-  bottom: 2rem; left: 50%;
+  bottom: 2.5rem; left: 50%;
   transform: translateX(-50%);
   z-index: 2;
   display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
@@ -217,22 +247,27 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   from { opacity: 0; transform: translateX(-50%) translateY(8px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+.scroll-indicator-label {
+  font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(100,100,96,0.5);
+}
 .scroll-indicator-line {
   width: 1px; height: 28px;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.15));
+  background: linear-gradient(to bottom, transparent, rgba(100,100,96,0.35));
 }
 .scroll-indicator-icon {
   width: 38px; height: 38px; border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: rgba(247,247,245,0.8);
+  border: 1px solid rgba(100,100,96,0.18);
+  background: rgba(247,247,245,0.55);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   display: flex; align-items: center; justify-content: center;
   transition: border-color 0.2s, background 0.2s, transform 0.2s;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .scroll-indicator:hover .scroll-indicator-icon {
-  border-color: rgba(0,0,0,0.25);
-  background: rgba(247,247,245,1);
+  border-color: rgba(100,100,96,0.4);
+  background: rgba(247,247,245,0.85);
   transform: translateY(2px);
 }
 .scroll-indicator-icon svg {
@@ -243,27 +278,38 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(4px); }
 }
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
 .content-outer {
   background: #16161a;
   border-top: 1px solid rgba(255,255,255,0.06);
   position: relative; overflow: hidden;
+  scroll-margin-top: var(--nav-h);
 }
 /* content-outer内のblobグラデーション */
 .content-blob {
-  position: absolute; border-radius: 50%; filter: blur(80px);
+  position: absolute; border-radius: 50%; filter: blur(90px);
   pointer-events: none; z-index: 0;
 }
 .content-blob-1 {
-  width: min(520px,55vw); height: min(520px,55vw);
-  background: radial-gradient(circle, rgba(112,40,192,0.18) 0%, transparent 70%);
-  top: 5%; right: -5%;
+  width: max(500px, 85vw); height: max(500px, 85vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.38) 0%, transparent 65%);
+  top: -5%; right: -20%;
   animation: blobdrift 13s ease-in-out infinite alternate;
 }
 .content-blob-2 {
-  width: min(400px,42vw); height: min(400px,42vw);
-  background: radial-gradient(circle, rgba(26,136,200,0.14) 0%, transparent 70%);
-  bottom: 10%; left: -5%;
+  width: max(420px, 75vw); height: max(420px, 75vw);
+  background: radial-gradient(circle, rgba(26,136,200,0.3) 0%, transparent 65%);
+  bottom: 5%; left: -20%;
   animation: blobdrift 10s ease-in-out infinite alternate-reverse;
+}
+.content-blob-3 {
+  width: max(350px, 65vw); height: max(350px, 65vw);
+  background: radial-gradient(circle, rgba(232,120,32,0.18) 0%, transparent 65%);
+  top: 40%; left: 20%;
+  animation: blobdrift 16s ease-in-out infinite alternate;
 }
 .content-wrap {
   position: relative; z-index: 1;
@@ -272,13 +318,22 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   display: flex; flex-direction: column; gap: 1.5rem;
 }
 
-/* ══ カード共通 ══ */
+/* ══ シェアエリア（明るい背景） ══ */
+.share-outer {
+  background: var(--bg);
+  position: relative; overflow: hidden;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  scroll-margin-top: var(--nav-h);
+}
+.share-outer .content-wrap {
+  position: relative; z-index: 1;
+}
 .card {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(224,224,220,0.8);
+  background: rgba(255,255,255,0.97);
+  border: 1px solid rgba(224,224,220,0.6);
   border-radius: 14px;
   padding: 1.5rem;
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
 .section-eyebrow {
   font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;
@@ -292,10 +347,9 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 
 /* ══ 最も割れた文字ハイライト ══ */
 .highlight-card {
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(224,224,220,0.8);
-  border-radius: 14px;
+  background: rgba(247,247,245,0.97);
+  border: 1px solid rgba(224,224,220,0.6);
+  border-radius: 10px;
   padding: 1.25rem 1.5rem;
   display: flex; align-items: center; gap: 1.25rem;
 }
@@ -312,6 +366,11 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 }
 .highlight-text { font-size: 0.82rem; color: var(--ink2); line-height: 1.5; }
 .highlight-text strong { color: var(--ink); }
+.highlight-comment {
+  font-size: 0.75rem; color: var(--ink3);
+  font-style: italic; line-height: 1.5;
+  margin-top: 0.1rem;
+}
 /* ハイライトのミニバー（▼あなた付き） */
 .highlight-bar-wrap {
   margin-top: 0.5rem;
@@ -332,6 +391,67 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   pointer-events: none; padding-bottom: 2px;
 }
 .highlight-mine-marker::after { content: '▼'; font-size: 0.48rem; color: var(--ink); line-height: 1; }
+
+/* ══ Your Sense カード ══ */
+/* 2列グリッド */
+.sense-grid {
+  display: flex; flex-direction: column; gap: 1.75rem;
+}
+.sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
+.sense-col-label {
+  font-family: var(--jp); font-weight: 700; font-size: 1rem;
+  color: var(--ink);
+}
+.sense-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
+
+/* 1行レイアウト：左＝色エリア、右＝テキスト */
+.sense-row {
+  display: flex; align-items: flex-start; gap: 0.85rem;
+}
+
+/* 色エリア（左） */
+.sense-circles {
+  display: flex; align-items: flex-start; flex-shrink: 0;
+}
+.sense-circle-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  width: 48px;
+}
+.sense-circle {
+  border-radius: 50%;
+  width: 38px; height: 38px;
+}
+.sense-circle-label {
+  font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
+  color: var(--ink2); text-align: center; line-height: 1.3;
+  white-space: nowrap;
+}
+/* vs / = 記号 */
+.sense-op {
+  font-family: var(--outfit); font-size: 0.75rem; font-weight: 700;
+  color: var(--ink3); flex-shrink: 0; line-height: 1;
+  width: 22px; text-align: center;
+  margin-top: calc(19px - 0.375rem);
+}
+
+/* テキストエリア（右） */
+.sense-text { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 0; padding-top: 0.15rem; }
+.sense-sentence {
+  font-size: 0.72rem; color: var(--ink2); line-height: 1.65;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+.sense-strong { font-family: var(--outfit); font-weight: 700; color: var(--ink); }
+.sense-color-word { font-weight: 700; }
+.sense-comment { font-size: 0.65rem; color: var(--ink3); font-style: italic; line-height: 1.6; }
+
+/* 文言行 */
+.empathy-pct-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.5; }
+.empathy-comment { font-size: 0.72rem; color: var(--ink3); font-style: italic; line-height: 1.5; margin-top: 0.1rem; }
+.empathy-badge {
+  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1.3rem;
+}
 
 /* ══ 投票グラフ ══ */
 .vote-list { display: flex; flex-direction: column; gap: 1.25rem; }
@@ -403,7 +523,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 80px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.95));
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.97));
   pointer-events: none;
   border-radius: 0 0 14px 14px;
   transition: opacity 0.3s;
@@ -460,7 +580,7 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   padding-top: 0.85rem;
   border-top: 1px solid var(--border);
   font-size: 0.72rem; color: var(--ink3); line-height: 1.7;
-  display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
+  display: block;
 }
 .diag-basis strong { color: var(--ink2); font-weight: 700; }
 .diag-basis-label {
@@ -479,22 +599,28 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 .share-section { display: flex; flex-direction: column; gap: 0.9rem; }
 .share-card-preview {
   border-radius: 10px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: #16161a; padding: 1.25rem;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: var(--bg); padding: 1.25rem;
+  position: relative;
 }
-.share-card-inner { display: flex; flex-direction: column; gap: 0.5rem; }
+.share-card-inner { display: flex; flex-direction: column; gap: 0.5rem; position: relative; z-index: 1; }
 .share-card-eyebrow {
   font-family: var(--outfit); font-size: 0.58rem; font-weight: 600; letter-spacing: 0.2em;
-  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  text-transform: uppercase; color: var(--ink3);
 }
 .share-card-title {
   font-family: var(--jp); font-weight: 700; font-size: 1rem;
-  color: rgba(255,255,255,0.9); line-height: 1.3;
+  color: var(--ink); line-height: 1.3;
 }
 .share-card-palette { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 0.15rem; }
 .share-card-dot { width: 20px; height: 20px; border-radius: 50%; }
-.share-card-stats { font-family: var(--outfit); font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 0.25rem; }
-.share-card-tag { font-family: var(--outfit); font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; }
+.share-card-stats { font-family: var(--outfit); font-size: 0.65rem; color: var(--ink3); margin-top: 0.25rem; }
+.share-card-tag { font-family: var(--outfit); font-size: 0.6rem; font-weight: 700; color: var(--ink3); letter-spacing: 0.1em; }
+/* share-card内のblobグラデーション */
+.share-card-blob {
+  position: absolute; border-radius: 50%; filter: blur(50px);
+  pointer-events: none; z-index: 0;
+}
 
 .share-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .btn-x-share {
@@ -525,8 +651,6 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
 }
 .btn-back:hover { background: var(--border); color: var(--ink); }
 .x-logo { width: 13px; height: 13px; fill: white; flex-shrink: 0; }
-
-/* ══ TOAST ══ */
 .toast {
   position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: var(--white);
@@ -546,6 +670,28 @@ nav.nav-dark .nav-back:hover { color: rgba(255,255,255,0.8); }
   width: 28px; height: 28px; border: 2.5px solid rgba(255,255,255,0.1);
   border-top-color: rgba(255,255,255,0.5); border-radius: 50%;
   animation: spin 0.7s linear infinite;
+}
+
+.btn-diag {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.3rem; border-radius: 100px;
+  background: rgba(220,50,32,0.88); color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  font-family: var(--jp); font-weight: 700; font-size: 0.82rem;
+  text-decoration: none; letter-spacing: 0.04em;
+  box-shadow: 0 4px 18px rgba(220,50,32,0.3), inset 0 1px 0 rgba(255,255,255,0.18);
+  transition: background 0.15s, transform 0.12s;
+  white-space: nowrap;
+}
+.btn-diag:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.diag-btn-wrap {
+  position: relative; z-index: 1;
+  max-width: 640px; margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  display: flex; justify-content: center;
+}
+@media (max-width: 600px) {
+  .diag-btn-wrap { padding: 0 1.25rem 2.5rem; }
 }
 
 /* ══ FOOTER ══ */
@@ -575,9 +721,9 @@ footer {
     <img src="images_sub/logo.png" alt="SynestheShare">
   </a>
   <ul>
-    <li><a href="index.html#how">使い方</a></li>
-    <li><a href="index.html#themes">テーマ</a></li>
-    <li><a href="index.html#about">共感覚とは</a></li>
+    <li><a href="#typeHeroArea">TOP</a></li>
+    <li><a href="#contentOuter">詳細</a></li>
+    <li><a href="#shareOuter">シェア</a></li>
   </ul>
   <div class="nav-right">
     <a class="nav-back" href="alphabet.html">← 診断に戻る</a>
@@ -586,25 +732,28 @@ footer {
 
 <div class="page-outer">
   <!-- ファーストビュー：タイプ＋統計 -->
-  <div id="typeHeroArea">
+  <div id="typeHeroArea" style="scroll-margin-top:0">
     <div class="loading-wrap">
       <div class="spinner"></div>
       <span style="color:rgba(255,255,255,0.3)">結果を集計中...</span>
     </div>
   </div>
 
-  <!-- スクロール後：グラフ・診断・シェア -->
+  <!-- スクロール後：グラフ・診断 -->
   <div class="content-outer" id="contentOuter">
     <div class="content-blob content-blob-1"></div>
     <div class="content-blob content-blob-2"></div>
+    <div class="content-blob content-blob-3"></div>
     <div class="content-wrap" id="mainWrap"></div>
   </div>
+
+  <!-- シェアエリア：明るい背景 -->
+  <div class="share-outer" id="shareOuter"></div>
 </div>
 
 <!-- ══ FOOTER ══ -->
 <footer>
   <span class="footer-logo">SynestheShare</span>
-  <span>© 2024</span>
 </footer>
 
 <!-- ══ TOAST ══ -->
@@ -684,11 +833,27 @@ const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
 const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const letters = isFullMode ? LETTERS_26 : LETTERS_10;
 
+/* 色IDマップ */
+const COLOR_IDS = '0123456789ABC';
+
 const colorMap = {};
-letters.forEach(l => {
-  const c = params.get(l);
-  if (c) colorMap[l] = snapToPreset(c); // カスタム色は最近傍プリセットに変換
-});
+const rParam = params.get('r');
+if (rParam) {
+  // 新方式：?mode=10&r=05A2-...
+  letters.forEach((l, i) => {
+    const id = rParam[i];
+    if (!id || id === '-') return;
+    const idx = COLOR_IDS.indexOf(id);
+    if (idx >= 0) colorMap[l] = ALPHABET_PRESETS[idx]?.color || null;
+    if (colorMap[l] === null) delete colorMap[l];
+  });
+} else {
+  // 旧方式との後方互換：?A=%23e03a2a&B=...
+  letters.forEach(l => {
+    const c = params.get(l);
+    if (c) colorMap[l] = snapToPreset(c);
+  });
+}
 
 /* ══ 色名を取得（プリセット照合、なければ概算） ══ */
 const PRESET_COLORS = ['#e03a2a','#e87820','#f0e040','#a8d020','#2a9e60','#1888c8','#70cbff','#7028c0','#ff90b8','#8b4513','#181818','#888880','#ffffff'];
@@ -743,7 +908,22 @@ function rgbToHsl(hex) {
 function isBright(hex) { return getLuminance(hex) > 0.88; }
 function textColorFor(bg) {
   if (!bg) return 'var(--ink3)';
-  return isBright(bg) ? 'var(--ink)' : '#ffffff';
+  return isBright(bg) ? '#888880' : '#ffffff';
+}
+
+/* 背景テーマに対してアクセントカラーのコントラストを確保する
+   light背景: 輝度 > 0.55 なら暗くする
+   dark背景:  輝度 < 0.12 なら明るくする */
+function ensureContrast(hex, theme) {
+  const lum = getLuminance(hex);
+  const { r, g, b } = hexToRgb(hex);
+  if (theme === 'light' && lum > 0.55) {
+    return `rgb(${Math.round(r*0.55)},${Math.round(g*0.55)},${Math.round(b*0.55)})`;
+  }
+  if (theme === 'dark' && lum < 0.12) {
+    return `rgb(${Math.min(255,Math.round(r*2.2+80))},${Math.min(255,Math.round(g*2.2+80))},${Math.min(255,Math.round(b*2.2+80))})`;
+  }
+  return hex;
 }
 
 /* ══ HEROパレット描画 ══ */
@@ -805,114 +985,109 @@ function calcDiagnosis() {
 
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
-  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', desc: 'あなたの色覚は非常にユニーク。同じ感覚を持つ人は少数派です。その鋭い感性は、アートや創造的な分野で力を発揮するかもしれません。' };
-  if (rareScore >= 40)  return { label: '◈ 個性派センサー', desc: 'ほどよくユニーク。一般的な傾向は踏まえつつも、あなたらしい独自の色使いが光っています。' };
-  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', desc: 'あなたの色覚は多くの人と共通しています。共感覚の「スタンダード」に近い感性の持ち主です。' };
-  return { label: '◇ バランス型', desc: '多数派の色と少数派の色が混在しています。広い感性でさまざまな色世界を持ち合わせています。' };
+  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなたの色覚は<wbr>非常にユニーク。<wbr>同じ感覚を持つ人は<wbr>少数派です。<wbr>その鋭い感性は、<wbr>アートや創造的な分野で<wbr>力を発揮するかもしれません。' };
+  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#e87820', desc: 'ほどよくユニーク。<wbr>一般的な傾向は<wbr>踏まえつつも、<wbr>あなたらしい独自の<wbr>色使いが光っています。' };
+  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#1888c8', desc: 'あなたの色覚は<wbr>多くの人と共通しています。<wbr>共感覚の「スタンダード」に<wbr>近い感性の持ち主です。' };
+  return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派の色と<wbr>少数派の色が混在しています。<wbr>広い感性で<wbr>さまざまな色世界を<wbr>持ち合わせています。' };
 }
 
 /* ══ 色傾向タイプ判定 ══ */
 const COLOR_TYPES = [
   {
-    id: 'warm',
-    name: '暖色タイプ',
+    id: 'warm',   theme: 'light',
+    name: '🔥 暖色タイプ',
     color: '#e87820',
-    tagline: '赤・橙・黄が織りなす温かな世界。\nあなたの感覚には、光のような熱量が宿っている。',
+    tagline: '温かく燃えるような<wbr>色彩の感覚。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
   {
-    id: 'cool',
-    name: '深海タイプ',
-    color: '#70cbff',
-    tagline: '青・水色・紫が沈む静かな深淵。\n言葉より先に、色が感情を語りかけてくる。',
+    id: 'cool',   theme: 'light',
+    name: '🌊 深海タイプ',
+    color: '#1888c8',
+    tagline: '静かな深さをたたえた<wbr>色彩の感覚。\n言葉より先に、<wbr>色が感情を<wbr>語りかけてくる。',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
   {
-    id: 'nature',
-    name: '森林タイプ',
-    color: '#a8d020',
-    tagline: '緑・黄緑が広がる生命の色彩。\n自然の呼吸に同調するような、静かで豊かな感覚。',
+    id: 'nature', theme: 'light',
+    name: '🌿 森林タイプ',
+    color: '#2a7a30',
+    tagline: '生命の息吹を感じる、<wbr>みずみずしい色彩の感覚。\n自然の呼吸に<wbr>同調するような、<wbr>静かで豊かな感性。',
     blobColors: ['rgba(42,158,96,0.5)', 'rgba(168,208,32,0.35)'],
   },
   {
-    id: 'mono',
-    name: 'モノクロタイプ',
-    color: '#aaaaaa',
-    tagline: '黒・白・グレーが支配する無彩の宇宙。\n色を超えた先に、あなただけの深度がある。',
+    id: 'mono',   theme: 'light',
+    name: '🖤 モノクロタイプ',
+    color: '#555550',
+    tagline: '色を超えた先にある、<wbr>無彩の宇宙。\nあなただけが知っている<wbr>深度が、そこにある。',
     blobColors: ['rgba(80,80,80,0.5)', 'rgba(136,136,128,0.3)'],
   },
   {
-    id: 'pastel',
-    name: 'パステルタイプ',
-    color: '#ff90b8',
-    tagline: '白・水色・ピンク・黄が溶け合う夢の余白。\nどこか遠い午後の光を、文字の中に見ている。',
+    id: 'pastel', theme: 'light',
+    name: '🌸 パステルタイプ',
+    color: '#c0507a',
+    tagline: '夢のように淡く、<wbr>やわらかな色彩の感覚。\nどこか遠い午後の光を、<wbr>文字の中に見ている。',
     blobColors: ['rgba(255,144,184,0.45)', 'rgba(112,203,255,0.4)'],
   },
   {
-    id: 'neon',
-    name: 'ネオンタイプ',
-    color: '#e03a2a',
-    tagline: '鮮やかな色が混在する、夜の看板のような感覚。\n感情と色が、鮮烈に交差する。',
+    id: 'neon',   theme: 'light',
+    name: '⚡ ネオンタイプ',
+    color: '#c02818',
+    tagline: '鮮烈な色が混在する、<wbr>夜の感覚。\n感情と色が、<wbr>境界なく交差している。',
     blobColors: ['rgba(224,58,42,0.45)', 'rgba(112,40,192,0.4)'],
   },
   {
-    id: 'dream',
-    name: '夢想タイプ',
-    color: '#b060e8',
-    tagline: '紫・ピンク・青が混ざり合う、夢と現の境界線。\nあなたの共感覚は、どこか別の場所から来ている。',
+    id: 'dream',  theme: 'light',
+    name: '🌙 夢想タイプ',
+    color: '#7028c0',
+    tagline: '夢と現の境界に<wbr>漂うような色彩の感覚。\nあなたの共感覚は、<wbr>どこか別の場所から<wbr>来ている。',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
   {
-    id: 'earth',
-    name: '大地タイプ',
+    id: 'earth',  theme: 'light',
+    name: '🌱 大地タイプ',
     color: '#c07840',
-    tagline: '茶色・緑・黄緑が重なる、土と草の記憶。\n根のある感性が、文字に色を与えている。',
+    tagline: '土と草の記憶が<wbr>混ざり合う、<wbr>根のある色彩。\n静かな力強さが、<wbr>文字の奥に宿っている。',
     blobColors: ['rgba(139,69,19,0.5)', 'rgba(42,158,96,0.38)'],
   },
 ];
 
 function detectColorType(coloredLetters) {
-  // 各色のカウント
   const counts = {};
   coloredLetters.forEach(l => {
     const c = colorMap[l];
     counts[c] = (counts[c] || 0) + 1;
   });
   const total = coloredLetters.length;
+  const hasBrown = (counts['#8b4513']||0) >= 1;
 
-  // グループ集計
-  const warm  = ((counts['#e03a2a']||0) + (counts['#e87820']||0) + (counts['#f0e040']||0)) / total;
-  const cool  = ((counts['#1888c8']||0) + (counts['#70cbff']||0) + (counts['#7028c0']||0)) / total;
-  const nature= ((counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
-  const mono  = ((counts['#181818']||0) + (counts['#888880']||0) + (counts['#ffffff']||0)) / total;
-  const pastel= ((counts['#ffffff']||0) + (counts['#70cbff']||0) + (counts['#ff90b8']||0) + (counts['#f0e040']||0)) / total;
-  const dream = ((counts['#7028c0']||0) + (counts['#ff90b8']||0) + (counts['#1888c8']||0)) / total;
-  const earth = ((counts['#8b4513']||0) + (counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
+  const warm   = ((counts['#e03a2a']||0) + (counts['#e87820']||0) + (counts['#f0e040']||0)) / total;
+  const cool   = ((counts['#1888c8']||0) + (counts['#70cbff']||0) + (counts['#7028c0']||0)) / total;
+  const nature = ((counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
+  const mono   = ((counts['#181818']||0) + (counts['#888880']||0) + (counts['#ffffff']||0)) / total;
+  const pastel = ((counts['#ffffff']||0) + (counts['#70cbff']||0) + (counts['#ff90b8']||0) + (counts['#f0e040']||0)) / total;
+  const dream  = ((counts['#7028c0']||0) + (counts['#ff90b8']||0) + (counts['#1888c8']||0)) / total;
+  // earth は茶色必須。茶色がなければカウントしない
+  const earth  = hasBrown
+    ? ((counts['#8b4513']||0) + (counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total
+    : 0;
 
-  // 無彩色率が高い
   if (mono >= 0.55) return 'mono';
-  // パステル系（明るい色が多い）
-  if (pastel >= 0.55 && warm < 0.3) return 'pastel';
-  // 夢想（紫・ピンク系）
-  if (dream >= 0.5) return 'dream';
-  // 深海（青系）
+  if (earth >= 0.4) return 'earth';                   // 茶色ありのときのみ
+  if (pastel >= 0.55 && warm < 0.3 && cool < 0.3) return 'pastel';
+  if (dream >= 0.5 && warm < 0.2) return 'dream';
   if (cool >= 0.5 && warm < 0.2) return 'cool';
-  // 大地（茶色あり）
-  if (earth >= 0.4 && (counts['#8b4513']||0) >= 1) return 'earth';
-  // 森林
-  if (nature >= 0.45) return 'nature';
-  // 暖色
+  if (nature >= 0.45 && warm < 0.3) return 'nature';
   if (warm >= 0.45) return 'warm';
-  // 暖色と寒色が拮抗 → ネオン
-  if (warm >= 0.25 && cool >= 0.25) return 'neon';
-  // 最多グループで決定
-  const scores = { warm, cool, nature, mono, dream, earth };
+  if (warm >= 0.22 && cool >= 0.22) return 'neon';
+  // フォールバック：earthを除いたスコアで最大を選ぶ
+  const scores = { warm, cool, nature, mono, dream, pastel };
   return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
 }
 
 function buildTypeHero(coloredLetters, diag) {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
+  const theme = type.theme || 'light';
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
 
   const dots = coloredLetters.map(l => {
@@ -921,91 +1096,170 @@ function buildTypeHero(coloredLetters, diag) {
       ? 'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)'
       : 'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)';
     const tc = textColorFor(c);
-    return `<div class="type-palette-dot" style="background:${c};${shadow};color:${tc}">${l}</div>`;
+    const sizeOverride = '';
+    return `<div class="type-palette-dot" style="background:${c};${shadow};color:${tc};${sizeOverride}">${l}</div>`;
   }).join('');
 
-  const taglineHtml = type.tagline.replace(/\n/g, '<br>');
+  const taglineHtml = type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');
+  const uniqueResult = calcMostUnique(coloredLetters);
 
-  // 一致率：高いほど青寄り（多数派）、低いほど緑（希少）
-  const majColor = diag.majorityRate >= 70 ? '#1888c8'
+  // 一致率：背景テーマに合わせてコントラスト確保
+  const majColorRaw = diag.majorityRate >= 70 ? '#1888c8'
     : diag.majorityRate >= 50 ? '#2a7ab8'
     : diag.majorityRate >= 30 ? '#555550'
     : '#2a9e60';
+  const majColor = ensureContrast(majColorRaw, theme);
 
-  // レア度：高いほど紫（希少）、低いほど青
-  const rareColor = diag.rareScore >= 65 ? '#7028c0'
+  const rareColorRaw = diag.rareScore >= 65 ? '#7028c0'
     : diag.rareScore >= 40 ? '#9060c0'
     : diag.rareScore >= 20 ? '#1888c8'
     : '#555550';
+  const rareColor = ensureContrast(rareColorRaw, theme);
 
-  // タイプ名の色
-  const typeColor = type.color || '#181818';
+  // タイプ名の色・diagType色もコントラスト確保
+  const typeColor = ensureContrast(type.color || '#181818', theme);
+  const diagColor = ensureContrast(diagType.color, theme);
 
-  // ユーザー選択色の上位2色からblobカラーを生成
-  const counts = {};
-  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
-  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
-  const blob1Color = topColors[0] || '#e03a2a';
-  const blob2Color = topColors[1] || topColors[0] || '#1888c8';
-  const { r: r1, g: g1, b: b1 } = hexToRgb(blob1Color);
-  const { r: r2, g: g2, b: b2 } = hexToRgb(blob2Color);
-  const blobStyle1 = `radial-gradient(circle, rgba(${r1},${g1},${b1},0.25) 0%, transparent 70%)`;
-  const blobStyle2 = `radial-gradient(circle, rgba(${r2},${g2},${b2},0.18) 0%, transparent 70%)`;
+  // 最も個性的な文字の色
+  const uniqueColor = uniqueResult.isAllMajority
+    ? 'var(--hero-ink3)'
+    : ensureContrast(colorMap[uniqueResult.mostUnique] || '#181818', theme);
 
-  return `<div class="type-hero">
-    <div class="type-hero-blob type-hero-blob-1" style="background:${blobStyle1}"></div>
-    <div class="type-hero-blob type-hero-blob-2" style="background:${blobStyle2}"></div>
+  return `<div class="type-hero" data-type="${typeId}" data-theme="${theme}">
+    <canvas class="type-art-canvas" id="artCanvas"></canvas>
     <div class="type-hero-inner">
-      <div class="type-eyebrow">Color Personality — Alphabet</div>
-      <div class="type-label">あなたの共感覚タイプ</div>
-      <div class="type-name">${diagType.label}<span class="type-name-sep">/</span><span style="color:${typeColor}">${type.name}</span></div>
+      <div class="type-eyebrow">Color Personality<wbr> — Alphabet</div>
+      <div class="type-label">あなたの<wbr>共感覚タイプ</div>
+      <div class="type-name">
+        <span class="type-name-diag" style="color:${diagColor}">${diagType.label}</span>
+        <span class="type-name-color" style="color:${typeColor}">${type.name}</span>
+      </div>
       <div class="type-stats">
         <div class="type-stat">
           <span class="type-stat-label">多数派一致率</span>
           <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}%</span>
-          <span class="type-stat-sub">${diag.majorityCount}/${diag.total}文字が世間と一致</span>
         </div>
         <div class="type-stat">
           <span class="type-stat-label">レア度</span>
-          <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}<span class="type-stat-denom">/100</span></span>
-          <span class="type-stat-sub">高いほど希少な感覚</span>
+          <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}</span>
+        </div>
+        <div class="type-stat">
+          <span class="type-stat-label">最も個性的な文字</span>
+          ${uniqueResult.isAllMajority
+            ? `<span class="type-stat-value" style="color:var(--hero-ink3)">-</span>`
+            : `<span class="type-stat-value" style="color:${uniqueColor}">${uniqueResult.mostUnique}</span>`
+          }
         </div>
       </div>
       <div class="type-palette-strip">${dots}</div>
     </div>
     <a class="scroll-indicator" href="#contentOuter">
-      <div class="scroll-indicator-line"></div>
-      <div class="scroll-indicator-icon">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <span class="scroll-indicator-label">Scroll</span>
+      <span class="scroll-indicator-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
           <polyline points="2,4 7,10 12,4"/>
         </svg>
-      </div>
+      </span>
     </a>
+  </div>`;
+}
+
+/* ══ 最も個性的な文字を計算（共用） ══ */
+function calcMostUnique(coloredLetters) {
+  let mostUnique = null, lowestMyPct = 101;
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+    const myMatchIdx = votes.findIndex(v => v.color === myColor);
+    if (myMatchIdx === 0) return;
+    const myPct = myMatchIdx === -1 ? 0 : votes[myMatchIdx].pct;
+    if (myPct < lowestMyPct) { lowestMyPct = myPct; mostUnique = l; }
+  });
+  const isAllMajority = !mostUnique;
+  if (!mostUnique) {
+    let maxPct = -1;
+    coloredLetters.forEach(l => {
+      const votes = DUMMY_VOTES[l] || [];
+      if (!votes.length) return;
+      if (votes[0].pct > maxPct) { maxPct = votes[0].pct; mostUnique = l; }
+    });
+  }
+  return { mostUnique, isAllMajority };
+}
+
+/* ══ 共感カード：最も共感された文字 ══ */
+function buildEmpathyCard(coloredLetters) {
+  // 自分の色が世間1位と一致している文字の中で、一致率が最も高いものを探す
+  let mostEmpathy = null, highestPct = -1;
+
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+    const myMatchIdx = votes.findIndex(v => v.color === myColor);
+    if (myMatchIdx !== 0) return; // 世間1位と一致している文字のみ
+    if (votes[0].pct > highestPct) {
+      highestPct = votes[0].pct;
+      mostEmpathy = l;
+    }
+  });
+
+  // 誰とも一致しなかった場合
+  if (!mostEmpathy) {
+    return `<div class="card">
+      <div class="section-eyebrow">Shared Sense</div>
+      <div class="section-title">あなたが最も<wbr>共感された文字</div>
+      <div class="empathy-card">
+        <div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>
+        <div class="empathy-body">
+          <div class="empathy-pct-label">すべての文字で世間と異なる色を選んでいました。</div>
+          <div class="empathy-comment">あなたの感覚は、誰とも違う独自の宇宙を持っています。</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const myColor = colorMap[mostEmpathy];
+  const votes = DUMMY_VOTES[mostEmpathy];
+
+  // 詩的なコメント
+  const comment = highestPct >= 70
+    ? 'その感覚は、多くの人の心と静かに重なっています。'
+    : highestPct >= 50
+    ? '2人に1人以上が、あなたと同じ色を感じていました。'
+    : 'それぞれの感じ方の中に、確かな共鳴がありました。';
+
+  return `<div class="card">
+    <div class="section-eyebrow">Shared Sense</div>
+    <div class="section-title">あなたが最も<wbr>共感された文字</div>
+    <div class="empathy-card">
+      <div class="empathy-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostEmpathy}</div>
+      <div class="empathy-body">
+        <div class="empathy-pct">${highestPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>
+        <div class="empathy-pct-label">の人が、<wbr>あなたと同じ色を<wbr>感じていました。</div>
+        <div class="empathy-comment">${comment}</div>
+      </div>
+    </div>
   </div>`;
 }
 
 /* ══ 最も意見が割れた文字ハイライト ══ */
 function buildHighlightCard(coloredLetters) {
-  let mostDivided = null, lowestTop = 101;
-  coloredLetters.forEach(l => {
-    const votes = DUMMY_VOTES[l] || [];
-    if (!votes.length) return;
-    if (votes[0].pct < lowestTop) { lowestTop = votes[0].pct; mostDivided = l; }
-  });
-  if (!mostDivided) return '';
+  const { mostUnique: _mu, isAllMajority } = calcMostUnique(coloredLetters);
+  let mostUnique = _mu;
+  if (!mostUnique) return '';
 
-  const myColor = colorMap[mostDivided];
-  const votes = DUMMY_VOTES[mostDivided];
+  const myColor = colorMap[mostUnique];
+  const votes = DUMMY_VOTES[mostUnique];
   const myMatchIdx = votes.findIndex(v => v.color === myColor);
+  const isOutlier = myMatchIdx === -1;
+  const myPct = isOutlier ? 0 : votes[myMatchIdx].pct;
+  const topPct = votes[0].pct;
 
-  const myRankText = myMatchIdx === 0 ? '世間の1位と一致' :
-    myMatchIdx === 1 ? '世間の2位' :
-    myMatchIdx === 2 ? '世間の3位' :
-    myMatchIdx === -1 ? '少数派（圏外）' : `世間の${myMatchIdx+1}位`;
-
-  // ▼マーカー位置（一致時はセグメント中央、不一致は非表示）
+  // 「あなた」マーカー位置
   let markerLeftPct = null;
-  if (myMatchIdx !== -1) {
+  if (!isOutlier) {
     let acc = 0;
     for (let i = 0; i < myMatchIdx; i++) acc += votes[i].pct;
     markerLeftPct = acc + votes[myMatchIdx].pct / 2;
@@ -1019,20 +1273,182 @@ function buildHighlightCard(coloredLetters) {
     `<div class="highlight-bar-seg" style="background:${v.color}" data-pct="${v.pct}"></div>`
   ).join('');
 
+  const sectionTitle = 'あなたが最も個性的だった文字';
+
+  const gapText = isAllMajority
+    ? 'すべての文字で<wbr>世間と一致'
+    : isOutlier
+    ? `世間の${topPct}%が<wbr>${mostUnique}に${votes[0].name}を感じる中、<wbr>あなたは${getColorName(myColor)}を<wbr>選んでいました。`
+    : `世間の${topPct}%が<wbr>${mostUnique}に${votes[0].name}を感じる中、<wbr>あなたは${getColorName(myColor)}を<wbr>選んでいました。`;
+
+  const comment = isAllMajority
+    ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
+    : isOutlier
+    ? '誰とも重ならない、<wbr>あなただけの色。'
+    : myPct <= 10
+    ? 'ほとんどの人とは<wbr>違う感覚を持っています。'
+    : myPct <= 20
+    ? '少数派の感覚。<wbr>その見え方は、<wbr>あなたならでは。'
+    : '世間とは少し違う、<wbr>独自の感覚。';
+
+  const badgeHtml = isAllMajority
+    ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
+    : `<div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
+
+  const barHtml = isAllMajority ? '' : `
+    <div class="highlight-bar-wrap">
+      ${markerHtml}
+      <div class="highlight-bar">${barSegs}</div>
+    </div>`;
+
   return `<div class="card">
-    <div class="section-eyebrow">Highlight</div>
-    <div class="section-title">最も意見が割れた文字</div>
+    <div class="section-eyebrow">Your Uniqueness</div>
+    <div class="section-title">${sectionTitle}</div>
     <div class="highlight-card">
-      <div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostDivided}</div>
+      ${badgeHtml}
       <div class="highlight-body">
-        <div class="highlight-text">
-          世間の1位は<strong>${votes[0].name}（${votes[0].pct}%）</strong>。
-          あなたは<strong>${myRankText}</strong>。
-        </div>
-        <div class="highlight-bar-wrap">
-          ${markerHtml}
-          <div class="highlight-bar">${barSegs}</div>
-        </div>
+        <div class="highlight-text">${gapText}</div>
+        <div class="highlight-comment">${comment}</div>
+        ${barHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ══ 個性・共感 統合カード ══ */
+function buildSenseCard(coloredLetters) {
+  // ── 個性：最も少数派だった文字 ──
+  const { mostUnique: _mu, isAllMajority } = calcMostUnique(coloredLetters);
+  let mostUnique = _mu;
+
+  const uColor = mostUnique ? colorMap[mostUnique] : null;
+  const uVotes = mostUnique ? DUMMY_VOTES[mostUnique] : [];
+  const uMatchIdx = uColor ? uVotes.findIndex(v => v.color === uColor) : -1;
+  const isOutlier = uMatchIdx === -1;
+  const uMyPct = (uMatchIdx >= 0) ? uVotes[uMatchIdx]?.pct || 0 : 0;
+  const uTopPct = uVotes[0]?.pct || 0;
+
+  // バッジ：isAllMajorityのみ🎯、それ以外は常にアルファベット円
+  const uniqueBadge = isAllMajority
+    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
+    : `<div class="empathy-badge" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
+
+  const uTopColorName = getColorName(uVotes[0]?.color || '');
+  const uMyColorName  = getColorName(uColor || '');
+  const uTopColorHex  = uVotes[0]?.color || '#888880';
+
+  // %表示（個性側）
+  const uniquePctHtml = isAllMajority ? '' : '';
+
+  const uniqueLabelHtml = isAllMajority
+    ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と一致</div>`
+    : `<div class="sense-sentence">
+        <span class="sense-strong">${uTopPct}%</span>の人が${mostUnique}に<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を感じる中、
+      </div>
+      <div class="sense-sentence">
+        <span class="sense-strong">あなた</span>は<span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>を選んでいました。
+      </div>`;
+
+  const uniqueCommentHtml = `<div class="empathy-comment">${
+    isAllMajority ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
+    : isOutlier ? '誰とも重ならない、<wbr>あなただけの色。'
+    : uMyPct <= 10 ? 'ほとんどの人とは<wbr>違う感覚を持っています。'
+    : uMyPct <= 20 ? '少数派の感覚。<wbr>その見え方は、<wbr>あなたならでは。'
+    : '世間とは少し違う、<wbr>独自の感覚。'
+  }</div>`;
+
+  const uniqueText = `${uniquePctHtml}${uniqueLabelHtml}${uniqueCommentHtml}`;
+
+  // ── 共感：最も共感された文字 ──
+  let mostEmpathy = null, highestPct = -1;
+  coloredLetters.forEach(l => {
+    const myColor = colorMap[l];
+    const votes = DUMMY_VOTES[l] || [];
+    if (!votes.length) return;
+    if (votes.findIndex(v => v.color === myColor) !== 0) return;
+    if (votes[0].pct > highestPct) { highestPct = votes[0].pct; mostEmpathy = l; }
+  });
+
+  const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
+  const empathyBadge = !mostEmpathy
+    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>`
+    : `<div class="empathy-badge" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostEmpathy}</div>`;
+
+  const empathyComment = !mostEmpathy ? 'あなたの感覚は、<wbr>誰とも違う独自の宇宙を<wbr>持っています。'
+    : highestPct >= 70 ? 'その感覚は、<wbr>多くの人の心と<wbr>静かに重なっています。'
+    : highestPct >= 50 ? '2人に1人以上が、<wbr>あなたと同じ色を<wbr>感じていました。'
+    : 'それぞれの感じ方の中に、<wbr>確かな共鳴がありました。';
+
+  const eColorName = eColor ? getColorName(eColor) : '';
+
+  const empathyLabelHtml = !mostEmpathy
+    ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と異なる色を<wbr>選んでいました。</div>`
+    : `<div class="sense-sentence">
+        <span class="sense-strong">${highestPct}%</span>の人が、${mostEmpathy}にあなたと同じ<span class="sense-color-word" style="color:${isBright(eColor)?'var(--ink)':eColor}">${eColorName}</span>を感じていました。
+      </div>`;
+
+  const empathyText = `${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
+
+  // ── 個性：色円HTML ──
+  const uTopColorHex2 = uVotes[0]?.color || '#888880';
+  const uCirclesHtml = isAllMajority
+    ? `<div class="sense-circle-wrap">
+         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
+       </div>`
+    : `<div class="sense-circle-wrap">
+         <div class="sense-circle mine" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
+         <span class="sense-circle-label">あなた</span>
+       </div>
+       <div class="sense-op">vs</div>
+       <div class="sense-circle-wrap">
+         <div class="sense-circle theirs" style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)};${isBright(uTopColorHex2)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
+         <span class="sense-circle-label">みんな</span>
+       </div>`;
+
+  // ── 共感：色円HTML ──
+  const eCirclesHtml = !mostEmpathy
+    ? `<div class="sense-circle-wrap">
+         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🌀</div>
+       </div>`
+    : `<div class="sense-circle-wrap">
+         <div class="sense-circle mine" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
+         <span class="sense-circle-label">あなた</span>
+       </div>
+       <div class="sense-op">=</div>
+       <div class="sense-circle-wrap">
+         <div class="sense-circle theirs" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
+         <span class="sense-circle-label">みんな</span>
+       </div>`;
+
+  return `<div class="card">
+    <div class="section-eyebrow">Your Sense</div>
+    <div class="sense-grid">
+      <div class="sense-col">
+        <div class="sense-col-label">最も個性的だった文字</div>
+        ${isAllMajority
+          ? `<div class="sense-row">
+               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center">🎯</div>
+               <div class="sense-text">${uniqueText}</div>
+             </div>`
+          : `<div class="sense-row">
+               <div class="sense-circles">${uCirclesHtml}</div>
+               <div class="sense-text">${uniqueText}</div>
+             </div>`
+        }
+      </div>
+      <div class="sense-divider"></div>
+      <div class="sense-col">
+        <div class="sense-col-label">最も共感された文字</div>
+        ${!mostEmpathy
+          ? `<div class="sense-row">
+               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center">🌀</div>
+               <div class="sense-text">${empathyText}</div>
+             </div>`
+          : `<div class="sense-row">
+               <div class="sense-circles">${eCirclesHtml}</div>
+               <div class="sense-text">${empathyText}</div>
+             </div>`
+        }
       </div>
     </div>
   </div>`;
@@ -1098,7 +1514,7 @@ function buildVoteSection(coloredLetters) {
 
   let html = `<div class="card">
     <div class="section-eyebrow">Vote</div>
-    <div class="section-title">各文字の色 — 世間との比較</div>
+    <div class="section-title">各文字の色<wbr> — 世間との比較</div>
     <div class="vote-collapse-wrap" id="voteCollapseWrap">
       <div class="vote-list">
         ${visible.map(buildItem).join('')}
@@ -1124,13 +1540,13 @@ function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
   return `<div class="card">
     <div class="section-eyebrow">Diagnosis — 1 / 2</div>
-    <div class="section-title">あなたの共感覚タイプ</div>
+    <div class="section-title">あなたの<wbr>共感覚タイプ</div>
     <div class="diag-body">
-      <div class="diag-type-main">${type.label}</div>
-      <div class="diag-type-desc">${type.desc}</div>
+      <div class="diag-type-main" style="color:${type.color}">${type.label}</div>
+      <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率 <strong>${diag.majorityRate}%</strong>、レア度 <strong>${diag.rareScore}/100</strong> をもとに判定
+      多数派一致率：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>レア度：<strong>${diag.rareScore}</strong>
     </div>
   </div>`;
 }
@@ -1155,10 +1571,10 @@ function buildColorTypeSection(coloredLetters, diag) {
     <div class="section-title">タイプ診断</div>
     <div class="diag-body">
       <div class="diag-type-main" style="color:${typeColor}">${type.name}</div>
-      <div class="diag-type-desc">${type.tagline.replace(/\n/g, ' ')}</div>
+      <div class="diag-type-desc">${type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      選んだ色の傾向：${basisDots}
+      選んだ色の傾向：<br>${basisDots}
     </div>
   </div>`;
 }
@@ -1168,6 +1584,12 @@ function buildShareSection(diag, coloredLetters) {
   const typeId = detectColorType(coloredLetters);
   const colorType = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
+
+  // blob用の上位2色
+  const counts = {};
+  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
+  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+  const typeColor = colorType.color || '#181818';
 
   // シェアカードのドット
   const dots = coloredLetters.map(l =>
@@ -1180,12 +1602,14 @@ function buildShareSection(diag, coloredLetters) {
 
   return `<div class="card">
     <div class="section-eyebrow">Share</div>
-    <div class="section-title">結果をシェアする</div>
+    <div class="section-title">結果を<wbr>シェアする</div>
     <div class="share-section">
       <div class="share-card-preview">
+        <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#e03a2a');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>
+        <div class="share-card-blob" style="width:160px;height:160px;bottom:-30px;left:-30px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[1]||topColors[0]||'#1888c8');return `${r},${g},${b}`})()},0.15) 0%,transparent 70%)"></div>
         <div class="share-card-inner">
           <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
-          <div class="share-card-title">${colorType.name} / ${diagType.label}</div>
+          <div class="share-card-title"><span style="color:${diagType.color}">${diagType.label}</span><span style="color:var(--ink3);font-weight:300;margin:0 0.2em">/</span><span style="color:${typeColor};opacity:0.7">${colorType.name}</span></div>
           <div class="share-card-palette">${dots}</div>
           <div class="share-card-stats">多数派一致率 ${diag.majorityRate}% ／ レア度 ${diag.rareScore}</div>
           <div class="share-card-tag">#SynestheShare</div>
@@ -1199,7 +1623,6 @@ function buildShareSection(diag, coloredLetters) {
         <button class="btn-copy-share" id="btnCopyShare" data-text="${shareText.replace(/"/g,'&quot;')}">
           📋 テキストをコピー
         </button>
-        <a class="btn-back" href="alphabet.html">← 診断に戻る</a>
       </div>
     </div>
   </div>`;
@@ -1222,17 +1645,40 @@ function render() {
 
   const diag = calcDiagnosis();
 
+  // blob用の上位2色（typeHero・shareOuter共用）
+  const counts = {};
+  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
+  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+
   setTimeout(() => {
-    // ① ファーストビュー（タイプ名・統計・パレット）
+    // ① ファーストビュー
     typeHeroArea.innerHTML = buildTypeHero(coloredLetters, diag);
 
-    // ② スクロール後コンテンツ（ハイライト・グラフ・診断・シェア）
+    // アートcanvas描画
+    const artCanvas = document.getElementById('artCanvas');
+    if (artCanvas) {
+      const typeId = document.querySelector('.type-hero')?.dataset.type || 'warm';
+      requestAnimationFrame(() => drawArtCanvas(typeId, artCanvas));
+    }
+
+    // ② ダークエリア（診断・グラフ・ハイライト）
     mainWrap.innerHTML =
-      buildDiagSection(diag) +                      // ① 共感覚タイプ
-      buildColorTypeSection(coloredLetters, diag) + // ② タイプ診断
-      buildVoteSection(coloredLetters) +             // ③ 各文字の色
-      buildHighlightCard(coloredLetters) +           // ④ 最も意見が割れた文字
-      buildShareSection(diag, coloredLetters);       // ⑤ シェア
+      buildDiagSection(diag).replace('<div class="card">', '<div class="card" id="diagnosis">') +
+      buildColorTypeSection(coloredLetters, diag).replace('<div class="card">', '<div class="card" id="colortype">') +
+      buildSenseCard(coloredLetters).replace('<div class="card">', '<div class="card" id="uniqueness">') +
+      buildVoteSection(coloredLetters).replace('<div class="card">', '<div class="card" id="vote">');
+
+    // ③ シェアエリア（明るい背景）
+    const shareOuter = document.getElementById('shareOuter');
+    const { r: r1, g: g1, b: b1 } = hexToRgb(topColors[0] || '#e03a2a');
+    const { r: r2, g: g2, b: b2 } = hexToRgb(topColors[1] || topColors[0] || '#1888c8');
+    shareOuter.innerHTML = `
+      <div class="share-blob" style="position:absolute;width:max(400px,90vw);height:max(400px,90vw);border-radius:50%;filter:blur(70px);pointer-events:none;top:-25%;right:-20%;background:radial-gradient(circle,rgba(${r1},${g1},${b1},0.5) 0%,transparent 65%)"></div>
+      <div class="share-blob" style="position:absolute;width:max(320px,75vw);height:max(320px,75vw);border-radius:50%;filter:blur(60px);pointer-events:none;bottom:-15%;left:-15%;background:radial-gradient(circle,rgba(${r2},${g2},${b2},0.38) 0%,transparent 65%)"></div>
+      <div class="content-wrap">${buildShareSection(diag, coloredLetters)}</div>
+      <div class="diag-btn-wrap">
+        <a class="btn-diag" href="alphabet.html">最初から診断する →</a>
+      </div>`;
 
     // バーアニメーション（最初の3件）
     document.querySelectorAll('.vote-list:not(.vote-hidden-list) .vote-stacked-seg').forEach((el, i) => {
@@ -1281,19 +1727,370 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+/* ══ アートカード描画 ══ */
+function drawArtCanvas(typeId, canvas) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  if (!w || !h) return;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const rng = (() => { let s = 42; return () => { s ^= s<<13; s ^= s>>17; s ^= s<<5; return (s>>>0)/4294967296; }; })();
+
+  const art = {
+    warm() {
+      ctx.fillStyle = '#f5ede4'; ctx.fillRect(0,0,w,h);
+      const g = ctx.createRadialGradient(w*0.75,h*0.2,0,w*0.75,h*0.2,w*0.9);
+      g.addColorStop(0,'rgba(240,140,60,0.55)'); g.addColorStop(0.5,'rgba(224,80,40,0.28)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      const g2 = ctx.createRadialGradient(w*0.1,h*0.85,0,w*0.1,h*0.85,w*0.6);
+      g2.addColorStop(0,'rgba(255,180,60,0.45)'); g2.addColorStop(1,'transparent');
+      ctx.fillStyle = g2; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<120;i++) {
+        const x=rng()*w, y=rng()*h, r=rng()*2+0.5, a=rng()*0.5+0.1;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,${Math.floor(120+rng()*80)},${Math.floor(rng()*60)},${a})`; ctx.fill();
+      }
+      for (let i=0;i<6;i++) {
+        const y=h*(0.2+i*0.13), x0=rng()*w*0.3;
+        ctx.beginPath(); ctx.moveTo(x0,y);
+        ctx.bezierCurveTo(w*0.3+rng()*w*0.1,y+rng()*60-30, w*0.7+rng()*w*0.1,y+rng()*60-30, w,y+rng()*40-20);
+        ctx.strokeStyle=`rgba(220,80,20,${0.04+rng()*0.06})`; ctx.lineWidth=60+rng()*80; ctx.stroke();
+      }
+    },
+    cool() {
+      ctx.fillStyle = '#e8f0f8'; ctx.fillRect(0,0,w,h);
+      const g = ctx.createRadialGradient(w*0.3,h*0.3,0,w*0.3,h*0.3,w*1.1);
+      g.addColorStop(0,'rgba(24,136,200,0.45)'); g.addColorStop(0.6,'rgba(112,40,192,0.2)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<8;i++) {
+        const y = h*(i/8); const amp=20+rng()*30;
+        ctx.beginPath();
+        for (let x=0;x<=w;x+=2) { const yy=y+Math.sin(x/w*Math.PI*3+i)*amp; if(x===0)ctx.moveTo(x,yy); else ctx.lineTo(x,yy); }
+        ctx.strokeStyle=`rgba(24,136,200,${0.04+rng()*0.07})`; ctx.lineWidth=1.5; ctx.stroke();
+      }
+      for (let i=0;i<80;i++) {
+        const x=rng()*w,y=rng()*h,r=rng()*3+0.5;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(112,203,255,${0.2+rng()*0.4})`; ctx.fill();
+      }
+      const g2=ctx.createLinearGradient(0,h*0.6,0,h);
+      g2.addColorStop(0,'transparent'); g2.addColorStop(1,'rgba(112,40,192,0.12)');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);
+    },
+    nature() {
+      ctx.fillStyle = '#edf4e8'; ctx.fillRect(0,0,w,h);
+      const g=ctx.createRadialGradient(w*0.6,h*0.4,0,w*0.6,h*0.4,w*0.9);
+      g.addColorStop(0,'rgba(42,158,96,0.4)'); g.addColorStop(0.5,'rgba(168,208,32,0.2)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<200;i++) {
+        const x=rng()*w, y=rng()*h;
+        const len=4+rng()*12, angle=(-Math.PI/2)+rng()*0.6-0.3;
+        ctx.beginPath();
+        ctx.moveTo(x,y); ctx.lineTo(x+Math.cos(angle)*len, y+Math.sin(angle)*len);
+        ctx.strokeStyle=`rgba(${Math.floor(42+rng()*60)},${Math.floor(120+rng()*80)},${Math.floor(20+rng()*40)},${0.12+rng()*0.18})`;
+        ctx.lineWidth=0.8+rng(); ctx.stroke();
+      }
+      const g2=ctx.createRadialGradient(w*0.1,h*0.9,0,w*0.1,h*0.9,w*0.5);
+      g2.addColorStop(0,'rgba(168,208,32,0.3)'); g2.addColorStop(1,'transparent');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);
+    },
+    mono() {
+      ctx.fillStyle = '#f0f0ee'; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<12;i++) {
+        const y=h*(i/12), v=0.02+rng()*0.05;
+        ctx.fillStyle=`rgba(0,0,0,${v})`; ctx.fillRect(0,y,w,h/12);
+      }
+      const g=ctx.createRadialGradient(w*0.5,h*0.4,0,w*0.5,h*0.4,w*0.8);
+      g.addColorStop(0,'rgba(24,24,24,0.18)'); g.addColorStop(0.4,'rgba(136,136,128,0.12)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<300;i++) {
+        const x=rng()*w, y=rng()*h;
+        const s=rng()*3; const a=rng()*0.12;
+        ctx.fillStyle=`rgba(0,0,0,${a})`; ctx.fillRect(x,y,s,s);
+      }
+      for (let i=0;i<5;i++) {
+        const x=rng()*w, r=w*0.1+rng()*w*0.3;
+        ctx.beginPath(); ctx.arc(x,h*0.5,r,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(0,0,0,${0.03+rng()*0.04})`; ctx.lineWidth=1; ctx.stroke();
+      }
+    },
+    pastel() {
+      ctx.fillStyle = '#fdf0f5'; ctx.fillRect(0,0,w,h);
+      const cols=['rgba(255,144,184,0.4)','rgba(112,203,255,0.35)','rgba(255,220,240,0.5)','rgba(200,220,255,0.35)'];
+      for (let i=0;i<6;i++) {
+        const x=rng()*w,y=rng()*h,r=w*(0.2+rng()*0.4);
+        const g=ctx.createRadialGradient(x,y,0,x,y,r);
+        g.addColorStop(0,cols[Math.floor(rng()*cols.length)]); g.addColorStop(1,'transparent');
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      }
+      for (let i=0;i<60;i++) {
+        const x=rng()*w,y=rng()*h,r=1+rng()*4;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,144,184,${0.15+rng()*0.3})`; ctx.fill();
+      }
+      const g2=ctx.createLinearGradient(0,0,w,h);
+      g2.addColorStop(0,'rgba(255,255,255,0.3)'); g2.addColorStop(0.5,'transparent'); g2.addColorStop(1,'rgba(200,180,255,0.2)');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);
+    },
+    neon() {
+      ctx.fillStyle = '#f0eef8'; ctx.fillRect(0,0,w,h);
+      const pairs=[['rgba(224,58,42,0.5)','rgba(112,40,192,0.4)'],['rgba(232,120,32,0.3)','rgba(24,136,200,0.35)']];
+      pairs.forEach(([c1,c2],i)=>{
+        const x1=rng()*w,y1=rng()*h,x2=w-rng()*w*0.5,y2=h-rng()*h*0.4;
+        const g=ctx.createLinearGradient(x1,y1,x2,y2);
+        g.addColorStop(0,c1); g.addColorStop(1,c2);
+        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        if(i<1){const g2=ctx.createRadialGradient(w*0.8,h*0.15,0,w*0.8,h*0.15,w*0.5); g2.addColorStop(0,'rgba(112,40,192,0.35)'); g2.addColorStop(1,'transparent'); ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);}
+      });
+      for (let i=0;i<150;i++) {
+        const x=rng()*w,y=rng()*h,r=0.5+rng()*2.5;
+        const bright=rng()>0.5;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=bright?`rgba(255,220,80,${0.3+rng()*0.5})`:`rgba(255,255,255,${0.15+rng()*0.35})`; ctx.fill();
+      }
+      for (let i=0;i<4;i++) {
+        const x1=rng()*w,y1=rng()*h,x2=rng()*w,y2=rng()*h;
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=`rgba(255,${Math.floor(rng()*100)},${Math.floor(rng()*200)},${0.08+rng()*0.1})`; ctx.lineWidth=30+rng()*60; ctx.stroke();
+      }
+    },
+    dream() {
+      ctx.fillStyle = '#f0eaf8'; ctx.fillRect(0,0,w,h);
+      const g=ctx.createRadialGradient(w*0.4,h*0.35,0,w*0.4,h*0.35,w*1.0);
+      g.addColorStop(0,'rgba(176,96,232,0.45)'); g.addColorStop(0.5,'rgba(112,40,192,0.22)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      const g2=ctx.createRadialGradient(w*0.8,h*0.75,0,w*0.8,h*0.75,w*0.6);
+      g2.addColorStop(0,'rgba(255,144,184,0.38)'); g2.addColorStop(1,'transparent');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<100;i++) {
+        const x=rng()*w,y=rng()*h,r=0.5+rng()*3.5,a=rng()*0.6+0.1;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=rng()>0.4?`rgba(176,96,232,${a})`:`rgba(255,144,184,${a})`; ctx.fill();
+      }
+      for (let i=0;i<5;i++) {
+        const x=w*(0.1+rng()*0.8),y=h*(0.1+rng()*0.8),r=w*(0.08+rng()*0.18);
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(176,96,232,${0.04+rng()*0.06})`; ctx.lineWidth=1; ctx.stroke();
+      }
+      const gv=ctx.createLinearGradient(0,0,0,h);
+      gv.addColorStop(0,'transparent'); gv.addColorStop(1,'rgba(112,40,192,0.1)');
+      ctx.fillStyle=gv; ctx.fillRect(0,0,w,h);
+    },
+    earth() {
+      ctx.fillStyle = '#f0ece4'; ctx.fillRect(0,0,w,h);
+      const g=ctx.createRadialGradient(w*0.65,h*0.3,0,w*0.65,h*0.3,w*0.9);
+      g.addColorStop(0,'rgba(192,120,64,0.4)'); g.addColorStop(0.6,'rgba(139,69,19,0.2)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      const g2=ctx.createRadialGradient(w*0.15,h*0.8,0,w*0.15,h*0.8,w*0.55);
+      g2.addColorStop(0,'rgba(42,158,96,0.32)'); g2.addColorStop(1,'transparent');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<8;i++) {
+        const y=h*(0.1+i*0.12);
+        ctx.beginPath(); ctx.moveTo(0,y+rng()*20-10);
+        for (let x=0;x<=w;x+=8) {
+          ctx.lineTo(x,y+Math.sin(x/90+i)*12+rng()*6-3);
+        }
+        ctx.strokeStyle=`rgba(${Math.floor(100+rng()*60)},${Math.floor(50+rng()*40)},${Math.floor(10+rng()*20)},${0.05+rng()*0.06})`;
+        ctx.lineWidth=20+rng()*30; ctx.stroke();
+      }
+      for (let i=0;i<80;i++) {
+        const x=rng()*w,y=rng()*h,r=0.5+rng()*2;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(139,69,19,${0.1+rng()*0.18})`; ctx.fill();
+      }
+    },
+  };
+
+  (art[typeId] || art.warm)();
+
+  const vignette=ctx.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,w*0.85);
+  vignette.addColorStop(0,'transparent'); vignette.addColorStop(1,'rgba(0,0,0,0.08)');
+  ctx.fillStyle=vignette; ctx.fillRect(0,0,w,h);
+
+  canvas.classList.add('is-ready');
+}
+
 /* ══ 初期化 ══ */
+window.DUMMY_VOTES = DUMMY_VOTES; // Firebase moduleから上書き可能にする
+window.render = render;
 render();
 
-/* ══ NAV スクロール切り替え ══ */
-(function() {
-  const nav = document.querySelector('nav');
-  const hero = document.getElementById('typeHeroArea');
-  if (!nav || !hero) return;
-  const obs = new IntersectionObserver(entries => {
-    // typeHeroAreaが見えなくなったらnav-darkを付与
-    nav.classList.toggle('nav-dark', !entries[0].isIntersecting);
-  }, { threshold: 0.05 });
-  obs.observe(hero);
+</script>
+
+<!-- ══ Firebase 投票・集計ロジック ══ -->
+<script type="module">
+import { initializeApp }                          from 'firebase/app';
+import { getFirestore, doc, getDoc, setDoc,
+         updateDoc, increment, collection,
+         addDoc, serverTimestamp }                from 'firebase/firestore';
+
+/* ── Firebase 設定（firebase-config.js の値をここに貼る） ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyDsH54o6q3UBGD6Cu6OjcTg4cMvRF5_5nc",
+  authDomain:        "synestheshare.firebaseapp.com",
+  projectId:         "synestheshare",
+  storageBucket:     "synestheshare.firebasestorage.app",
+  messagingSenderId: "164018072977",
+  appId:             "1:164018072977:web:06cfe6e3520d8f66ecbe30",
+};
+
+/* ────────────────────────────────────────────────
+   色ID → hex 変換（result.html既存の定数と同じ）
+──────────────────────────────────────────────── */
+const COLOR_HEX = {
+  '0':'#e03a2a','1':'#e87820','2':'#f0e040','3':'#a8d020',
+  '4':'#2a9e60','5':'#1888c8','6':'#70cbff','7':'#7028c0',
+  '8':'#ff90b8','9':'#8b4513','A':'#181818','B':'#888880','C':'#ffffff',
+};
+const COLOR_NAME = {
+  '#e03a2a':'赤','#e87820':'橙','#f0e040':'黄','#a8d020':'黄緑',
+  '#2a9e60':'緑','#1888c8':'青','#70cbff':'水色','#7028c0':'紫',
+  '#ff90b8':'ピンク','#8b4513':'茶色','#181818':'黒','#888880':'グレー','#ffffff':'白',
+};
+
+/* ────────────────────────────────────────────────
+   URLパラメータから選択色を復元
+──────────────────────────────────────────────── */
+function parseColorMap() {
+  const params = new URLSearchParams(location.search);
+  const r = params.get('r') || '';
+  const mode = params.get('mode') || '10';
+  const letters = mode === '26'
+    ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+    : ['A','B','C','D','E','F','G','X','Y','Z'];
+  const map = {};
+  letters.forEach((l, i) => {
+    const id = r[i];
+    if (id && COLOR_HEX[id]) map[l] = COLOR_HEX[id];
+  });
+  return map;
+}
+
+/* ────────────────────────────────────────────────
+   投票すべきか判定
+   ・alphabet.htmlから来た（sessionStorage に ss_from_alphabet=1）
+   ・かつ、この結果でまだ投票していない（ss_vote_key が未完）
+──────────────────────────────────────────────── */
+function shouldVote() {
+  const fromAlphabet = sessionStorage.getItem('ss_from_alphabet') === '1';
+  if (!fromAlphabet) return false;
+  const voteKey = sessionStorage.getItem('ss_vote_key');
+  if (!voteKey) return false;
+  if (sessionStorage.getItem(voteKey) === 'done') return false;
+  return true;
+}
+
+function markVoteDone() {
+  const voteKey = sessionStorage.getItem('ss_vote_key');
+  if (voteKey) sessionStorage.setItem(voteKey, 'done');
+  sessionStorage.removeItem('ss_from_alphabet'); // 再遷移まで無効化
+}
+
+/* ────────────────────────────────────────────────
+   統計ドキュメントを votes 形式に変換
+   Firestore: statistics/{letter} = { "#e03a2a": 120, "#1888c8": 50, ... }
+──────────────────────────────────────────────── */
+function statsToVotes(statsData) {
+  const votes = {};
+  Object.entries(statsData).forEach(([letter, colorCounts]) => {
+    const total = Object.values(colorCounts).reduce((s, n) => s + n, 0);
+    if (total === 0) return;
+    votes[letter] = Object.entries(colorCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([hex, count]) => ({
+        color: hex,
+        name: COLOR_NAME[hex] || hex,
+        pct: Math.round(count / total * 100),
+      }));
+  });
+  return votes;
+}
+
+/* ────────────────────────────────────────────────
+   MAIN
+──────────────────────────────────────────────── */
+(async () => {
+  /* Firebase が設定されていなければ静かにスキップ */
+  if (firebaseConfig.apiKey === 'YOUR_API_KEY') {
+    console.info('[SynestheShare] Firebase未設定のためスキップ');
+    return;
+  }
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  const colorMap = parseColorMap();
+  const letters  = Object.keys(colorMap);
+  if (letters.length === 0) return;
+
+  /* ── STEP 1: 投票を保存（alphabet→result の直接遷移時のみ） ── */
+  if (shouldVote()) {
+    try {
+      /* responses コレクションに1件追加 */
+      await addDoc(collection(db, 'responses'), {
+        r:         new URLSearchParams(location.search).get('r') || '',
+        mode:      new URLSearchParams(location.search).get('mode') || '10',
+        timestamp: serverTimestamp(),
+      });
+
+      /* statistics/{letter} に各色の票数をインクリメント */
+      const updates = letters.map(async l => {
+        const hex = colorMap[l];
+        if (!hex) return;
+        const ref = doc(db, 'statistics', l);
+        try {
+          await updateDoc(ref, { [hex]: increment(1) });
+        } catch {
+          // ドキュメントが存在しない場合は新規作成
+          await setDoc(ref, { [hex]: 1 });
+        }
+      });
+      await Promise.all(updates);
+
+      markVoteDone();
+      console.info('[SynestheShare] 投票完了');
+    } catch (e) {
+      console.warn('[SynestheShare] 投票エラー:', e);
+    }
+  }
+
+  /* ── STEP 2: 統計データを取得してUIを更新 ── */
+  try {
+    const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', l)));
+    const snaps   = await Promise.all(fetches);
+
+    const statsData = {};
+    allLetters.forEach((l, i) => {
+      if (snaps[i].exists()) statsData[l] = snaps[i].data();
+    });
+
+    const hasData = Object.keys(statsData).length > 0;
+    if (!hasData) {
+      console.info('[SynestheShare] 統計データなし（まだ誰も投票していない）');
+      return;
+    }
+
+    const liveVotes = statsToVotes(statsData);
+
+    /* グローバルの DUMMY_VOTES をリアルデータで上書き */
+    if (typeof window.DUMMY_VOTES !== 'undefined') {
+      Object.assign(window.DUMMY_VOTES, liveVotes);
+    }
+
+    /* result画面を再描画 */
+    if (typeof window.render === 'function') {
+      window.render();
+    }
+
+    console.info('[SynestheShare] リアルデータで更新完了');
+  } catch (e) {
+    console.warn('[SynestheShare] 統計取得エラー（ダミーデータで表示）:', e);
+  }
 })();
 </script>
 </body>

@@ -11,6 +11,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Firebase SDK -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":       "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+  }
+}
+</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1906,8 +1915,183 @@ function drawArtCanvas(typeId, canvas) {
 }
 
 /* ══ 初期化 ══ */
+window.DUMMY_VOTES = DUMMY_VOTES; // Firebase moduleから上書き可能にする
+window.render = render;
 render();
 
+</script>
+
+<!-- ══ Firebase 投票・集計ロジック ══ -->
+<script type="module">
+import { initializeApp }                          from 'firebase/app';
+import { getFirestore, doc, getDoc, setDoc,
+         updateDoc, increment, collection,
+         addDoc, serverTimestamp }                from 'firebase/firestore';
+
+/* ── Firebase 設定（firebase-config.js の値をここに貼る） ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyDsH54o6q3UBGD6Cu6OjcTg4cMvRF5_5nc",
+  authDomain:        "synestheshare.firebaseapp.com",
+  projectId:         "synestheshare",
+  storageBucket:     "synestheshare.firebasestorage.app",
+  messagingSenderId: "164018072977",
+  appId:             "1:164018072977:web:06cfe6e3520d8f66ecbe30",
+};
+
+/* ────────────────────────────────────────────────
+   色ID → hex 変換（result.html既存の定数と同じ）
+──────────────────────────────────────────────── */
+const COLOR_HEX = {
+  '0':'#e03a2a','1':'#e87820','2':'#f0e040','3':'#a8d020',
+  '4':'#2a9e60','5':'#1888c8','6':'#70cbff','7':'#7028c0',
+  '8':'#ff90b8','9':'#8b4513','A':'#181818','B':'#888880','C':'#ffffff',
+};
+const COLOR_NAME = {
+  '#e03a2a':'赤','#e87820':'橙','#f0e040':'黄','#a8d020':'黄緑',
+  '#2a9e60':'緑','#1888c8':'青','#70cbff':'水色','#7028c0':'紫',
+  '#ff90b8':'ピンク','#8b4513':'茶色','#181818':'黒','#888880':'グレー','#ffffff':'白',
+};
+
+/* ────────────────────────────────────────────────
+   URLパラメータから選択色を復元
+──────────────────────────────────────────────── */
+function parseColorMap() {
+  const params = new URLSearchParams(location.search);
+  const r = params.get('r') || '';
+  const mode = params.get('mode') || '10';
+  const letters = mode === '26'
+    ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+    : ['A','B','C','D','E','F','G','X','Y','Z'];
+  const map = {};
+  letters.forEach((l, i) => {
+    const id = r[i];
+    if (id && COLOR_HEX[id]) map[l] = COLOR_HEX[id];
+  });
+  return map;
+}
+
+/* ────────────────────────────────────────────────
+   投票すべきか判定
+   ・alphabet.htmlから来た（sessionStorage に ss_from_alphabet=1）
+   ・かつ、この結果でまだ投票していない（ss_vote_key が未完）
+──────────────────────────────────────────────── */
+function shouldVote() {
+  const fromAlphabet = sessionStorage.getItem('ss_from_alphabet') === '1';
+  if (!fromAlphabet) return false;
+  const voteKey = sessionStorage.getItem('ss_vote_key');
+  if (!voteKey) return false;
+  if (sessionStorage.getItem(voteKey) === 'done') return false;
+  return true;
+}
+
+function markVoteDone() {
+  const voteKey = sessionStorage.getItem('ss_vote_key');
+  if (voteKey) sessionStorage.setItem(voteKey, 'done');
+  sessionStorage.removeItem('ss_from_alphabet'); // 再遷移まで無効化
+}
+
+/* ────────────────────────────────────────────────
+   統計ドキュメントを votes 形式に変換
+   Firestore: statistics/{letter} = { "#e03a2a": 120, "#1888c8": 50, ... }
+──────────────────────────────────────────────── */
+function statsToVotes(statsData) {
+  const votes = {};
+  Object.entries(statsData).forEach(([letter, colorCounts]) => {
+    const total = Object.values(colorCounts).reduce((s, n) => s + n, 0);
+    if (total === 0) return;
+    votes[letter] = Object.entries(colorCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([hex, count]) => ({
+        color: hex,
+        name: COLOR_NAME[hex] || hex,
+        pct: Math.round(count / total * 100),
+      }));
+  });
+  return votes;
+}
+
+/* ────────────────────────────────────────────────
+   MAIN
+──────────────────────────────────────────────── */
+(async () => {
+  /* Firebase が設定されていなければ静かにスキップ */
+  if (firebaseConfig.apiKey === 'YOUR_API_KEY') {
+    console.info('[SynestheShare] Firebase未設定のためスキップ');
+    return;
+  }
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  const colorMap = parseColorMap();
+  const letters  = Object.keys(colorMap);
+  if (letters.length === 0) return;
+
+  /* ── STEP 1: 投票を保存（alphabet→result の直接遷移時のみ） ── */
+  if (shouldVote()) {
+    try {
+      /* responses コレクションに1件追加 */
+      await addDoc(collection(db, 'responses'), {
+        r:         new URLSearchParams(location.search).get('r') || '',
+        mode:      new URLSearchParams(location.search).get('mode') || '10',
+        timestamp: serverTimestamp(),
+      });
+
+      /* statistics/{letter} に各色の票数をインクリメント */
+      const updates = letters.map(async l => {
+        const hex = colorMap[l];
+        if (!hex) return;
+        const ref = doc(db, 'statistics', l);
+        try {
+          await updateDoc(ref, { [hex]: increment(1) });
+        } catch {
+          // ドキュメントが存在しない場合は新規作成
+          await setDoc(ref, { [hex]: 1 });
+        }
+      });
+      await Promise.all(updates);
+
+      markVoteDone();
+      console.info('[SynestheShare] 投票完了');
+    } catch (e) {
+      console.warn('[SynestheShare] 投票エラー:', e);
+    }
+  }
+
+  /* ── STEP 2: 統計データを取得してUIを更新 ── */
+  try {
+    const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', l)));
+    const snaps   = await Promise.all(fetches);
+
+    const statsData = {};
+    allLetters.forEach((l, i) => {
+      if (snaps[i].exists()) statsData[l] = snaps[i].data();
+    });
+
+    const hasData = Object.keys(statsData).length > 0;
+    if (!hasData) {
+      console.info('[SynestheShare] 統計データなし（まだ誰も投票していない）');
+      return;
+    }
+
+    const liveVotes = statsToVotes(statsData);
+
+    /* グローバルの DUMMY_VOTES をリアルデータで上書き */
+    if (typeof window.DUMMY_VOTES !== 'undefined') {
+      Object.assign(window.DUMMY_VOTES, liveVotes);
+    }
+
+    /* result画面を再描画 */
+    if (typeof window.render === 'function') {
+      window.render();
+    }
+
+    console.info('[SynestheShare] リアルデータで更新完了');
+  } catch (e) {
+    console.warn('[SynestheShare] 統計取得エラー（ダミーデータで表示）:', e);
+  }
+})();
 </script>
 </body>
 </html>

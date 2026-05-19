@@ -702,6 +702,23 @@ let activeLetter = null;
 let pendingColor = null;
 let isFullMode = false; // false=10文字, true=26文字
 
+/* ── 起動時にURLから復元 ── */
+(function restoreFromURL() {
+  const params = new URLSearchParams(location.search);
+  const rParam = params.get('r');
+  const modeParam = params.get('mode');
+  if (modeParam === '26') isFullMode = true;
+  if (rParam) {
+    const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+    letters.forEach((l, i) => {
+      const id = rParam[i];
+      if (!id || id === '-') return;
+      const idx = '0123456789ABC'.indexOf(id);
+      if (idx >= 0 && PRESET_COLORS[idx]) colorMap[l] = PRESET_COLORS[idx];
+    });
+  }
+})();
+
 /* ══ DOM参照 ══ */
 const alphaGrid       = document.getElementById('alphaGrid');
 const pickerPanel     = document.getElementById('pickerPanel');
@@ -857,11 +874,12 @@ pickerBackdrop.addEventListener('click', closePicker);
 /* ══ クリア ══ */
 btnClear.addEventListener('click', () => {
   if (!activeLetter) return;
-  const letter = activeLetter; // closePicker前に保存
+  const letter = activeLetter;
   delete colorMap[letter];
   applyColor(letter, null);
   updateProgress();
   updateResultPalette();
+  updateURL();
   closePicker();
   showToast(`${letter} の色をクリアしました`);
 });
@@ -878,6 +896,7 @@ btnDecide.addEventListener('click', () => {
   }
   updateProgress();
   updateResultPalette();
+  updateURL();
   closePicker();
 });
 
@@ -1054,6 +1073,7 @@ btnReset.addEventListener('click', () => {
   letters.forEach(l => applyColor(l, null));
   updateProgress();
   updateResultPalette();
+  history.replaceState(null, '', location.pathname);
   showToast('リセットしました');
 });
 
@@ -1062,6 +1082,13 @@ const COLOR_IDS = '0123456789ABC';
 function colorToId(hex) {
   const i = PRESET_COLORS.indexOf(hex);
   return i >= 0 ? COLOR_IDS[i] : '-';
+}
+
+/* ══ URL同期（リロード復元用） ══ */
+function updateURL() {
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
+  history.replaceState(null, '', `?mode=${isFullMode ? '26' : '10'}&r=${encoded}`);
 }
 
 btnResult.addEventListener('click', () => {

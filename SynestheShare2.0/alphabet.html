@@ -1071,12 +1071,23 @@ btnResult.addEventListener('click', () => {
   const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
   const resultUrl = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
 
-  // ── 診断完了フラグ（同一タブのみ有効なsessionStorage）──
-  // result.htmlがこのフラグを読んで「本人診断」と判断し投票を行う
+  // ── 投票済みチェック（localStorage で永続管理）──
+  // 同じブラウザから2回目以降はフラグを立てずに遷移→投票されない
+  const lsKey = `ss_submitted`;
+  const alreadyVoted = localStorage.getItem(lsKey) === '1';
+
   const voteKey = `ss_voted_${encoded}`;
-  sessionStorage.setItem('ss_from_alphabet', '1');
   sessionStorage.setItem('ss_vote_key', voteKey);
-  sessionStorage.removeItem(voteKey); // リセットして未投票状態にする
+
+  if (!alreadyVoted) {
+    // 初回のみフラグを立てて投票を許可
+    sessionStorage.setItem('ss_from_alphabet', '1');
+    sessionStorage.removeItem(voteKey);
+    localStorage.setItem(lsKey, '1'); // 投票済みとして記録
+  } else {
+    // 2回目以降はフラグなし（ユーザーには気づかれない）
+    sessionStorage.removeItem('ss_from_alphabet');
+  }
 
   window.location.href = resultUrl;
 });

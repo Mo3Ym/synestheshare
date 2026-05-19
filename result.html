@@ -3,10 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="og:title" content="診断結果 — SynestheShare">
-<meta property="og:description" content="あなたの共感覚パレットと世間とのギャップを確認しよう。">
-<meta property="og:url" content="https://mo3ym.github.io/synestheshare/result.html">
-<meta name="twitter:card" content="summary_large_image">
+
+<!-- ═══ OGP / Twitter Card ═══════════════════════════════════════
+     静的フォールバック
+     Cloudflare Workers が /api/og?r=... で動的OGP画像を返す構成。
+     GitHub Pages では静的フォールバック画像を使用。
+═════════════════════════════════════════════════════════════════ -->
+<meta property="og:type"        content="website">
+<meta property="og:site_name"   content="SynestheShare">
+<meta property="og:title"       id="ogTitle"       content="診断結果 — SynestheShare">
+<meta property="og:description" id="ogDesc"        content="あなたの文字には、どんな色が見えますか？">
+<meta property="og:url"         id="ogUrl"         content="">
+<meta property="og:image"       id="ogImage"       content="">
+<meta property="og:image:width"                    content="1200">
+<meta property="og:image:height"                   content="630">
+<meta name="twitter:card"                          content="summary_large_image">
+<meta name="twitter:title"      id="twTitle"       content="診断結果 — SynestheShare">
+<meta name="twitter:description" id="twDesc"       content="あなたの文字には、どんな色が見えますか？">
+<meta name="twitter:image"      id="twImage"       content="">
+<script>
+// OGPメタタグをURLから動的に設定
+// Cloudflare Workers側でHTMLにog:imageを注入する際もこの構造を参照
+(function() {
+  const base = location.origin;
+  const r = new URLSearchParams(location.search).get('r') || '';
+  const ogImageUrl = r
+    ? `${base}/api/og?r=${encodeURIComponent(r)}`
+    : `${base}/ogp.png`;
+  const pageUrl = location.href;
+  document.getElementById('ogUrl')   ?.setAttribute('content', pageUrl);
+  document.getElementById('ogImage') ?.setAttribute('content', ogImageUrl);
+  document.getElementById('twImage') ?.setAttribute('content', ogImageUrl);
+})();
+</script>
+
 <title>診断結果 — SynestheShare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -623,6 +653,18 @@ nav ul a:hover { color: var(--ink); }
 }
 
 .share-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+/* 画像保存ボタン */
+.btn-save-image {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.7rem 1.3rem; border-radius: 100px;
+  background: var(--ink); color: var(--bg); border: none; cursor: pointer;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.04em;
+  transition: opacity 0.15s, transform 0.12s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+.btn-save-image:hover { opacity: 0.85; transform: translateY(-2px); }
+.btn-save-image:disabled { opacity: 0.5; cursor: wait; }
 .btn-x-share {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
@@ -718,7 +760,7 @@ footer {
 <!-- ══ NAV ══ -->
 <nav>
   <a class="nav-logo" href="index.html">
-    <img src="images_sub/logo.png" alt="SynestheShare">
+    <img src="images/logo.png" alt="SynestheShare">
   </a>
   <ul>
     <li><a href="#typeHeroArea">TOP</a></li>
@@ -1596,15 +1638,17 @@ function buildShareSection(diag, coloredLetters) {
     `<div class="share-card-dot" style="background:${colorMap[l]};${isBright(colorMap[l])?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'border:1px solid rgba(255,255,255,0.12)'}"></div>`
   ).join('');
 
-  // Xシェアテキスト（色傾向タイプ名を先頭に）
-  const shareText = `【SynestheShare アルファベット診断】\n${colorType.name}\n${diagType.label}\n多数派一致率: ${diag.majorityRate}% / レア度: ${diag.rareScore}\n\n#SynestheShare #共感覚\nhttps://mo3ym.github.io/synestheshare/alphabet.html`;
+  // STEP2: 「感覚を見せる」方向のXシェアテキスト
+  // result URL（自分の結果が開く）をシェア
+  const resultUrl = `${location.origin}/result.html${location.search}`;
+  const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ レア度: ${diag.rareScore}\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
     <div class="section-eyebrow">Share</div>
     <div class="section-title">結果を<wbr>シェアする</div>
     <div class="share-section">
-      <div class="share-card-preview">
+      <div class="share-card-preview" id="shareCardPreview">
         <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#e03a2a');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>
         <div class="share-card-blob" style="width:160px;height:160px;bottom:-30px;left:-30px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[1]||topColors[0]||'#1888c8');return `${r},${g},${b}`})()},0.15) 0%,transparent 70%)"></div>
         <div class="share-card-inner">
@@ -1616,6 +1660,10 @@ function buildShareSection(diag, coloredLetters) {
         </div>
       </div>
       <div class="share-btn-row">
+        <button class="btn-save-image" id="btnSaveImage">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+          画像を保存
+        </button>
         <button class="btn-x-share" id="btnXShare" data-url="${xUrl}">
           <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.623L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
           Xにシェア
@@ -1717,6 +1765,69 @@ function render() {
       await navigator.clipboard.writeText(text).catch(() => {});
       showToast('コピーしました！');
     });
+
+    // ── STEP1: 画像保存ボタン ──
+    document.getElementById('btnSaveImage')?.addEventListener('click', async () => {
+      const btn = document.getElementById('btnSaveImage');
+      const target = document.getElementById('typeHeroArea');
+      if (!target) return;
+      btn.disabled = true;
+      btn.textContent = '生成中…';
+
+      // html2canvas を CDN から動的ロード
+      if (!window.html2canvas) {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+          s.onload = resolve; s.onerror = reject;
+          document.head.appendChild(s);
+        });
+      }
+
+      try {
+        const canvas = await window.html2canvas(target, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null,
+          logging: false,
+          width: target.offsetWidth,
+          height: target.offsetHeight,
+        });
+
+        // PNG としてダウンロード
+        const link = document.createElement('a');
+        link.download = 'synestheshare.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('画像を保存しました');
+      } catch (e) {
+        console.warn('画像保存エラー:', e);
+        showToast('画像の生成に失敗しました');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg> 画像を保存`;
+      }
+    });
+
+    // ── STEP3: OGPメタタグをURLパラメータから動的書き換え ──
+    // （GitHub Pages では bot がJSを実行しないため効果はSNSプレビューには出ないが
+    //   将来 Cloudflare Workers に移行した際のロジック確認用として記録）
+    (function updateOGP() {
+      const p = new URLSearchParams(location.search);
+      if (!p.get('r')) return;
+      const typeHero = document.querySelector('.type-hero');
+      const typeName = typeHero?.querySelector('.type-name-color')?.textContent?.trim() || '';
+      const diagName = typeHero?.querySelector('.type-name-diag')?.textContent?.trim() || '';
+      const desc = `${typeName} / ${diagName} — あなたの文字には、どんな色が見えますか？`;
+      const url  = location.href;
+      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', `${typeName} — SynestheShare`);
+      document.querySelector('meta[property="og:description"]') ?.setAttribute('content', desc);
+      document.querySelector('meta[property="og:url"]')         ?.setAttribute('content', url);
+      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', `${typeName} — SynestheShare`);
+      document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', desc);
+      document.title = `${typeName} — SynestheShare`;
+    })();
   }, 500);
 }
 
@@ -1987,12 +2098,20 @@ function shouldVote() {
 function markVoteDone() {
   const voteKey = sessionStorage.getItem('ss_vote_key');
   if (voteKey) sessionStorage.setItem(voteKey, 'done');
-  sessionStorage.removeItem('ss_from_alphabet'); // 再遷移まで無効化
+  sessionStorage.removeItem('ss_from_alphabet');
+  localStorage.setItem('ss_submitted', '1'); // 同ブラウザからの再投票を永続ブロック
 }
 
 /* ────────────────────────────────────────────────
+   色名 → hex の逆引きマップ
+──────────────────────────────────────────────── */
+const NAME_TO_HEX = Object.fromEntries(
+  Object.entries(COLOR_NAME).map(([hex, name]) => [name, hex])
+);
+
+/* ────────────────────────────────────────────────
    統計ドキュメントを votes 形式に変換
-   Firestore: statistics/{letter} = { "#e03a2a": 120, "#1888c8": 50, ... }
+   Firestore: statistics/{letter} = { "赤": 120, "青": 50, ... }
 ──────────────────────────────────────────────── */
 function statsToVotes(statsData) {
   const votes = {};
@@ -2001,9 +2120,9 @@ function statsToVotes(statsData) {
     if (total === 0) return;
     votes[letter] = Object.entries(colorCounts)
       .sort((a, b) => b[1] - a[1])
-      .map(([hex, count]) => ({
-        color: hex,
-        name: COLOR_NAME[hex] || hex,
+      .map(([name, count]) => ({
+        color: NAME_TO_HEX[name] || name,
+        name,
         pct: Math.round(count / total * 100),
       }));
   });
@@ -2037,16 +2156,16 @@ function statsToVotes(statsData) {
         timestamp: serverTimestamp(),
       });
 
-      /* statistics/{letter} に各色の票数をインクリメント */
+      /* statistics/{letter} に各色の票数をインクリメント（キー=色名） */
       const updates = letters.map(async l => {
         const hex = colorMap[l];
         if (!hex) return;
+        const colorName = COLOR_NAME[hex] || hex;
         const ref = doc(db, 'statistics', l);
         try {
-          await updateDoc(ref, { [hex]: increment(1) });
+          await updateDoc(ref, { [colorName]: increment(1) });
         } catch {
-          // ドキュメントが存在しない場合は新規作成
-          await setDoc(ref, { [hex]: 1 });
+          await setDoc(ref, { [colorName]: 1 });
         }
       });
       await Promise.all(updates);

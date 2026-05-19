@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:type"        content="website">
+<meta property="og:site_name"   content="SynestheShare">
+<meta property="og:title"       content="アルファベット診断 — SynestheShare">
+<meta property="og:description" content="A〜Zに色を割り当てて、あなただけの共感覚パレットを作ろう。">
+<meta property="og:url"         content="">
+<meta property="og:image"       content="">
+<meta name="twitter:card"       content="summary_large_image">
+<meta name="twitter:title"      content="アルファベット診断 — SynestheShare">
+<meta name="twitter:description" content="A〜Zに色を割り当てて、あなただけの共感覚パレットを作ろう。">
+<script>
+(function() {
+  document.querySelector('meta[property="og:url"]')  ?.setAttribute('content', location.href);
+  document.querySelector('meta[property="og:image"]') ?.setAttribute('content', `${location.origin}/ogp.png`);
+  document.querySelector('meta[name="twitter:image"]') || (() => {
+    const m = document.createElement('meta');
+    m.name = 'twitter:image'; m.content = `${location.origin}/ogp.png`;
+    document.head.appendChild(m);
+  })();
+})();
+</script>
+<title>アルファベット診断 — SynestheShare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:  #ffffff;
+  --bg:     #f7f7f5;
+  --ink:    #181818;
+  --ink2:   #555550;
+  --ink3:   #aaaaaa;
+  --border: #e0e0dc;
+  --c1: #e03a2a;
+  --c2: #e87820;
+  --c3: #d4b800;
+  --c4: #2a9e60;
+  --c5: #1888c8;
+  --c6: #7028c0;
+  --c7: #d8306a;
+  --mint: #1aaeaa;
+  --outfit: 'Outfit', sans-serif;
+  --jp: "HiraginoUDSansN-W3", "ヒラギノUD角ゴ ProN W3",
+        "Hiragino Sans", "ヒラギノ角ゴシック",
+        "Meiryo UI", "Meiryo", sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
+
+/* wbr対応 */
+h1, h2, h3, p, .page-title, .page-lead, .mode-label,
+.picker-title, .hint, .result-title, .result-meta,
+nav ul a, .page-eyebrow, .page-breadcrumb {
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 1.5rem;
+  background: rgba(247,247,245,0.88);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
+}
+.nav-logo {
+  position: absolute; left: 1.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 26px;
+}
+.nav-logo img { height: 100%; width: auto; display: block; }
+.nav-right { position: absolute; right: 1.5rem; }
+nav ul { list-style: none; display: flex; gap: 1.8rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+nav ul a:hover { color: var(--ink); }
+.nav-back {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--ink3);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
+
+.btn-primary, .nav-cta {
+  background: rgba(220,50,32,0.88);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  border-radius: 100px; color: #fff;
+  font-family: var(--jp); font-weight: 700;
+  text-decoration: none; letter-spacing: 0.04em;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 18px rgba(220,50,32,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.btn-primary { padding: 0.82rem 1.85rem; font-size: 0.9rem; }
+.nav-cta     { padding: 0.48rem 1.25rem; font-size: 0.82rem; }
+.btn-primary:hover, .nav-cta:hover {
+  background: rgba(200,35,18,0.96); transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(220,50,32,0.45), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+/* ══════════════════════════════════════
+   パンくず（HERO内・absolute）
+══════════════════════════════════════ */
+.breadcrumb-bar {
+  position: absolute;
+  top: calc(5rem - 0.4rem); /* nav高さ分 - 少し上 */
+  left: 2.5rem;
+  z-index: 2;
+}
+.breadcrumb-bar .page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.45rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.breadcrumb-bar .page-breadcrumb::before { content: '←'; }
+.breadcrumb-bar .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
+
+@media (max-width: 600px) {
+  .breadcrumb-bar { left: 1.25rem; }
+}
+
+/* ══════════════════════════════════════
+   PAGE HERO (診断ページ用コンパクト版)
+══════════════════════════════════════ */
+.page-hero-wrap {
+  position: relative; overflow: hidden;
+  padding-top: 6.5rem; /* nav + パンくず分 */
+  background: #16161a;
+}
+.page-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
+.page-blob-1 {
+  width: max(480px, 80vw); height: max(480px, 80vw);
+  top: -25%; left: -12%;
+  animation: blobdrift 9s ease-in-out infinite alternate;
+}
+.page-blob-2 {
+  width: max(360px, 60vw); height: max(360px, 60vw);
+  top: 5%; right: -15%;
+  animation: blobdrift 12s ease-in-out infinite alternate-reverse;
+}
+.page-blob-3 {
+  width: max(300px, 50vw); height: max(300px, 50vw);
+  bottom: -10%; left: 30%;
+  animation: blobdrift 10s ease-in-out infinite alternate;
+}
+@keyframes blobdrift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(24px,18px) scale(1.06); }
+}
+
+.page-hero {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 3.5rem 2.5rem 2.5rem;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
+}
+.page-eyebrow {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink3);
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.page-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
+
+.page-title {
+  font-family: var(--jp); font-weight: 300;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.2; letter-spacing: -0.01em;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+.page-title strong { font-weight: 700; }
+.page-title .hl-red  { color: var(--c1); font-weight: 700; }
+
+.page-lead {
+  font-size: 0.88rem; color: var(--ink2); line-height: 1.85;
+  max-width: 480px; font-weight: 300;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
+/* ── HEROエリア ダークテーマ上書き ── */
+.page-hero-wrap .page-breadcrumb {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 0.5rem;
+  text-decoration: none; transition: color 0.15s;
+}
+.page-hero-wrap .page-breadcrumb::before { content: '←'; font-family: var(--outfit); }
+.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
+.page-hero-wrap .page-eyebrow { color: rgba(255,255,255,0.35); }
+.page-hero-wrap .page-eyebrow::before { background: rgba(255,255,255,0.25); }
+.page-hero-wrap .page-title { color: rgba(255,255,255,0.92); }
+.page-hero-wrap .page-lead { color: rgba(255,255,255,0.5); }
+.page-hero-wrap .progress-label { color: rgba(255,255,255,0.3); }
+.page-hero-wrap .progress-count { color: rgba(255,255,255,0.55); }
+.page-hero-wrap .progress-track { background: rgba(255,255,255,0.1); }
+.page-hero-wrap .progress-bar-wrap { border-top: none; }
+.progress-bar-wrap {
+  width: 100%; max-width: 900px;
+  margin: 0 auto 0;
+  padding: 0 2.5rem 2rem;
+  position: relative; z-index: 1;
+}
+.progress-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 0.5rem;
+}
+.progress-label { font-family: var(--outfit); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; color: var(--ink3); text-transform: uppercase; }
+.progress-count { font-family: var(--outfit); font-size: 0.8rem; font-weight: 700; color: var(--ink2); }
+.progress-count span { color: var(--c1); }
+.progress-track {
+  height: 3px; background: var(--border); border-radius: 100px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--c1), var(--c2)); /* 初期値、JS側で上書き */
+  transition: width 0.4s cubic-bezier(.34,1.56,.64,1), background 0.6s ease;
+  width: 0%;
+}
+
+/* ══════════════════════════════════════
+   メインコンテンツ
+══════════════════════════════════════ */
+.main-outer {
+  position: relative; overflow: hidden;
+  background: #e4e4e0;
+  border-top: 1px solid #d4d4d0;
+}
+/* ABOUTセクション風blob */
+.main-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+.main-blob-1 {
+  width: min(520px, 55vw); height: min(520px, 55vw);
+  background: radial-gradient(circle, rgba(26,174,170,0.18) 0%, transparent 70%);
+  top: -10%; right: -5%;
+  animation: blobdrift 10s ease-in-out infinite alternate;
+}
+.main-blob-2 {
+  width: min(400px, 42vw); height: min(400px, 42vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.14) 0%, transparent 70%);
+  bottom: 5%; left: -5%;
+  animation: blobdrift 13s ease-in-out infinite alternate-reverse;
+}
+.main-blob-3 {
+  width: min(350px, 38vw); height: min(350px, 38vw);
+  background: radial-gradient(circle, rgba(232,120,32,0.13) 0%, transparent 70%);
+  top: 40%; left: 30%;
+  animation: blobdrift 11s ease-in-out infinite alternate;
+}
+.main-wrap {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 3rem 2.5rem 5rem;
+}
+
+/* ── モードトグル ── */
+.mode-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
+}
+.mode-label {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3);
+}
+.mode-label strong { color: var(--ink2); font-size: 0.85rem; letter-spacing: 0; text-transform: none; font-family: var(--jp); }
+.btn-mode-toggle {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 1.1rem; border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  cursor: pointer; font-family: var(--jp); font-size: 0.78rem; font-weight: 700;
+  color: var(--ink2); transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+.btn-mode-toggle:hover {
+  background: rgba(255,255,255,0.95); border-color: var(--ink3); color: var(--ink);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+.btn-mode-toggle.full-mode {
+  background: rgba(220,50,32,0.88); border-color: transparent; color: white;
+  box-shadow: 0 3px 14px rgba(220,50,32,0.3);
+}
+.btn-mode-toggle.full-mode:hover { background: rgba(200,35,18,0.96); }
+.btn-mode-toggle-icon { font-size: 0.9rem; }
+
+/* ── アルファベットグリッド ── */
+.alpha-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 2.5rem;
+}
+/* 10文字モード時のグリッド幅制限 */
+.alpha-grid.mode-10 {
+  max-width: 480px;
+  margin-left: auto; margin-right: auto;
+}
+/* 26文字モード: 6列 */
+.alpha-grid.mode-26 {
+  grid-template-columns: repeat(6, 1fr);
+  max-width: 100%;
+}
+
+/* 正円 padding-topトリック */
+.alpha-cell { position: relative; cursor: pointer; }
+.alpha-cell::before { content: ''; display: block; padding-top: 100%; }
+.alpha-bubble {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700;
+  transition: transform 0.28s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+  overflow: hidden;
+  /* 初期: アウトライン */
+  background: var(--white);
+  border: 2.5px solid var(--border);
+}
+.alpha-bubble span { display: block; line-height: 1; text-align: center; white-space: nowrap; color: var(--ink3); }
+.alpha-cell:hover .alpha-bubble { transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.alpha-cell.selected .alpha-bubble { border-width: 0; }
+.alpha-cell.selected .alpha-bubble span { color: white; }
+
+/* ── カラーピッカーパネル ── */
+.picker-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex; align-items: flex-end; justify-content: center;
+  pointer-events: none;
+  /* opacityをpanelにかけない → backdropのblur遅延を防ぐ */
+}
+.picker-panel.active { pointer-events: auto; }
+
+.picker-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(24,24,24,0.32);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.picker-panel.active .picker-backdrop { opacity: 1; }
+
+.picker-sheet {
+  position: relative; z-index: 1;
+  background: rgba(247,247,245,0.96);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(224,224,220,0.9);
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem 1.75rem 2.5rem;
+  width: 100%; max-width: 520px;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(.34,1.4,.64,1);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+}
+.picker-panel.active .picker-sheet { transform: translateY(0); }
+
+.picker-handle {
+  width: 36px; height: 4px; border-radius: 100px;
+  background: var(--border); margin: 0 auto 1.25rem;
+}
+.picker-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.picker-letter-preview {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1.5rem;
+  color: white; transition: background 0.2s;
+  background: var(--border);
+}
+.picker-title { font-family: var(--jp); font-weight: 700; font-size: 1rem; }
+.picker-title small { display: block; font-size: 0.75rem; color: var(--ink3); font-weight: 300; margin-top: 0.1rem; }
+.picker-close {
+  width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--ink3); font-size: 1.1rem; transition: background 0.15s, color 0.15s;
+}
+.picker-close:hover { background: var(--border); color: var(--ink); }
+
+/* プリセットカラースウォッチ */
+.swatches-section { margin-bottom: 1.25rem; }
+.swatches-label { font-family: var(--outfit); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.6rem; }
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+.swatch {
+  width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; transition: transform 0.18s cubic-bezier(.34,1.56,.64,1), border-color 0.15s;
+}
+.swatch:hover { transform: scale(1.15); }
+.swatch.active { border-color: var(--ink); transform: scale(1.1); }
+
+/* 「色なし」スウォッチ */
+.swatch-none {
+  background: white;
+  border: 2px solid var(--border) !important;
+  position: relative;
+}
+.swatch-none::after {
+  content: '';
+  position: absolute; inset: 3px;
+  background: repeating-linear-gradient(
+    -45deg, rgba(180,180,180,0.4) 0px, rgba(180,180,180,0.4) 1.5px, transparent 1.5px, transparent 6px
+  );
+  border-radius: 50%;
+}
+
+/* カスタムカラー */
+.custom-section { display: flex; align-items: center; gap: 0.75rem; }
+.custom-label { font-family: var(--outfit); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); white-space: nowrap; }
+.color-input-wrap { position: relative; flex: 1; }
+.color-input-wrap input[type="color"] {
+  width: 100%; height: 40px; border-radius: 8px;
+  border: 1.5px solid var(--border); cursor: pointer;
+  padding: 3px 6px; background: white;
+  font-family: var(--outfit);
+}
+.picker-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+.btn-clear {
+  flex: 1; padding: 0.7rem; border-radius: 100px;
+  border: 1.5px solid var(--border); background: transparent; cursor: pointer;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 700; color: var(--ink2);
+  transition: background 0.15s, color 0.15s;
+}
+.btn-clear:hover { background: var(--border); }
+.btn-decide {
+  flex: 2; padding: 0.7rem; border-radius: 100px;
+  border: none; cursor: pointer;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 700; color: white;
+  background: rgba(220,50,32,0.9);
+  box-shadow: 0 4px 14px rgba(220,50,32,0.32);
+  transition: background 0.15s, transform 0.12s;
+}
+.btn-decide:hover { background: rgba(200,35,18,0.96); transform: translateY(-1px); }
+
+/* ── 結果パレット ── */
+.result-section {
+  border-top: 1px solid var(--border);
+  padding-top: 2.5rem;
+}
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
+}
+.result-title { font-family: var(--jp); font-weight: 700; font-size: 1rem; }
+.result-meta { font-family: var(--outfit); font-size: 0.72rem; color: var(--ink3); letter-spacing: 0.06em; }
+
+.result-palette {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.palette-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  flex-shrink: 0;
+}
+.palette-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--white);
+  transition: transform 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.palette-dot.colored { border-color: transparent; }
+.palette-dot:hover { transform: scale(1.15); }
+.palette-letter { font-family: var(--outfit); font-size: 0.6rem; font-weight: 700; color: var(--ink3); letter-spacing: 0.05em; }
+
+/* シェア・リセットボタン */
+.action-row {
+  display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+}
+.btn-result {
+  background: rgba(220,50,32,0.88);
+  backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border-radius: 100px; color: #fff;
+  font-family: var(--jp); font-weight: 700; font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.72rem 1.6rem; cursor: pointer; border: none;
+  box-shadow: 0 4px 18px rgba(220,50,32,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.btn-result:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.btn-reset {
+  padding: 0.72rem 1.4rem; border-radius: 100px;
+  border: 1.5px solid var(--border); background: transparent; cursor: pointer;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 700; color: var(--ink3);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn-reset:hover { background: var(--border); color: var(--ink); }
+
+/* ── ヒントテキスト ── */
+.hint {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: 0.78rem; color: var(--ink3); line-height: 1.6;
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  min-width: 0;
+}
+.hint-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+.hint span { min-width: 0; overflow-wrap: break-word; }
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer {
+  background: var(--ink); color: rgba(255,255,255,0.35);
+  padding: 2rem 2.5rem; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
+}
+.footer-logo { font-family: var(--outfit); font-weight: 600; font-size: 0.95rem; color: rgba(255,255,255,0.6); }
+footer a { color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.15s; }
+footer a:hover { color: rgba(255,255,255,0.65); }
+
+/* ══════════════════════════════════════
+   TOAST通知
+══════════════════════════════════════ */
+.toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--white);
+  padding: 0.7rem 1.4rem; border-radius: 100px;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 700;
+  opacity: 0; transition: opacity 0.2s, transform 0.3s;
+  pointer-events: none; white-space: nowrap; z-index: 500;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 960px) {
+  nav ul { display: none; }
+  .alpha-grid.mode-26 { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (max-width: 600px) {
+  nav { padding: 0 1.25rem; }
+  .nav-logo { left: 1.25rem; height: 26px; }
+
+  .page-hero { padding: 2.5rem 1.25rem 1.5rem; align-items: center; text-align: center; }
+  .page-eyebrow { justify-content: center; }
+  .page-eyebrow::before { display: none; }
+  .page-lead { text-align: center; max-width: 100%; }
+  .page-breadcrumb { align-self: flex-start; }
+
+  .progress-bar-wrap { padding: 0 1.25rem 1.5rem; }
+  .main-wrap { padding: 2rem 1.25rem 4rem; }
+  .alpha-grid.mode-10 { max-width: 100%; }
+  .alpha-grid.mode-26 { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+
+  .picker-sheet { border-radius: 16px 16px 0 0; padding: 1.25rem 1.25rem 2rem; }
+
+  .result-palette { gap: 5px; }
+  .palette-dot { width: 30px; height: 30px; }
+  footer { padding: 1.5rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/logo.png" alt="SynestheShare">
+  </a>
+  <ul></ul>
+  <div class="nav-right">
+    <a class="nav-back" href="index.html">← TOPに戻る</a>
+  </div>
+</nav>
+
+<!-- ══ PAGE HERO ══ -->
+<div class="page-hero-wrap">
+  <div class="page-blob page-blob-1" id="pageBlob1"></div>
+  <div class="page-blob page-blob-2" id="pageBlob2"></div>
+  <div class="page-blob page-blob-3" id="pageBlob3"></div>
+
+  <div class="page-hero">
+    <div class="page-eyebrow">No. 01 — Alphabet</div>
+    <h1 class="page-title">
+      <strong class="hl-red">A〜Z</strong>は<wbr>何色ですか？
+    </h1>
+    <p class="page-lead">
+      直感で色を割り当てるだけ。<br>すべての文字に<wbr>設定しなくてもOKです。
+    </p>
+  </div>
+
+  <!-- 進捗バー -->
+  <div class="progress-bar-wrap">
+    <div class="progress-meta">
+      <span class="progress-label">進捗</span>
+      <span class="progress-count"><span>0</span> / 10</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ メインコンテンツ ══ -->
+<div class="main-outer">
+  <div class="main-blob main-blob-1"></div>
+  <div class="main-blob main-blob-2"></div>
+  <div class="main-blob main-blob-3"></div>
+  <div class="main-wrap">
+
+    <!-- モードトグル -->
+    <div class="mode-toggle-row">
+      <div class="mode-label">文字を選んで色をつけよう</div>
+      <button class="btn-mode-toggle" id="btnModeToggle">
+        <span class="btn-mode-toggle-icon">＋</span>
+        <span id="modeToggleLabel">全26文字を設定する</span>
+      </button>
+    </div>
+
+    <!-- アルファベットグリッド -->
+    <div class="alpha-grid mode-10" id="alphaGrid"></div>
+
+    <!-- 結果パレット -->
+    <div class="result-section">
+    <div class="result-header">
+      <div class="result-title">あなたのパレット</div>
+      <div class="result-meta" id="resultMeta">0文字に色が設定されています</div>
+    </div>
+    <div class="result-palette" id="resultPalette"></div>
+
+    <div class="action-row">
+      <button class="btn-result" id="btnResult">🔍 結果を見る</button>
+      <button class="btn-reset" id="btnReset">リセット</button>
+    </div>
+
+    <div class="hint">
+      <span class="hint-icon">💡</span>
+      <span>色を感じない文字は<wbr>設定しなくて大丈夫。<wbr>直感を大切に。</span>
+    </div>
+  </div><!-- /.result-section -->
+
+  </div><!-- /.main-wrap -->
+</div><!-- /.main-outer -->
+
+<!-- ══ カラーピッカーパネル ══ -->
+<div class="picker-panel" id="pickerPanel">
+  <div class="picker-backdrop" id="pickerBackdrop"></div>
+  <div class="picker-sheet">
+    <div class="picker-handle"></div>
+    <div class="picker-header">
+      <div class="picker-letter-preview" id="pickerPreview">A</div>
+      <div>
+        <div class="picker-title" id="pickerTitle">A の色を選ぶ</div>
+        <div><small class="picker-title" style="font-size:0.75rem;color:var(--ink3);font-weight:300;display:block;margin-top:0.1rem;">直感で選んでOK</small></div>
+      </div>
+      <button class="picker-close" id="pickerClose">✕</button>
+    </div>
+
+    <div class="swatches-section">
+      <div class="swatches-label">よく使う色</div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="picker-actions">
+      <button class="btn-clear" id="btnClear">クリア</button>
+      <button class="btn-decide" id="btnDecide">この色に決定 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <span class="footer-logo">SynestheShare v2.0</span>
+</footer>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ 定数 ══ */
+const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
+const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const PRESET_COLORS = [
+  '#e03a2a', // 赤
+  '#e87820', // 橙
+  '#f0e040', // 黄
+  '#a8d020', // 黄緑
+  '#2a9e60', // 緑
+  '#1888c8', // 青
+  '#70cbff', // 水色
+  '#7028c0', // 紫
+  '#ff90b8', // ピンク
+  '#8b4513', // 茶色
+  '#181818', // 黒
+  '#888880', // グレー
+  '#ffffff', // 白
+];
+const PRESET_LABELS = ['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'];
+
+/* ══ 状態 ══ */
+let colorMap = {};
+let activeLetter = null;
+let pendingColor = null;
+let isFullMode = false; // false=10文字, true=26文字
+
+/* ── 起動時にURLから復元 ── */
+(function restoreFromURL() {
+  const params = new URLSearchParams(location.search);
+  const rParam = params.get('r');
+  const modeParam = params.get('mode');
+  if (modeParam === '26') isFullMode = true;
+  if (rParam) {
+    const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+    letters.forEach((l, i) => {
+      const id = rParam[i];
+      if (!id || id === '-') return;
+      const idx = '0123456789ABC'.indexOf(id);
+      if (idx >= 0 && PRESET_COLORS[idx]) colorMap[l] = PRESET_COLORS[idx];
+    });
+  }
+})();
+
+/* ══ DOM参照 ══ */
+const alphaGrid       = document.getElementById('alphaGrid');
+const pickerPanel     = document.getElementById('pickerPanel');
+const pickerBackdrop  = document.getElementById('pickerBackdrop');
+const pickerPreview   = document.getElementById('pickerPreview');
+const pickerTitle     = document.getElementById('pickerTitle');
+const pickerClose     = document.getElementById('pickerClose');
+const swatchesEl      = document.getElementById('swatches');
+const btnClear        = document.getElementById('btnClear');
+const btnDecide       = document.getElementById('btnDecide');
+const progressFill    = document.getElementById('progressFill');
+const doneCount       = document.getElementById('doneCount');
+const resultPalette   = document.getElementById('resultPalette');
+const resultMeta      = document.getElementById('resultMeta');
+const btnResult       = document.getElementById('btnResult');
+const btnReset        = document.getElementById('btnReset');
+const toastEl         = document.getElementById('toast');
+const btnModeToggle   = document.getElementById('btnModeToggle');
+const modeToggleLabel = document.getElementById('modeToggleLabel');
+const progressCountEl = document.querySelector('.progress-count');
+
+/* ══ グリッド構築 ══ */
+function buildGrid() {
+  alphaGrid.innerHTML = '';
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  alphaGrid.className = 'alpha-grid ' + (isFullMode ? 'mode-26' : 'mode-10');
+
+  letters.forEach(l => {
+    const cell = document.createElement('div');
+    cell.className = 'alpha-cell';
+    cell.dataset.letter = l;
+    cell.innerHTML = `<div class="alpha-bubble"><span>${l}</span></div>`;
+    cell.addEventListener('click', () => openPicker(l));
+    alphaGrid.appendChild(cell);
+    // appendChild後に色を反映（DOM挿入後でないとquerySelectorが効かない）
+    if (colorMap[l]) applyColor(l, colorMap[l]);
+  });
+
+  syncFontSize();
+}
+
+/* ══ モード切替 ══ */
+btnModeToggle.addEventListener('click', () => {
+  isFullMode = !isFullMode;
+  if (isFullMode) {
+    btnModeToggle.classList.add('full-mode');
+    modeToggleLabel.textContent = '10文字に戻す';
+    btnModeToggle.querySelector('.btn-mode-toggle-icon').textContent = '−';
+  } else {
+    btnModeToggle.classList.remove('full-mode');
+    modeToggleLabel.textContent = '全26文字を設定する';
+    btnModeToggle.querySelector('.btn-mode-toggle-icon').textContent = '＋';
+  }
+  buildGrid();
+  updateProgress();
+  updateResultPalette();
+});
+
+/* ══ フォントサイズ同期（正円トリック対応） ══ */
+function syncFontSize() {
+  document.querySelectorAll('.alpha-cell').forEach(cell => {
+    const bubble = cell.querySelector('.alpha-bubble');
+    const d = bubble.offsetWidth;
+    if (d > 0) bubble.querySelector('span').style.fontSize = (d * 0.44) + 'px';
+  });
+}
+new ResizeObserver(syncFontSize).observe(alphaGrid);
+requestAnimationFrame(() => { syncFontSize(); requestAnimationFrame(() => { syncFontSize(); setTimeout(syncFontSize, 100); setTimeout(syncFontSize, 400); }); });
+window.addEventListener('load', () => { syncFontSize(); setTimeout(syncFontSize, 200); });
+
+/* ══ ピッカー: スウォッチ生成 ══ */
+// 「色なし」スウォッチ
+const noneEl = document.createElement('div');
+noneEl.className = 'swatch swatch-none';
+noneEl.title = '色なし';
+noneEl.addEventListener('click', () => selectPendingColor(null));
+swatchesEl.appendChild(noneEl);
+
+PRESET_COLORS.forEach((c, i) => {
+  const s = document.createElement('div');
+  s.className = 'swatch';
+  s.style.background = c;
+  if (c === '#ffffff') s.style.border = '2px solid var(--border)';
+  s.title = PRESET_LABELS[i];
+  s.addEventListener('click', () => selectPendingColor(c));
+  swatchesEl.appendChild(s);
+});
+
+function selectPendingColor(color) {
+  pendingColor = color;
+  updatePickerPreview(color);
+  // スウォッチのactive更新
+  swatchesEl.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  if (color === null) {
+    noneEl.classList.add('active');
+  } else {
+    const idx = PRESET_COLORS.indexOf(color);
+    if (idx >= 0) swatchesEl.querySelectorAll('.swatch:not(.swatch-none)')[idx]?.classList.add('active');
+  }
+}
+
+function updatePickerPreview(color) {
+  if (color === null) {
+    pickerPreview.style.background = 'var(--border)';
+    pickerPreview.style.color = 'var(--ink3)';
+    pickerPreview.style.border = 'none';
+    pickerPreview.style.textShadow = 'none';
+  } else if (isBright(color)) {
+    const dark = getDarkenedColor(color);
+    pickerPreview.style.background = color;
+    pickerPreview.style.color = '#ffffff';
+    pickerPreview.style.border = `1.5px solid ${dark}`;
+    pickerPreview.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
+  } else {
+    pickerPreview.style.background = color;
+    pickerPreview.style.color = '#ffffff';
+    pickerPreview.style.border = 'none';
+    pickerPreview.style.textShadow = 'none';
+  }
+}
+
+/* ══ ピッカー: 開閉 ══ */
+function openPicker(letter) {
+  activeLetter = letter;
+  pendingColor = colorMap[letter] || null;
+
+  pickerTitle.textContent = `${letter} の色を選ぶ`;
+  pickerPreview.textContent = letter;
+  updatePickerPreview(pendingColor);
+
+  // スウォッチ初期選択
+  swatchesEl.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  if (pendingColor === null) {
+    noneEl.classList.add('active');
+  } else {
+    const idx = PRESET_COLORS.indexOf(pendingColor);
+    if (idx >= 0) swatchesEl.querySelectorAll('.swatch:not(.swatch-none)')[idx]?.classList.add('active');
+  }
+
+  pickerPanel.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePicker() {
+  pickerPanel.classList.remove('active');
+  document.body.style.overflow = '';
+  activeLetter = null;
+}
+
+pickerClose.addEventListener('click', closePicker);
+pickerBackdrop.addEventListener('click', closePicker);
+
+/* ══ クリア ══ */
+btnClear.addEventListener('click', () => {
+  if (!activeLetter) return;
+  const letter = activeLetter;
+  delete colorMap[letter];
+  applyColor(letter, null);
+  updateProgress();
+  updateResultPalette();
+  updateURL();
+  closePicker();
+  showToast(`${letter} の色をクリアしました`);
+});
+
+/* ══ 決定 ══ */
+btnDecide.addEventListener('click', () => {
+  if (!activeLetter) return;
+  if (pendingColor === null) {
+    delete colorMap[activeLetter];
+    applyColor(activeLetter, null);
+  } else {
+    colorMap[activeLetter] = pendingColor;
+    applyColor(activeLetter, pendingColor);
+  }
+  updateProgress();
+  updateResultPalette();
+  updateURL();
+  closePicker();
+});
+
+/* ══ ユーティリティ ══ */
+function hexToRgb(hex) {
+  let h = hex.replace('#', '');
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  const n = parseInt(h, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function getLuminance(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const toLinear = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  return 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+}
+function rgbToHsl(hex) {
+  let { r, g, b } = hexToRgb(hex);
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h=0, s=0, l=(max+min)/2;
+  if (max!==min) {
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=((g-b)/d+(g<b?6:0))/6; break;
+      case g: h=((b-r)/d+2)/6; break;
+      case b: h=((r-g)/d+4)/6; break;
+    }
+  }
+  return { h:h*360, s, l };
+}
+// 無彩色判定（彩度が低い = 黒・白・グレー系）
+function isAchromatic(hex) {
+  return rgbToHsl(hex).s < 0.12;
+}
+// 淡色判定（白に近いレベルのみ縁取りが必要）
+function isBright(hex) {
+  return getLuminance(hex) > 0.88;
+}
+// 選択色を暗くした「縁取り用カラー」を生成（黒にならないよう下限あり）
+function getDarkenedColor(hex) {
+  const { h, s, l } = rgbToHsl(hex);
+  const newL = Math.max(0.18, l * 0.48);
+  // 無彩色（白・グレー）は彩度を上げずそのままグレー系にする
+  const newS = isAchromatic(hex) ? Math.min(s, 0.08) : Math.min(1, Math.max(s, 0.65));
+  function hslToHex(hh, ss, ll) {
+    const k = n => (n + hh/30) % 12;
+    const a = ss * Math.min(ll, 1-ll);
+    const f = n => ll - a*Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+    const toHex = x => Math.round(x*255).toString(16).padStart(2,'0');
+    return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+  }
+  return hslToHex(h, newS, newL);
+}
+
+/* ══ バブルに色を適用 ══ */
+function applyColor(letter, color) {
+  const cell = alphaGrid.querySelector(`[data-letter="${letter}"]`);
+  if (!cell) return;
+  const bubble = cell.querySelector('.alpha-bubble');
+  const span   = bubble.querySelector('span');
+  if (color) {
+    cell.classList.add('selected');
+    bubble.style.background = color;
+    if (isBright(color)) {
+      // 淡色：白文字＋4方向shadowで袋文字
+      const dark = getDarkenedColor(color);
+      bubble.style.border = `1.5px solid ${dark}`;
+      bubble.style.boxShadow = 'none';
+      span.style.color = '#ffffff';
+      span.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
+      span.style.webkitTextStroke = '0';
+    } else {
+      // 濃色：白文字、縁取りなし
+      bubble.style.border = 'none';
+      bubble.style.boxShadow = 'none';
+      span.style.color = '#ffffff';
+      span.style.textShadow = 'none';
+      span.style.webkitTextStroke = '0';
+    }
+  } else {
+    cell.classList.remove('selected');
+    bubble.style.background = 'var(--white)';
+    bubble.style.border = '2.5px solid var(--border)';
+    bubble.style.boxShadow = 'none';
+    span.style.color = 'var(--ink3)';
+    span.style.textShadow = 'none';
+    span.style.webkitTextStroke = '0';
+  }
+}
+
+/* ══ 進捗更新（グラデーションバー付き） ══ */
+function updateProgress() {
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  const total = letters.length;
+  const done = letters.filter(l => colorMap[l]).length;
+  // 分母を動的更新（MAX時は分母分子ともに白に）
+  const countEl = document.querySelector('.progress-count');
+  if (done === total) {
+    countEl.innerHTML = `<span style="color:#ffffff">${done}</span> / <span style="color:#ffffff">${total}</span>`;
+  } else {
+    countEl.innerHTML = `<span>${done}</span> / ${total}`;
+  }
+  progressFill.style.width = (done / total * 100) + '%';
+
+  // ── グラデーション生成 ──
+  const selectedColors = letters.map(l => colorMap[l]).filter(Boolean);
+  // 無彩色（黒・白・グレー）はグラデーションから除外し、有彩色だけで構成
+  const chromaticColors = selectedColors.filter(c => !isAchromatic(c));
+  const gradientColors = chromaticColors.length > 0 ? chromaticColors : selectedColors;
+
+  if (gradientColors.length === 0) {
+    progressFill.style.background = 'linear-gradient(90deg, #e03a2a, #e87820)';
+    return;
+  }
+  if (gradientColors.length === 1) {
+    // 単色でも幅が分かるよう少し明暗を付ける
+    const { h, s, l } = rgbToHsl(gradientColors[0]);
+    function hslStr(hh, ss, ll) { return `hsl(${Math.round(hh)},${Math.round(ss*100)}%,${Math.round(ll*100)}%)`; }
+    progressFill.style.background = `linear-gradient(90deg, ${hslStr(h, s, Math.max(0.2, l-0.12))}, ${hslStr(h, s, Math.min(0.85, l+0.1))})`;
+    return;
+  }
+
+  // 色ごとのカウント集計（有彩色のみ）
+  const colorWeights = {};
+  gradientColors.forEach(c => { colorWeights[c] = (colorWeights[c] || 0) + 1; });
+
+  // hue順ソート＋重み付きでstopを生成
+  const weightedColors = [];
+  Object.entries(colorWeights).forEach(([c, w]) => {
+    for (let i = 0; i < w; i++) weightedColors.push({ c, h: rgbToHsl(c).h });
+  });
+  weightedColors.sort((a, b) => a.h - b.h);
+
+  const stops = [];
+  const totalW = weightedColors.length;
+  let acc = 0;
+  stops.push(`${weightedColors[0].c} 0%`);
+  weightedColors.forEach(item => {
+    acc += 1;
+    stops.push(`${item.c} ${Math.round(acc / totalW * 100)}%`);
+  });
+
+  progressFill.style.background = `linear-gradient(90deg, ${stops.join(', ')})`;
+}
+
+/* ══ 結果パレット更新 ══ */
+function updateResultPalette() {
+  resultPalette.innerHTML = '';
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  const done = letters.filter(l => colorMap[l]).length;
+  resultMeta.textContent = `${done}文字に色が設定されています`;
+
+  letters.forEach(l => {
+    const color = colorMap[l] || null;
+    const item = document.createElement('div');
+    item.className = 'palette-item';
+    item.innerHTML = `
+      <div class="palette-dot ${color ? 'colored' : ''}" style="${color ? `background:${color};border-color:${color};` : ''}">
+        ${!color ? `<span style="font-family:var(--outfit);font-size:0.65rem;font-weight:700;color:var(--border)">${l}</span>` : ''}
+      </div>
+      <span class="palette-letter">${l}</span>
+    `;
+    item.addEventListener('click', () => openPicker(l));
+    resultPalette.appendChild(item);
+  });
+}
+
+/* ══ リセット ══ */
+btnReset.addEventListener('click', () => {
+  if (!confirm('すべての色設定をリセットしますか？')) return;
+  colorMap = {};
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  letters.forEach(l => applyColor(l, null));
+  updateProgress();
+  updateResultPalette();
+  history.replaceState(null, '', location.pathname);
+  showToast('リセットしました');
+});
+
+/* ══ 結果ページへ遷移 ══ */
+const COLOR_IDS = '0123456789ABC';
+function colorToId(hex) {
+  const i = PRESET_COLORS.indexOf(hex);
+  return i >= 0 ? COLOR_IDS[i] : '-';
+}
+
+/* ══ URL同期（リロード復元用） ══ */
+function updateURL() {
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
+  history.replaceState(null, '', `?mode=${isFullMode ? '26' : '10'}&r=${encoded}`);
+}
+
+btnResult.addEventListener('click', () => {
+  const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+  const done = letters.filter(l => colorMap[l]).length;
+  if (done === 0) { showToast('色を1つ以上設定してから結果を見よう'); return; }
+  const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
+  const resultUrl = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
+
+  // ── 投票済みチェック（localStorage で永続管理）──
+  const alreadyVoted = localStorage.getItem('ss_submitted') === '1';
+
+  const voteKey = `ss_voted_${encoded}`;
+  sessionStorage.setItem('ss_vote_key', voteKey);
+
+  if (!alreadyVoted) {
+    sessionStorage.setItem('ss_from_alphabet', '1');
+    sessionStorage.removeItem(voteKey);
+    // ※ localStorage への記録は result.html で投票成功後に行う
+  } else {
+    sessionStorage.removeItem('ss_from_alphabet');
+  }
+
+  window.location.href = resultUrl;
+});
+
+/* ══ Toast通知 ══ */
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+/* ══ BLOBカラーアニメーション ══ */
+(function() {
+  const b1 = document.getElementById('pageBlob1');
+  const b2 = document.getElementById('pageBlob2');
+  const b3 = document.getElementById('pageBlob3');
+  if (!b1 || !b2) return;
+  const blobs = [
+    { el: b1, hue: 240, speed: 14, alpha: 0.55, sat: 55, lit: 28 }, // 深い青紫
+    { el: b2, hue: 340, speed: 10, alpha: 0.42, sat: 60, lit: 24 }, // 深い赤
+    { el: b3, hue: 180, speed: 18, alpha: 0.32, sat: 50, lit: 22 }, // 深いティール
+  ].filter(b => b.el);
+  function hslToRgba(h, s, l, a) {
+    h = h % 360; s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const f = n => l - Math.min(l, 1-l) * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+    return `rgba(${Math.round(f(0)*255)},${Math.round(f(8)*255)},${Math.round(f(4)*255)},${a})`;
+  }
+  function setColor(b) {
+    b.el.style.background = `radial-gradient(circle, ${hslToRgba(b.hue, b.sat, b.lit, b.alpha)} 0%, transparent 68%)`;
+  }
+  blobs.forEach(setColor);
+  let last = null;
+  function tick(ts) {
+    if (last !== null) {
+      const dt = (ts - last) / 1000;
+      blobs.forEach(b => { b.hue = (b.hue + b.speed * dt) % 360; setColor(b); });
+    }
+    last = ts;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ══ 初期化 ══ */
+buildGrid();
+updateProgress();
+updateResultPalette();
+</script>
+</body>
+</html>

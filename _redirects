@@ -1,0 +1,4 @@
+# Cloudflare Pages _redirects
+# /result へのアクセスを /result.html にリダイレクト（拡張子なしURL対応）
+/result   /result.html   200
+/alphabet /alphabet.html 200

@@ -110,20 +110,30 @@ nav ul a:hover { color: var(--ink); }
   display: flex; flex-direction: column; gap: 1.1rem;
 }
 
+/* ══ hero テーマ切替 ══ */
+.type-hero[data-theme="dark"] { --hero-ink: #f0f0ec; --hero-ink2: rgba(240,240,236,0.65); --hero-ink3: rgba(240,240,236,0.38); --hero-border: rgba(255,255,255,0.14); --hero-stat-bg: rgba(255,255,255,0.08); --hero-stat-border: rgba(255,255,255,0.14); }
+.type-hero[data-theme="light"] { --hero-ink: #181818; --hero-ink2: rgba(24,24,24,0.6); --hero-ink3: rgba(24,24,24,0.35); --hero-border: rgba(0,0,0,0.12); --hero-stat-bg: rgba(0,0,0,0.04); --hero-stat-border: rgba(0,0,0,0.1); }
+
+.type-eyebrow { color: var(--hero-ink3); }
+.type-eyebrow::before { background: var(--hero-ink3); }
+.type-label { color: var(--hero-ink3); }
+.type-name-color::before { background: var(--hero-border); }
+.type-stat { background: var(--hero-stat-bg); border-color: var(--hero-stat-border); }
+.type-stat-label { color: var(--hero-ink3); }
+.scroll-indicator-label { color: var(--hero-ink3); }
+
 /* eyebrow */
 .type-eyebrow {
   font-family: var(--outfit); font-size: 0.65rem; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--ink3);
   display: flex; align-items: center; gap: 0.5rem;
 }
-.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; background: var(--ink3); }
+.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; }
 
 /* あなたの共感覚タイプ ラベル */
 .type-label {
   font-family: var(--jp); font-weight: 300;
-  font-size: 0.8rem;
-  color: var(--ink3); line-height: 1;
+  font-size: 0.8rem; line-height: 1;
   letter-spacing: 0.02em;
 }
 
@@ -157,8 +167,10 @@ nav ul a:hover { color: var(--ink); }
 .type-stat {
   display: flex; flex-direction: column; gap: 0.15rem;
   padding: 0.75rem 0.85rem;
-  background: rgba(0,0,0,0.03);
-  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   flex: 1;
 }
 .type-stat:first-child { border-radius: 12px 0 0 12px; }
@@ -167,12 +179,12 @@ nav ul a:hover { color: var(--ink); }
 .type-stat-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink3); line-height: 1;
+  color: #888880; line-height: 1;
 }
 .type-stat-value {
   font-family: var(--outfit); font-weight: 700;
   font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1;
-  color: var(--ink);
+  color: #181818;
 }
 .type-stat-sub { font-size: 0.62rem; color: var(--ink3); line-height: 1.3; }
 /* タイプ診断欄（日本語は視覚的に圧力が強いため数値より少し小さく） */
@@ -890,6 +902,21 @@ function textColorFor(bg) {
   return isBright(bg) ? '#888880' : '#ffffff';
 }
 
+/* 背景テーマに対してアクセントカラーのコントラストを確保する
+   light背景: 輝度 > 0.55 なら暗くする
+   dark背景:  輝度 < 0.12 なら明るくする */
+function ensureContrast(hex, theme) {
+  const lum = getLuminance(hex);
+  const { r, g, b } = hexToRgb(hex);
+  if (theme === 'light' && lum > 0.55) {
+    return `rgb(${Math.round(r*0.55)},${Math.round(g*0.55)},${Math.round(b*0.55)})`;
+  }
+  if (theme === 'dark' && lum < 0.12) {
+    return `rgb(${Math.min(255,Math.round(r*2.2+80))},${Math.min(255,Math.round(g*2.2+80))},${Math.min(255,Math.round(b*2.2+80))})`;
+  }
+  return hex;
+}
+
 /* ══ HEROパレット描画 ══ */
 function buildHeroPalette() {
   const el = document.getElementById('heroPalette');
@@ -958,56 +985,56 @@ function getDiagType(majorityRate, rareScore) {
 /* ══ 色傾向タイプ判定 ══ */
 const COLOR_TYPES = [
   {
-    id: 'warm',
+    id: 'warm',   theme: 'light',
     name: '🔥 暖色タイプ',
     color: '#e87820',
     tagline: '温かく燃えるような<wbr>色彩の感覚。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
   {
-    id: 'cool',
+    id: 'cool',   theme: 'light',
     name: '🌊 深海タイプ',
-    color: '#70cbff',
+    color: '#1888c8',
     tagline: '静かな深さをたたえた<wbr>色彩の感覚。\n言葉より先に、<wbr>色が感情を<wbr>語りかけてくる。',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
   {
-    id: 'nature',
+    id: 'nature', theme: 'light',
     name: '🌿 森林タイプ',
-    color: '#a8d020',
+    color: '#2a7a30',
     tagline: '生命の息吹を感じる、<wbr>みずみずしい色彩の感覚。\n自然の呼吸に<wbr>同調するような、<wbr>静かで豊かな感性。',
     blobColors: ['rgba(42,158,96,0.5)', 'rgba(168,208,32,0.35)'],
   },
   {
-    id: 'mono',
+    id: 'mono',   theme: 'light',
     name: '🖤 モノクロタイプ',
-    color: '#aaaaaa',
+    color: '#555550',
     tagline: '色を超えた先にある、<wbr>無彩の宇宙。\nあなただけが知っている<wbr>深度が、そこにある。',
     blobColors: ['rgba(80,80,80,0.5)', 'rgba(136,136,128,0.3)'],
   },
   {
-    id: 'pastel',
+    id: 'pastel', theme: 'light',
     name: '🌸 パステルタイプ',
-    color: '#ff90b8',
+    color: '#c0507a',
     tagline: '夢のように淡く、<wbr>やわらかな色彩の感覚。\nどこか遠い午後の光を、<wbr>文字の中に見ている。',
     blobColors: ['rgba(255,144,184,0.45)', 'rgba(112,203,255,0.4)'],
   },
   {
-    id: 'neon',
+    id: 'neon',   theme: 'light',
     name: '⚡ ネオンタイプ',
-    color: '#e03a2a',
+    color: '#c02818',
     tagline: '鮮烈な色が混在する、<wbr>夜の感覚。\n感情と色が、<wbr>境界なく交差している。',
     blobColors: ['rgba(224,58,42,0.45)', 'rgba(112,40,192,0.4)'],
   },
   {
-    id: 'dream',
+    id: 'dream',  theme: 'light',
     name: '🌙 夢想タイプ',
-    color: '#b060e8',
+    color: '#7028c0',
     tagline: '夢と現の境界に<wbr>漂うような色彩の感覚。\nあなたの共感覚は、<wbr>どこか別の場所から<wbr>来ている。',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
   {
-    id: 'earth',
+    id: 'earth',  theme: 'light',
     name: '🌱 大地タイプ',
     color: '#c07840',
     tagline: '土と草の記憶が<wbr>混ざり合う、<wbr>根のある色彩。\n静かな力強さが、<wbr>文字の奥に宿っている。',
@@ -1051,6 +1078,7 @@ function detectColorType(coloredLetters) {
 function buildTypeHero(coloredLetters, diag) {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
+  const theme = type.theme || 'light';
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
 
   const dots = coloredLetters.map(l => {
@@ -1066,28 +1094,35 @@ function buildTypeHero(coloredLetters, diag) {
   const taglineHtml = type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');
   const uniqueResult = calcMostUnique(coloredLetters);
 
-  // 一致率：高いほど青寄り（多数派）、低いほど緑（希少）
-  const majColor = diag.majorityRate >= 70 ? '#1888c8'
+  // 一致率：背景テーマに合わせてコントラスト確保
+  const majColorRaw = diag.majorityRate >= 70 ? '#1888c8'
     : diag.majorityRate >= 50 ? '#2a7ab8'
     : diag.majorityRate >= 30 ? '#555550'
     : '#2a9e60';
+  const majColor = ensureContrast(majColorRaw, theme);
 
-  // レア度：高いほど紫（希少）、低いほど青
-  const rareColor = diag.rareScore >= 65 ? '#7028c0'
+  const rareColorRaw = diag.rareScore >= 65 ? '#7028c0'
     : diag.rareScore >= 40 ? '#9060c0'
     : diag.rareScore >= 20 ? '#1888c8'
     : '#555550';
+  const rareColor = ensureContrast(rareColorRaw, theme);
 
-  // タイプ名の色
-  const typeColor = type.color || '#181818';
+  // タイプ名の色・diagType色もコントラスト確保
+  const typeColor = ensureContrast(type.color || '#181818', theme);
+  const diagColor = ensureContrast(diagType.color, theme);
 
-  return `<div class="type-hero" data-type="${typeId}">
+  // 最も個性的な文字の色
+  const uniqueColor = uniqueResult.isAllMajority
+    ? 'var(--hero-ink3)'
+    : ensureContrast(colorMap[uniqueResult.mostUnique] || '#181818', theme);
+
+  return `<div class="type-hero" data-type="${typeId}" data-theme="${theme}">
     <canvas class="type-art-canvas" id="artCanvas"></canvas>
     <div class="type-hero-inner">
       <div class="type-eyebrow">Color Personality<wbr> — Alphabet</div>
       <div class="type-label">あなたの<wbr>共感覚タイプ</div>
       <div class="type-name">
-        <span class="type-name-diag" style="color:${diagType.color}">${diagType.label}</span>
+        <span class="type-name-diag" style="color:${diagColor}">${diagType.label}</span>
         <span class="type-name-color" style="color:${typeColor}">${type.name}</span>
       </div>
       <div class="type-stats">
@@ -1102,8 +1137,8 @@ function buildTypeHero(coloredLetters, diag) {
         <div class="type-stat">
           <span class="type-stat-label">最も個性的な文字</span>
           ${uniqueResult.isAllMajority
-            ? `<span class="type-stat-value" style="color:var(--ink3)">-</span>`
-            : `<span class="type-stat-value" style="color:${isBright(colorMap[uniqueResult.mostUnique]) ? 'var(--ink)' : colorMap[uniqueResult.mostUnique]}">${uniqueResult.mostUnique}</span>`
+            ? `<span class="type-stat-value" style="color:var(--hero-ink3)">-</span>`
+            : `<span class="type-stat-value" style="color:${uniqueColor}">${uniqueResult.mostUnique}</span>`
           }
         </div>
       </div>
@@ -1112,7 +1147,7 @@ function buildTypeHero(coloredLetters, diag) {
     <a class="scroll-indicator" href="#contentOuter">
       <span class="scroll-indicator-label">Scroll</span>
       <span class="scroll-indicator-icon">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
           <polyline points="2,4 7,10 12,4"/>
         </svg>
       </span>

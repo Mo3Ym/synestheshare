@@ -81,22 +81,15 @@ export async function onRequest(context) {
   const title      = `${typeName} — SynestheShare`;
   const desc       = `あなたの文字には、どんな色が見えますか？`;
 
-  // HTMLRewriterでOGPタグを書き換え
+  // HTMLRewriterでOGPタグを書き換え（コンマ区切りセレクタは非対応のため個別に指定）
   return new HTMLRewriter()
-    .on('meta[property="og:title"], meta[name="twitter:title"]', {
-      element(el) { el.setAttribute('content', title); }
-    })
-    .on('meta[property="og:description"], meta[name="twitter:description"]', {
-      element(el) { el.setAttribute('content', desc); }
-    })
-    .on('meta[property="og:url"]', {
-      element(el) { el.setAttribute('content', pageUrl); }
-    })
-    .on('meta[property="og:image"], meta[name="twitter:image"]', {
-      element(el) { el.setAttribute('content', ogImageUrl); }
-    })
-    .on('title', {
-      element(el) { el.setInnerContent(title); }
-    })
+    .on('meta[property="og:title"]',       { element(el) { el.setAttribute('content', title); } })
+    .on('meta[name="twitter:title"]',      { element(el) { el.setAttribute('content', title); } })
+    .on('meta[property="og:description"]', { element(el) { el.setAttribute('content', desc);  } })
+    .on('meta[name="twitter:description"]',{ element(el) { el.setAttribute('content', desc);  } })
+    .on('meta[property="og:url"]',         { element(el) { el.setAttribute('content', pageUrl); } })
+    .on('meta[property="og:image"]',       { element(el) { el.setAttribute('content', ogImageUrl); } })
+    .on('meta[name="twitter:image"]',      { element(el) { el.setAttribute('content', ogImageUrl); } })
+    .on('title',                           { element(el) { el.setInnerContent(title); } })
     .transform(response);
 }

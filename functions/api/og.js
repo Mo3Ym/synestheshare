@@ -83,6 +83,13 @@ function hexRgb(hex) {
 // Noto Sans JP / Noto Sans CJK は Workers の Skia ビルドに含まれている。
 
 async function generatePNG(colorMap, type, W, H) {
+  if (typeof OffscreenCanvas === 'undefined') {
+    throw new Error(
+      'OffscreenCanvas not available. ' +
+      'Go to Cloudflare Pages → Settings → Functions → Compatibility Date, ' +
+      'set to 2024-09-23 and redeploy.'
+    );
+  }
   const [r1,g1,b1] = hexRgb(type.blob1);
   const [r2,g2,b2] = hexRgb(type.blob2);
   const letters    = Object.keys(colorMap);

@@ -114,15 +114,8 @@ async function fetchGoogleFont(family, weight, text) {
 let resvgInited = false;
 async function ensureResvg() {
   if (resvgInited) return;
-  // WASM バイナリを CDN から取得（Cache API でキャッシュ）
-  const wasmUrl = 'https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm';
-  const cache   = caches.default;
-  let wasmResp  = await cache.match(wasmUrl);
-  if (!wasmResp) {
-    wasmResp = await fetch(wasmUrl);
-    await cache.put(wasmUrl, wasmResp.clone());
-  }
-  await initWasm(wasmResp.arrayBuffer());
+  // initWasm は Promise<Response> をそのまま受け付ける
+  await initWasm(fetch('https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm'));
   resvgInited = true;
 }
 

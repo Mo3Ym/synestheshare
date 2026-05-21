@@ -2,7 +2,7 @@
  * functions/api/og.js
  * OGP画像（PNG）生成
  * OffscreenCanvas が使える場合はテキスト付きリッチ版
- * 使えない場合は純粋JS版にフォールバック
+ * 使えない場合は 5x7 ピクセルフォントでテキスト描画
  */
 
 const PRESET_COLORS = [
@@ -13,14 +13,14 @@ const PRESET_COLORS = [
 const COLOR_IDS = '0123456789ABC';
 
 const COLOR_TYPES = {
-  warm:   { name: '暖色タイプ',    color: '#e87820' },
-  cool:   { name: '深海タイプ',    color: '#1888c8' },
-  nature: { name: '森林タイプ',    color: '#2a7a30' },
-  mono:   { name: 'モノクロタイプ', color: '#555550' },
-  pastel: { name: 'パステルタイプ', color: '#c0507a' },
-  neon:   { name: 'ネオンタイプ',   color: '#c02818' },
-  dream:  { name: '夢想タイプ',    color: '#7028c0' },
-  earth:  { name: '大地タイプ',    color: '#c07840' },
+  warm:   { name: '暖色タイプ',     name_en: 'WARM TYPE',    color: '#e87820' },
+  cool:   { name: '深海タイプ',     name_en: 'COOL TYPE',    color: '#1888c8' },
+  nature: { name: '森林タイプ',     name_en: 'NATURE TYPE',  color: '#2a7a30' },
+  mono:   { name: 'モノクロタイプ',  name_en: 'MONO TYPE',    color: '#555550' },
+  pastel: { name: 'パステルタイプ',  name_en: 'PASTEL TYPE',  color: '#c0507a' },
+  neon:   { name: 'ネオンタイプ',    name_en: 'NEON TYPE',    color: '#c02818' },
+  dream:  { name: '夢想タイプ',     name_en: 'DREAM TYPE',   color: '#7028c0' },
+  earth:  { name: '大地タイプ',     name_en: 'EARTH TYPE',   color: '#c07840' },
 };
 
 function parseColors(r, mode) {
@@ -73,11 +73,71 @@ function hexRgb(hex) {
   return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
 }
 
-// ユーザーの選択色の中で使用回数が多い順に返す
 function getTopColors(colorMap) {
   const counts = {};
   Object.values(colorMap).forEach(c => { counts[c] = (counts[c]||0)+1; });
   return Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+}
+
+// ─── 5x7 ピクセルフォント（A-Z, 0-9, #, space） ──────────────────────
+// 各行は 5bit: bit4=左端, bit0=右端
+
+const FONT_5X7 = {
+  A:[14,17,17,31,17,17,17], B:[30,17,17,30,17,17,30], C:[15,16,16,16,16,16,15],
+  D:[30,17,17,17,17,17,30], E:[31,16,16,30,16,16,31], F:[31,16,16,30,16,16,16],
+  G:[15,16,16,23,17,17,15], H:[17,17,17,31,17,17,17], I:[31,4,4,4,4,4,31],
+  J:[7,1,1,1,17,17,14],    K:[17,18,20,24,20,18,17], L:[16,16,16,16,16,16,31],
+  M:[17,27,21,17,17,17,17], N:[17,25,21,19,17,17,17], O:[14,17,17,17,17,17,14],
+  P:[30,17,17,30,16,16,16], Q:[14,17,17,17,21,18,13], R:[30,17,17,30,20,18,17],
+  S:[15,16,16,14,1,1,30],   T:[31,4,4,4,4,4,4],       U:[17,17,17,17,17,17,14],
+  V:[17,17,17,17,17,10,4],  W:[17,17,17,21,21,27,17],  X:[17,10,10,4,10,10,17],
+  Y:[17,17,10,4,4,4,4],     Z:[31,1,2,4,8,16,31],
+  '0':[14,17,19,21,25,17,14], '1':[4,12,4,4,4,4,14],   '2':[14,17,1,6,8,16,31],
+  '3':[30,1,1,14,1,1,30],    '4':[2,6,10,18,31,2,2],   '5':[31,16,16,30,1,1,30],
+  '6':[7,8,16,30,17,17,14],  '7':[31,1,2,4,4,4,4],     '8':[14,17,17,14,17,17,14],
+  '9':[14,17,17,15,1,2,12],
+  '#':[10,31,10,31,10,0,0],  ' ':[0,0,0,0,0,0,0],
+};
+
+/**
+ * 1文字を中心座標 (cx, cy) に描画する
+ */
+function drawPixelChar(px, W, H, char, cx, cy, scale, r, g, b) {
+  const rows = FONT_5X7[char.toUpperCase()];
+  if (!rows) return;
+  const startX = Math.round(cx - 5 * scale / 2);
+  const startY = Math.round(cy - 7 * scale / 2);
+  for (let row = 0; row < 7; row++) {
+    for (let col = 0; col < 5; col++) {
+      if (rows[row] & (1 << (4 - col))) {
+        for (let dy = 0; dy < scale; dy++) {
+          for (let dx = 0; dx < scale; dx++) {
+            const pidx = (startY + row * scale + dy) * W + (startX + col * scale + dx);
+            if (pidx >= 0 && pidx < W * H) {
+              px[pidx*3] = r; px[pidx*3+1] = g; px[pidx*3+2] = b;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 文字列を (x, y) = 左上隅から描画する
+ */
+function drawPixelString(px, W, H, str, x, y, scale, r, g, b) {
+  const charStep = 5 * scale + scale; // charW + 1px gap
+  const cy = y + Math.floor(7 * scale / 2);
+  for (let i = 0; i < str.length; i++) {
+    const cx = x + i * charStep + Math.floor(5 * scale / 2);
+    drawPixelChar(px, W, H, str[i], cx, cy, scale, r, g, b);
+  }
+}
+
+/** 文字列の描画幅（ピクセル）を返す */
+function textWidth(str, scale) {
+  return str.length * (5 * scale + scale) - scale;
 }
 
 // ─── OffscreenCanvas 版（テキスト付きリッチ画像） ────────────────
@@ -86,11 +146,9 @@ async function drawWithCanvas(colorMap, type, W, H) {
   const canvas = new OffscreenCanvas(W, H);
   const ctx    = canvas.getContext('2d');
 
-  // ── 背景（result.html と同じ #f0f0ec ベース） ──
   ctx.fillStyle = '#f0f0ec';
   ctx.fillRect(0, 0, W, H);
 
-  // ── Blob グラデーション（ユーザーの上位2色） ──
   const top = getTopColors(colorMap);
   const blob1 = top[0];
   const blob2 = top[1] || top[0];
@@ -110,32 +168,27 @@ async function drawWithCanvas(colorMap, type, W, H) {
     ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
   }
 
-  const px = 96; // 左マージン
+  const px = 96;
 
-  // ── Eyebrow ──
   ctx.fillStyle   = 'rgba(24,24,24,0.28)';
   ctx.font        = '600 13px sans-serif';
   ctx.textAlign   = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.fillText('COLOR SYNESTHESIA', px, 92);
 
-  // ── サブラベル ──
   ctx.fillStyle = 'rgba(24,24,24,0.45)';
   ctx.font      = '300 18px sans-serif';
   ctx.fillText('あなたの共感覚タイプ', px, 132);
 
-  // ── セパレーター ──
   ctx.strokeStyle = 'rgba(24,24,24,0.10)';
   ctx.lineWidth   = 1;
   ctx.beginPath(); ctx.moveTo(px, 150); ctx.lineTo(px+240, 150); ctx.stroke();
 
-  // ── タイプ名（大） ──
   ctx.fillStyle    = type.color;
   ctx.font         = 'bold 78px sans-serif';
   ctx.textBaseline = 'alphabetic';
   ctx.fillText(type.name, px, 268);
 
-  // ── カラードット ──
   const letters = Object.keys(colorMap);
   const n       = Math.min(letters.length, 13);
   const dotR    = 30;
@@ -165,7 +218,6 @@ async function drawWithCanvas(colorMap, type, W, H) {
     ctx.fillText(l, cx, dotsY);
   });
 
-  // ── ブランド ──
   ctx.fillStyle    = 'rgba(24,24,24,0.25)';
   ctx.font         = '600 13px sans-serif';
   ctx.textBaseline = 'alphabetic';
@@ -178,7 +230,7 @@ async function drawWithCanvas(colorMap, type, W, H) {
   return await blob.arrayBuffer();
 }
 
-// ─── 純粋 JS PNG 版（フォールバック・テキストなし） ──────────────
+// ─── 純粋 JS PNG 版（ピクセルフォントでテキスト描画） ─────────────
 
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
@@ -267,7 +319,7 @@ function drawCircle(px, W, H, cx, cy, rad, r, g, b) {
 async function generatePurePNG(colorMap, type, W, H) {
   const px = new Uint8Array(W * H * 3);
 
-  // result.html と同じ #f0f0ec ベース
+  // 背景 #f0f0ec
   fillBg(px, W, H, 0xf0, 0xf0, 0xec);
 
   // ユーザーの上位2色でblobグラデーション
@@ -282,25 +334,55 @@ async function generatePurePNG(colorMap, type, W, H) {
     blendGradient(px, W, H, W*0.12, H*0.85, W*0.58, r, g, b, 0.42);
   }
 
-  // タイプカラーの細い上部バー
+  // タイプカラーの上部アクセントバー（5px）
   const [acR,acG,acB] = hexRgb(type.color);
   for (let x=0; x<W; x++) for (let y=0; y<5; y++) {
     const i=(y*W+x)*3; px[i]=acR; px[i+1]=acG; px[i+2]=acB;
   }
 
-  // カラードット（左寄せ、テキストなし）
+  const margin = 96;
+
+  // ── テキスト描画 ──
+
+  // "COLOR SYNESTHESIA" eyebrow (scale 2 = 10×14 px/char, 薄いグレー)
+  drawPixelString(px, W, H, 'COLOR SYNESTHESIA', margin, 70, 2, 80, 80, 80);
+
+  // セパレーター
+  for (let x = margin; x < margin + 220; x++) {
+    const i = (100 * W + x) * 3;
+    if (i + 2 < px.length) { px[i] = 180; px[i+1] = 180; px[i+2] = 180; }
+  }
+
+  // タイプ名（英語、scale 3 = 15×21 px/char、タイプカラー）
+  drawPixelString(px, W, H, type.name_en, margin, 118, 3, acR, acG, acB);
+
+  // ── カラードット（文字ラベル付き） ──
   const letters = Object.keys(colorMap);
   const n       = Math.min(letters.length, 13);
   const dotR    = 30, gap = 8;
-  const startX  = 96 + dotR;
-  const dotsY   = Math.round(H * 0.58);
+  const startX  = margin + dotR;
+  const dotsY   = Math.round(H * 0.62); // ≈ 391px
 
   letters.slice(0, n).forEach((l, i) => {
     const col = colorMap[l];
     const cx  = startX + i * (dotR*2 + gap);
     const [r,g,b] = hexRgb(col);
     drawCircle(px, W, H, cx, dotsY, dotR, r, g, b);
+
+    // 文字ラベル（scale 2 = 10×14px、暗い背景→白、明るい背景→黒）
+    const lum = getLuminance(col);
+    const [lr, lg, lb] = lum > 0.4 ? [24, 24, 24] : [255, 255, 255];
+    drawPixelChar(px, W, H, l, cx, dotsY, 2, lr, lg, lb);
   });
+
+  // ── ブランドテキスト ──
+  const brandY = H - 70;
+  // 左: "SYNESTHESHARE"
+  drawPixelString(px, W, H, 'SYNESTHESHARE', margin, brandY, 2, 100, 100, 96);
+  // 右: "#SYNESTHESHARE"
+  const tag = '#SYNESTHESHARE';
+  const tagX = W - margin - textWidth(tag, 2);
+  drawPixelString(px, W, H, tag, tagX, brandY, 2, 100, 100, 96);
 
   return await encodePNG(px, W, H);
 }
@@ -325,13 +407,11 @@ export async function onRequest(context) {
     const type     = COLOR_TYPES[typeId] || COLOR_TYPES.warm;
     const W = 1200, H = 630;
 
-    // OffscreenCanvas が使えればテキスト付きリッチ版
     if (typeof OffscreenCanvas !== 'undefined') {
       const buf = await drawWithCanvas(colorMap, type, W, H);
       return new Response(buf, { headers: PNG_HEADERS });
     }
 
-    // フォールバック：純粋JS版（テキストなし）
     const png = await generatePurePNG(colorMap, type, W, H);
     return new Response(png, { headers: PNG_HEADERS });
 

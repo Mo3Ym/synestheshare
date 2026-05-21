@@ -1647,7 +1647,7 @@ function buildShareSection(diag, coloredLetters) {
 
   // STEP2: 「感覚を見せる」方向のXシェアテキスト
   // result URL（自分の結果が開く）をシェア
-  const resultUrl = `${location.origin}/result.html${location.search}`;
+  const resultUrl = `${location.origin}${location.pathname}${location.search}`;
   const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ レア度: ${diag.rareScore}\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 

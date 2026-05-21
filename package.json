@@ -1,7 +1,5 @@
 {
   "name": "synestheshare",
   "private": true,
-  "dependencies": {
-    "satori": "^0.10.14"
-  }
+  "dependencies": {}
 }

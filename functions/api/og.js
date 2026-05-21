@@ -77,42 +77,12 @@ function hexRgb(hex) {
   return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
 }
 
-// ── フォント取得（jsDelivr CDN + Workers Cache API） ────────────────────
-// FontFace API は woff2 をネイティブサポートするのでそのまま渡せる
-
-const FONT_URLS = {
-  notoJP:  'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp@5/files/noto-sans-jp-japanese-700-normal.woff2',
-  outfit:  'https://cdn.jsdelivr.net/npm/@fontsource/outfit@5/files/outfit-latin-700-normal.woff2',
-};
-
-async function loadFont(url, cacheKey) {
-  const cache = caches.default;
-  const req   = new Request(`https://og-font-cache.internal/${cacheKey}`);
-  const hit   = await cache.match(req);
-  if (hit) return hit.arrayBuffer();
-  const resp  = await fetch(url);
-  if (!resp.ok) throw new Error(`Font fetch failed: HTTP ${resp.status} — ${url}`);
-  const buf   = await resp.arrayBuffer();
-  await cache.put(req, new Response(buf, { headers: { 'Cache-Control': 'public, max-age=2592000' } }));
-  return buf;
-}
-
 // ── OffscreenCanvas 描画 ────────────────────────────────────────────────
+// FontFace API は Cloudflare Workers 未対応のため、
+// Workers の Skia ランタイムに組み込まれたシステムフォントを使用する。
+// Noto Sans JP / Noto Sans CJK は Workers の Skia ビルドに含まれている。
 
 async function generatePNG(colorMap, type, W, H) {
-  // フォント読み込み
-  const [notoData, outfitData] = await Promise.all([
-    loadFont(FONT_URLS.notoJP, 'noto-jp-700'),
-    loadFont(FONT_URLS.outfit,  'outfit-700'),
-  ]);
-
-  // FontFace 登録（woff2 はブラウザ/Workers の FontFace API がネイティブ処理）
-  const notoFace   = new FontFace('Noto Sans JP', notoData,   { weight: '700', style: 'normal' });
-  const outfitFace = new FontFace('Outfit',       outfitData, { weight: '700', style: 'normal' });
-  await Promise.all([notoFace.load(), outfitFace.load()]);
-  self.fonts.add(notoFace);
-  self.fonts.add(outfitFace);
-
   const [r1,g1,b1] = hexRgb(type.blob1);
   const [r2,g2,b2] = hexRgb(type.blob2);
   const letters    = Object.keys(colorMap);
@@ -146,15 +116,15 @@ async function generatePNG(colorMap, type, W, H) {
   ctx.fillStyle = 'rgba(24,24,24,0.20)';
   ctx.fillRect(PX, PY + 7, 24, 1);
   // テキスト
-  ctx.fillStyle   = 'rgba(24,24,24,0.30)';
-  ctx.font        = '700 13px Outfit';
-  ctx.textAlign   = 'left';
+  ctx.fillStyle    = 'rgba(24,24,24,0.30)';
+  ctx.font         = '700 13px sans-serif';
+  ctx.textAlign    = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText('COLOR PERSONALITY — ALPHABET', PX + 32, PY + 7);
 
   // ── サブラベル ──
   ctx.fillStyle    = 'rgba(24,24,24,0.50)';
-  ctx.font         = '700 21px "Noto Sans JP"';
+  ctx.font         = '700 21px "Noto Sans CJK JP", "Noto Sans JP", sans-serif';
   ctx.textBaseline = 'top';
   ctx.fillText('あなたの共感覚タイプ', PX, PY + 26);
 
@@ -164,7 +134,7 @@ async function generatePNG(colorMap, type, W, H) {
 
   // ── タイプ名（大） ──
   ctx.fillStyle    = type.color;
-  ctx.font         = '700 54px "Noto Sans JP"';
+  ctx.font         = '700 54px "Noto Sans CJK JP", "Noto Sans JP", sans-serif';
   ctx.textBaseline = 'top';
   ctx.fillText(type.name, PX, PY + 80);
 
@@ -196,7 +166,7 @@ async function generatePNG(colorMap, type, W, H) {
     // 文字ラベル
     const lum = getLuminance(col);
     ctx.fillStyle    = lum > 0.4 ? '#181818' : '#ffffff';
-    ctx.font         = '700 22px Outfit';
+    ctx.font         = '700 22px sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(l, cx, cy);
@@ -219,12 +189,12 @@ async function generatePNG(colorMap, type, W, H) {
   // ── ブランドテキスト ──
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle    = 'rgba(24,24,24,0.28)';
-  ctx.font         = '700 16px Outfit';
+  ctx.font         = '700 16px sans-serif';
   ctx.textAlign    = 'left';
   ctx.fillText('SynestheShare', PX, H - PY);
 
   ctx.fillStyle = 'rgba(24,24,24,0.20)';
-  ctx.font      = '600 13px Outfit';
+  ctx.font      = '600 13px sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText('#SynestheShare', W - PX, H - PY);
 

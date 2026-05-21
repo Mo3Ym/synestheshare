@@ -12,14 +12,14 @@ const PRESET_COLORS = [
 const COLOR_IDS = '0123456789ABC';
 
 const COLOR_TYPES = {
-  warm:   { name: '🔥 暖色タイプ' },
-  cool:   { name: '🌊 深海タイプ' },
-  nature: { name: '🌿 森林タイプ' },
-  mono:   { name: '🖤 モノクロタイプ' },
-  pastel: { name: '🌸 パステルタイプ' },
-  neon:   { name: '⚡ ネオンタイプ' },
-  dream:  { name: '🌙 夢想タイプ' },
-  earth:  { name: '🌱 大地タイプ' },
+  warm:   { name: 'SUNSET TYPE' },
+  cool:   { name: 'OCEAN TYPE'  },
+  nature: { name: 'FOREST TYPE' },
+  mono:   { name: 'VOID TYPE'   },
+  pastel: { name: 'BLOOM TYPE'  },
+  neon:   { name: 'NEON TYPE'   },
+  dream:  { name: 'DREAM TYPE'  },
+  earth:  { name: 'EARTH TYPE'  },
 };
 
 function parseColors(r, mode) {

@@ -1,9 +1,16 @@
 /**
  * functions/api/og.js
- * OffscreenCanvas + FontFace API で OGP 画像を生成
- * - satori / WASM は不使用（Workers の制約を回避）
- * - FontFace API は woff2 をネイティブサポート
+ * satori (SVG生成) + @resvg/resvg-wasm (SVG→PNG) による OGP 画像生成
+ *
+ * WASM はビルド時に esbuild がコンパイルして WebAssembly.Module として束ねるため、
+ * 「動的ロード」制限に引っかからず Cloudflare Workers で動作する。
  */
+
+import satori from 'satori';
+import { initWasm, Resvg } from '@resvg/resvg-wasm';
+
+// ビルド時にコンパイル済み WebAssembly.Module としてバンドルされる
+import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
 
 // ── カラーデータ ────────────────────────────────────────────────────────
 
@@ -77,140 +84,169 @@ function hexRgb(hex) {
   return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
 }
 
-// ── OffscreenCanvas 描画 ────────────────────────────────────────────────
-// FontFace API は Cloudflare Workers 未対応のため、
-// Workers の Skia ランタイムに組み込まれたシステムフォントを使用する。
-// Noto Sans JP / Noto Sans CJK は Workers の Skia ビルドに含まれている。
+// ── resvg 初期化（ビルド時バンドル済み WASM を使用） ─────────────────────
 
-async function generatePNG(colorMap, type, W, H) {
-  if (typeof OffscreenCanvas === 'undefined') {
-    throw new Error(
-      'OffscreenCanvas not available. ' +
-      'Go to Cloudflare Pages → Settings → Functions → Compatibility Date, ' +
-      'set to 2024-09-23 and redeploy.'
-    );
+let resvgReady = false;
+async function ensureResvg() {
+  if (!resvgReady) {
+    // resvgWasm は WebAssembly.Module（ビルド時コンパイル済み）→ 動的コンパイル不要
+    await initWasm(resvgWasm);
+    resvgReady = true;
   }
+}
+
+// ── フォント取得（TTF 形式・satori が要求） ────────────────────────────
+// Google Fonts に旧式 UA を送ることで TTF 形式の URL を取得する
+// （satori は TTF/OTF のみ対応、woff2 は不可）
+
+async function fetchTTFFont(family, weight, textSubset) {
+  const cache  = caches.default;
+  const cacheKey = `font-ttf-${family.replace(/ /g,'-')}-${weight}`;
+  const req    = new Request(`https://og-font-cache.internal/${cacheKey}`);
+  const hit    = await cache.match(req);
+  if (hit) return hit.arrayBuffer();
+
+  // IE6 UA → Google Fonts が TTF 形式を返す
+  const legacyUA = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)';
+  const params   = `family=${encodeURIComponent(`${family}:wght@${weight}`)}${textSubset ? `&text=${encodeURIComponent(textSubset)}` : ''}`;
+  const cssResp  = await fetch(`https://fonts.googleapis.com/css2?${params}`, {
+    headers: { 'User-Agent': legacyUA },
+  });
+  if (!cssResp.ok) throw new Error(`Google Fonts CSS: HTTP ${cssResp.status} for ${family}`);
+
+  const css   = await cssResp.text();
+  // TTF URL を抽出（クォートあり・なし両対応）
+  const match = css.match(/url\(["']?(https:\/\/fonts\.gstatic\.com\/[^"')\s]+)["']?\)/);
+  if (!match) throw new Error(`No font URL for ${family} ${weight}. CSS: ${css.slice(0, 400)}`);
+
+  const fontBuf = await fetch(match[1]).then(r => r.arrayBuffer());
+  await cache.put(req, new Response(fontBuf, { headers: { 'Cache-Control': 'public, max-age=2592000' } }));
+  return fontBuf;
+}
+
+// satori に必要な日本語文字（サブセット用）
+const JP_CHARS = 'あなたの共感覚タイプ暖色深海森林モノクロパステルネオン夢想大地';
+
+// ── satori レイアウト定義 ────────────────────────────────────────────────
+
+function buildLayout(colorMap, type, W, H) {
+  const letters = Object.keys(colorMap);
   const [r1,g1,b1] = hexRgb(type.blob1);
   const [r2,g2,b2] = hexRgb(type.blob2);
-  const letters    = Object.keys(colorMap);
+  const DOT = 62, GAP = 8, COLS = Math.min(letters.length, 5);
+  const numRows = Math.ceil(letters.length / COLS);
 
-  const canvas = new OffscreenCanvas(W, H);
-  const ctx    = canvas.getContext('2d');
+  const dotRows = Array.from({ length: numRows }, (_, row) => ({
+    type: 'div',
+    props: {
+      style: { display: 'flex', flexDirection: 'row', gap: GAP },
+      children: letters.slice(row * COLS, (row + 1) * COLS).map(l => {
+        const col = colorMap[l];
+        const lum = getLuminance(col);
+        return {
+          type: 'div',
+          props: {
+            style: {
+              width: DOT, height: DOT, borderRadius: DOT / 2,
+              background: col,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: lum > 0.4 ? '#181818' : '#ffffff',
+              fontSize: 24, fontFamily: 'Outfit', fontWeight: 700,
+              boxShadow: lum > 0.88
+                ? 'inset 0 0 0 1.5px rgba(0,0,0,0.13)'
+                : '0 2px 8px rgba(0,0,0,0.14)',
+            },
+            children: l,
+          },
+        };
+      }),
+    },
+  }));
 
-  // ── 背景 ──
-  ctx.fillStyle = '#f5f2ef';
-  ctx.fillRect(0, 0, W, H);
-
-  // Blob グラデーション（右上）
-  {
-    const g = ctx.createRadialGradient(W*0.82, H*0.15, 0, W*0.82, H*0.15, W*0.58);
-    g.addColorStop(0, `rgba(${r1},${g1},${b1},0.48)`);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  }
-  // Blob グラデーション（左下）
-  {
-    const g = ctx.createRadialGradient(W*0.18, H*0.82, 0, W*0.18, H*0.82, W*0.52);
-    g.addColorStop(0, `rgba(${r2},${g2},${b2},0.40)`);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  }
-
-  const PX = 96, PY = 52;
-
-  // ── Eyebrow ──
-  // 装飾ライン
-  ctx.fillStyle = 'rgba(24,24,24,0.20)';
-  ctx.fillRect(PX, PY + 7, 24, 1);
-  // テキスト
-  ctx.fillStyle    = 'rgba(24,24,24,0.30)';
-  ctx.font         = '700 13px sans-serif';
-  ctx.textAlign    = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('COLOR PERSONALITY — ALPHABET', PX + 32, PY + 7);
-
-  // ── サブラベル ──
-  ctx.fillStyle    = 'rgba(24,24,24,0.50)';
-  ctx.font         = '700 21px "Noto Sans CJK JP", "Noto Sans JP", sans-serif';
-  ctx.textBaseline = 'top';
-  ctx.fillText('あなたの共感覚タイプ', PX, PY + 26);
-
-  // ── セパレーター ──
-  ctx.fillStyle = 'rgba(24,24,24,0.14)';
-  ctx.fillRect(PX, PY + 66, 180, 1);
-
-  // ── タイプ名（大） ──
-  ctx.fillStyle    = type.color;
-  ctx.font         = '700 54px "Noto Sans CJK JP", "Noto Sans JP", sans-serif';
-  ctx.textBaseline = 'top';
-  ctx.fillText(type.name, PX, PY + 80);
-
-  // ── パレットドット ──
-  const DOT_R  = 30, DOT_D = DOT_R * 2, DOT_GAP = 10;
-  const COLS   = Math.min(letters.length, 5);
-  const DOTS_Y = PY + 80 + 54 + 22;
-
-  letters.forEach((l, i) => {
-    const col   = colorMap[l];
-    const col_i = i % COLS;
-    const row_i = Math.floor(i / COLS);
-    const cx    = PX + DOT_R + col_i * (DOT_D + DOT_GAP);
-    const cy    = DOTS_Y + DOT_R + row_i * (DOT_D + DOT_GAP);
-
-    // 円
-    ctx.beginPath();
-    ctx.arc(cx, cy, DOT_R, 0, Math.PI * 2);
-    ctx.fillStyle = col;
-    ctx.fill();
-
-    // 明るい色には細い境界線
-    if (getLuminance(col) > 0.88) {
-      ctx.strokeStyle = 'rgba(0,0,0,0.13)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    }
-
-    // 文字ラベル
-    const lum = getLuminance(col);
-    ctx.fillStyle    = lum > 0.4 ? '#181818' : '#ffffff';
-    ctx.font         = '700 22px sans-serif';
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(l, cx, cy);
-  });
-
-  // ── 右側グローサークル（装飾） ──
-  {
-    const [tc, tg, tb] = hexRgb(type.color);
-    const gx = W - 190, gy = H * 0.38;
-    const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, 130);
-    g.addColorStop(0,    `rgba(${tc},${tg},${tb},0.35)`);
-    g.addColorStop(0.55, `rgba(${tc},${tg},${tb},0.12)`);
-    g.addColorStop(1,    'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(gx, gy, 130, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // ── ブランドテキスト ──
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle    = 'rgba(24,24,24,0.28)';
-  ctx.font         = '700 16px sans-serif';
-  ctx.textAlign    = 'left';
-  ctx.fillText('SynestheShare', PX, H - PY);
-
-  ctx.fillStyle = 'rgba(24,24,24,0.20)';
-  ctx.font      = '600 13px sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText('#SynestheShare', W - PX, H - PY);
-
-  // ── PNG 出力 ──
-  const blob = await canvas.convertToBlob({ type: 'image/png' });
-  return new Uint8Array(await blob.arrayBuffer());
+  return {
+    type: 'div',
+    props: {
+      style: {
+        width: W, height: H, display: 'flex', flexDirection: 'column',
+        background: [
+          `radial-gradient(circle at 82% 15%, rgba(${r1},${g1},${b1},0.48) 0%, transparent 55%)`,
+          `radial-gradient(circle at 18% 82%, rgba(${r2},${g2},${b2},0.40) 0%, transparent 52%)`,
+          '#f5f2ef',
+        ].join(', '),
+        padding: '52px 96px',
+        fontFamily: 'Noto Sans JP',
+      },
+      children: [
+        // メイン行
+        {
+          type: 'div',
+          props: {
+            style: { display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'center', gap: 56 },
+            children: [
+              // 左: テキスト
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', flexDirection: 'column', gap: 14, flex: 1 },
+                  children: [
+                    // Eyebrow
+                    {
+                      type: 'div',
+                      props: {
+                        style: { display: 'flex', alignItems: 'center', gap: 10 },
+                        children: [
+                          { type: 'div', props: { style: { width: 24, height: 1, background: 'rgba(24,24,24,0.22)', flexShrink: 0 }, children: null } },
+                          { type: 'span', props: { style: { fontSize: 13, fontFamily: 'Outfit', fontWeight: 700, letterSpacing: 3, color: 'rgba(24,24,24,0.30)' }, children: 'COLOR PERSONALITY — ALPHABET' } },
+                        ],
+                      },
+                    },
+                    // サブラベル
+                    { type: 'div', props: { style: { fontSize: 22, color: 'rgba(24,24,24,0.50)', fontWeight: 400 }, children: 'あなたの共感覚タイプ' } },
+                    // セパレーター
+                    { type: 'div', props: { style: { width: 180, height: 1, background: 'rgba(24,24,24,0.14)' }, children: null } },
+                    // タイプ名（大）
+                    { type: 'div', props: { style: { fontSize: 60, fontWeight: 700, color: type.color, lineHeight: 1.15 }, children: type.name } },
+                    // パレットドット
+                    { type: 'div', props: { style: { display: 'flex', flexDirection: 'column', gap: GAP, marginTop: 10 }, children: dotRows } },
+                  ],
+                },
+              },
+              // 右: グロー
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    width: 240, height: 240, borderRadius: 120, flexShrink: 0,
+                    background: `radial-gradient(circle at center, ${type.color}55 0%, ${type.color}20 55%, transparent 75%)`,
+                  },
+                  children: null,
+                },
+              },
+            ],
+          },
+        },
+        // ブランド行
+        {
+          type: 'div',
+          props: {
+            style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18 },
+            children: [
+              { type: 'div', props: { style: { fontSize: 16, fontFamily: 'Outfit', fontWeight: 700, color: 'rgba(24,24,24,0.28)', letterSpacing: 1 }, children: 'SynestheShare' } },
+              { type: 'div', props: { style: { fontSize: 13, fontFamily: 'Outfit', fontWeight: 600, color: 'rgba(24,24,24,0.20)', letterSpacing: 2 }, children: '#SynestheShare' } },
+            ],
+          },
+        },
+      ],
+    },
+  };
 }
 
 // ── メインハンドラ ───────────────────────────────────────────────────────
+
+const PNG_HEADERS = {
+  'Content-Type':  'image/png',
+  'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+};
 
 export async function onRequest(context) {
   const url    = new URL(context.request.url);
@@ -225,14 +261,28 @@ export async function onRequest(context) {
     const type     = COLOR_TYPES[typeId] || COLOR_TYPES.warm;
     const W = 1200, H = 630;
 
-    const png = await generatePNG(colorMap, type, W, H);
+    // フォント・WASM を並列準備
+    const [notoData, outfitData] = await Promise.all([
+      fetchTTFFont('Noto Sans JP', 700, JP_CHARS),
+      fetchTTFFont('Outfit',       700, null),
+      ensureResvg(),
+    ]);
 
-    return new Response(png, {
-      headers: {
-        'Content-Type':  'image/png',
-        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-      },
+    // SVG 生成（satori）
+    const svg = await satori(buildLayout(colorMap, type, W, H), {
+      width: W, height: H,
+      fonts: [
+        { name: 'Noto Sans JP', data: notoData,   weight: 700, style: 'normal' },
+        { name: 'Outfit',       data: outfitData,  weight: 700, style: 'normal' },
+      ],
     });
+
+    // SVG → PNG（resvg、ビルド時コンパイル済み WASM 使用）
+    const resvg  = new Resvg(svg, { fitTo: { mode: 'width', value: W } });
+    const pngBuf = resvg.render().asPng();
+
+    return new Response(pngBuf, { headers: PNG_HEADERS });
+
   } catch (err) {
     return new Response(`og error: ${err.message}\n${err.stack}`, { status: 500 });
   }

@@ -1,11 +1,11 @@
 /**
  * functions/api/og.js
- * satori + @resvg/resvg-wasm による OGP 画像生成
- * result.html の type-hero セクションに近いデザインを再現
+ * OGP 画像生成
+ * satori（SVG）+ OffscreenCanvas + FontFace（PNG変換）
+ * ※ Cloudflare Workers は動的WASM実行不可のため resvg-wasm は使用しない
  */
 
 import satori from 'satori';
-import { Resvg, initWasm } from '@resvg/resvg-wasm';
 
 // ── カラーデータ ────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ const COLOR_TYPES = {
   earth:  { name: '大地タイプ',    color: '#c07840', blob1: '#8b4513', blob2: '#2a9e60' },
 };
 
-// ── パーサー / 判定 ────────────────────────────────────────────────────
+// ── ユーティリティ ──────────────────────────────────────────────────────
 
 function parseColors(r, mode) {
   const letters = mode === '26'
@@ -79,61 +79,41 @@ function hexRgb(hex) {
   return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
 }
 
-// ── フォント読み込み（Workers Cache API でキャッシュ） ─────────────────
+// ── フォント取得（Google Fonts + Cache API） ───────────────────────────
 
 async function cachedFetch(url, cacheKey) {
   const cache = caches.default;
   const req   = new Request(`https://og-font-cache.internal/${cacheKey}`);
   const hit   = await cache.match(req);
   if (hit) return hit.arrayBuffer();
-  const buf   = await fetch(url).then(r => r.arrayBuffer());
+  const buf = await fetch(url).then(r => r.arrayBuffer());
   await cache.put(req, new Response(buf, { headers: { 'Cache-Control': 'public, max-age=2592000' } }));
   return buf;
 }
 
-/**
- * Google Fonts CSS を取得し、woff2 URL を抽出してフォントデータを返す
- * text パラメータで文字をサブセット化（ファイルサイズを大幅に削減）
- */
 async function fetchGoogleFont(family, weight, text) {
   const params = new URLSearchParams({ family: `${family}:wght@${weight}`, display: 'block' });
   if (text) params.set('text', text);
-  const cssUrl = `https://fonts.googleapis.com/css2?${params}`;
-  const css = await fetch(cssUrl, {
+  const css = await fetch(`https://fonts.googleapis.com/css2?${params}`, {
     headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36' },
   }).then(r => r.text());
-
-  // woff2 URL を全て抽出し最初のものを使用
   const match = css.match(/url\((https:[^)]+\.woff2)\)/);
-  if (!match) throw new Error(`Font URL not found for ${family} ${weight}`);
+  if (!match) throw new Error(`Font URL not found: ${family} ${weight}`);
   return cachedFetch(match[1], `${family}-${weight}`);
 }
 
-// ── resvg WASM 初期化（インスタンス内で一度だけ） ──────────────────────
+// OGP に必要な日本語文字（サブセット化でファイルサイズ削減）
+const JP_CHARS = 'あなたの共感覚タイプ暖色深海森林モノクロパステルネオン夢想大地';
 
-let resvgInited = false;
-async function ensureResvg() {
-  if (resvgInited) return;
-  // initWasm は Promise<Response> をそのまま受け付ける
-  await initWasm(fetch('https://unpkg.com/@resvg/resvg-wasm@2.6.2/index_bg.wasm'));
-  resvgInited = true;
-}
+// ── satori OGP レイアウト ────────────────────────────────────────────────
 
-// ── OGP レイアウト（satori オブジェクト） ───────────────────────────────
-
-function buildOGP(colorMap, type, W, H) {
+function buildLayout(colorMap, type, W, H) {
   const letters = Object.keys(colorMap);
-  const [r1, g1, b1] = hexRgb(type.blob1);
-  const [r2, g2, b2] = hexRgb(type.blob2);
-
-  const PAD_V = 52;
-  const PAD_H = 96;
-  const DOT   = 62;
-  const GAP   = 8;
-  const COLS  = Math.min(letters.length, 5);
-
-  // パレットドット（列ごとに分割）
+  const [r1,g1,b1] = hexRgb(type.blob1);
+  const [r2,g2,b2] = hexRgb(type.blob2);
+  const DOT = 62, GAP = 8, COLS = Math.min(letters.length, 5);
   const numRows = Math.ceil(letters.length / COLS);
+
   const dotRows = Array.from({ length: numRows }, (_, row) => ({
     type: 'div',
     props: {
@@ -142,9 +122,6 @@ function buildOGP(colorMap, type, W, H) {
         const col = colorMap[l];
         const lum = getLuminance(col);
         const tc  = lum > 0.4 ? '#181818' : '#ffffff';
-        const shadow = lum > 0.88
-          ? 'inset 0 0 0 1.5px rgba(0,0,0,0.13)'
-          : '0 2px 8px rgba(0,0,0,0.14)';
         return {
           type: 'div',
           props: {
@@ -153,7 +130,7 @@ function buildOGP(colorMap, type, W, H) {
               background: col,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: tc, fontSize: 24, fontFamily: 'Outfit', fontWeight: 700,
-              boxShadow: shadow,
+              boxShadow: lum > 0.88 ? 'inset 0 0 0 1.5px rgba(0,0,0,0.13)' : '0 2px 8px rgba(0,0,0,0.14)',
             },
             children: l,
           },
@@ -162,46 +139,30 @@ function buildOGP(colorMap, type, W, H) {
     },
   }));
 
-  // 右側の装飾サークル（type カラーのグロー）
-  const glowCircle = {
-    type: 'div',
-    props: {
-      style: {
-        width: 240, height: 240, borderRadius: 120, flexShrink: 0,
-        background: `radial-gradient(circle at center, ${type.color}55 0%, ${type.color}20 55%, transparent 75%)`,
-      },
-      children: null,
-    },
-  };
-
   return {
     type: 'div',
     props: {
       style: {
-        width: W, height: H,
-        display: 'flex', flexDirection: 'column',
+        width: W, height: H, display: 'flex', flexDirection: 'column',
         background: [
           `radial-gradient(circle at 82% 15%, rgba(${r1},${g1},${b1},0.48) 0%, transparent 55%)`,
           `radial-gradient(circle at 18% 82%, rgba(${r2},${g2},${b2},0.40) 0%, transparent 52%)`,
           '#f5f2ef',
         ].join(', '),
-        padding: `${PAD_V}px ${PAD_H}px`,
+        padding: '52px 96px',
         fontFamily: 'Noto Sans JP',
       },
       children: [
-        // ── メイン行（左: テキスト、右: グロー） ──
         {
           type: 'div',
           props: {
             style: { display: 'flex', flexDirection: 'row', flex: 1, alignItems: 'center', gap: 56 },
             children: [
-              // 左: テキストカラム
               {
                 type: 'div',
                 props: {
                   style: { display: 'flex', flexDirection: 'column', gap: 14, flex: 1 },
                   children: [
-                    // eyebrow
                     {
                       type: 'div',
                       props: {
@@ -212,23 +173,26 @@ function buildOGP(colorMap, type, W, H) {
                         ],
                       },
                     },
-                    // サブラベル
                     { type: 'div', props: { style: { fontSize: 22, color: 'rgba(24,24,24,0.50)', fontWeight: 400 }, children: 'あなたの共感覚タイプ' } },
-                    // セパレーター
                     { type: 'div', props: { style: { width: 180, height: 1, background: 'rgba(24,24,24,0.14)' }, children: null } },
-                    // タイプ名（大）
                     { type: 'div', props: { style: { fontSize: 60, fontWeight: 700, color: type.color, lineHeight: 1.15 }, children: type.name } },
-                    // パレットドット
                     { type: 'div', props: { style: { display: 'flex', flexDirection: 'column', gap: GAP, marginTop: 10 }, children: dotRows } },
                   ],
                 },
               },
-              // 右: グロー
-              glowCircle,
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    width: 240, height: 240, borderRadius: 120, flexShrink: 0,
+                    background: `radial-gradient(circle at center, ${type.color}55 0%, ${type.color}20 55%, transparent 75%)`,
+                  },
+                  children: null,
+                },
+              },
             ],
           },
         },
-        // ── ブランド行 ──
         {
           type: 'div',
           props: {
@@ -244,15 +208,35 @@ function buildOGP(colorMap, type, W, H) {
   };
 }
 
+// ── SVG → PNG（OffscreenCanvas + FontFace） ────────────────────────────
+
+async function svgToPng(svg, notoData, outfitData, W, H) {
+  // FontFace でフォントを登録（canvas 描画に必要）
+  const notoFace  = new FontFace('Noto Sans JP', notoData,  { weight: '700', style: 'normal' });
+  const outfitFace = new FontFace('Outfit',       outfitData, { weight: '700', style: 'normal' });
+  await Promise.all([notoFace.load(), outfitFace.load()]);
+  self.fonts.add(notoFace);
+  self.fonts.add(outfitFace);
+
+  // SVG を Blob → ImageBitmap → OffscreenCanvas で PNG 出力
+  const blob   = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  const bitmap = await createImageBitmap(blob, { resizeWidth: W, resizeHeight: H, resizeQuality: 'high' });
+
+  const canvas = new OffscreenCanvas(W, H);
+  const ctx    = canvas.getContext('2d');
+  ctx.drawImage(bitmap, 0, 0, W, H);
+  bitmap.close();
+
+  const pngBlob = await canvas.convertToBlob({ type: 'image/png' });
+  return new Uint8Array(await pngBlob.arrayBuffer());
+}
+
 // ── メインハンドラ ───────────────────────────────────────────────────────
 
 const PNG_HEADERS = {
   'Content-Type':  'image/png',
   'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
 };
-
-// OGP に必要な日本語文字（Google Fonts サブセット用）
-const JP_CHARS = 'あなたの共感覚タイプ暖色深海森林モノクロパステルネオン夢想大地';
 
 export async function onRequest(context) {
   const url    = new URL(context.request.url);
@@ -267,28 +251,23 @@ export async function onRequest(context) {
     const type     = COLOR_TYPES[typeId] || COLOR_TYPES.warm;
     const W = 1200, H = 630;
 
-    // フォント読み込みと resvg 初期化を並列実行
+    // フォント読み込みと SVG 生成を並列実行
     const [notoData, outfitData] = await Promise.all([
       fetchGoogleFont('Noto Sans JP', 700, JP_CHARS),
       fetchGoogleFont('Outfit', 700, null),
-      ensureResvg(),
     ]);
 
-    // SVG 生成
-    const svg = await satori(buildOGP(colorMap, type, W, H), {
-      width: W,
-      height: H,
+    const svg = await satori(buildLayout(colorMap, type, W, H), {
+      width: W, height: H,
       fonts: [
-        { name: 'Noto Sans JP', data: notoData,  weight: 700, style: 'normal' },
-        { name: 'Outfit',       data: outfitData, weight: 700, style: 'normal' },
+        { name: 'Noto Sans JP', data: notoData,   weight: 700, style: 'normal' },
+        { name: 'Outfit',       data: outfitData,  weight: 700, style: 'normal' },
       ],
     });
 
-    // SVG → PNG 変換
-    const resvg  = new Resvg(svg, { fitTo: { mode: 'width', value: W } });
-    const pngBuf = resvg.render().asPng();
+    const png = await svgToPng(svg, notoData, outfitData, W, H);
 
-    return new Response(pngBuf, { headers: PNG_HEADERS });
+    return new Response(png, { headers: PNG_HEADERS });
 
   } catch (err) {
     return new Response(`og error: ${err.message}\n${err.stack}`, { status: 500 });

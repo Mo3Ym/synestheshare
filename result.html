@@ -30,10 +30,12 @@
 // OGPメタタグをURLから動的に設定
 // Cloudflare Workers側でHTMLにog:imageを注入する際もこの構造を参照
 (function() {
-  const base = location.origin;
-  const r = new URLSearchParams(location.search).get('r') || '';
+  const base   = location.origin;
+  const params = new URLSearchParams(location.search);
+  const r      = params.get('r') || '';
+  const mode   = params.get('mode') || '10';
   const ogImageUrl = r
-    ? `${base}/api/og?r=${encodeURIComponent(r)}`
+    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${mode}`
     : `${base}/ogp.png`;
   const pageUrl = location.href;
   document.getElementById('ogUrl')   ?.setAttribute('content', pageUrl);

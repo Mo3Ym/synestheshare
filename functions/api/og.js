@@ -79,31 +79,27 @@ function hexRgb(hex) {
   return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
 }
 
-// ── フォント取得（Google Fonts + Cache API） ───────────────────────────
+// ── フォント取得（jsDelivr 経由・直接バイナリ取得） ──────────────────
+// Google Fonts CSS 解析を使わず、@fontsource CDN の安定 URL を直接参照する
 
-async function cachedFetch(url, cacheKey) {
+const FONT_URLS = {
+  // Noto Sans JP 700 - japanese サブセット（日本語文字を含む）
+  notoJP:  'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp@5/files/noto-sans-jp-japanese-700-normal.woff2',
+  // Outfit 700 - latin サブセット（A-Z・数字・記号）
+  outfit:  'https://cdn.jsdelivr.net/npm/@fontsource/outfit@5/files/outfit-latin-700-normal.woff2',
+};
+
+async function loadFont(url, cacheKey) {
   const cache = caches.default;
   const req   = new Request(`https://og-font-cache.internal/${cacheKey}`);
   const hit   = await cache.match(req);
   if (hit) return hit.arrayBuffer();
-  const buf = await fetch(url).then(r => r.arrayBuffer());
+  const resp  = await fetch(url);
+  if (!resp.ok) throw new Error(`Font fetch failed: HTTP ${resp.status} for ${url}`);
+  const buf   = await resp.arrayBuffer();
   await cache.put(req, new Response(buf, { headers: { 'Cache-Control': 'public, max-age=2592000' } }));
   return buf;
 }
-
-async function fetchGoogleFont(family, weight, text) {
-  const params = new URLSearchParams({ family: `${family}:wght@${weight}`, display: 'block' });
-  if (text) params.set('text', text);
-  const css = await fetch(`https://fonts.googleapis.com/css2?${params}`, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36' },
-  }).then(r => r.text());
-  const match = css.match(/url\((https:[^)]+\.woff2)\)/);
-  if (!match) throw new Error(`Font URL not found: ${family} ${weight}`);
-  return cachedFetch(match[1], `${family}-${weight}`);
-}
-
-// OGP に必要な日本語文字（サブセット化でファイルサイズ削減）
-const JP_CHARS = 'あなたの共感覚タイプ暖色深海森林モノクロパステルネオン夢想大地';
 
 // ── satori OGP レイアウト ────────────────────────────────────────────────
 
@@ -253,8 +249,8 @@ export async function onRequest(context) {
 
     // フォント読み込みと SVG 生成を並列実行
     const [notoData, outfitData] = await Promise.all([
-      fetchGoogleFont('Noto Sans JP', 700, JP_CHARS),
-      fetchGoogleFont('Outfit', 700, null),
+      loadFont(FONT_URLS.notoJP,  'noto-jp-700'),
+      loadFont(FONT_URLS.outfit,  'outfit-700'),
     ]);
 
     const svg = await satori(buildLayout(colorMap, type, W, H), {

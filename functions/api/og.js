@@ -9,8 +9,9 @@
 import satori from 'satori';
 import { initWasm, Resvg } from '@resvg/resvg-wasm';
 
-// ビルド時にコンパイル済み WebAssembly.Module としてバンドルされる
-import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
+// RESVG_WASM は wrangler.toml の [wasm_modules] でビルド時に注入される
+// WebAssembly.Module 型（コンパイル済み）なので動的コンパイル制限に引っかからない
+/* global RESVG_WASM */
 
 // ── カラーデータ ────────────────────────────────────────────────────────
 
@@ -89,8 +90,11 @@ function hexRgb(hex) {
 let resvgReady = false;
 async function ensureResvg() {
   if (!resvgReady) {
-    // resvgWasm は WebAssembly.Module（ビルド時コンパイル済み）→ 動的コンパイル不要
-    await initWasm(resvgWasm);
+    if (typeof RESVG_WASM === 'undefined') {
+      throw new Error('RESVG_WASM global not injected. Check wrangler.toml [wasm_modules] configuration.');
+    }
+    // RESVG_WASM は WebAssembly.Module（wrangler がビルド時にコンパイル済み）
+    await initWasm(RESVG_WASM);
     resvgReady = true;
   }
 }

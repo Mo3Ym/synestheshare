@@ -1,3 +1,7 @@
 name = "synestheshare"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "."
+
+# WASM をビルド時にコンパイルして WebAssembly.Module としてグローバル変数に注入
+[wasm_modules]
+RESVG_WASM = "node_modules/@resvg/resvg-wasm/index_bg.wasm"

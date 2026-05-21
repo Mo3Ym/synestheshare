@@ -1,8 +1,5 @@
 {
   "name": "synestheshare",
   "private": true,
-  "dependencies": {
-    "satori": "^0.10.14",
-    "@resvg/resvg-wasm": "^2.6.2"
-  }
+  "dependencies": {}
 }

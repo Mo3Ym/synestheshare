@@ -2125,13 +2125,22 @@ function statsToVotes(statsData) {
   Object.entries(statsData).forEach(([letter, colorCounts]) => {
     const total = Object.values(colorCounts).reduce((s, n) => s + n, 0);
     if (total === 0) return;
-    votes[letter] = Object.entries(colorCounts)
+    const entries = Object.entries(colorCounts)
       .sort((a, b) => b[1] - a[1])
       .map(([name, count]) => ({
         color: NAME_TO_HEX[name] || name,
         name,
-        pct: Math.round(count / total * 100),
+        exact: count / total * 100,
+        pct: Math.floor(count / total * 100),
       }));
+    // 最大余剰法：合計が必ず100になるよう余りを余剰の大きい順に1ずつ配分
+    const remainder = 100 - entries.reduce((s, e) => s + e.pct, 0);
+    entries
+      .map((e, i) => ({ i, rem: e.exact - e.pct }))
+      .sort((a, b) => b.rem - a.rem)
+      .slice(0, remainder)
+      .forEach(({ i }) => entries[i].pct++);
+    votes[letter] = entries.map(({ color, name, pct }) => ({ color, name, pct }));
   });
   return votes;
 }

@@ -270,10 +270,19 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--jp); font-size: clamp(0.75rem, 3.8vw, 1.1rem); font-weight: 500;
   color: var(--hero-ink3); margin-bottom: 0.5rem; margin-top: 1rem;
 }
-.type-palette-strip { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.type-palette-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 36px);
+  justify-content: center;
+  gap: 10px;
+}
 .type-palette-dot {
-  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700;
+  font-size: 0.82rem;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
 
@@ -1055,6 +1064,18 @@ function getDiagType(majorityRate, rareScore) {
   return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派の色と<wbr>少数派の色が混在しています。<wbr>広い感性で<wbr>さまざまな色世界を<wbr>持ち合わせています。' };
 }
 
+/* 珍しさ/共感度ラベルと値を返すヘルパー
+   x = rareScore（平均色順位ベースの希少度スコア）
+   x >= 50（少数派）→ 珍しさ：上位(100-x)%  ← 常に50%以下
+   x <  50（多数派）→ 共感度：上位x%         ← 常に50%未満 */
+function calcRareStat(diag) {
+  const x = diag.rareScore;
+  if (x >= 50) {
+    return { label: '珍しさ', value: Math.max(1, 100 - x) };
+  }
+  return { label: '共感度', value: Math.max(1, x) };
+}
+
 /* ══ 色傾向タイプ判定 ══ */
 const COLOR_TYPES = [
   {
@@ -1157,8 +1178,8 @@ function buildTypeHero(coloredLetters, diag) {
   const dots = coloredLetters.map(l => {
     const c = colorMap[l];
     const shadow = isBright(c)
-      ? 'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)'
-      : 'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)';
+      ? 'box-shadow:0 0 0 2.5px rgba(255,255,255,0.55),inset 0 0 0 1.5px rgba(0,0,0,0.1)'
+      : 'box-shadow:0 0 0 2.5px rgba(255,255,255,0.4)';
     const tc = textColorFor(c);
     const sizeOverride = '';
     return `<div class="type-palette-dot" style="background:${c};${shadow};color:${tc};${sizeOverride}">${l}</div>`;
@@ -1204,8 +1225,8 @@ function buildTypeHero(coloredLetters, diag) {
           <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}<span style="font-size:0.8em">%</span></span>
         </div>
         <div class="type-stat">
-          <span class="type-stat-label">${diag.rareScore >= 40 ? '珍しさ' : '共感度'}</span>
-          <span class="type-stat-value" style="color:${rareColor}"><span style="font-size:0.5em">上位</span>${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}<span style="font-size:0.8em">%</span></span>
+          <span class="type-stat-label">${calcRareStat(diag).label}</span>
+          <span class="type-stat-value" style="color:${rareColor}"><span style="font-size:0.5em">上位</span>${calcRareStat(diag).value}<span style="font-size:0.8em">%</span></span>
         </div>
         <div class="type-stat">
           <span class="type-stat-label">最も個性的な文字</span>
@@ -1611,7 +1632,7 @@ function buildDiagSection(diag) {
       <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率：<strong>${diag.majorityRate}<span style="font-size:0.8em">%</span></strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>${diag.rareScore >= 40 ? '珍しさ' : '共感度'}：<strong><span style="font-size:0.5em">上位</span>${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}<span style="font-size:0.8em">%</span></strong>
+      多数派一致率：<strong>${diag.majorityRate}<span style="font-size:0.8em">%</span></strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>${calcRareStat(diag).label}：<strong><span style="font-size:0.5em">上位</span>${calcRareStat(diag).value}<span style="font-size:0.8em">%</span></strong>
     </div>
   </div>`;
 }
@@ -1664,7 +1685,7 @@ function buildShareSection(diag, coloredLetters) {
   // STEP2: 「感覚を見せる」方向のXシェアテキスト
   // result URL（自分の結果が開く）をシェア
   const resultUrl = `${location.origin}${location.pathname}${location.search}`;
-  const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${diag.rareScore >= 40 ? '珍しさ' : '共感度'}: 上位${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}%\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
+  const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${calcRareStat(diag).label}: 上位${calcRareStat(diag).value}%\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -1678,7 +1699,7 @@ function buildShareSection(diag, coloredLetters) {
           <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
           <div class="share-card-title"><span style="color:${diagType.color}">${diagType.label}</span><span style="color:var(--ink3);font-weight:300;margin:0 0.2em">/</span><span style="color:${typeColor};opacity:0.7">${colorType.name}</span></div>
           <div class="share-card-palette">${dots}</div>
-          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}<span style="font-size:0.8em">%</span> ／ ${diag.rareScore >= 40 ? '珍しさ' : '共感度'} <span style="font-size:0.5em">上位</span>${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}<span style="font-size:0.8em">%</span></div>
+          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}<span style="font-size:0.8em">%</span> ／ ${calcRareStat(diag).label} <span style="font-size:0.5em">上位</span>${calcRareStat(diag).value}<span style="font-size:0.8em">%</span></div>
           <div class="share-card-tag">#SynestheShare</div>
         </div>
       </div>
@@ -2110,6 +2131,7 @@ function parseColorMap() {
    ・かつ、この結果でまだ投票していない（ss_vote_key が未完）
 ──────────────────────────────────────────────── */
 function shouldVote() {
+  if (localStorage.getItem('ss_submitted') === '1') return false;
   const fromAlphabet = sessionStorage.getItem('ss_from_alphabet') === '1';
   if (!fromAlphabet) return false;
   const voteKey = sessionStorage.getItem('ss_vote_key');
@@ -2142,7 +2164,7 @@ function statsToVotes(statsData) {
     const total = Object.values(colorCounts).reduce((s, n) => s + n, 0);
     if (total === 0) return;
     const entries = Object.entries(colorCounts)
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(([name, count]) => ({
         color: NAME_TO_HEX[name] || name,
         name,

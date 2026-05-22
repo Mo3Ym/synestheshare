@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circle Debug</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  background: #0a1628 url('./assets/backgrounds/ocean.webp') center/cover no-repeat;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.25rem;
+  gap: 2rem;
+}
+
+/* ── プレビュー ── */
+#preview {
+  width: 100%;
+  max-width: 480px;
+}
+#label {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+#grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.dot {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── コントロールパネル ── */
+#panel {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.row-label {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+.row-value {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 3em;
+  text-align: right;
+}
+input[type=range] {
+  width: 100%;
+  accent-color: rgba(255,255,255,0.7);
+  height: 4px;
+  cursor: pointer;
+}
+
+/* ── 現在値コピー ── */
+#result-box {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+#result-box p {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+#result-text {
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  white-space: pre;
+}
+#copy-btn {
+  margin-top: 0.75rem;
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#copy-btn:active { background: rgba(255,255,255,0.25); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="preview">
+  <div id="label">あなたのアルファベットの色</div>
+  <div id="grid"></div>
+</div>
+
+<div id="panel">
+  <div class="row">
+    <div class="row-header">
+      <span class="row-label">GAP（円の余白）</span>
+      <span class="row-value" id="val-gap">12px</span>
+    </div>
+    <input type="range" id="sl-gap" min="2" max="24" step="1" value="12">
+  </div>
+  <div class="row">
+    <div class="row-header">
+      <span class="row-label">BORDER（枠の太さ）</span>
+      <span class="row-value" id="val-border">2.5px</span>
+    </div>
+    <input type="range" id="sl-border" min="0" max="6" step="0.5" value="2.5">
+  </div>
+  <div class="row">
+    <div class="row-header">
+      <span class="row-label">FONT（文字の大きさ）</span>
+      <span class="row-value" id="val-font">4vw</span>
+    </div>
+    <input type="range" id="sl-font" min="1" max="8" step="0.5" value="4">
+  </div>
+</div>
+
+<div id="result-box">
+  <p>▼ この値をコピーしてClaudeに送ってください</p>
+  <div id="result-text"></div>
+  <button id="copy-btn">コピー</button>
+</div>
+
+<script>
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const COLORS = [
+  '#e03a2a','#e87820','#f0e040','#a8d020','#2a9e60','#1888c8','#70cbff',
+  '#7028c0','#d8306a','#ff90b8','#8b4513','#181818','#888880','#2a9e60',
+  '#e87820','#1888c8','#7028c0','#e03a2a','#a8d020','#f0e040','#70cbff',
+  '#d8306a','#e03a2a','#1888c8','#f0e040','#7028c0',
+];
+
+const grid = document.getElementById('grid');
+
+LETTERS.forEach((l, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'dot';
+  dot.textContent = l;
+  dot.style.background = COLORS[i % COLORS.length];
+  grid.appendChild(dot);
+});
+
+const slGap    = document.getElementById('sl-gap');
+const slBorder = document.getElementById('sl-border');
+const slFont   = document.getElementById('sl-font');
+const valGap    = document.getElementById('val-gap');
+const valBorder = document.getElementById('val-border');
+const valFont   = document.getElementById('val-font');
+const resultText = document.getElementById('result-text');
+
+function update() {
+  const gap    = parseFloat(slGap.value);
+  const border = parseFloat(slBorder.value);
+  const font   = parseFloat(slFont.value);
+
+  grid.style.gap = gap + 'px';
+
+  document.querySelectorAll('.dot').forEach(dot => {
+    const isBright = dot.style.background === '#f0e040' || dot.style.background === '#a8d020';
+    dot.style.boxShadow = border > 0
+      ? `0 0 0 ${border}px rgba(255,255,255,0.45)`
+      : 'none';
+    dot.style.fontSize = font + 'vw';
+  });
+
+  valGap.textContent    = gap + 'px';
+  valBorder.textContent = border + 'px';
+  valFont.textContent   = font + 'vw';
+
+  resultText.textContent =
+    `gap:    ${gap}px\nborder: ${border}px\nfont:   ${font}vw`;
+}
+
+slGap.addEventListener('input', update);
+slBorder.addEventListener('input', update);
+slFont.addEventListener('input', update);
+
+document.getElementById('copy-btn').addEventListener('click', () => {
+  navigator.clipboard.writeText(resultText.textContent).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'コピーしました！';
+    setTimeout(() => btn.textContent = 'コピー', 1500);
+  });
+});
+
+update();
+</script>
+</body>
+</html>

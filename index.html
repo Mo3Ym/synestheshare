@@ -542,7 +542,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 ══════════════════════════════════════ */
 @media (max-width: 960px) {
   .hero { grid-template-columns: 1fr; min-height: auto; padding: 7rem 1.75rem 3rem; gap: 2.5rem; }
-  .hero-visual { max-width: 320px; margin: 0 auto; gap: 8px; }
+  .hero-visual { display: none; }
   .theme-grid { grid-template-columns: repeat(2,1fr); }
   .steps { grid-template-columns: repeat(2,1fr); }
   .fact-grid { grid-template-columns: repeat(3,1fr); }
@@ -618,7 +618,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 }
 
 @media (max-width: 390px) {
-  /* hero-visual は600px以下で非表示のため指定不要 */
+  /* hero-visual は960px以下で既に非表示のため指定不要 */
 }
 </style>
 </head>

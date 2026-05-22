@@ -47,7 +47,7 @@
 <title>診断結果 — SynestheShare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
 <script type="importmap">
 {
@@ -69,7 +69,7 @@
   --border: #e0e0dc;
   --c1: #e03a2a;
   --outfit: 'Outfit', sans-serif;
-  --jp: "HiraginoUDSansN-W3","ヒラギノUD角ゴ ProN W3",
+  --jp: 'Noto Sans JP',"HiraginoUDSansN-W3","ヒラギノUD角ゴ ProN W3",
         "Hiragino Sans","ヒラギノ角ゴシック",
         "Meiryo UI","Meiryo",sans-serif;
   --marker-h: 24px;
@@ -114,6 +114,7 @@ nav ul a:hover { color: var(--ink); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .type-art-canvas {
+  display: none;
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   pointer-events: none; z-index: 0;
@@ -134,7 +135,7 @@ nav ul a:hover { color: var(--ink); }
   padding: 2.5rem 1.5rem 5rem;
   min-height: calc(100svh - var(--nav-h));
   display: flex; flex-direction: column; justify-content: center;
-  background: var(--bg);
+  background: #0a1628 url('./assets/backgrounds/ocean.webp') center/cover no-repeat;
 }
 .type-hero-blob {
   position: absolute; border-radius: 50%; filter: blur(70px);
@@ -159,6 +160,16 @@ nav ul a:hover { color: var(--ink); }
 /* ══ hero テーマ切替 ══ */
 .type-hero[data-theme="dark"] { --hero-ink: #f0f0ec; --hero-ink2: rgba(240,240,236,0.65); --hero-ink3: rgba(240,240,236,0.38); --hero-border: rgba(255,255,255,0.14); --hero-stat-bg: rgba(255,255,255,0.08); --hero-stat-border: rgba(255,255,255,0.14); }
 .type-hero[data-theme="light"] { --hero-ink: #181818; --hero-ink2: rgba(24,24,24,0.6); --hero-ink3: rgba(24,24,24,0.35); --hero-border: rgba(0,0,0,0.12); --hero-stat-bg: rgba(0,0,0,0.04); --hero-stat-border: rgba(0,0,0,0.1); }
+
+/* ══ hero 全文字白色強制（背景画像対応） ══ */
+.type-hero .type-eyebrow,
+.type-hero .type-label,
+.type-hero .type-name-diag,
+.type-hero .type-name-color,
+.type-hero .type-stat-value,
+.type-hero .type-palette-label { color: #ffffff !important; }
+.type-hero .type-stat-label,
+.type-hero .type-stat-sub { color: rgba(255,255,255,0.6) !important; }
 
 .type-eyebrow { color: var(--hero-ink3); }
 .type-eyebrow::before { background: var(--hero-ink3); }
@@ -208,20 +219,19 @@ nav ul a:hover { color: var(--ink); }
 
 /* 一致率・レア度 */
 .type-stats {
-  display: flex; gap: 0; margin-top: 0.2rem;
+  display: flex; gap: 0.45rem; margin-top: 0.2rem;
 }
 .type-stat {
   display: flex; flex-direction: column; gap: 0.15rem;
-  padding: 0.75rem 0.85rem;
-  background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(255,255,255,0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 0.8rem 0.9rem;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 28px rgba(60,100,220,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
+  border-radius: 16px;
   flex: 1;
 }
-.type-stat:first-child { border-radius: 12px 0 0 12px; }
-.type-stat:not(:first-child) { border-left: none; }
-.type-stat:last-child  { border-radius: 0 12px 12px 0; }
 .type-stat-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
@@ -256,7 +266,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* パレットドット帯 */
 .type-palette-label {
-  font-family: var(--jp); font-size: 0.75rem; font-weight: 500;
+  font-family: var(--jp); font-size: clamp(0.75rem, 3.8vw, 1.1rem); font-weight: 500;
   color: var(--hero-ink3); margin-bottom: 0.5rem; margin-top: 1rem;
 }
 .type-palette-strip { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
@@ -1140,7 +1150,7 @@ function detectColorType(coloredLetters) {
 function buildTypeHero(coloredLetters, diag) {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
-  const theme = type.theme || 'light';
+  const theme = 'dark';
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
 
   const dots = coloredLetters.map(l => {

@@ -167,8 +167,6 @@ nav ul a:hover { color: var(--ink); }
 /* ══ hero 全文字白色強制（背景画像対応） ══ */
 .type-hero .type-eyebrow,
 .type-hero .type-label,
-.type-hero .type-name-diag,
-.type-hero .type-name-color,
 .type-hero .type-stat-value,
 .type-hero .type-palette-label { color: #ffffff !important; }
 .type-hero .type-stat-label,
@@ -204,19 +202,38 @@ nav ul a:hover { color: var(--ink); }
 .type-name-diag {
   font-family: var(--jp); font-weight: 700;
   font-size: clamp(1.7rem, 5.5vw, 2.6rem);
-  color: var(--ink); line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.15; letter-spacing: -0.02em;
+
+  /* 淡い金色グラデーション */
+  background: linear-gradient(135deg,
+    #ffb347 0%, #ffd36b 40%, #fff0b0 70%, #ffd36b 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+  filter: drop-shadow(0 0 10px rgba(255, 190, 80, 0.22));
 }
 .type-name-color {
-  font-family: var(--jp); font-weight: 700;
-  font-size: clamp(1.7rem, 5.5vw, 2.6rem);
-  line-height: 1.15; letter-spacing: -0.02em;
-  display: flex; align-items: center; gap: 0.4em;
+  font-family: var(--outfit); font-weight: 700;
+  font-size: clamp(2.6rem, 12vw, 4.8rem);
+  line-height: 1.05; letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 0.35em;
+
+  /* 水・光のグラデーション */
+  background: linear-gradient(135deg,
+    #8ff6ff 0%, #dffcff 30%, #7bcfff 60%, #d8bfff 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+  filter: drop-shadow(0 0 14px rgba(143, 246, 255, 0.22));
 }
 .type-name-color::before {
   content: '';
-  display: inline-block; width: 2px; height: 1em;
-  background: var(--border); border-radius: 1px;
+  display: inline-block; width: 1.5px; height: 0.75em;
+  background: rgba(255,255,255,0.28); border-radius: 1px;
   flex-shrink: 0;
 }
 

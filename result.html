@@ -268,6 +268,44 @@ nav ul a:hover { color: var(--ink); }
   line-height: 1.9; font-weight: 300;
 }
 
+/* ── 統合統計カード ── */
+.type-stat-card {
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 28px rgba(60,100,220,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
+  border-radius: 16px; overflow: hidden;
+}
+.type-stat-row {
+  display: flex; align-items: center;
+  padding: 0.85rem 0.75rem;
+}
+.type-stat-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 0.25rem;
+}
+.type-stat-sep {
+  width: 1px; align-self: stretch;
+  background: rgba(255,255,255,0.15);
+  margin: 0 0.25rem;
+}
+.type-stat-card-label {
+  font-family: var(--outfit); font-size: 0.55rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.6); line-height: 1;
+}
+.type-stat-card-value {
+  font-family: var(--outfit); font-weight: 700;
+  font-size: clamp(1.6rem, 5.5vw, 2.4rem); line-height: 1;
+  color: #ffffff !important;
+}
+.type-stat-desc {
+  padding: 0 1.1rem 0.85rem;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 300;
+  color: rgba(255,255,255,0.88); line-height: 1.75;
+  text-align: center;
+}
+
 /* パレットドット帯 */
 .type-palette-label {
   font-family: var(--jp); font-size: clamp(0.75rem, 3.8vw, 1.1rem); font-weight: 500;
@@ -1060,10 +1098,10 @@ function calcDiagnosis() {
 
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
-  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなたの色覚は<wbr>非常にユニーク。<wbr>同じ感覚を持つ人は<wbr>少数派です。<wbr>その鋭い感性は、<wbr>アートや創造的な分野で<wbr>力を発揮するかもしれません。' };
-  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#e87820', desc: 'ほどよくユニーク。<wbr>一般的な傾向は<wbr>踏まえつつも、<wbr>あなたらしい独自の<wbr>色使いが光っています。' };
-  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#1888c8', desc: 'あなたの色覚は<wbr>多くの人と共通しています。<wbr>共感覚の「スタンダード」に<wbr>近い感性の持ち主です。' };
-  return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派の色と<wbr>少数派の色が混在しています。<wbr>広い感性で<wbr>さまざまな色世界を<wbr>持ち合わせています。' };
+  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなただけが知っている、<wbr>希少な色の世界です。' };
+  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#e87820', desc: '人によって印象が<wbr>分かれやすい、<wbr>独自の色感覚です。' };
+  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#1888c8', desc: '多くの人と色の感覚を<wbr>共有する、<wbr>共感覚の王道です。' };
+  return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派と少数派が交差する、<wbr>広い感性の持ち主です。' };
 }
 
 /* 珍しさ/共感度ラベルと値を返すヘルパー
@@ -1215,6 +1253,7 @@ function buildTypeHero(coloredLetters, diag) {
     : diag.rareScore >= 20 ? '#1888c8'
     : '#555550';
   const rareColor = ensureContrast(rareColorRaw, theme);
+  const rareStat = calcRareStat(diag);
 
   // タイプ名の色・diagType色もコントラスト確保
   const typeColor = ensureContrast(type.color || '#181818', theme);
@@ -1234,22 +1273,27 @@ function buildTypeHero(coloredLetters, diag) {
         <span class="type-name-diag" style="color:${diagColor}">${diagType.label}</span>
         <span class="type-name-color" style="color:${typeColor}">${type.name}</span>
       </div>
-      <div class="type-stats">
-        <div class="type-stat">
-          <span class="type-stat-label">多数派一致率</span>
-          <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}<span style="font-size:0.8em">%</span></span>
+      <div class="type-stat-card">
+        <div class="type-stat-row">
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">多数派一致率</span>
+            <span class="type-stat-card-value" style="color:${majColor}">${diag.majorityRate}<span style="font-size:0.8em">%</span></span>
+          </div>
+          <div class="type-stat-sep"></div>
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">${rareStat.label}</span>
+            <span class="type-stat-card-value" style="color:${rareColor}"><span style="font-size:0.5em">上位</span>${rareStat.value}<span style="font-size:0.8em">%</span></span>
+          </div>
+          <div class="type-stat-sep"></div>
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">最も個性的な文字</span>
+            ${uniqueResult.isAllMajority
+              ? `<span class="type-stat-card-value" style="color:rgba(255,255,255,0.4)">-</span>`
+              : `<span class="type-stat-card-value" style="color:${uniqueColor}">${uniqueResult.mostUnique}</span>`
+            }
+          </div>
         </div>
-        <div class="type-stat">
-          <span class="type-stat-label">${calcRareStat(diag).label}</span>
-          <span class="type-stat-value" style="color:${rareColor}"><span style="font-size:0.5em">上位</span>${calcRareStat(diag).value}<span style="font-size:0.8em">%</span></span>
-        </div>
-        <div class="type-stat">
-          <span class="type-stat-label">最も個性的な文字</span>
-          ${uniqueResult.isAllMajority
-            ? `<span class="type-stat-value" style="color:var(--hero-ink3)">-</span>`
-            : `<span class="type-stat-value" style="color:${uniqueColor}">${uniqueResult.mostUnique}</span>`
-          }
-        </div>
+        <div class="type-stat-desc">${diagType.desc.replace(/<wbr>/g, '')}</div>
       </div>
       <div class="type-palette-label">あなたのアルファベットの色</div>
       <div class="type-palette-strip">${dots}</div>

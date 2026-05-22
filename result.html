@@ -272,16 +272,16 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-palette-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 36px);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, 34px);
+  gap: 13px;
 }
 .type-palette-dot {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.98rem;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
 
@@ -1177,8 +1177,8 @@ function buildTypeHero(coloredLetters, diag) {
   const dots = coloredLetters.map(l => {
     const c = colorMap[l];
     const shadow = isBright(c)
-      ? 'box-shadow:0 0 0 2.5px rgba(255,255,255,0.55),inset 0 0 0 1.5px rgba(0,0,0,0.1)'
-      : 'box-shadow:0 0 0 2.5px rgba(255,255,255,0.4)';
+      ? 'box-shadow:0 0 0 1.5px rgba(255,255,255,0.55),inset 0 0 0 1px rgba(0,0,0,0.1)'
+      : 'box-shadow:0 0 0 1.5px rgba(255,255,255,0.45)';
     const tc = textColorFor(c);
     const sizeOverride = '';
     return `<div class="type-palette-dot" style="background:${c};${shadow};color:${tc};${sizeOverride}">${l}</div>`;

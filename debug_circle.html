@@ -24,16 +24,16 @@ body {
 }
 #label {
   color: rgba(255,255,255,0.6);
-  font-size: 0.8rem;
-  margin-bottom: 0.6rem;
+  font-size: clamp(0.75rem, 3.8vw, 1.1rem);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
 }
 #grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  /* grid-template-columns は JS で動的に更新 */
+  gap: 10px;
 }
 .dot {
-  aspect-ratio: 1;
-  width: 100%;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -41,6 +41,7 @@ body {
   font-family: 'Outfit', 'Helvetica Neue', sans-serif;
   font-weight: 700;
   color: #fff;
+  /* width / height / font-size / box-shadow は JS で更新 */
 }
 
 /* ── コントロールパネル ── */
@@ -57,68 +58,32 @@ body {
   flex-direction: column;
   gap: 1rem;
 }
-.row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.row-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-.row-label {
-  color: rgba(255,255,255,0.65);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-}
+.row { display: flex; flex-direction: column; gap: 0.35rem; }
+.row-header { display: flex; justify-content: space-between; align-items: baseline; }
+.row-label { color: rgba(255,255,255,0.65); font-size: 0.72rem; letter-spacing: 0.06em; }
 .row-value {
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  min-width: 3em;
-  text-align: right;
+  color: #fff; font-size: 0.85rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; min-width: 4em; text-align: right;
 }
 input[type=range] {
-  width: 100%;
-  accent-color: rgba(255,255,255,0.7);
-  height: 4px;
-  cursor: pointer;
+  width: 100%; accent-color: rgba(255,255,255,0.7); height: 4px; cursor: pointer;
 }
 
 /* ── 現在値コピー ── */
 #result-box {
-  width: 100%;
-  max-width: 480px;
+  width: 100%; max-width: 480px;
   background: rgba(0,0,0,0.35);
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 12px;
   padding: 1rem 1.25rem;
 }
-#result-box p {
-  color: rgba(255,255,255,0.4);
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.5rem;
-}
-#result-text {
-  color: #fff;
-  font-size: 0.82rem;
-  line-height: 1.7;
-  white-space: pre;
-}
+#result-box p { color: rgba(255,255,255,0.4); font-size: 0.65rem; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+#result-text { color: #fff; font-size: 0.82rem; line-height: 1.7; white-space: pre; }
 #copy-btn {
-  margin-top: 0.75rem;
-  width: 100%;
-  padding: 0.6rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: background 0.15s;
+  margin-top: 0.75rem; width: 100%; padding: 0.6rem;
+  border-radius: 8px; border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-size: 0.8rem; cursor: pointer; transition: background 0.15s;
 }
 #copy-btn:active { background: rgba(255,255,255,0.25); }
 </style>
@@ -135,10 +100,17 @@ input[type=range] {
 <div id="panel">
   <div class="row">
     <div class="row-header">
-      <span class="row-label">GAP（円の余白）</span>
-      <span class="row-value" id="val-gap">12px</span>
+      <span class="row-label">SIZE（円の大きさ）</span>
+      <span class="row-value" id="val-size">36px</span>
     </div>
-    <input type="range" id="sl-gap" min="2" max="24" step="1" value="12">
+    <input type="range" id="sl-size" min="20" max="64" step="1" value="36">
+  </div>
+  <div class="row">
+    <div class="row-header">
+      <span class="row-label">GAP（円の余白）</span>
+      <span class="row-value" id="val-gap">10px</span>
+    </div>
+    <input type="range" id="sl-gap" min="2" max="24" step="1" value="10">
   </div>
   <div class="row">
     <div class="row-header">
@@ -150,9 +122,9 @@ input[type=range] {
   <div class="row">
     <div class="row-header">
       <span class="row-label">FONT（文字の大きさ）</span>
-      <span class="row-value" id="val-font">4vw</span>
+      <span class="row-value" id="val-font">0.82rem</span>
     </div>
-    <input type="range" id="sl-font" min="1" max="8" step="0.5" value="4">
+    <input type="range" id="sl-font" min="0.4" max="1.6" step="0.02" value="0.82">
   </div>
 </div>
 
@@ -172,7 +144,6 @@ const COLORS = [
 ];
 
 const grid = document.getElementById('grid');
-
 LETTERS.forEach((l, i) => {
   const dot = document.createElement('div');
   dot.className = 'dot';
@@ -181,40 +152,46 @@ LETTERS.forEach((l, i) => {
   grid.appendChild(dot);
 });
 
+const slSize   = document.getElementById('sl-size');
 const slGap    = document.getElementById('sl-gap');
 const slBorder = document.getElementById('sl-border');
 const slFont   = document.getElementById('sl-font');
+const valSize   = document.getElementById('val-size');
 const valGap    = document.getElementById('val-gap');
 const valBorder = document.getElementById('val-border');
 const valFont   = document.getElementById('val-font');
 const resultText = document.getElementById('result-text');
 
 function update() {
-  const gap    = parseFloat(slGap.value);
+  const size   = parseInt(slSize.value);
+  const gap    = parseInt(slGap.value);
   const border = parseFloat(slBorder.value);
-  const font   = parseFloat(slFont.value);
+  const font   = parseFloat(slFont.value).toFixed(2);
 
+  // グリッド更新（auto-fill で左揃え折り返し）
+  grid.style.gridTemplateColumns = `repeat(auto-fill, ${size}px)`;
   grid.style.gap = gap + 'px';
 
+  // 各ドット更新
   document.querySelectorAll('.dot').forEach(dot => {
-    const isBright = dot.style.background === '#f0e040' || dot.style.background === '#a8d020';
+    dot.style.width  = size + 'px';
+    dot.style.height = size + 'px';
+    dot.style.fontSize = font + 'rem';
     dot.style.boxShadow = border > 0
       ? `0 0 0 ${border}px rgba(255,255,255,0.45)`
       : 'none';
-    dot.style.fontSize = font + 'vw';
   });
 
+  valSize.textContent   = size + 'px';
   valGap.textContent    = gap + 'px';
   valBorder.textContent = border + 'px';
-  valFont.textContent   = font + 'vw';
+  valFont.textContent   = font + 'rem';
 
   resultText.textContent =
-    `gap:    ${gap}px\nborder: ${border}px\nfont:   ${font}vw`;
+    `size:   ${size}px\ngap:    ${gap}px\nborder: ${border}px\nfont:   ${font}rem`;
 }
 
-slGap.addEventListener('input', update);
-slBorder.addEventListener('input', update);
-slFont.addEventListener('input', update);
+[slSize, slGap, slBorder, slFont].forEach(sl => sl.addEventListener('input', update));
 
 document.getElementById('copy-btn').addEventListener('click', () => {
   navigator.clipboard.writeText(resultText.textContent).then(() => {

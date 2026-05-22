@@ -748,12 +748,12 @@ nav ul a:hover { color: var(--ink); }
 .btn-send-friend {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
-  background: transparent; color: var(--ink2);
-  border: 1.5px solid var(--border); cursor: pointer;
-  font-family: var(--jp); font-weight: 700; font-size: 0.78rem;
-  transition: background 0.15s, color 0.15s;
+  background: var(--ink); color: var(--bg); border: none; cursor: pointer;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.04em;
+  transition: opacity 0.15s, transform 0.12s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
 }
-.btn-send-friend:hover { background: var(--border); color: var(--ink); }
+.btn-send-friend:hover { opacity: 0.85; transform: translateY(-2px); }
 .btn-back {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
@@ -1771,7 +1771,7 @@ function buildShareSection(diag, coloredLetters) {
           <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.623L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
           Xにシェア
         </button>
-        <button class="btn-send-friend" id="btnSendFriend">
+        <button class="btn-send-friend" id="btnSendFriend" data-text="${shareText.replace(/"/g,'&quot;')}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           友だちに送る
         </button>
@@ -1865,16 +1865,17 @@ function render() {
     });
     // 友だちに送るボタン（Web Share API → URLコピーにフォールバック）
     document.getElementById('btnSendFriend')?.addEventListener('click', async () => {
-      const url = location.href;
+      const btn = document.getElementById('btnSendFriend');
+      const text = btn.dataset.text.replace(/&quot;/g, '"');
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'SynestheShare', text: 'あなたの文字には、どんな色が見えますか？', url });
+          await navigator.share({ title: 'SynestheShare', text });
         } catch (e) {
           if (e.name !== 'AbortError') showToast('シェアに失敗しました');
         }
       } else {
-        await navigator.clipboard.writeText(url).catch(() => {});
-        showToast('URLをコピーしました');
+        await navigator.clipboard.writeText(text).catch(() => {});
+        showToast('テキストをコピーしました');
       }
     });
 

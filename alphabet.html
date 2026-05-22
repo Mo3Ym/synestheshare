@@ -501,7 +501,13 @@ nav ul a:hover { color: var(--ink); }
   padding: 0.72rem 1.6rem; cursor: pointer; border: none;
   box-shadow: 0 4px 18px rgba(220,50,32,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
 }
-.btn-result:hover { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.btn-result:hover:not(:disabled) { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.btn-result:disabled {
+  background: rgba(140,140,140,0.35);
+  box-shadow: none;
+  cursor: not-allowed;
+  color: rgba(255,255,255,0.45);
+}
 .btn-reset {
   padding: 0.72rem 1.4rem; border-radius: 100px;
   border: 1.5px solid var(--border); background: transparent; cursor: pointer;
@@ -642,7 +648,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
     <div class="result-section">
     <div class="action-row">
-      <button class="btn-result" id="btnResult">🔍 結果を見る</button>
+      <button class="btn-result" id="btnResult" disabled>🔍 結果を見る</button>
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
 
@@ -1015,6 +1021,7 @@ function updateProgress() {
     countEl.innerHTML = `<span>${done}</span> / ${total}`;
   }
   progressFill.style.width = (done / total * 100) + '%';
+  btnResult.disabled = done === 0;
 
   // ── グラデーション生成 ──
   const selectedColors = letters.map(l => colorMap[l]).filter(Boolean);
@@ -1059,10 +1066,11 @@ function updateProgress() {
 
 /* ══ 結果パレット更新 ══ */
 function updateResultPalette() {
+  if (!resultPalette) return;
   resultPalette.innerHTML = '';
   const letters = isFullMode ? LETTERS_26 : LETTERS_10;
   const done = letters.filter(l => colorMap[l]).length;
-  resultMeta.textContent = `${done}文字に色が設定されています`;
+  if (resultMeta) resultMeta.textContent = `${done}文字に色が設定されています`;
 
   letters.forEach(l => {
     const color = colorMap[l] || null;

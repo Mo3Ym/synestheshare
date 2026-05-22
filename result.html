@@ -745,7 +745,7 @@ nav ul a:hover { color: var(--ink); }
   box-shadow: 0 4px 14px rgba(0,0,0,0.25);
 }
 .btn-x-share:hover { background: #111; transform: translateY(-2px); }
-.btn-copy-share {
+.btn-send-friend {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
   background: transparent; color: var(--ink2);
@@ -753,7 +753,7 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--jp); font-weight: 700; font-size: 0.78rem;
   transition: background 0.15s, color 0.15s;
 }
-.btn-copy-share:hover { background: var(--border); color: var(--ink); }
+.btn-send-friend:hover { background: var(--border); color: var(--ink); }
 .btn-back {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
@@ -1771,8 +1771,9 @@ function buildShareSection(diag, coloredLetters) {
           <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.623L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
           Xにシェア
         </button>
-        <button class="btn-copy-share" id="btnCopyShare" data-text="${shareText.replace(/"/g,'&quot;')}">
-          📋 テキストをコピー
+        <button class="btn-send-friend" id="btnSendFriend">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          友だちに送る
         </button>
       </div>
     </div>
@@ -1862,11 +1863,19 @@ function render() {
     document.getElementById('btnXShare')?.addEventListener('click', () => {
       window.open(document.getElementById('btnXShare').dataset.url, '_blank');
     });
-    // コピーボタン
-    document.getElementById('btnCopyShare')?.addEventListener('click', async () => {
-      const text = document.getElementById('btnCopyShare').dataset.text.replace(/&quot;/g, '"');
-      await navigator.clipboard.writeText(text).catch(() => {});
-      showToast('コピーしました！');
+    // 友だちに送るボタン（Web Share API → URLコピーにフォールバック）
+    document.getElementById('btnSendFriend')?.addEventListener('click', async () => {
+      const url = location.href;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'SynestheShare', text: 'あなたの文字には、どんな色が見えますか？', url });
+        } catch (e) {
+          if (e.name !== 'AbortError') showToast('シェアに失敗しました');
+        }
+      } else {
+        await navigator.clipboard.writeText(url).catch(() => {});
+        showToast('URLをコピーしました');
+      }
     });
 
     // ── STEP1: 画像保存ボタン ──
@@ -1874,39 +1883,73 @@ function render() {
       const btn = document.getElementById('btnSaveImage');
       const target = document.getElementById('typeHeroArea');
       if (!target) return;
+
+      // ユーザー操作直後（同期）に空ウィンドウを開く（ポップアップブロッカー対策）
+      const newWin = window.open('', '_blank');
+
       btn.disabled = true;
       btn.textContent = '生成中…';
 
       // html2canvas を CDN から動的ロード
       if (!window.html2canvas) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-          s.onload = resolve; s.onerror = reject;
-          document.head.appendChild(s);
-        });
+        try {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            s.onload = resolve; s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        } catch {
+          if (newWin) newWin.close();
+          showToast('ライブラリの読み込みに失敗しました（通信確認）');
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg> 画像を保存`;
+          return;
+        }
       }
 
       try {
+        // 背景画像をbase64に変換（CORSによるtainted canvas回避）
+        const heroDom = target.querySelector('.type-hero');
+        const origBg = heroDom ? heroDom.style.backgroundImage : '';
+        if (heroDom && origBg) {
+          const urlMatch = origBg.match(/url\(['"]?([^'"]+)['"]?\)/);
+          if (urlMatch) {
+            try {
+              const res = await fetch(urlMatch[1]);
+              const imgBlob = await res.blob();
+              const b64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(imgBlob); });
+              heroDom.style.backgroundImage = `url('${b64}')`;
+            } catch {}
+          }
+        }
+
         const canvas = await window.html2canvas(target, {
           scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: null,
+          useCORS: false,
+          allowTaint: false,
+          backgroundColor: '#0a1628',
           logging: false,
-          width: target.offsetWidth,
-          height: target.offsetHeight,
+          ignoreElements: el => el.tagName === 'CANVAS' && el.id === 'artCanvas',
         });
 
-        // PNG としてダウンロード
-        const link = document.createElement('a');
-        link.download = 'synestheshare.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('画像を保存しました');
+        // 背景を元に戻す
+        if (heroDom) heroDom.style.backgroundImage = origBg;
+
+        // toBlob → Blob URL で新規ウィンドウに表示
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const blobUrl = URL.createObjectURL(blob);
+        if (newWin && !newWin.closed) {
+          newWin.location.href = blobUrl;
+        } else {
+          window.open(blobUrl, '_blank');
+        }
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+        showToast('新規ウィンドウで画像を開きました');
       } catch (e) {
         console.warn('画像保存エラー:', e);
-        showToast('画像の生成に失敗しました');
+        if (newWin && !newWin.closed) newWin.close();
+        showToast('失敗: ' + (e?.message || String(e)));
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg> 画像を保存`;

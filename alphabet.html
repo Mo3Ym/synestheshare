@@ -1025,9 +1025,7 @@ function updateProgress() {
 
   // ── グラデーション生成 ──
   const selectedColors = letters.map(l => colorMap[l]).filter(Boolean);
-  // 無彩色（黒・白・グレー）はグラデーションから除外し、有彩色だけで構成
-  const chromaticColors = selectedColors.filter(c => !isAchromatic(c));
-  const gradientColors = chromaticColors.length > 0 ? chromaticColors : selectedColors;
+  const gradientColors = selectedColors;
 
   if (gradientColors.length === 0) {
     progressFill.style.background = 'linear-gradient(90deg, #e03a2a, #e87820)';

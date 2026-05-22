@@ -1186,11 +1186,11 @@ function buildTypeHero(coloredLetters, diag) {
       <div class="type-stats">
         <div class="type-stat">
           <span class="type-stat-label">多数派一致率</span>
-          <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}%</span>
+          <span class="type-stat-value" style="color:${majColor}">${diag.majorityRate}<span style="font-size:0.8em">%</span></span>
         </div>
         <div class="type-stat">
-          <span class="type-stat-label">レア度</span>
-          <span class="type-stat-value" style="color:${rareColor}">${diag.rareScore}</span>
+          <span class="type-stat-label">${diag.rareScore >= 40 ? '珍しさ' : '共感度'}</span>
+          <span class="type-stat-value" style="color:${rareColor}"><span style="font-size:0.5em">上位</span>${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}<span style="font-size:0.8em">%</span></span>
         </div>
         <div class="type-stat">
           <span class="type-stat-label">最も個性的な文字</span>
@@ -1595,7 +1595,7 @@ function buildDiagSection(diag) {
       <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>レア度：<strong>${diag.rareScore}</strong>
+      多数派一致率：<strong>${diag.majorityRate}<span style="font-size:0.8em">%</span></strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>${diag.rareScore >= 40 ? '珍しさ' : '共感度'}：<strong><span style="font-size:0.5em">上位</span>${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}<span style="font-size:0.8em">%</span></strong>
     </div>
   </div>`;
 }
@@ -1648,7 +1648,7 @@ function buildShareSection(diag, coloredLetters) {
   // STEP2: 「感覚を見せる」方向のXシェアテキスト
   // result URL（自分の結果が開く）をシェア
   const resultUrl = `${location.origin}${location.pathname}${location.search}`;
-  const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ レア度: ${diag.rareScore}\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
+  const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${diag.rareScore >= 40 ? '珍しさ' : '共感度'}: 上位${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}%\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -1662,7 +1662,7 @@ function buildShareSection(diag, coloredLetters) {
           <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
           <div class="share-card-title"><span style="color:${diagType.color}">${diagType.label}</span><span style="color:var(--ink3);font-weight:300;margin:0 0.2em">/</span><span style="color:${typeColor};opacity:0.7">${colorType.name}</span></div>
           <div class="share-card-palette">${dots}</div>
-          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}% ／ レア度 ${diag.rareScore}</div>
+          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}<span style="font-size:0.8em">%</span> ／ ${diag.rareScore >= 40 ? '珍しさ' : '共感度'} <span style="font-size:0.5em">上位</span>${Math.max(1, 100 - (diag.rareScore >= 40 ? diag.rareScore : diag.majorityRate))}<span style="font-size:0.8em">%</span></div>
           <div class="share-card-tag">#SynestheShare</div>
         </div>
       </div>

@@ -219,22 +219,60 @@ nav ul a:hover { color: var(--ink); }
   font-size: clamp(2.6rem, 12vw, 4.8rem);
   line-height: 1.05; letter-spacing: 0.1em;
   display: flex; align-items: center; gap: 0.35em;
-
-  /* 水・光のグラデーション */
-  background: linear-gradient(135deg,
-    #8ff6ff 0%, #dffcff 30%, #7bcfff 60%, #d8bfff 100%
-  );
+  /* background-image を先に置き、clip を後に書く（shorthandのリセット回避） */
+  background-image: linear-gradient(135deg, #e8eeff 0%, #ffffff 50%, #e8eeff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent !important;
-  filter: drop-shadow(0 0 14px rgba(143, 246, 255, 0.22));
 }
 .type-name-color::before {
   content: '';
   display: inline-block; width: 1.5px; height: 0.75em;
   background: rgba(255,255,255,0.28); border-radius: 1px;
   flex-shrink: 0;
+}
+
+/* ── タイプ別グラデーション（background-imageで上書きしclipを維持） ── */
+.type-hero[data-type="cool"] .type-name-color {
+  background-image: linear-gradient(135deg, #8ff6ff 0%, #dffcff 30%, #7bcfff 65%, #d8bfff 100%);
+  filter: drop-shadow(0 0 14px rgba(143,246,255,0.22));
+  text-shadow: 0 2px 18px rgba(0,30,80,0.35);
+}
+.type-hero[data-type="warm"] .type-name-color {
+  background-image: linear-gradient(135deg, #ffcc80 0%, #fff8e0 35%, #ffb347 65%, #ffe8b0 100%);
+  filter: drop-shadow(0 0 14px rgba(255,170,60,0.22));
+  text-shadow: 0 2px 18px rgba(80,25,0,0.35);
+}
+.type-hero[data-type="nature"] .type-name-color {
+  background-image: linear-gradient(135deg, #a0ffcc 0%, #eafffb 35%, #70ffb0 65%, #d8fff0 100%);
+  filter: drop-shadow(0 0 14px rgba(80,220,140,0.22));
+  text-shadow: 0 2px 18px rgba(0,50,20,0.35);
+}
+.type-hero[data-type="mono"] .type-name-color {
+  background-image: linear-gradient(135deg, #c8c8c8 0%, #ffffff 40%, #e0e0e0 70%, #ffffff 100%);
+  filter: drop-shadow(0 0 16px rgba(210,210,210,0.3));
+  text-shadow: 0 2px 20px rgba(0,0,0,0.45);
+}
+.type-hero[data-type="pastel"] .type-name-color {
+  background-image: linear-gradient(135deg, #ffc8e0 0%, #fff8ff 38%, #f0b0ff 70%, #ffe0f0 100%);
+  filter: drop-shadow(0 0 12px rgba(220,100,180,0.22));
+  text-shadow: 0 2px 18px rgba(80,0,60,0.32);
+}
+.type-hero[data-type="neon"] .type-name-color {
+  background-image: linear-gradient(135deg, #ff9080 0%, #ffe8e4 40%, #ff7060 70%, #ffd0c8 100%);
+  filter: drop-shadow(0 0 14px rgba(255,100,70,0.28));
+  text-shadow: 0 2px 18px rgba(80,0,0,0.38);
+}
+.type-hero[data-type="dream"] .type-name-color {
+  background-image: linear-gradient(135deg, #d0a0ff 0%, #f8e8ff 35%, #c080ff 65%, #ffd8f8 100%);
+  filter: drop-shadow(0 0 14px rgba(160,80,255,0.25));
+  text-shadow: 0 2px 18px rgba(40,0,80,0.35);
+}
+.type-hero[data-type="earth"] .type-name-color {
+  background-image: linear-gradient(135deg, #e8c080 0%, #fff5dc 40%, #d4a050 70%, #ffe8b0 100%);
+  filter: drop-shadow(0 0 12px rgba(200,130,50,0.25));
+  text-shadow: 0 2px 18px rgba(60,25,0,0.38);
 }
 
 /* 一致率・レア度 */

@@ -135,7 +135,10 @@ nav ul a:hover { color: var(--ink); }
   padding: 2.5rem 1.5rem 5rem;
   min-height: calc(100svh - var(--nav-h));
   display: flex; flex-direction: column; justify-content: center;
-  background: #0a1628 url('./assets/backgrounds/ocean.webp') center/cover no-repeat;
+  background-color: #0a1628;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .type-hero-blob {
   position: absolute; border-radius: 50%; filter: blur(70px);
@@ -1168,10 +1171,23 @@ function detectColorType(coloredLetters) {
   return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
 }
 
+const TYPE_BG = {
+  warm:   'sunset',
+  cool:   'ocean',
+  nature: 'forest',
+  mono:   'void',
+  pastel: 'bloom',
+  neon:   'neon',
+  dream:  'dream',
+  earth:  'earth',
+};
+
 function buildTypeHero(coloredLetters, diag) {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
   const theme = 'dark';
+  const bgFile = TYPE_BG[typeId] || typeId;
+  const bgStyle = `background-image:url('./assets/backgrounds/${bgFile}.webp')`;
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
 
   const dots = coloredLetters.map(l => {
@@ -1209,7 +1225,7 @@ function buildTypeHero(coloredLetters, diag) {
     ? 'var(--hero-ink3)'
     : ensureContrast(colorMap[uniqueResult.mostUnique] || '#181818', theme);
 
-  return `<div class="type-hero" data-type="${typeId}" data-theme="${theme}">
+  return `<div class="type-hero" data-type="${typeId}" data-theme="${theme}" style="${bgStyle}">
     <canvas class="type-art-canvas" id="artCanvas"></canvas>
     <div class="type-hero-inner">
       <div class="type-eyebrow">Color Personality<wbr> — Alphabet</div>

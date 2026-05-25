@@ -595,7 +595,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   </a>
   <ul></ul>
   <div class="nav-right">
-    <a class="nav-back" href="index.html">← TOPに戻る</a>
+    <a class="nav-back" href="index.html">TOPに戻る ←</a>
   </div>
 </nav>
 
@@ -847,7 +847,8 @@ function updatePickerPreview(color) {
     pickerPreview.style.border = 'none';
     pickerPreview.style.textShadow = 'none';
   } else if (isBright(color)) {
-    const dark = getDarkenedColor(color);
+    // 白の場合はパレット黒（#2b2d38）を縁取り色にする
+    const dark = color.toLowerCase() === '#fffdf9' ? '#2b2d38' : getDarkenedColor(color);
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#fffdf9';
     pickerPreview.style.border = `1.5px solid ${dark}`;
@@ -983,7 +984,8 @@ function applyColor(letter, color) {
     bubble.style.background = color;
     if (isBright(color)) {
       // 淡色：白文字＋4方向shadowで袋文字
-      const dark = getDarkenedColor(color);
+      // 白の場合はパレット黒（#2b2d38）を縁取り色にする
+      const dark = color.toLowerCase() === '#fffdf9' ? '#2b2d38' : getDarkenedColor(color);
       bubble.style.border = `1.5px solid ${dark}`;
       bubble.style.boxShadow = 'none';
       span.style.color = '#fffdf9';

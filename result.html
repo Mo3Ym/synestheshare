@@ -654,6 +654,8 @@ nav ul a:hover { color: var(--ink); }
   padding-left: calc(28px + 0.6rem);
 }
 .vote-legend-item { display: flex; align-items: baseline; gap: 0.28rem; }
+.vote-legend-item.is-mine .vote-legend-label { font-weight: 700; color: var(--ink); }
+.vote-legend-item.is-mine .vote-legend-pct { color: var(--ink); }
 .vote-legend-dot {
   width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.08); align-self: center;
@@ -923,10 +925,6 @@ footer {
   <div class="share-outer" id="shareOuter"></div>
 </div>
 
-<!-- ══ FOOTER ══ -->
-<footer>
-  <span class="footer-logo">SynestheShare</span>
-</footer>
 
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast"></div>
@@ -1157,10 +1155,30 @@ function calcDiagnosis() {
 
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
-  if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなただけが知っている、<wbr>希少な色の世界です。' };
-  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#ffae66', desc: '人によって印象が<wbr>分かれやすい、<wbr>独自の色感覚です。' };
-  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#4da8e8', desc: '多くの人と色の感覚を<wbr>共有する、<wbr>共感覚の王道です。' };
-  return { label: '◇ バランス感受者', color: '#67bf92', desc: '多数派と少数派が交差する、<wbr>広い感性の持ち主です。' };
+  if (rareScore >= 65)  return {
+    label: '✦ 孤高の共感覚者',
+    color: '#9060c0',
+    desc: 'あなただけが知っている、<wbr>希少な色の世界',
+    descFull: 'あなたの色覚は非常にユニーク。同じ感覚を持つ人は少数派です。その鋭い感性は、アートや創造的な分野で力を発揮するかもしれません。'
+  };
+  if (rareScore >= 40)  return {
+    label: '◈ 個性派の色覚者',
+    color: '#ffae66',
+    desc: '人によって印象が<wbr>分かれやすい、<wbr>独自の色感覚',
+    descFull: 'ほどよくユニーク。一般的な傾向は踏まえつつも、あなたらしい独自の色使いが光っています。'
+  };
+  if (majorityRate >= 70) return {
+    label: '◎ 共感覚の王道',
+    color: '#4da8e8',
+    desc: '多くの人と色の感覚を<wbr>共有する、<wbr>共感覚の王道',
+    descFull: 'あなたの色覚は多くの人と共通しています。共感覚の「スタンダード」に近い感性の持ち主です。'
+  };
+  return {
+    label: '◇ バランス感受者',
+    color: '#67bf92',
+    desc: '多数派と少数派が交差する、<wbr>広い感性の持ち主',
+    descFull: '多数派の色と少数派の色が混在しています。広い感性でさまざまな色世界を持ち合わせています。'
+  };
 }
 
 /* 珍しさ/共感度ラベルと値を返すヘルパー
@@ -1681,7 +1699,8 @@ function buildVoteSection(coloredLetters) {
 
     let legendHtml = '<div class="vote-legend">';
     votes.forEach((v) => {
-      legendHtml += `<div class="vote-legend-item">
+      const mineCls = v.color === myColor ? ' is-mine' : '';
+      legendHtml += `<div class="vote-legend-item${mineCls}">
         <div class="vote-legend-dot" style="background:${v.color}${isBright(v.color)?';box-shadow:inset 0 0 0 1px rgba(0,0,0,0.12)':''}"></div>
         <span class="vote-legend-label">${v.name}</span>
         <span class="vote-legend-pct">${v.pct}%</span>
@@ -1747,7 +1766,7 @@ function buildDiagSection(diag) {
     <div class="section-title">あなたの<wbr>共感覚タイプ</div>
     <div class="diag-body">
       <div class="diag-type-main" style="color:${type.color}">${type.label}</div>
-      <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
+      <div class="diag-type-desc">${type.descFull.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
       多数派一致率：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>${calcRareStat(diag).label}：<strong>上位${calcRareStat(diag).value}%</strong>

@@ -1500,8 +1500,8 @@ function buildHighlightCard(coloredLetters) {
   const gapText = isAllMajority
     ? 'すべての文字で<wbr>世間と一致'
     : isOutlier
-    ? `世間の${topPct}%が<wbr>${mostUnique}に${votes[0].name}を感じる中、<wbr>あなたは${getColorName(myColor)}を<wbr>選んでいました。`
-    : `世間の${topPct}%が<wbr>${mostUnique}に${votes[0].name}を感じる中、<wbr>あなたは${getColorName(myColor)}を<wbr>選んでいました。`;
+    ? `世間の${topPct}%が<wbr>${votes[0].name}を選ぶ${mostUnique}に、<wbr>あなたは${getColorName(myColor)}を<wbr>見ていました。`
+    : `世間の${topPct}%が<wbr>${votes[0].name}を選ぶ${mostUnique}に、<wbr>あなたは${getColorName(myColor)}を<wbr>見ていました。`;
 
   const comment = isAllMajority
     ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
@@ -1565,10 +1565,10 @@ function buildSenseCard(coloredLetters) {
   const uniqueLabelHtml = isAllMajority
     ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と一致</div>`
     : `<div class="sense-sentence">
-        <span class="sense-strong">${uTopPct}%</span>の人が${mostUnique}に<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を感じる中、
+        <span class="sense-strong">${uTopPct}%</span>が<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を選ぶ${mostUnique}に、
       </div>
       <div class="sense-sentence">
-        <span class="sense-strong">あなた</span>は<span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>を選んでいました。
+        <span class="sense-strong">あなた</span>は<span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>を見ていました。
       </div>`;
 
   const uniqueCommentHtml = `<div class="empathy-comment">${

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mkdir -p .claude)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx serve *)",
+      "Bash(curl -sI \"http://localhost:3000/result.html?r=001122----&mode=10\")"
     ]
   }
 }

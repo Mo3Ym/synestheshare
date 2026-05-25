@@ -139,6 +139,10 @@ nav ul a:hover { color: var(--ink); }
   background-position: center;
   background-repeat: no-repeat;
 }
+/* デスクトップ寄りの幅では hero 領域を 1.5 倍ほどの高さに伸ばす */
+@media (min-width: 600px) {
+  .type-hero { min-height: 780px; }
+}
 .type-hero-blob {
   position: absolute; border-radius: 50%; filter: blur(70px);
   pointer-events: none; z-index: 0;
@@ -180,7 +184,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* eyebrow */
 .type-eyebrow {
-  font-family: var(--outfit); font-size: 0.65rem; font-weight: 600;
+  font-family: var(--outfit); font-size: 0.55rem; font-weight: 600;
   letter-spacing: 0.2em; text-transform: uppercase;
   display: flex; align-items: center; gap: 0.5rem;
 }
@@ -189,8 +193,9 @@ nav ul a:hover { color: var(--ink); }
 /* あなたの共感覚タイプ ラベル */
 .type-label {
   font-family: var(--jp); font-weight: 300;
-  font-size: 0.8rem; line-height: 1;
+  font-size: 0.69rem; line-height: 1;
   letter-spacing: 0.02em;
+  margin-top: -3px;
 }
 
 /* 個性派センサー / 大地タイプ — 主役 */
@@ -199,8 +204,9 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-name-diag {
   font-family: var(--jp); font-weight: 700;
-  font-size: clamp(1.7rem, 5.5vw, 2.6rem);
+  font-size: 1.3rem;
   line-height: 1.15; letter-spacing: -0.02em;
+  margin-top: 17px;
 
   /* 淡い金色グラデーション */
   background: linear-gradient(135deg,
@@ -217,6 +223,7 @@ nav ul a:hover { color: var(--ink); }
   font-size: clamp(2.2rem, 11.5vw, 4.8rem);
   line-height: 1.05; letter-spacing: 0.08em;
   white-space: nowrap;
+  margin-top: 7px;
   display: flex; align-items: center; gap: 0.35em;
   /* background-image を先に置き、clip を後に書く（shorthandのリセット回避） */
   background-image: linear-gradient(135deg, #e8eeff 0%, #fffdf9 50%, #e8eeff 100%);
@@ -360,7 +367,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* パレットドット帯 */
 .type-palette-label {
-  font-family: var(--jp); font-size: clamp(0.75rem, 3.8vw, 1.1rem); font-weight: 500;
+  font-family: var(--jp); font-size: 0.9rem; font-weight: 500;
   color: var(--hero-ink3); margin-bottom: 0.5rem; margin-top: 1rem;
 }
 .type-palette-strip {
@@ -891,7 +898,7 @@ footer {
     <li><a href="#shareOuter">シェア</a></li>
   </ul>
   <div class="nav-right">
-    <a class="nav-back" href="alphabet.html">← 診断に戻る</a>
+    <a class="nav-back" href="alphabet.html">診断に戻る ←</a>
   </div>
 </nav>
 
@@ -1743,7 +1750,7 @@ function buildDiagSection(diag) {
       <div class="diag-type-desc">${type.desc.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      多数派一致率：<strong>${diag.majorityRate}<span style="font-size:0.8em">%</span></strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>${calcRareStat(diag).label}：<strong><span style="font-size:0.5em">上位</span>${calcRareStat(diag).value}<span style="font-size:0.8em">%</span></strong>
+      多数派一致率：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}文字が世間と一致）<br>${calcRareStat(diag).label}：<strong>上位${calcRareStat(diag).value}%</strong>
     </div>
   </div>`;
 }
@@ -1810,7 +1817,7 @@ function buildShareSection(diag, coloredLetters) {
           <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
           <div class="share-card-title"><span style="color:${diagType.color}">${diagType.label}</span><span style="color:var(--ink3);font-weight:300;margin:0 0.2em">/</span><span style="color:${typeColor};opacity:0.7">${colorType.name}</span></div>
           <div class="share-card-palette">${dots}</div>
-          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}<span style="font-size:0.8em">%</span> ／ ${calcRareStat(diag).label} <span style="font-size:0.5em">上位</span>${calcRareStat(diag).value}<span style="font-size:0.8em">%</span></div>
+          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}% ／ ${calcRareStat(diag).label} 上位${calcRareStat(diag).value}%</div>
           <div class="share-card-tag">#SynestheShare</div>
         </div>
       </div>
@@ -1831,6 +1838,26 @@ function buildShareSection(diag, coloredLetters) {
     </div>
   </div>`;
 }
+
+/* ══ タイプ名を表（type-stat-card）の幅にフィットさせる（モバイル限定） ══ */
+function fitTypeName() {
+  const el = document.querySelector('.type-name-color');
+  const ref = document.querySelector('.type-stat-card');
+  if (!el || !ref) return;
+  // デスクトップは CSS の clamp に委ねる
+  if (window.innerWidth > 640) { el.style.fontSize = ''; return; }
+  // 一旦 CSS 既定値に戻してから測る
+  el.style.fontSize = '';
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const textW = range.getBoundingClientRect().width;
+  const targetW = ref.getBoundingClientRect().width;
+  if (textW > 0 && targetW > 0) {
+    const cur = parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize = (cur * targetW / textW) + 'px';
+  }
+}
+window.addEventListener('resize', () => requestAnimationFrame(fitTypeName));
 
 /* ══ メイン描画 ══ */
 function render() {
@@ -1857,6 +1884,8 @@ function render() {
   setTimeout(() => {
     // ① ファーストビュー
     typeHeroArea.innerHTML = buildTypeHero(coloredLetters, diag);
+    setTimeout(fitTypeName, 0);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTypeName);
 
     // アートcanvas描画
     const artCanvas = document.getElementById('artCanvas');

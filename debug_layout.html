@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>SynestheShare レイアウト調整</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;color:#222}
+  body{display:grid;grid-template-columns:380px 1fr;background:#1a1a1a}
+  /* ── 左：コントロール ── */
+  .controls{
+    background:#f5f5f5;border-right:1px solid #d0d0d0;
+    padding:16px;overflow-y:auto;height:100vh
+  }
+  .controls h1{margin:0 0 12px;font-size:15px;font-weight:700;color:#222}
+  .frame-bar{
+    background:#fff;border:1px solid #ddd;border-radius:8px;padding:10px;margin-bottom:14px
+  }
+  .frame-bar label{display:block;font-size:11px;color:#666;margin-bottom:4px}
+  .frame-bar input[type=number]{width:80px;padding:4px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px}
+  .frame-bar input[type=text]{width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:4px;font-size:11px;font-family:monospace}
+  .frame-bar .preset{display:inline-block;padding:3px 8px;margin:4px 4px 0 0;background:#eee;border:1px solid #ccc;border-radius:4px;font-size:11px;cursor:pointer}
+  .frame-bar .preset:hover{background:#ddd}
+
+  .group{
+    background:#fff;border:1px solid #ddd;border-radius:8px;
+    padding:10px 12px;margin-bottom:10px
+  }
+  .group h3{
+    margin:0 0 8px;font-size:12px;font-weight:700;color:#333;
+    display:flex;align-items:center;justify-content:space-between
+  }
+  .group h3 .sel{font-family:monospace;font-weight:400;font-size:10px;color:#888}
+  .group h3 .reset{
+    background:none;border:1px solid #ddd;border-radius:4px;
+    font-size:10px;padding:1px 6px;cursor:pointer;color:#666
+  }
+  .group h3 .reset:hover{background:#eee}
+  .row{display:flex;align-items:center;gap:8px;font-size:11px;margin:5px 0}
+  .row label{width:80px;color:#555;font-weight:500}
+  .row input[type=range]{flex:1;min-width:0}
+  .row .val{width:54px;text-align:right;color:#222;font-variant-numeric:tabular-nums;font-family:monospace;font-size:11px}
+
+  /* ── 右：プレビュー ── */
+  .preview-wrap{
+    display:flex;align-items:flex-start;justify-content:center;
+    background:#2a2a2a;padding:20px;overflow:auto;height:100vh
+  }
+  iframe{
+    border:none;background:#fff;
+    box-shadow:0 4px 24px rgba(0,0,0,0.4);
+    transition:width 0.15s
+  }
+</style>
+</head>
+<body>
+<aside class="controls">
+  <h1>SynestheShare レイアウト調整</h1>
+
+  <div class="frame-bar">
+    <label>iframe 幅 (スマホ表示シミュレーション)</label>
+    <input type="number" id="frameW" value="390" min="280" max="900" step="1"> px
+    <div>
+      <span class="preset" data-w="320">320</span>
+      <span class="preset" data-w="360">360</span>
+      <span class="preset" data-w="375">375</span>
+      <span class="preset" data-w="390">390</span>
+      <span class="preset" data-w="414">414</span>
+      <span class="preset" data-w="430">430</span>
+      <span class="preset" data-w="640">640</span>
+      <span class="preset" data-w="1024">1024</span>
+    </div>
+    <label style="margin-top:8px">URL パラメータ (r=)</label>
+    <input type="text" id="rparam" value="001122----">
+    <span class="preset" data-r="001122----">SUNSET</span>
+    <span class="preset" data-r="6666665555">OCEAN</span>
+    <span class="preset" data-r="334433----">FOREST</span>
+    <span class="preset" data-r="AABBCC----">VOID</span>
+    <span class="preset" data-r="88888888CC">BLOOM</span>
+  </div>
+
+  <div id="status" style="padding:6px 10px;border-radius:6px;font-size:11px;font-family:monospace;margin-bottom:10px;background:#fff;border:1px solid #ddd;line-height:1.5"></div>
+
+  <div id="groupContainer"></div>
+</aside>
+
+<div class="preview-wrap">
+  <iframe id="preview"></iframe>
+</div>
+
+<script>
+/* ── 調整対象の要素定義 ──
+   each: { id, label, sel, controls:[{prop, unit, min, max, step, default}] } */
+const TARGETS = [
+  { id:'hero', label:'★ ヒーロー全体（上下パディング）', sel:'.type-hero', controls:[
+    { prop:'padding-top', unit:'px', min:0, max:120, step:1, default:24 },
+    { prop:'padding-bottom', unit:'px', min:0, max:160, step:1, default:40 },
+  ]},
+  { id:'eyebrow', label:'Color Personality — Alphabet', sel:'.type-eyebrow', controls:[
+    { prop:'font-size', unit:'rem', min:0.4, max:1.5, step:0.01, default:0.65 },
+    { prop:'margin-inline', unit:'px', min:-40, max:80, step:1, default:0 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+  ]},
+  { id:'label', label:'あなたの共感覚タイプ', sel:'.type-label', controls:[
+    { prop:'font-size', unit:'rem', min:0.5, max:1.6, step:0.01, default:0.8 },
+    { prop:'margin-inline', unit:'px', min:-40, max:80, step:1, default:0 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+  ]},
+  { id:'diag', label:'共感覚の王道 / 個性派など', sel:'.type-name-diag', controls:[
+    { prop:'font-size', unit:'rem', min:1.0, max:4.0, step:0.05, default:2.0 },
+    { prop:'margin-inline', unit:'px', min:-40, max:80, step:1, default:0 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+  ]},
+  { id:'typename', label:'SUNSET TYPE 等（既定は JS 自動フィット）', sel:'.type-name-color', controls:[
+    { prop:'font-size', unit:'rem', min:1.5, max:6.0, step:0.05, default:1.5, autoNote:'スライダーを動かすと JS 自動フィットを上書き' },
+    { prop:'margin-inline', unit:'px', min:-40, max:80, step:1, default:0 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+    { prop:'letter-spacing', unit:'em', min:0, max:0.25, step:0.005, default:0.08 },
+  ]},
+  { id:'statcard', label:'表ウィンドウ（多数派一致率…）', sel:'.type-stat-card', controls:[
+    { prop:'margin-inline', unit:'px', min:-40, max:80, step:1, default:0 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+    { prop:'border-radius', unit:'px', min:0, max:40, step:1, default:16 },
+  ]},
+  { id:'palettelabel', label:'あなたのアルファベットの色', sel:'.type-palette-label', controls:[
+    { prop:'font-size', unit:'rem', min:0.5, max:1.6, step:0.01, default:0.95 },
+    { prop:'margin-inline', unit:'px', min:-40, max:80, step:1, default:0 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+  ]},
+  { id:'dot', label:'A〜Z 円（パレット）', sel:'.type-palette-dot', controls:[
+    { prop:'width', unit:'px', min:20, max:120, step:1, default:48 },
+    { prop:'height', unit:'px', min:20, max:120, step:1, default:48 },
+    { prop:'font-size', unit:'rem', min:0.5, max:2.0, step:0.05, default:0.95 },
+    { prop:'margin-top', unit:'px', min:-150, max:200, step:1, default:0 },
+  ]},
+];
+
+const iframe = document.getElementById('preview');
+const groupContainer = document.getElementById('groupContainer');
+
+/* ── コントロール生成 ── */
+TARGETS.forEach(t => {
+  const g = document.createElement('div');
+  g.className = 'group';
+  g.dataset.id = t.id;
+  g.dataset.sel = t.sel;
+  let rowsHtml = '';
+  t.controls.forEach(c => {
+    rowsHtml += `
+      <div class="row">
+        <label>${c.prop}</label>
+        <input type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.default}"
+               data-prop="${c.prop}" data-unit="${c.unit}" data-default="${c.default}">
+        <span class="val">${c.default}${c.unit}</span>
+      </div>`;
+  });
+  g.innerHTML = `
+    <h3>
+      <span>${t.label}<br><span class="sel">${t.sel}</span></span>
+      <button class="reset" type="button">reset</button>
+    </h3>
+    ${rowsHtml}
+  `;
+  groupContainer.appendChild(g);
+});
+
+/* ── スライダー → CSS 注入 ── */
+function getStyleEl() {
+  try {
+    const doc = iframe.contentDocument;
+    if (!doc) return null;
+    let s = doc.getElementById('debug-overrides');
+    if (!s) {
+      s = doc.createElement('style');
+      s.id = 'debug-overrides';
+      doc.head.appendChild(s);
+    }
+    return s;
+  } catch (e) { return null; }
+}
+
+function buildCSS() {
+  // デバッグ中は要素を上に出しても切れないよう overflow を解除（背景ブロブは見切れる可能性あり）
+  let css = '.type-hero{overflow:visible !important}\n';
+  document.querySelectorAll('.group').forEach(g => {
+    const sel = g.dataset.sel;
+    const rules = [];
+    g.querySelectorAll('input[data-prop]').forEach(inp => {
+      const prop = inp.dataset.prop;
+      const unit = inp.dataset.unit || '';
+      const def = parseFloat(inp.dataset.default);
+      const cur = parseFloat(inp.value);
+      // 既定値と一致するときはルール出力しない（CSS既定に委ねる）
+      if (cur === def) return;
+      const val = cur + unit;
+      rules.push(`${prop}: ${val} !important`);
+    });
+    if (rules.length) css += `${sel} { ${rules.join('; ')} }\n`;
+  });
+  /* .type-name-color の font-size を user 指定したときは、result.html 側の
+     fitTypeName() が後から動いて inline style を書き込んで上書きしてしまうので、
+     inline style 属性も明示的に消しに行く */
+  const fsTypename = document.querySelector('.group[data-id="typename"] input[data-prop="font-size"]');
+  if (fsTypename && parseFloat(fsTypename.value) !== parseFloat(fsTypename.dataset.default)) {
+    try {
+      const tn = iframe.contentDocument?.querySelector('.type-name-color');
+      if (tn) tn.style.fontSize = '';
+    } catch(e){}
+  }
+  return css;
+}
+
+function apply() {
+  const styleEl = getStyleEl();
+  const statusEl = document.getElementById('status');
+  if (!styleEl) {
+    if (statusEl) statusEl.innerHTML = '<span style="color:#c00">⚠ iframe アクセス失敗</span><br>localhost:3000 経由で開いてください（file:// では動きません）';
+    return;
+  }
+  const css = buildCSS();
+  styleEl.textContent = css;
+  if (statusEl) {
+    const ruleCount = (css.match(/\{/g) || []).length;
+    statusEl.innerHTML = ruleCount === 0
+      ? '<span style="color:#888">✓ iframe 接続 OK（オーバーライドなし）</span>'
+      : `<span style="color:#0a0">✓ ${ruleCount} 個のルールを適用中</span>`;
+  }
+  // 値表示更新
+  document.querySelectorAll('input[data-prop]').forEach(inp => {
+    inp.nextElementSibling.textContent = inp.value + inp.dataset.unit;
+  });
+}
+
+/* スライダー操作 */
+document.addEventListener('input', e => {
+  if (e.target.matches('input[data-prop]')) apply();
+});
+
+/* reset ボタン */
+document.addEventListener('click', e => {
+  if (e.target.matches('.reset')) {
+    const g = e.target.closest('.group');
+    g.querySelectorAll('input[data-prop]').forEach(inp => {
+      inp.value = inp.dataset.default;
+    });
+    apply();
+  }
+  if (e.target.matches('.preset[data-w]')) {
+    const w = e.target.dataset.w;
+    document.getElementById('frameW').value = w;
+    iframe.style.width = w + 'px';
+  }
+  if (e.target.matches('.preset[data-r]')) {
+    const r = e.target.dataset.r;
+    document.getElementById('rparam').value = r;
+    iframe.src = `result.html?r=${encodeURIComponent(r)}&mode=10&_=${Date.now()}`;
+  }
+});
+
+/* iframe 幅 */
+document.getElementById('frameW').addEventListener('input', e => {
+  iframe.style.width = e.target.value + 'px';
+});
+document.getElementById('rparam').addEventListener('change', e => {
+  iframe.src = `result.html?r=${encodeURIComponent(e.target.value)}&mode=10&_=${Date.now()}`;
+});
+
+/* iframe ロード時 / 高さは縦いっぱい */
+function setupIframe() {
+  iframe.style.width = document.getElementById('frameW').value + 'px';
+  iframe.style.height = (window.innerHeight - 40) + 'px';
+  // result.html 内の fitTypeName 関数を一度走らせる（user override が出ない時はそちらを使う）
+  setTimeout(apply, 500);
+  setTimeout(apply, 1500);
+}
+iframe.addEventListener('load', setupIframe);
+window.addEventListener('resize', () => {
+  iframe.style.height = (window.innerHeight - 40) + 'px';
+});
+// 初回ロード（キャッシュバスター付きで古い 308 リダイレクト回避）
+iframe.src = `result.html?r=${encodeURIComponent(document.getElementById('rparam').value)}&mode=10&_=${Date.now()}`;
+setupIframe();
+</script>
+</body>
+</html>

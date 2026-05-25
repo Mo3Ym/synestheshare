@@ -36,18 +36,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --white:  #ffffff;
+  --white:  #fffdf9;
   --bg:     #f7f7f5;
-  --ink:    #181818;
+  --ink:    #2b2d38;
   --ink2:   #555550;
   --ink3:   #aaaaaa;
   --border: #e0e0dc;
-  --c1: #e03a2a;
-  --c2: #e87820;
+  --c1: #ff7f7f;
+  --c2: #ffae66;
   --c3: #d4b800;
-  --c4: #2a9e60;
-  --c5: #1888c8;
-  --c6: #7028c0;
+  --c4: #67bf92;
+  --c5: #4da8e8;
+  --c6: #9272ff;
   --c7: #d8306a;
   --mint: #1aaeaa;
   --outfit: 'Outfit', sans-serif;
@@ -700,19 +700,19 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
 const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const PRESET_COLORS = [
-  '#e03a2a', // 赤
-  '#e87820', // 橙
-  '#f0e040', // 黄
-  '#a8d020', // 黄緑
-  '#2a9e60', // 緑
-  '#1888c8', // 青
-  '#70cbff', // 水色
-  '#7028c0', // 紫
-  '#ff90b8', // ピンク
-  '#8b4513', // 茶色
-  '#181818', // 黒
-  '#888880', // グレー
-  '#ffffff', // 白
+  '#ff7f7f', // 赤
+  '#ffae66', // 橙
+  '#f5dc72', // 黄
+  '#a8d85c', // 黄緑
+  '#67bf92', // 緑
+  '#4da8e8', // 青
+  '#8edfff', // 水色
+  '#9272ff', // 紫
+  '#ee9fd0', // ピンク
+  '#9f6f4f', // 茶色
+  '#2b2d38', // 黒
+  '#9698a8', // グレー
+  '#fffdf9', // 白
 ];
 const PRESET_LABELS = ['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'];
 
@@ -821,7 +821,7 @@ PRESET_COLORS.forEach((c, i) => {
   const s = document.createElement('div');
   s.className = 'swatch';
   s.style.background = c;
-  if (c === '#ffffff') s.style.border = '2px solid var(--border)';
+  if (c === '#fffdf9') s.style.border = '2px solid var(--border)';
   s.title = PRESET_LABELS[i];
   s.addEventListener('click', () => selectPendingColor(c));
   swatchesEl.appendChild(s);
@@ -849,12 +849,12 @@ function updatePickerPreview(color) {
   } else if (isBright(color)) {
     const dark = getDarkenedColor(color);
     pickerPreview.style.background = color;
-    pickerPreview.style.color = '#ffffff';
+    pickerPreview.style.color = '#fffdf9';
     pickerPreview.style.border = `1.5px solid ${dark}`;
     pickerPreview.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
   } else {
     pickerPreview.style.background = color;
-    pickerPreview.style.color = '#ffffff';
+    pickerPreview.style.color = '#fffdf9';
     pickerPreview.style.border = 'none';
     pickerPreview.style.textShadow = 'none';
   }
@@ -986,14 +986,14 @@ function applyColor(letter, color) {
       const dark = getDarkenedColor(color);
       bubble.style.border = `1.5px solid ${dark}`;
       bubble.style.boxShadow = 'none';
-      span.style.color = '#ffffff';
+      span.style.color = '#fffdf9';
       span.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
       span.style.webkitTextStroke = '0';
     } else {
       // 濃色：白文字、縁取りなし
       bubble.style.border = 'none';
       bubble.style.boxShadow = 'none';
-      span.style.color = '#ffffff';
+      span.style.color = '#fffdf9';
       span.style.textShadow = 'none';
       span.style.webkitTextStroke = '0';
     }
@@ -1016,7 +1016,7 @@ function updateProgress() {
   // 分母を動的更新（MAX時は分母分子ともに白に）
   const countEl = document.querySelector('.progress-count');
   if (done === total) {
-    countEl.innerHTML = `<span style="color:#ffffff">${done}</span> / <span style="color:#ffffff">${total}</span>`;
+    countEl.innerHTML = `<span style="color:#fffdf9">${done}</span> / <span style="color:#fffdf9">${total}</span>`;
   } else {
     countEl.innerHTML = `<span>${done}</span> / ${total}`;
   }
@@ -1028,7 +1028,7 @@ function updateProgress() {
   const gradientColors = selectedColors;
 
   if (gradientColors.length === 0) {
-    progressFill.style.background = 'linear-gradient(90deg, #e03a2a, #e87820)';
+    progressFill.style.background = 'linear-gradient(90deg, #ff7f7f, #ffae66)';
     return;
   }
   if (gradientColors.length === 1) {

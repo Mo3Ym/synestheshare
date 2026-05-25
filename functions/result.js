@@ -6,9 +6,9 @@
  */
 
 const PRESET_COLORS = [
-  '#e03a2a','#e87820','#f0e040','#a8d020',
-  '#2a9e60','#1888c8','#70cbff','#7028c0',
-  '#ff90b8','#8b4513','#181818','#888880','#ffffff',
+  '#ff7f7f','#ffae66','#f5dc72','#a8d85c',
+  '#67bf92','#4da8e8','#8edfff','#9272ff',
+  '#ee9fd0','#9f6f4f','#2b2d38','#9698a8','#fffdf9',
 ];
 const COLOR_IDS = '0123456789ABC';
 
@@ -42,14 +42,14 @@ function detectType(colorMap) {
   const total  = values.length;
   if (total === 0) return 'warm';
   const count  = (arr) => arr.filter(c => values.includes(c)).length / total;
-  const warm   = count(['#e03a2a','#e87820','#f0e040']);
-  const cool   = count(['#1888c8','#70cbff','#7028c0']);
-  const nature = count(['#2a9e60','#a8d020']);
-  const mono   = count(['#181818','#888880','#ffffff']);
-  const pastel = count(['#ffffff','#70cbff','#ff90b8','#f0e040']);
-  const dream  = count(['#7028c0','#ff90b8','#1888c8']);
-  const hasBrown = values.includes('#8b4513');
-  const earth  = hasBrown ? count(['#8b4513','#2a9e60','#a8d020']) : 0;
+  const warm   = count(['#ff7f7f','#ffae66','#f5dc72']);
+  const cool   = count(['#4da8e8','#8edfff','#9272ff']);
+  const nature = count(['#67bf92','#a8d85c']);
+  const mono   = count(['#2b2d38','#9698a8','#fffdf9']);
+  const pastel = count(['#fffdf9','#8edfff','#ee9fd0','#f5dc72']);
+  const dream  = count(['#9272ff','#ee9fd0','#4da8e8']);
+  const hasBrown = values.includes('#9f6f4f');
+  const earth  = hasBrown ? count(['#9f6f4f','#67bf92','#a8d85c']) : 0;
   if (mono   >= 0.55) return 'mono';
   if (earth  >= 0.4)  return 'earth';
   if (pastel >= 0.55 && warm < 0.3 && cool < 0.3) return 'pastel';

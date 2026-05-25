@@ -61,13 +61,13 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --white:  #ffffff;
+  --white:  #fffdf9;
   --bg:     #f0f0ec;
-  --ink:    #181818;
+  --ink:    #2b2d38;
   --ink2:   #555550;
   --ink3:   #aaaaaa;
   --border: #e0e0dc;
-  --c1: #e03a2a;
+  --c1: #ff7f7f;
   --outfit: 'Outfit', sans-serif;
   --jp: 'Noto Sans JP',"HiraginoUDSansN-W3","ヒラギノUD角ゴ ProN W3",
         "Hiragino Sans","ヒラギノ角ゴシック",
@@ -132,8 +132,7 @@ nav ul a:hover { color: var(--ink); }
 /* ══ タイプカード（ファーストビュー・明るい背景） ══ */
 .type-hero {
   position: relative; overflow: hidden;
-  padding: 2.5rem 1.5rem 5rem;
-  min-height: calc(100svh - var(--nav-h));
+  padding: 1.5rem 1.5rem 2.5rem;
   display: flex; flex-direction: column; justify-content: center;
   background-color: #0a1628;
   background-size: cover;
@@ -162,20 +161,19 @@ nav ul a:hover { color: var(--ink); }
 
 /* ══ hero テーマ切替 ══ */
 .type-hero[data-theme="dark"] { --hero-ink: #f0f0ec; --hero-ink2: rgba(240,240,236,0.65); --hero-ink3: rgba(240,240,236,0.38); --hero-border: rgba(255,255,255,0.14); --hero-stat-bg: rgba(255,255,255,0.08); --hero-stat-border: rgba(255,255,255,0.14); }
-.type-hero[data-theme="light"] { --hero-ink: #181818; --hero-ink2: rgba(24,24,24,0.6); --hero-ink3: rgba(24,24,24,0.35); --hero-border: rgba(0,0,0,0.12); --hero-stat-bg: rgba(0,0,0,0.04); --hero-stat-border: rgba(0,0,0,0.1); }
+.type-hero[data-theme="light"] { --hero-ink: #2b2d38; --hero-ink2: rgba(24,24,24,0.6); --hero-ink3: rgba(24,24,24,0.35); --hero-border: rgba(0,0,0,0.12); --hero-stat-bg: rgba(0,0,0,0.04); --hero-stat-border: rgba(0,0,0,0.1); }
 
 /* ══ hero 全文字白色強制（背景画像対応） ══ */
 .type-hero .type-eyebrow,
 .type-hero .type-label,
 .type-hero .type-stat-value,
-.type-hero .type-palette-label { color: #ffffff !important; }
+.type-hero .type-palette-label { color: #fffdf9 !important; }
 .type-hero .type-stat-label,
 .type-hero .type-stat-sub { color: rgba(255,255,255,0.6) !important; }
 
 .type-eyebrow { color: var(--hero-ink3); }
 .type-eyebrow::before { background: var(--hero-ink3); }
 .type-label { color: var(--hero-ink3); }
-.type-name-color::before { background: var(--hero-border); }
 .type-stat { background: var(--hero-stat-bg); border-color: var(--hero-stat-border); }
 .type-stat-label { color: var(--hero-ink3); }
 .scroll-indicator-label { color: var(--hero-ink3); }
@@ -216,23 +214,17 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-name-color {
   font-family: var(--outfit); font-weight: 700;
-  font-size: clamp(2.6rem, 12vw, 4.8rem);
-  line-height: 1.05; letter-spacing: 0.1em;
+  font-size: clamp(2.2rem, 11.5vw, 4.8rem);
+  line-height: 1.05; letter-spacing: 0.08em;
+  white-space: nowrap;
   display: flex; align-items: center; gap: 0.35em;
   /* background-image を先に置き、clip を後に書く（shorthandのリセット回避） */
-  background-image: linear-gradient(135deg, #e8eeff 0%, #ffffff 50%, #e8eeff 100%);
+  background-image: linear-gradient(135deg, #e8eeff 0%, #fffdf9 50%, #e8eeff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent !important;
 }
-.type-name-color::before {
-  content: '';
-  display: inline-block; width: 1.5px; height: 0.75em;
-  background: rgba(255,255,255,0.28); border-radius: 1px;
-  flex-shrink: 0;
-}
-
 /* ── タイプ別グラデーション（background-imageで上書きしclipを維持） ── */
 .type-hero[data-type="cool"] .type-name-color {
   background-image: linear-gradient(135deg, #8ff6ff 0%, #dffcff 30%, #7bcfff 65%, #d8bfff 100%);
@@ -250,7 +242,7 @@ nav ul a:hover { color: var(--ink); }
   text-shadow: 0 2px 18px rgba(0,50,20,0.35);
 }
 .type-hero[data-type="mono"] .type-name-color {
-  background-image: linear-gradient(135deg, #c8c8c8 0%, #ffffff 40%, #e0e0e0 70%, #ffffff 100%);
+  background-image: linear-gradient(135deg, #c8c8c8 0%, #fffdf9 40%, #e0e0e0 70%, #fffdf9 100%);
   filter: drop-shadow(0 0 16px rgba(210,210,210,0.3));
   text-shadow: 0 2px 20px rgba(0,0,0,0.45);
 }
@@ -275,6 +267,11 @@ nav ul a:hover { color: var(--ink); }
   text-shadow: 0 2px 18px rgba(60,25,0,0.38);
 }
 
+/* ── スマホ：タイプ名を中央寄せ ── */
+@media (max-width: 640px) {
+  .type-name-color { justify-content: center; }
+}
+
 /* 一致率・レア度 */
 .type-stats {
   display: flex; gap: 0.45rem; margin-top: 0.2rem;
@@ -294,12 +291,12 @@ nav ul a:hover { color: var(--ink); }
 .type-stat-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: #888880; line-height: 1;
+  color: #9698a8; line-height: 1;
 }
 .type-stat-value {
   font-family: var(--outfit); font-weight: 700;
   font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1;
-  color: #181818;
+  color: #2b2d38;
 }
 .type-stat-sub { font-size: 0.62rem; color: var(--ink3); line-height: 1.3; }
 /* タイプ診断欄（日本語は視覚的に圧力が強いため数値より少し小さく） */
@@ -352,7 +349,7 @@ nav ul a:hover { color: var(--ink); }
 .type-stat-card-value {
   font-family: var(--outfit); font-weight: 700;
   font-size: clamp(1.6rem, 5.5vw, 2.4rem); line-height: 1;
-  color: #ffffff !important;
+  color: #fffdf9 !important;
 }
 .type-stat-desc {
   padding: 0 1.1rem 0.85rem;
@@ -933,49 +930,49 @@ footer {
    各文字→[{color, pct}] 合計100%
 ══════════════════════════════════════ */
 const DUMMY_VOTES = {
-  A: [{color:'#e03a2a',name:'赤',pct:58},{color:'#e87820',name:'橙',pct:22},{color:'#f0e040',name:'黄',pct:12},{color:'#7028c0',name:'紫',pct:8}],
-  B: [{color:'#1888c8',name:'青',pct:62},{color:'#7028c0',name:'紫',pct:20},{color:'#181818',name:'黒',pct:11},{color:'#70cbff',name:'水色',pct:7}],
-  C: [{color:'#f0e040',name:'黄',pct:44},{color:'#e87820',name:'橙',pct:28},{color:'#a8d020',name:'黄緑',pct:16},{color:'#e03a2a',name:'赤',pct:12}],
-  D: [{color:'#2a9e60',name:'緑',pct:38},{color:'#a8d020',name:'黄緑',pct:30},{color:'#1888c8',name:'青',pct:20},{color:'#181818',name:'黒',pct:12}],
-  E: [{color:'#2a9e60',name:'緑',pct:52},{color:'#f0e040',name:'黄',pct:30},{color:'#e03a2a',name:'赤',pct:18}],
-  F: [{color:'#e87820',name:'橙',pct:35},{color:'#e03a2a',name:'赤',pct:28},{color:'#f0e040',name:'黄',pct:22},{color:'#ff90b8',name:'ピンク',pct:15}],
-  G: [{color:'#a8d020',name:'黄緑',pct:40},{color:'#2a9e60',name:'緑',pct:35},{color:'#f0e040',name:'黄',pct:15},{color:'#888880',name:'グレー',pct:10}],
-  H: [{color:'#e03a2a',name:'赤',pct:30},{color:'#e87820',name:'橙',pct:28},{color:'#7028c0',name:'紫',pct:24},{color:'#1888c8',name:'青',pct:18}],
-  I: [{color:'#ffffff',name:'白',pct:50},{color:'#f0e040',name:'黄',pct:28},{color:'#70cbff',name:'水色',pct:14},{color:'#888880',name:'グレー',pct:8}],
-  J: [{color:'#7028c0',name:'紫',pct:36},{color:'#1888c8',name:'青',pct:32},{color:'#ff90b8',name:'ピンク',pct:20},{color:'#e03a2a',name:'赤',pct:12}],
-  K: [{color:'#888880',name:'グレー',pct:30},{color:'#181818',name:'黒',pct:28},{color:'#1888c8',name:'青',pct:24},{color:'#7028c0',name:'紫',pct:18}],
-  L: [{color:'#f0e040',name:'黄',pct:42},{color:'#e87820',name:'橙',pct:26},{color:'#e03a2a',name:'赤',pct:20},{color:'#a8d020',name:'黄緑',pct:12}],
-  M: [{color:'#e03a2a',name:'赤',pct:34},{color:'#7028c0',name:'紫',pct:28},{color:'#181818',name:'黒',pct:22},{color:'#e87820',name:'橙',pct:16}],
-  N: [{color:'#1888c8',name:'青',pct:38},{color:'#181818',name:'黒',pct:30},{color:'#888880',name:'グレー',pct:20},{color:'#7028c0',name:'紫',pct:12}],
-  O: [{color:'#e87820',name:'橙',pct:64},{color:'#f0e040',name:'黄',pct:18},{color:'#e03a2a',name:'赤',pct:10},{color:'#a8d020',name:'黄緑',pct:8}],
-  P: [{color:'#7028c0',name:'紫',pct:52},{color:'#ff90b8',name:'ピンク',pct:28},{color:'#1888c8',name:'青',pct:12},{color:'#e03a2a',name:'赤',pct:8}],
-  Q: [{color:'#888880',name:'グレー',pct:36},{color:'#181818',name:'黒',pct:32},{color:'#7028c0',name:'紫',pct:20},{color:'#1888c8',name:'青',pct:12}],
-  R: [{color:'#e03a2a',name:'赤',pct:72},{color:'#e87820',name:'橙',pct:16},{color:'#f0e040',name:'黄',pct:8},{color:'#7028c0',name:'紫',pct:4}],
-  S: [{color:'#f0e040',name:'黄',pct:36},{color:'#1888c8',name:'青',pct:26},{color:'#e03a2a',name:'赤',pct:22},{color:'#2a9e60',name:'緑',pct:16}],
-  T: [{color:'#1888c8',name:'青',pct:48},{color:'#70cbff',name:'水色',pct:36},{color:'#888880',name:'グレー',pct:16}],
-  U: [{color:'#7028c0',name:'紫',pct:38},{color:'#1888c8',name:'青',pct:30},{color:'#ff90b8',name:'ピンク',pct:20},{color:'#e87820',name:'橙',pct:12}],
-  V: [{color:'#7028c0',name:'紫',pct:44},{color:'#e03a2a',name:'赤',pct:26},{color:'#1888c8',name:'青',pct:18},{color:'#181818',name:'黒',pct:12}],
-  W: [{color:'#ffffff',name:'白',pct:42},{color:'#888880',name:'グレー',pct:32},{color:'#1888c8',name:'青',pct:16},{color:'#70cbff',name:'水色',pct:10}],
-  X: [{color:'#181818',name:'黒',pct:48},{color:'#e03a2a',name:'赤',pct:28},{color:'#888880',name:'グレー',pct:14},{color:'#7028c0',name:'紫',pct:10}],
-  Y: [{color:'#f0e040',name:'黄',pct:66},{color:'#a8d020',name:'黄緑',pct:18},{color:'#e87820',name:'橙',pct:10},{color:'#2a9e60',name:'緑',pct:6}],
-  Z: [{color:'#1888c8',name:'青',pct:36},{color:'#181818',name:'黒',pct:30},{color:'#888880',name:'グレー',pct:20},{color:'#7028c0',name:'紫',pct:14}],
+  A: [{color:'#ff7f7f',name:'赤',pct:58},{color:'#ffae66',name:'橙',pct:22},{color:'#f5dc72',name:'黄',pct:12},{color:'#9272ff',name:'紫',pct:8}],
+  B: [{color:'#4da8e8',name:'青',pct:62},{color:'#9272ff',name:'紫',pct:20},{color:'#2b2d38',name:'黒',pct:11},{color:'#8edfff',name:'水色',pct:7}],
+  C: [{color:'#f5dc72',name:'黄',pct:44},{color:'#ffae66',name:'橙',pct:28},{color:'#a8d85c',name:'黄緑',pct:16},{color:'#ff7f7f',name:'赤',pct:12}],
+  D: [{color:'#67bf92',name:'緑',pct:38},{color:'#a8d85c',name:'黄緑',pct:30},{color:'#4da8e8',name:'青',pct:20},{color:'#2b2d38',name:'黒',pct:12}],
+  E: [{color:'#67bf92',name:'緑',pct:52},{color:'#f5dc72',name:'黄',pct:30},{color:'#ff7f7f',name:'赤',pct:18}],
+  F: [{color:'#ffae66',name:'橙',pct:35},{color:'#ff7f7f',name:'赤',pct:28},{color:'#f5dc72',name:'黄',pct:22},{color:'#ee9fd0',name:'ピンク',pct:15}],
+  G: [{color:'#a8d85c',name:'黄緑',pct:40},{color:'#67bf92',name:'緑',pct:35},{color:'#f5dc72',name:'黄',pct:15},{color:'#9698a8',name:'グレー',pct:10}],
+  H: [{color:'#ff7f7f',name:'赤',pct:30},{color:'#ffae66',name:'橙',pct:28},{color:'#9272ff',name:'紫',pct:24},{color:'#4da8e8',name:'青',pct:18}],
+  I: [{color:'#fffdf9',name:'白',pct:50},{color:'#f5dc72',name:'黄',pct:28},{color:'#8edfff',name:'水色',pct:14},{color:'#9698a8',name:'グレー',pct:8}],
+  J: [{color:'#9272ff',name:'紫',pct:36},{color:'#4da8e8',name:'青',pct:32},{color:'#ee9fd0',name:'ピンク',pct:20},{color:'#ff7f7f',name:'赤',pct:12}],
+  K: [{color:'#9698a8',name:'グレー',pct:30},{color:'#2b2d38',name:'黒',pct:28},{color:'#4da8e8',name:'青',pct:24},{color:'#9272ff',name:'紫',pct:18}],
+  L: [{color:'#f5dc72',name:'黄',pct:42},{color:'#ffae66',name:'橙',pct:26},{color:'#ff7f7f',name:'赤',pct:20},{color:'#a8d85c',name:'黄緑',pct:12}],
+  M: [{color:'#ff7f7f',name:'赤',pct:34},{color:'#9272ff',name:'紫',pct:28},{color:'#2b2d38',name:'黒',pct:22},{color:'#ffae66',name:'橙',pct:16}],
+  N: [{color:'#4da8e8',name:'青',pct:38},{color:'#2b2d38',name:'黒',pct:30},{color:'#9698a8',name:'グレー',pct:20},{color:'#9272ff',name:'紫',pct:12}],
+  O: [{color:'#ffae66',name:'橙',pct:64},{color:'#f5dc72',name:'黄',pct:18},{color:'#ff7f7f',name:'赤',pct:10},{color:'#a8d85c',name:'黄緑',pct:8}],
+  P: [{color:'#9272ff',name:'紫',pct:52},{color:'#ee9fd0',name:'ピンク',pct:28},{color:'#4da8e8',name:'青',pct:12},{color:'#ff7f7f',name:'赤',pct:8}],
+  Q: [{color:'#9698a8',name:'グレー',pct:36},{color:'#2b2d38',name:'黒',pct:32},{color:'#9272ff',name:'紫',pct:20},{color:'#4da8e8',name:'青',pct:12}],
+  R: [{color:'#ff7f7f',name:'赤',pct:72},{color:'#ffae66',name:'橙',pct:16},{color:'#f5dc72',name:'黄',pct:8},{color:'#9272ff',name:'紫',pct:4}],
+  S: [{color:'#f5dc72',name:'黄',pct:36},{color:'#4da8e8',name:'青',pct:26},{color:'#ff7f7f',name:'赤',pct:22},{color:'#67bf92',name:'緑',pct:16}],
+  T: [{color:'#4da8e8',name:'青',pct:48},{color:'#8edfff',name:'水色',pct:36},{color:'#9698a8',name:'グレー',pct:16}],
+  U: [{color:'#9272ff',name:'紫',pct:38},{color:'#4da8e8',name:'青',pct:30},{color:'#ee9fd0',name:'ピンク',pct:20},{color:'#ffae66',name:'橙',pct:12}],
+  V: [{color:'#9272ff',name:'紫',pct:44},{color:'#ff7f7f',name:'赤',pct:26},{color:'#4da8e8',name:'青',pct:18},{color:'#2b2d38',name:'黒',pct:12}],
+  W: [{color:'#fffdf9',name:'白',pct:42},{color:'#9698a8',name:'グレー',pct:32},{color:'#4da8e8',name:'青',pct:16},{color:'#8edfff',name:'水色',pct:10}],
+  X: [{color:'#2b2d38',name:'黒',pct:48},{color:'#ff7f7f',name:'赤',pct:28},{color:'#9698a8',name:'グレー',pct:14},{color:'#9272ff',name:'紫',pct:10}],
+  Y: [{color:'#f5dc72',name:'黄',pct:66},{color:'#a8d85c',name:'黄緑',pct:18},{color:'#ffae66',name:'橙',pct:10},{color:'#67bf92',name:'緑',pct:6}],
+  Z: [{color:'#4da8e8',name:'青',pct:36},{color:'#2b2d38',name:'黒',pct:30},{color:'#9698a8',name:'グレー',pct:20},{color:'#9272ff',name:'紫',pct:14}],
 };
 
 /* ══ alphabetのプリセット13色（ティールなし） ══ */
 const ALPHABET_PRESETS = [
-  {color:'#e03a2a', name:'赤'},
-  {color:'#e87820', name:'橙'},
-  {color:'#f0e040', name:'黄'},
-  {color:'#a8d020', name:'黄緑'},
-  {color:'#2a9e60', name:'緑'},
-  {color:'#1888c8', name:'青'},
-  {color:'#70cbff', name:'水色'},
-  {color:'#7028c0', name:'紫'},
-  {color:'#ff90b8', name:'ピンク'},
-  {color:'#8b4513', name:'茶色'},
-  {color:'#181818', name:'黒'},
-  {color:'#888880', name:'グレー'},
-  {color:'#ffffff', name:'白'},
+  {color:'#ff7f7f', name:'赤'},
+  {color:'#ffae66', name:'橙'},
+  {color:'#f5dc72', name:'黄'},
+  {color:'#a8d85c', name:'黄緑'},
+  {color:'#67bf92', name:'緑'},
+  {color:'#4da8e8', name:'青'},
+  {color:'#8edfff', name:'水色'},
+  {color:'#9272ff', name:'紫'},
+  {color:'#ee9fd0', name:'ピンク'},
+  {color:'#9f6f4f', name:'茶色'},
+  {color:'#2b2d38', name:'黒'},
+  {color:'#9698a8', name:'グレー'},
+  {color:'#fffdf9', name:'白'},
 ];
 
 /* カスタム色 → 最近傍プリセット色に変換（Lab近似としてrgbユークリッド距離） */
@@ -1024,7 +1021,7 @@ if (rParam) {
 }
 
 /* ══ 色名を取得（プリセット照合、なければ概算） ══ */
-const PRESET_COLORS = ['#e03a2a','#e87820','#f0e040','#a8d020','#2a9e60','#1888c8','#70cbff','#7028c0','#ff90b8','#8b4513','#181818','#888880','#ffffff'];
+const PRESET_COLORS = ['#ff7f7f','#ffae66','#f5dc72','#a8d85c','#67bf92','#4da8e8','#8edfff','#9272ff','#ee9fd0','#9f6f4f','#2b2d38','#9698a8','#fffdf9'];
 const PRESET_LABELS = ['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'];
 function getColorName(hex) {
   const idx = PRESET_COLORS.indexOf(hex?.toLowerCase());
@@ -1076,7 +1073,7 @@ function rgbToHsl(hex) {
 function isBright(hex) { return getLuminance(hex) > 0.88; }
 function textColorFor(bg) {
   if (!bg) return 'var(--ink3)';
-  return isBright(bg) ? '#888880' : '#ffffff';
+  return isBright(bg) ? '#9698a8' : '#fffdf9';
 }
 
 /* 背景テーマに対してアクセントカラーのコントラストを確保する
@@ -1154,9 +1151,9 @@ function calcDiagnosis() {
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
   if (rareScore >= 65)  return { label: '✦ 孤高の共感覚者', color: '#9060c0', desc: 'あなただけが知っている、<wbr>希少な色の世界です。' };
-  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#e87820', desc: '人によって印象が<wbr>分かれやすい、<wbr>独自の色感覚です。' };
-  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#1888c8', desc: '多くの人と色の感覚を<wbr>共有する、<wbr>共感覚の王道です。' };
-  return { label: '◇ バランス感受者', color: '#2a9e60', desc: '多数派と少数派が交差する、<wbr>広い感性の持ち主です。' };
+  if (rareScore >= 40)  return { label: '◈ 個性派の色覚者', color: '#ffae66', desc: '人によって印象が<wbr>分かれやすい、<wbr>独自の色感覚です。' };
+  if (majorityRate >= 70) return { label: '◎ 共感覚の王道', color: '#4da8e8', desc: '多くの人と色の感覚を<wbr>共有する、<wbr>共感覚の王道です。' };
+  return { label: '◇ バランス感受者', color: '#67bf92', desc: '多数派と少数派が交差する、<wbr>広い感性の持ち主です。' };
 }
 
 /* 珍しさ/共感度ラベルと値を返すヘルパー
@@ -1176,14 +1173,14 @@ const COLOR_TYPES = [
   {
     id: 'warm',   theme: 'light',
     name: 'SUNSET TYPE',
-    color: '#e87820',
+    color: '#ffae66',
     tagline: '温かく燃えるような<wbr>色彩の感覚。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
   {
     id: 'cool',   theme: 'light',
     name: 'OCEAN TYPE',
-    color: '#1888c8',
+    color: '#4da8e8',
     tagline: '静かな深さをたたえた<wbr>色彩の感覚。\n言葉より先に、<wbr>色が感情を<wbr>語りかけてくる。',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
@@ -1218,7 +1215,7 @@ const COLOR_TYPES = [
   {
     id: 'dream',  theme: 'light',
     name: 'DREAM TYPE',
-    color: '#7028c0',
+    color: '#9272ff',
     tagline: '夢と現の境界に<wbr>漂うような色彩の感覚。\nあなたの共感覚は、<wbr>どこか別の場所から<wbr>来ている。',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
@@ -1238,17 +1235,17 @@ function detectColorType(coloredLetters) {
     counts[c] = (counts[c] || 0) + 1;
   });
   const total = coloredLetters.length;
-  const hasBrown = (counts['#8b4513']||0) >= 1;
+  const hasBrown = (counts['#9f6f4f']||0) >= 1;
 
-  const warm   = ((counts['#e03a2a']||0) + (counts['#e87820']||0) + (counts['#f0e040']||0)) / total;
-  const cool   = ((counts['#1888c8']||0) + (counts['#70cbff']||0) + (counts['#7028c0']||0)) / total;
-  const nature = ((counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total;
-  const mono   = ((counts['#181818']||0) + (counts['#888880']||0) + (counts['#ffffff']||0)) / total;
-  const pastel = ((counts['#ffffff']||0) + (counts['#70cbff']||0) + (counts['#ff90b8']||0) + (counts['#f0e040']||0)) / total;
-  const dream  = ((counts['#7028c0']||0) + (counts['#ff90b8']||0) + (counts['#1888c8']||0)) / total;
+  const warm   = ((counts['#ff7f7f']||0) + (counts['#ffae66']||0) + (counts['#f5dc72']||0)) / total;
+  const cool   = ((counts['#4da8e8']||0) + (counts['#8edfff']||0) + (counts['#9272ff']||0)) / total;
+  const nature = ((counts['#67bf92']||0) + (counts['#a8d85c']||0)) / total;
+  const mono   = ((counts['#2b2d38']||0) + (counts['#9698a8']||0) + (counts['#fffdf9']||0)) / total;
+  const pastel = ((counts['#fffdf9']||0) + (counts['#8edfff']||0) + (counts['#ee9fd0']||0) + (counts['#f5dc72']||0)) / total;
+  const dream  = ((counts['#9272ff']||0) + (counts['#ee9fd0']||0) + (counts['#4da8e8']||0)) / total;
   // earth は茶色必須。茶色がなければカウントしない
   const earth  = hasBrown
-    ? ((counts['#8b4513']||0) + (counts['#2a9e60']||0) + (counts['#a8d020']||0)) / total
+    ? ((counts['#9f6f4f']||0) + (counts['#67bf92']||0) + (counts['#a8d85c']||0)) / total
     : 0;
 
   if (mono >= 0.55) return 'mono';
@@ -1297,27 +1294,27 @@ function buildTypeHero(coloredLetters, diag) {
   const uniqueResult = calcMostUnique(coloredLetters);
 
   // 一致率：背景テーマに合わせてコントラスト確保
-  const majColorRaw = diag.majorityRate >= 70 ? '#1888c8'
+  const majColorRaw = diag.majorityRate >= 70 ? '#4da8e8'
     : diag.majorityRate >= 50 ? '#2a7ab8'
     : diag.majorityRate >= 30 ? '#555550'
-    : '#2a9e60';
+    : '#67bf92';
   const majColor = ensureContrast(majColorRaw, theme);
 
-  const rareColorRaw = diag.rareScore >= 65 ? '#7028c0'
+  const rareColorRaw = diag.rareScore >= 65 ? '#9272ff'
     : diag.rareScore >= 40 ? '#9060c0'
-    : diag.rareScore >= 20 ? '#1888c8'
+    : diag.rareScore >= 20 ? '#4da8e8'
     : '#555550';
   const rareColor = ensureContrast(rareColorRaw, theme);
   const rareStat = calcRareStat(diag);
 
   // タイプ名の色・diagType色もコントラスト確保
-  const typeColor = ensureContrast(type.color || '#181818', theme);
+  const typeColor = ensureContrast(type.color || '#2b2d38', theme);
   const diagColor = ensureContrast(diagType.color, theme);
 
   // 最も個性的な文字の色
   const uniqueColor = uniqueResult.isAllMajority
     ? 'var(--hero-ink3)'
-    : ensureContrast(colorMap[uniqueResult.mostUnique] || '#181818', theme);
+    : ensureContrast(colorMap[uniqueResult.mostUnique] || '#2b2d38', theme);
 
   return `<div class="type-hero" data-type="${typeId}" data-theme="${theme}" style="${bgStyle}">
     <canvas class="type-art-canvas" id="artCanvas"></canvas>
@@ -1535,7 +1532,7 @@ function buildSenseCard(coloredLetters) {
 
   const uTopColorName = getColorName(uVotes[0]?.color || '');
   const uMyColorName  = getColorName(uColor || '');
-  const uTopColorHex  = uVotes[0]?.color || '#888880';
+  const uTopColorHex  = uVotes[0]?.color || '#9698a8';
 
   // %表示（個性側）
   const uniquePctHtml = isAllMajority ? '' : '';
@@ -1590,7 +1587,7 @@ function buildSenseCard(coloredLetters) {
   const empathyText = `${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
 
   // ── 個性：色円HTML ──
-  const uTopColorHex2 = uVotes[0]?.color || '#888880';
+  const uTopColorHex2 = uVotes[0]?.color || '#9698a8';
   const uCirclesHtml = isAllMajority
     ? `<div class="sense-circle-wrap">
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
@@ -1789,7 +1786,7 @@ function buildShareSection(diag, coloredLetters) {
   const counts = {};
   coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
   const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
-  const typeColor = colorType.color || '#181818';
+  const typeColor = colorType.color || '#2b2d38';
 
   // シェアカードのドット
   const dots = coloredLetters.map(l =>
@@ -1807,8 +1804,8 @@ function buildShareSection(diag, coloredLetters) {
     <div class="section-title">結果を<wbr>シェアする</div>
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
-        <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#e03a2a');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>
-        <div class="share-card-blob" style="width:160px;height:160px;bottom:-30px;left:-30px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[1]||topColors[0]||'#1888c8');return `${r},${g},${b}`})()},0.15) 0%,transparent 70%)"></div>
+        <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#ff7f7f');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>
+        <div class="share-card-blob" style="width:160px;height:160px;bottom:-30px;left:-30px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[1]||topColors[0]||'#4da8e8');return `${r},${g},${b}`})()},0.15) 0%,transparent 70%)"></div>
         <div class="share-card-inner">
           <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
           <div class="share-card-title"><span style="color:${diagType.color}">${diagType.label}</span><span style="color:var(--ink3);font-weight:300;margin:0 0.2em">/</span><span style="color:${typeColor};opacity:0.7">${colorType.name}</span></div>
@@ -1877,8 +1874,8 @@ function render() {
 
     // ③ シェアエリア（明るい背景）
     const shareOuter = document.getElementById('shareOuter');
-    const { r: r1, g: g1, b: b1 } = hexToRgb(topColors[0] || '#e03a2a');
-    const { r: r2, g: g2, b: b2 } = hexToRgb(topColors[1] || topColors[0] || '#1888c8');
+    const { r: r1, g: g1, b: b1 } = hexToRgb(topColors[0] || '#ff7f7f');
+    const { r: r2, g: g2, b: b2 } = hexToRgb(topColors[1] || topColors[0] || '#4da8e8');
     shareOuter.innerHTML = `
       <div class="share-blob" style="position:absolute;width:max(400px,90vw);height:max(400px,90vw);border-radius:50%;filter:blur(70px);pointer-events:none;top:-25%;right:-20%;background:radial-gradient(circle,rgba(${r1},${g1},${b1},0.5) 0%,transparent 65%)"></div>
       <div class="share-blob" style="position:absolute;width:max(320px,75vw);height:max(320px,75vw);border-radius:50%;filter:blur(60px);pointer-events:none;bottom:-15%;left:-15%;background:radial-gradient(circle,rgba(${r2},${g2},${b2},0.38) 0%,transparent 65%)"></div>
@@ -2255,14 +2252,14 @@ const firebaseConfig = {
    色ID → hex 変換（result.html既存の定数と同じ）
 ──────────────────────────────────────────────── */
 const COLOR_HEX = {
-  '0':'#e03a2a','1':'#e87820','2':'#f0e040','3':'#a8d020',
-  '4':'#2a9e60','5':'#1888c8','6':'#70cbff','7':'#7028c0',
-  '8':'#ff90b8','9':'#8b4513','A':'#181818','B':'#888880','C':'#ffffff',
+  '0':'#ff7f7f','1':'#ffae66','2':'#f5dc72','3':'#a8d85c',
+  '4':'#67bf92','5':'#4da8e8','6':'#8edfff','7':'#9272ff',
+  '8':'#ee9fd0','9':'#9f6f4f','A':'#2b2d38','B':'#9698a8','C':'#fffdf9',
 };
 const COLOR_NAME = {
-  '#e03a2a':'赤','#e87820':'橙','#f0e040':'黄','#a8d020':'黄緑',
-  '#2a9e60':'緑','#1888c8':'青','#70cbff':'水色','#7028c0':'紫',
-  '#ff90b8':'ピンク','#8b4513':'茶色','#181818':'黒','#888880':'グレー','#ffffff':'白',
+  '#ff7f7f':'赤','#ffae66':'橙','#f5dc72':'黄','#a8d85c':'黄緑',
+  '#67bf92':'緑','#4da8e8':'青','#8edfff':'水色','#9272ff':'紫',
+  '#ee9fd0':'ピンク','#9f6f4f':'茶色','#2b2d38':'黒','#9698a8':'グレー','#fffdf9':'白',
 };
 
 /* ────────────────────────────────────────────────

@@ -1990,6 +1990,17 @@ function render() {
         }
       }
 
+      // background-clip:text 透明テキストを solid color にスワップ（html2canvas 対策）
+      const textSwaps = [];
+      target.querySelectorAll('.type-name-diag, .type-name-color').forEach(el => {
+        textSwaps.push({ el, style: el.getAttribute('style') || '' });
+        el.style.backgroundImage = 'none';
+        el.style.webkitTextFillColor = '#fffdf9';
+        el.style.color = '#fffdf9';
+        el.style.filter = 'none';
+        el.style.textShadow = 'none';
+      });
+
       try {
         // 背景画像をbase64に変換（CORSによるtainted canvas回避）
         const heroDom = target.querySelector('.type-hero');
@@ -2033,6 +2044,8 @@ function render() {
         if (newWin && !newWin.closed) newWin.close();
         showToast('失敗: ' + (e?.message || String(e)));
       } finally {
+        // スワップしたテキスト要素を復元
+        textSwaps.forEach(({ el, style }) => el.setAttribute('style', style));
         btn.disabled = false;
         btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg> 画像を保存`;
       }

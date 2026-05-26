@@ -327,13 +327,22 @@ nav ul a:hover { color: var(--ink); }
   line-height: 1.9; font-weight: 300;
 }
 
-/* ── 統合統計カード ── */
+/* ── 統合統計カード（“空気の層”として背景に溶け込む半透明ガラス） ── */
 .type-stat-card {
-  background: rgba(255,255,255,0.13);
-  border: 1px solid rgba(255,255,255,0.22);
-  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 8px 28px rgba(60,100,220,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
-  border-radius: 16px; overflow: hidden;
+  /* 縦方向に薄いグラデーションで奥行きを出し、白の重さを抑える */
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.11) 0%,
+    rgba(255,255,255,0.07) 100%
+  );
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(22px) saturate(115%);
+  -webkit-backdrop-filter: blur(22px) saturate(115%);
+  /* ふんわりした外側の発光 + 内側のごく薄いハイライト線 */
+  box-shadow:
+    0 0 24px rgba(180,220,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  border-radius: 20px; overflow: hidden;
 }
 .type-stat-row {
   display: flex; align-items: center;
@@ -345,7 +354,13 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-stat-sep {
   width: 1px; align-self: stretch;
-  background: rgba(255,255,255,0.15);
+  /* 上下フェードで境界線を“霧の中の仕切り”寄りに */
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.16) 50%,
+    rgba(255,255,255,0) 100%
+  );
   margin: 0 0.25rem;
 }
 .type-stat-card-label {
@@ -380,9 +395,31 @@ nav ul a:hover { color: var(--ink); }
   height: 34px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700;
-  font-size: 0.98rem;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
+  /* “光を帯びた色の粒”：外側に淡い発光、内側に薄いハイライト */
+  box-shadow:
+    0 0 10px rgba(180,220,255,0.10),
+    inset 0 1px 1px rgba(255,255,255,0.28);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+/* 明色（白・パステル）のときだけ、エッジが消えないよう内側に極薄の縁を足す */
+.type-palette-dot[data-bright="1"] {
+  box-shadow:
+    0 0 10px rgba(180,220,255,0.10),
+    inset 0 0 0 1px rgba(0,0,0,0.08),
+    inset 0 1px 1px rgba(255,255,255,0.32);
+}
+.type-palette-dot:hover {
+  box-shadow:
+    0 0 18px rgba(180,220,255,0.20),
+    inset 0 1px 2px rgba(255,255,255,0.38);
+  transform: scale(1.04);
+}
+.type-palette-dot[data-bright="1"]:hover {
+  box-shadow:
+    0 0 18px rgba(180,220,255,0.20),
+    inset 0 0 0 1px rgba(0,0,0,0.08),
+    inset 0 1px 2px rgba(255,255,255,0.42);
 }
 
 /* 下スクロール誘導 */
@@ -1307,12 +1344,9 @@ function buildTypeHero(coloredLetters, diag) {
 
   const dots = coloredLetters.map(l => {
     const c = colorMap[l];
-    const shadow = isBright(c)
-      ? 'box-shadow:0 0 0 1.5px rgba(255,255,255,0.55),inset 0 0 0 1px rgba(0,0,0,0.1)'
-      : 'box-shadow:0 0 0 1.5px rgba(255,255,255,0.45)';
     const tc = textColorFor(c);
-    const sizeOverride = '';
-    return `<div class="type-palette-dot" style="background:${c};${shadow};color:${tc};${sizeOverride}">${l}</div>`;
+    const brightAttr = isBright(c) ? ' data-bright="1"' : '';
+    return `<div class="type-palette-dot"${brightAttr} style="background:${c};color:${tc}">${l}</div>`;
   }).join('');
 
   const taglineHtml = type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');

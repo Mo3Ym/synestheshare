@@ -396,30 +396,96 @@ nav ul a:hover { color: var(--ink); }
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
-  /* “光を帯びた色の粒”：外側に淡い発光、内側に薄いハイライト */
-  box-shadow:
-    0 0 10px rgba(180,220,255,0.10),
-    inset 0 1px 1px rgba(255,255,255,0.28);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
-/* 明色（白・パステル）のときだけ、エッジが消えないよう内側に極薄の縁を足す */
-.type-palette-dot[data-bright="1"] {
+
+/* ════════════════════════════════════
+   共通: 色円のガラス板光（左上から差し込む光のシート）
+════════════════════════════════════ */
+.type-palette-dot,
+.vote-letter-badge,
+.empathy-badge,
+.highlight-badge,
+.share-card-dot,
+.sense-circle {
+  position: relative;
+  isolation: isolate;
   box-shadow:
-    0 0 10px rgba(180,220,255,0.10),
-    inset 0 0 0 1px rgba(0,0,0,0.08),
-    inset 0 1px 1px rgba(255,255,255,0.32);
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+  transition: box-shadow 0.25s ease;
 }
-.type-palette-dot:hover {
+.share-card-dot {
+  box-shadow:
+    0 0 6px rgba(180,220,255,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+}
+.type-palette-dot::before,
+.vote-letter-badge::before,
+.empathy-badge::before,
+.highlight-badge::before,
+.share-card-dot::before,
+.sense-circle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+/* 明色（白・パステル）：ハイライト弱め＋黒い極薄縁で輪郭維持 */
+.type-palette-dot[data-bright="1"],
+.vote-letter-badge[data-bright="1"],
+.empathy-badge[data-bright="1"],
+.highlight-badge[data-bright="1"],
+.share-card-dot[data-bright="1"],
+.sense-circle[data-bright="1"] {
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+.share-card-dot[data-bright="1"] {
+  box-shadow:
+    0 0 6px rgba(180,220,255,0.10),
+    inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+.type-palette-dot[data-bright="1"]::before,
+.vote-letter-badge[data-bright="1"]::before,
+.empathy-badge[data-bright="1"]::before,
+.highlight-badge[data-bright="1"]::before,
+.share-card-dot[data-bright="1"]::before,
+.sense-circle[data-bright="1"]::before {
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.48) 0%,
+    rgba(255,255,255,0.22) 22%,
+    rgba(255,255,255,0.08) 42%,
+    transparent 65%
+  );
+}
+.type-palette-dot:hover,
+.vote-letter-badge:hover,
+.empathy-badge:hover,
+.highlight-badge:hover,
+.sense-circle:hover {
   box-shadow:
     0 0 18px rgba(180,220,255,0.20),
-    inset 0 1px 2px rgba(255,255,255,0.38);
-  transform: scale(1.04);
+    inset 0 1px 0 rgba(255,255,255,0.24);
 }
-.type-palette-dot[data-bright="1"]:hover {
+.type-palette-dot[data-bright="1"]:hover,
+.vote-letter-badge[data-bright="1"]:hover,
+.empathy-badge[data-bright="1"]:hover,
+.highlight-badge[data-bright="1"]:hover,
+.sense-circle[data-bright="1"]:hover {
   box-shadow:
     0 0 18px rgba(180,220,255,0.20),
-    inset 0 0 0 1px rgba(0,0,0,0.08),
-    inset 0 1px 2px rgba(255,255,255,0.42);
+    inset 0 0 0 1px rgba(0,0,0,0.08);
 }
 
 /* 下スクロール誘導 */
@@ -617,6 +683,8 @@ nav ul a:hover { color: var(--ink); }
 .sense-circle {
   border-radius: 50%;
   width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1.05rem;
 }
 .sense-circle-label {
   font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
@@ -1346,7 +1414,7 @@ function buildTypeHero(coloredLetters, diag) {
     const c = colorMap[l];
     const tc = textColorFor(c);
     const brightAttr = isBright(c) ? ' data-bright="1"' : '';
-    return `<div class="type-palette-dot"${brightAttr} style="background:${c};color:${tc}">${l}</div>`;
+    return `<div class="type-palette-dot"${brightAttr} style="background:${c};color:${tc}"><span>${l}</span></div>`;
   }).join('');
 
   const taglineHtml = type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');
@@ -1490,7 +1558,7 @@ function buildEmpathyCard(coloredLetters) {
     <div class="section-eyebrow">Shared Sense</div>
     <div class="section-title">あなたが最も<wbr>共感された文字</div>
     <div class="empathy-card">
-      <div class="empathy-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostEmpathy}</div>
+      <div class="empathy-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${mostEmpathy}</span></div>
       <div class="empathy-body">
         <div class="empathy-pct">${highestPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>
         <div class="empathy-pct-label">の人が、<wbr>あなたと同じ色を<wbr>感じていました。</div>
@@ -1549,7 +1617,7 @@ function buildHighlightCard(coloredLetters) {
 
   const badgeHtml = isAllMajority
     ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
-    : `<div class="highlight-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
+    : `<div class="highlight-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${mostUnique}</span></div>`;
 
   const barHtml = isAllMajority ? '' : `
     <div class="highlight-bar-wrap">
@@ -1587,7 +1655,7 @@ function buildSenseCard(coloredLetters) {
   // バッジ：isAllMajorityのみ🎯、それ以外は常にアルファベット円
   const uniqueBadge = isAllMajority
     ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
-    : `<div class="empathy-badge" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostUnique}</div>`;
+    : `<div class="empathy-badge"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${mostUnique}</span></div>`;
 
   const uTopColorName = getColorName(uVotes[0]?.color || '');
   const uMyColorName  = getColorName(uColor || '');
@@ -1628,7 +1696,7 @@ function buildSenseCard(coloredLetters) {
   const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
   const empathyBadge = !mostEmpathy
     ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>`
-    : `<div class="empathy-badge" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 2px rgba(0,0,0,0.15)':''}">${mostEmpathy}</div>`;
+    : `<div class="empathy-badge"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>`;
 
   const empathyComment = !mostEmpathy ? 'あなたの感覚は、<wbr>誰とも違う独自の宇宙を<wbr>持っています。'
     : highestPct >= 70 ? 'その感覚は、<wbr>多くの人の心と<wbr>静かに重なっています。'
@@ -1652,12 +1720,12 @@ function buildSenseCard(coloredLetters) {
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
        </div>`
     : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine" style="background:${uColor};color:${textColorFor(uColor)};${isBright(uColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
+         <div class="sense-circle mine"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${mostUnique}</span></div>
          <span class="sense-circle-label">あなた</span>
        </div>
        <div class="sense-op">vs</div>
        <div class="sense-circle-wrap">
-         <div class="sense-circle theirs" style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)};${isBright(uTopColorHex2)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostUnique}</div>
+         <div class="sense-circle theirs"${isBright(uTopColorHex2)?' data-bright="1"':''} style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)}"><span>${mostUnique}</span></div>
          <span class="sense-circle-label">みんな</span>
        </div>`;
 
@@ -1667,12 +1735,12 @@ function buildSenseCard(coloredLetters) {
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🌀</div>
        </div>`
     : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
+         <div class="sense-circle mine"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>
          <span class="sense-circle-label">あなた</span>
        </div>
        <div class="sense-op">=</div>
        <div class="sense-circle-wrap">
-         <div class="sense-circle theirs" style="background:${eColor};color:${textColorFor(eColor)};${isBright(eColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'box-shadow:0 0 0 1.5px rgba(255,255,255,0.15)'};display:flex;align-items:center;justify-content:center;font-family:var(--outfit);font-weight:700;font-size:1.05rem">${mostEmpathy}</div>
+         <div class="sense-circle theirs"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>
          <span class="sense-circle-label">みんな</span>
        </div>`;
 
@@ -1755,7 +1823,7 @@ function buildVoteSection(coloredLetters) {
 
     return `<div class="vote-item">
       <div class="vote-item-row">
-        <div class="vote-letter-badge" style="background:${myColor};color:${textColorFor(myColor)};${isBright(myColor)?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':''}">${l}</div>
+        <div class="vote-letter-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${l}</span></div>
         <div class="vote-stacked-outer">
           <div class="vote-marker-row">${markerHtml}</div>
           <div class="vote-stacked-track">${segsHtml}</div>
@@ -1850,7 +1918,7 @@ function buildShareSection(diag, coloredLetters) {
 
   // シェアカードのドット
   const dots = coloredLetters.map(l =>
-    `<div class="share-card-dot" style="background:${colorMap[l]};${isBright(colorMap[l])?'box-shadow:inset 0 0 0 1.5px rgba(0,0,0,0.15)':'border:1px solid rgba(255,255,255,0.12)'}"></div>`
+    `<div class="share-card-dot"${isBright(colorMap[l])?' data-bright="1"':''} style="background:${colorMap[l]}"></div>`
   ).join('');
 
   // STEP2: 「感覚を見せる」方向のXシェアテキスト

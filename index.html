@@ -229,10 +229,25 @@ nav ul a:hover { color: var(--ink); }
 .bubble-cell::before { content: ''; display: block; padding-top: 100%; }
 .bubble-cell .letter-bubble { position: absolute; inset: 0; width: 100%; height: 100%; }
 .letter-bubble {
+  position: relative; isolation: isolate;
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; color: white;
-  font-size: 1rem; transition: transform 0.28s cubic-bezier(.34,1.56,.64,1);
+  font-size: 1rem; transition: transform 0.28s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
   cursor: default; overflow: hidden;
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+}
+.letter-bubble::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none; z-index: -1;
 }
 .letter-bubble span { display: block; line-height: 1; text-align: center; white-space: nowrap; }
 .letter-bubble:hover { transform: scale(1.12); z-index: 2; }
@@ -317,9 +332,24 @@ nav ul a:hover { color: var(--ink); }
 .tbubble-cell { position: relative; width: 36px; flex-shrink: 0; }
 .tbubble-cell::before { content:''; display:block; padding-top:100%; }
 .tbubble {
-  position: absolute; inset: 0; border-radius: 50%;
+  position: absolute; inset: 0; isolation: isolate; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.85rem; color: white; overflow: hidden;
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+  transition: box-shadow 0.25s ease;
+}
+.tbubble::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none; z-index: -1;
 }
 /* ⑧ テーマカード内アウトライン◯ */
 .tbubble-outline {

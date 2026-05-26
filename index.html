@@ -274,7 +274,10 @@ nav ul a:hover { color: var(--ink); }
 
 .themes {
   position: relative; z-index: 1;
-  padding: 8rem 2.5rem; max-width: 1200px; margin: 0 auto;
+  padding: 9rem 1.75rem 7rem; max-width: 720px; margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .themes { padding: 10rem 2.5rem 8rem; }
 }
 
 .sec-eyebrow {
@@ -295,40 +298,103 @@ nav ul a:hover { color: var(--ink); }
 
 .themes-lead {
   font-size: 0.88rem; color: var(--ink2); font-weight: 300;
-  margin-bottom: 2.5rem; line-height: 1.7;
+  margin-bottom: 3.5rem; line-height: 1.7;
   word-break: keep-all; overflow-wrap: break-word;
 }
 
-.theme-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; }
+/* 2x2 グリッド。スマホ最優先で、PCでも同じ列数を維持 */
+.theme-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 768px) { .theme-grid { gap: 1.5rem; } }
 
 .theme-card {
-  background: rgba(255,255,255,0.82);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  border: 1px solid var(--border); border-radius: 6px;
-  padding: 1.5rem 1.5rem 1.5rem; /* ③下部にボタン追加のためpaddingを調整 */
-  text-decoration: none; color: var(--ink); display: flex; flex-direction: column;
-  transition: box-shadow 0.2s, transform 0.2s;
+  /* すりガラス：強い blur + 半透明グラデーション */
+  background: linear-gradient(
+    155deg,
+    rgba(255,255,255,0.58) 0%,
+    rgba(255,255,255,0.42) 100%
+  );
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 18px;
+  padding: 1.6rem 1.4rem 1.5rem;
+  text-decoration: none; color: var(--ink);
+  display: flex; flex-direction: column;
+  /* ふんわりした影 + 内側に薄いハイライト */
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.18);
+  transition: box-shadow 0.35s ease, transform 0.35s ease, background 0.35s ease;
   position: relative; overflow: hidden;
+  isolation: isolate;
 }
-.theme-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+@media (min-width: 768px) {
+  .theme-card { padding: 2rem 1.75rem 1.75rem; border-radius: 22px; }
+}
+.theme-card:hover {
+  background: linear-gradient(
+    155deg,
+    rgba(255,255,255,0.65) 0%,
+    rgba(255,255,255,0.48) 100%
+  );
+  box-shadow:
+    0 18px 54px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 0 0 1px rgba(255,255,255,0.22);
+  transform: translateY(-2px);
+}
+/* No.01（人気）カードのみ：赤〜オレンジの漏れ光ハロー（すりガラス維持） */
+.theme-card:has(.badge-popular) {
+  border-color: rgba(255,160,100,0.45);
+  box-shadow:
+    0 0 0 1px rgba(255,127,127,0.14),
+    0 0 18px rgba(255,127,127,0.26),
+    0 0 42px rgba(255,174,102,0.20),
+    0 12px 40px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.18),
+    inset 0 0 18px rgba(255,170,100,0.10);
+}
+.theme-card:has(.badge-popular):hover {
+  border-color: rgba(255,160,100,0.58);
+  box-shadow:
+    0 0 0 1px rgba(255,127,127,0.20),
+    0 0 26px rgba(255,127,127,0.34),
+    0 0 58px rgba(255,174,102,0.24),
+    0 18px 54px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 0 0 1px rgba(255,255,255,0.22),
+    inset 0 0 20px rgba(255,170,100,0.13);
+}
 
-/* ⑧ No.とバッジを同じ行に */
+/* No. ラベルは控えめに（管理番号感を弱める） */
 .theme-header-row {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1rem;
+  min-height: 1rem; margin-bottom: 1.4rem;
 }
-.theme-no { font-family: var(--outfit); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; color: var(--ink3); }
+.theme-no {
+  font-family: var(--outfit); font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.18em; color: var(--ink3); opacity: 0.7;
+}
 .badge-popular {
   display: inline-flex; align-items: center; gap: 0.3rem;
-  background: rgba(224,58,42,0.10); border: 1px solid rgba(224,58,42,0.28);
+  background: rgba(255,127,127,0.10); border: 1px solid rgba(255,127,127,0.28);
   color: var(--c1); font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 0.2rem 0.55rem; border-radius: 100px; white-space: nowrap;
 }
 .badge-popular::before { content: '★'; font-size: 0.6rem; }
 
-.theme-accent-bar { height: 3px; border-radius: 2px; margin-bottom: 1.25rem; }
-.theme-bubble-row { display: flex; gap: 7px; margin-bottom: 1.25rem; align-items: flex-start; }
+/* 上部の細いグラデーションライン：もう少し繊細に */
+.theme-accent-bar {
+  height: 2px; border-radius: 2px; margin-bottom: 1.5rem;
+  opacity: 0.85;
+}
+.theme-bubble-row { display: flex; gap: 7px; margin-bottom: 1.5rem; align-items: flex-start; }
 .tbubble-cell { position: relative; width: 36px; flex-shrink: 0; }
 .tbubble-cell::before { content:''; display:block; padding-top:100%; }
 .tbubble {
@@ -356,28 +422,40 @@ nav ul a:hover { color: var(--ink); }
   background: var(--white) !important;
   box-sizing: border-box;
 }
-.theme-name { font-family: var(--jp); font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; word-break: keep-all; overflow-wrap: break-word; }
-.theme-desc { font-size: 0.78rem; color: var(--ink2); line-height: 1.6; font-weight: 300; flex: 1; word-break: keep-all; overflow-wrap: break-word; }
-
-/* ③ 「このテーマで診断」ボタン */
-.theme-cta {
-  display: flex; align-items: center; justify-content: center; gap: 0.35rem;
-  flex-wrap: wrap;
-  margin-top: 1.25rem;
-  padding: 0.55rem 0;
-  border-top: 1px solid var(--border);
-  font-family: var(--jp); font-size: 0.78rem; font-weight: 700;
-  color: var(--ink2);
-  transition: color 0.15s;
-  letter-spacing: 0.03em;
+/* タイポ階層を明確に：テーマ名は大きく、本文は細く */
+.theme-name {
+  font-family: var(--jp); font-weight: 700;
+  font-size: 1.05rem; line-height: 1.35; letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
   word-break: keep-all; overflow-wrap: break-word;
 }
-.theme-card:hover .theme-cta { color: var(--c1); }
-.theme-cta-arrow {
-  font-family: var(--outfit); font-size: 0.9rem;
-  transition: transform 0.2s;
+@media (min-width: 768px) {
+  .theme-name { font-size: 1.2rem; }
 }
-.theme-card:hover .theme-cta-arrow { transform: translateX(3px); }
+.theme-desc {
+  font-size: 0.78rem; color: var(--ink2); line-height: 1.7;
+  font-weight: 300; flex: 1;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
+/* 「→」だけのミニマルなCTA */
+.theme-cta {
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1.6rem;
+  padding: 0;
+  color: var(--ink3);
+  transition: color 0.3s ease;
+}
+.theme-card:hover .theme-cta { color: var(--ink); }
+.theme-cta-arrow {
+  font-family: var(--outfit); font-size: 1.05rem; font-weight: 400;
+  transition: transform 0.35s ease;
+  display: inline-block; opacity: 0.7;
+}
+.theme-card:hover .theme-cta-arrow {
+  transform: translateX(4px);
+  opacity: 1;
+}
 
 /* ══════════════════════════════════════
    HOW — グラデーション背景付き（CTA系だが青紫寄りで差別化）
@@ -766,7 +844,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         <div class="theme-name">アルファベット</div>
         <div class="theme-desc">A〜Zは<wbr>どんな色？</div>
         <!-- ③「このテーマで診断」ボタン -->
-        <div class="theme-cta">このテーマで<wbr>診断<span class="theme-cta-arrow">→</span></div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="number.html" class="theme-card">
@@ -781,7 +859,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         </div>
         <div class="theme-name">数字</div>
         <div class="theme-desc">1〜9は<wbr>どんな色？</div>
-        <div class="theme-cta">このテーマで<wbr>診断<span class="theme-cta-arrow">→</span></div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="consonant.html" class="theme-card">
@@ -796,7 +874,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         </div>
         <div class="theme-name">ひらがな</div>
         <div class="theme-desc">あ～おは<wbr>どんな色？</div>
-        <div class="theme-cta">このテーマで<wbr>診断<span class="theme-cta-arrow">→</span></div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="subject.html" class="theme-card">
@@ -811,7 +889,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         </div>
         <div class="theme-name">教科</div>
         <div class="theme-desc">国語や数学は<wbr>どんな色？</div>
-        <div class="theme-cta">このテーマで<wbr>診断<span class="theme-cta-arrow">→</span></div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
     </div>

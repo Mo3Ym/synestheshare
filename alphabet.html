@@ -57,7 +57,13 @@
 }
 
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
+body {
+  background-image: url('assets/backgrounds/alphabet.webp');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6;
+}
 
 /* wbr対応 */
 h1, h2, h3, p, .page-title, .page-lead, .mode-label,
@@ -142,11 +148,11 @@ nav ul a:hover { color: var(--ink); }
    PAGE HERO (診断ページ用コンパクト版)
 ══════════════════════════════════════ */
 .page-hero-wrap {
-  position: relative; overflow: hidden;
-  padding-top: 6.5rem; /* nav + パンくず分 */
-  background: #16161a;
+  position: relative;
+  padding-top: 6.5rem;
+  background: transparent;
 }
-.page-blob { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; z-index: 0; }
+.page-blob { display: none; }
 .page-blob-1 {
   width: max(480px, 80vw); height: max(480px, 80vw);
   top: -25%; left: -12%;
@@ -196,23 +202,6 @@ nav ul a:hover { color: var(--ink); }
   word-break: keep-all; overflow-wrap: break-word;
 }
 
-/* ── HEROエリア ダークテーマ上書き ── */
-.page-hero-wrap .page-breadcrumb {
-  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
-  letter-spacing: 0.15em; text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
-  display: flex; align-items: center; gap: 0.5rem;
-  text-decoration: none; transition: color 0.15s;
-}
-.page-hero-wrap .page-breadcrumb::before { content: '←'; font-family: var(--outfit); }
-.page-hero-wrap .page-breadcrumb:hover { color: rgba(255,255,255,0.8); }
-.page-hero-wrap .page-eyebrow { color: rgba(255,255,255,0.35); }
-.page-hero-wrap .page-eyebrow::before { background: rgba(255,255,255,0.25); }
-.page-hero-wrap .page-title { color: rgba(255,255,255,0.92); }
-.page-hero-wrap .page-lead { color: rgba(255,255,255,0.5); }
-.page-hero-wrap .progress-label { color: rgba(255,255,255,0.3); }
-.page-hero-wrap .progress-count { color: rgba(255,255,255,0.55); }
-.page-hero-wrap .progress-track { background: rgba(255,255,255,0.1); }
 .page-hero-wrap .progress-bar-wrap { border-top: none; }
 .progress-bar-wrap {
   width: 100%; max-width: 900px;
@@ -241,9 +230,8 @@ nav ul a:hover { color: var(--ink); }
    メインコンテンツ
 ══════════════════════════════════════ */
 .main-outer {
-  position: relative; overflow: hidden;
-  background: #e4e4e0;
-  border-top: 1px solid #d4d4d0;
+  position: relative;
+  background: transparent;
 }
 /* ABOUTセクション風blob */
 .main-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
@@ -457,7 +445,6 @@ nav ul a:hover { color: var(--ink); }
 
 /* ── 結果パレット ── */
 .result-section {
-  border-top: 1px solid var(--border);
   padding-top: 2.5rem;
 }
 .result-header {
@@ -491,23 +478,54 @@ nav ul a:hover { color: var(--ink); }
   display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
 }
 .btn-result {
-  background: rgba(220,50,32,0.88);
-  backdrop-filter: blur(14px) saturate(180%); -webkit-backdrop-filter: blur(14px) saturate(180%);
+  position: relative; isolation: isolate;
+  background: rgba(255,90,90,0.88);
+  backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.28);
   border-radius: 100px; color: #fff;
-  font-family: var(--jp); font-weight: 700; font-size: 0.88rem;
+  font-family: var(--jp); font-weight: 700; font-size: 0.9rem;
   letter-spacing: 0.04em;
-  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   display: inline-flex; align-items: center; gap: 0.4rem;
-  padding: 0.72rem 1.6rem; cursor: pointer; border: none;
-  box-shadow: 0 4px 18px rgba(220,50,32,0.35), inset 0 1px 0 rgba(255,255,255,0.18);
+  padding: 0.82rem 1.85rem; cursor: pointer;
+  white-space: nowrap;
+  box-shadow:
+    0 0  8px rgba(255, 90, 80,0.70),
+    0 0 22px rgba(255,110,90,0.48),
+    0 0 50px rgba(255,120,80,0.28),
+    0 0 90px rgba(255,100,70,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.28);
 }
-.btn-result:hover:not(:disabled) { background: rgba(200,35,18,0.96); transform: translateY(-2px); }
+.btn-result::before {
+  content: '';
+  position: absolute; inset: -14px -20px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 60%,
+    rgba(255,100,80,0.42) 0%, rgba(255,130,80,0.22) 40%, transparent 72%);
+  filter: blur(22px);
+  z-index: -1; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.btn-result:hover:not(:disabled) {
+  background: rgba(255,105,95,0.94);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 10px rgba(255, 90, 80,0.80),
+    0 0 30px rgba(255,110,90,0.58),
+    0 0 65px rgba(255,120,80,0.36),
+    0 0 110px rgba(255,100,70,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.32);
+}
+.btn-result:hover:not(:disabled)::before {
+  background: radial-gradient(ellipse at 50% 60%,
+    rgba(255,110,85,0.55) 0%, rgba(255,135,85,0.30) 40%, transparent 72%);
+}
 .btn-result:disabled {
-  background: rgba(140,140,140,0.35);
-  box-shadow: none;
-  cursor: not-allowed;
-  color: rgba(255,255,255,0.45);
+  background: rgba(140,140,140,0.25);
+  box-shadow: none; border-color: rgba(255,255,255,0.12);
+  cursor: not-allowed; color: rgba(255,255,255,0.35);
 }
+.btn-result:disabled::before { display: none; }
 .btn-reset {
   padding: 0.72rem 1.4rem; border-radius: 100px;
   border: 1.5px solid var(--border); background: transparent; cursor: pointer;
@@ -584,6 +602,35 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .palette-dot { width: 30px; height: 30px; }
   footer { padding: 1.5rem 1.25rem; }
 }
+
+/* ── テキスト白文字化 ── */
+.page-eyebrow { color: rgba(255,255,255,0.72); }
+.page-eyebrow::before { background: rgba(255,255,255,0.35); }
+.page-title { color: rgba(255,255,255,0.95); }
+.page-title .hl-red { color: var(--c1); }
+.page-lead { color: rgba(255,255,255,0.62); }
+.progress-label { color: rgba(255,255,255,0.55); }
+.progress-count { color: rgba(255,255,255,0.75); }
+.progress-count span { color: var(--c1); }
+.mode-label { color: rgba(255,255,255,0.72); }
+.mode-label strong { color: rgba(255,255,255,0.9); }
+.btn-mode-toggle {
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.25);
+}
+.btn-mode-toggle:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: none;
+}
+.alpha-bubble {
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.25);
+}
+.alpha-bubble span { color: rgba(255,255,255,0.85); }
+.alpha-cell:hover .alpha-bubble { box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
 </style>
 </head>
 <body>
@@ -652,10 +699,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <button class="btn-reset" id="btnReset">リセット</button>
     </div>
 
-    <div class="hint">
-      <span class="hint-icon">💡</span>
-      <span>色を感じない文字は<wbr>設定しなくて大丈夫。<wbr>直感を大切に。</span>
-    </div>
   </div><!-- /.result-section -->
 
   </div><!-- /.main-wrap -->

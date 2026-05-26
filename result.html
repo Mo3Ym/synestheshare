@@ -592,11 +592,28 @@ nav ul a:hover { color: var(--ink); }
   position: relative; z-index: 1;
 }
 .card {
-  background: rgba(255,255,255,0.97);
-  border: 1px solid rgba(224,224,220,0.6);
-  border-radius: 14px;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: 1px solid rgba(255,255,255,0.55);
+  border-radius: 18px;
   padding: 1.5rem;
   scroll-margin-top: calc(var(--nav-h) + 1rem);
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.05),
+    0 0 1px rgba(255,255,255,0.6) inset;
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+  position: relative; overflow: hidden;
+  isolation: isolate;
+}
+@media (min-width: 768px) {
+  .card { padding: 1.75rem; border-radius: 22px; }
+}
+.card:hover {
+  box-shadow:
+    0 18px 50px rgba(0,0,0,0.07),
+    0 0 1px rgba(255,255,255,0.7) inset;
+  transform: translateY(-2px);
 }
 .section-eyebrow {
   font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;

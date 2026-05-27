@@ -135,7 +135,7 @@ nav ul a:hover { color: var(--ink); }
 .btn-primary-dark:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
 
 /* ══════════════════════════════════════
-   HERO — Blob背景グラデーション
+   HERO — 背景・大気エフェクト
 ══════════════════════════════════════ */
 .hero-wrap {
   position: relative; overflow: hidden;
@@ -144,25 +144,192 @@ nav ul a:hover { color: var(--ink); }
   background-position: center top;
 }
 .hero-blob { display: none; }
-/* スマホで見えやすくするため opacity を上げ、サイズをvwベースに */
-.hero-blob-1 {
-  width: max(420px, 85vw); height: max(420px, 85vw);
-  top: -15%; left: -15%;
-  animation: blobdrift 9s ease-in-out infinite alternate;
-}
-.hero-blob-2 {
-  width: max(360px, 70vw); height: max(360px, 70vw);
-  top: 20%; right: -15%;
-  animation: blobdrift 11s ease-in-out infinite alternate-reverse;
-}
-.hero-blob-3 {
-  width: max(300px, 60vw); height: max(300px, 60vw);
-  bottom: 0; left: 25%;
-  animation: blobdrift 13s ease-in-out infinite alternate;
-}
+.hero-blob-1 { width: max(420px, 85vw); height: max(420px, 85vw); top: -15%; left: -15%; }
+.hero-blob-2 { width: max(360px, 70vw); height: max(360px, 70vw); top: 20%; right: -15%; }
+.hero-blob-3 { width: max(300px, 60vw); height: max(300px, 60vw); bottom: 0; left: 25%; }
+
 @keyframes blobdrift {
   from { transform: translate(0,0) scale(1); }
   to   { transform: translate(24px,18px) scale(1.06); }
+}
+
+/* ── 底辺ヴィネット：空気の重さ ── */
+.hero-wrap::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    ellipse 110% 42% at 50% 108%,
+    rgba(8,6,20,0.22) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 大気層：2枚の光膜がゆっくり呼吸する ── */
+.hero-atmo {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+}
+.hero-atmo::before {
+  content: '';
+  position: absolute;
+  width: 130%; height: 130%;
+  top: -15%; left: -15%;
+  background: radial-gradient(
+    ellipse 65% 55% at 38% 48%,
+    rgba(255,110,80,0.52) 0%,
+    rgba(210,80,170,0.28) 42%,
+    transparent 68%
+  );
+  filter: blur(55px);
+  animation: atmoA 38s ease-in-out infinite alternate;
+}
+.hero-atmo::after {
+  content: '';
+  position: absolute;
+  width: 130%; height: 130%;
+  top: -15%; right: -20%;
+  background: radial-gradient(
+    ellipse 58% 62% at 62% 52%,
+    rgba(70,130,255,0.44) 0%,
+    rgba(130,70,220,0.26) 48%,
+    transparent 70%
+  );
+  filter: blur(65px);
+  animation: atmoB 52s ease-in-out infinite alternate-reverse;
+}
+@keyframes atmoA {
+  0%   { transform: translate(0,0)    scale(1)    rotate(0deg); }
+  40%  { transform: translate(7%,5%)  scale(1.05) rotate(10deg); }
+  70%  { transform: translate(-4%,8%) scale(0.97) rotate(-6deg); }
+  100% { transform: translate(4%,-6%) scale(1.03) rotate(14deg); }
+}
+@keyframes atmoB {
+  0%   { transform: translate(0,0)    scale(1); }
+  55%  { transform: translate(-9%,6%) scale(1.07); }
+  100% { transform: translate(5%,-4%) scale(0.96); }
+}
+
+/* ── 微粒子フィールド（背景画像の光点に合わせ白グロー） ── */
+.hero-p-a, .hero-p-b, .hero-p-c, .hero-p-d {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 小さな白光点 グループA（10個） */
+.hero-p-a {
+  box-shadow:
+     8vw  15vh 5px 1px rgba(255,255,255,0.88),
+    22vw  72vh 4px 1px rgba(255,255,255,0.82),
+    38vw  28vh 5px 1px rgba(255,255,255,0.85),
+    55vw  85vh 4px 1px rgba(255,255,255,0.80),
+    72vw  42vh 5px 1px rgba(255,255,255,0.86),
+    88vw  18vh 4px 1px rgba(255,255,255,0.82),
+    16vw  55vh 5px 1px rgba(255,255,255,0.88),
+    48vw  62vh 4px 1px rgba(255,255,255,0.80),
+    64vw   8vh 5px 1px rgba(255,255,255,0.84),
+    92vw  58vh 4px 1px rgba(255,255,255,0.82);
+  animation: particleDrift1 12s ease-in-out infinite alternate,
+             particlePulse   4s ease-in-out infinite;
+}
+
+/* 小さな白光点 グループB（10個） */
+.hero-p-b {
+  box-shadow:
+    14vw  38vh 5px 1px rgba(255,255,255,0.84),
+    32vw   5vh 4px 1px rgba(255,255,255,0.80),
+    50vw  75vh 5px 1px rgba(255,255,255,0.88),
+    68vw  32vh 4px 1px rgba(255,255,255,0.82),
+    85vw  65vh 5px 1px rgba(255,255,255,0.85),
+     5vw  82vh 4px 1px rgba(255,255,255,0.80),
+    42vw  45vh 5px 1px rgba(255,255,255,0.86),
+    78vw  88vh 4px 1px rgba(255,255,255,0.82),
+    26vw  22vh 5px 1px rgba(255,255,255,0.88),
+    95vw  12vh 4px 1px rgba(255,255,255,0.80);
+  animation: particleDrift2 17s ease-in-out infinite alternate-reverse,
+             particlePulse   5s ease-in-out infinite 1s;
+}
+
+/* 中サイズ・温かみグロー（8個） */
+.hero-p-c {
+  box-shadow:
+    18vw  48vh  9px 2px rgba(255,215,190,0.70),
+    45vw  20vh  8px 2px rgba(255,205,178,0.65),
+    72vw  68vh  9px 2px rgba(255,218,192,0.72),
+    30vw  90vh  8px 2px rgba(255,210,182,0.64),
+    60vw  35vh  9px 2px rgba(255,215,188,0.68),
+    10vw  62vh  8px 2px rgba(255,205,178,0.66),
+    88vw  40vh  9px 2px rgba(255,218,192,0.70),
+    52vw  78vh  8px 2px rgba(255,210,182,0.64);
+  animation: particleDrift3 14s ease-in-out infinite alternate,
+             particlePulse   5s ease-in-out infinite 0.5s;
+}
+
+/* 大きなボケ光点（6個） */
+.hero-p-d {
+  box-shadow:
+    25vw  60vh 18px 5px rgba(255,222,205,0.52),
+    62vw  15vh 16px 4px rgba(218,205,255,0.48),
+    80vw  78vh 20px 6px rgba(255,222,205,0.54),
+    10vw  30vh 15px 4px rgba(205,218,255,0.46),
+    48vw  50vh 18px 5px rgba(255,218,198,0.52),
+    90vw  25vh 16px 4px rgba(218,205,255,0.50);
+  animation: particleDrift4 20s ease-in-out infinite alternate-reverse,
+             particlePulse   6s ease-in-out infinite 1.5s;
+}
+
+@keyframes particleDrift1 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate( 28px,-45px); }
+}
+@keyframes particleDrift2 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate(-32px,-50px); }
+}
+@keyframes particleDrift3 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate( 22px,-38px); }
+}
+@keyframes particleDrift4 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate(-20px,-32px); }
+}
+@keyframes particlePulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.20; }
+}
+
+/* ── 波リボン（SVG・透視収束） ── */
+.hero-wave-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+/* 手前ほど大きく動き、奥ほど小さく動く（遠近感） */
+.wave-g1 { animation: waveDrift1 22s ease-in-out infinite alternate; }
+.wave-g2 { animation: waveDrift2 30s ease-in-out infinite alternate-reverse; }
+.wave-g3 { animation: waveDrift3 26s ease-in-out infinite alternate; }
+@keyframes waveDrift1 {
+  0%   { transform: translateY(  0px); }
+  100% { transform: translateY(-30px); }
+}
+@keyframes waveDrift2 {
+  0%   { transform: translateY( 0px); }
+  100% { transform: translateY(20px); }
+}
+@keyframes waveDrift3 {
+  0%   { transform: translateY(  0px); }
+  100% { transform: translateY(-14px); }
 }
 
 .hero {
@@ -812,6 +979,38 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="hero-blob hero-blob-1"></div>
   <div class="hero-blob hero-blob-2"></div>
   <div class="hero-blob hero-blob-3"></div>
+
+  <!-- 大気エフェクト：光膜 + 微粒子 -->
+  <div class="hero-atmo" aria-hidden="true"></div>
+  <div class="hero-p-a" aria-hidden="true"></div>
+  <div class="hero-p-b" aria-hidden="true"></div>
+  <div class="hero-p-c" aria-hidden="true"></div>
+  <div class="hero-p-d" aria-hidden="true"></div>
+
+  <!-- 波リボン：手前から奥へ収束する透視図法 -->
+  <svg class="hero-wave-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"
+       xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <filter id="wf" x="-10%" y="-100%" width="120%" height="300%">
+        <feGaussianBlur stdDeviation="2.0"/>
+      </filter>
+    </defs>
+    <!-- 波1：手前（低い・太い・明るい）→ 右奥へ収束 -->
+    <g class="wave-g1" filter="url(#wf)">
+      <path d="M -100,780 C 180,720 480,620 760,555 C 1000,500 1260,472 1540,465"
+            fill="none" stroke="white" stroke-width="3.0" opacity="0.34"/>
+    </g>
+    <!-- 波2：中間距離（間隔が広くまばら） -->
+    <g class="wave-g2" filter="url(#wf)">
+      <path d="M -100,620 C 200,590 460,558 750,530 C 1000,508 1260,496 1540,490"
+            fill="none" stroke="white" stroke-width="1.8" opacity="0.20"/>
+    </g>
+    <!-- 波3：一番奥（細く・薄く・手前と間隔大） -->
+    <g class="wave-g3" filter="url(#wf)">
+      <path d="M -100,900 C 160,830 440,720 740,648 C 990,592 1250,568 1540,558"
+            fill="none" stroke="white" stroke-width="1.3" opacity="0.13"/>
+    </g>
+  </svg>
 
   <section class="hero">
     <div class="hero-text">

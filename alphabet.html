@@ -153,6 +153,7 @@ nav ul a:hover { color: var(--ink); }
   background: transparent;
 }
 .page-blob { display: none; }
+.main-blob  { display: none; }
 .page-blob-1 {
   width: max(480px, 80vw); height: max(480px, 80vw);
   top: -25%; left: -12%;
@@ -217,13 +218,31 @@ nav ul a:hover { color: var(--ink); }
 .progress-count { font-family: var(--outfit); font-size: 0.8rem; font-weight: 700; color: var(--ink2); }
 .progress-count span { color: var(--c1); }
 .progress-track {
-  height: 3px; background: var(--border); border-radius: 100px; overflow: hidden;
+  height: 4px;
+  background: rgba(255,255,255,0.10);
+  border-radius: 100px;
 }
 .progress-fill {
   height: 100%; border-radius: 100px;
   background: linear-gradient(90deg, var(--c1), var(--c2)); /* 初期値、JS側で上書き */
   transition: width 0.4s cubic-bezier(.34,1.56,.64,1), background 0.6s ease;
+  position: relative; overflow: hidden;
+  box-shadow: 0 0 8px rgba(180,220,255,0.40), 0 0 2px rgba(255,255,255,0.45);
   width: 0%;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.30) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 2.4s ease-in-out infinite;
+}
+@keyframes progressShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 /* ══════════════════════════════════════
@@ -611,7 +630,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 .page-lead { color: rgba(255,255,255,0.62); }
 .progress-label { color: rgba(255,255,255,0.55); }
 .progress-count { color: rgba(255,255,255,0.75); }
-.progress-count span { color: var(--c1); }
 .mode-label { color: rgba(255,255,255,0.72); }
 .mode-label strong { color: rgba(255,255,255,0.9); }
 .btn-mode-toggle {
@@ -626,11 +644,51 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   box-shadow: none;
 }
 .alpha-bubble {
-  background: rgba(255,255,255,0.12);
-  border: 1.5px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.45);
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.18),
+    0 0 24px rgba(180,220,255,0.14),
+    inset 0 0 10px rgba(255,255,255,0.08);
 }
-.alpha-bubble span { color: rgba(255,255,255,0.85); }
-.alpha-cell:hover .alpha-bubble { box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.alpha-bubble span { color: rgba(255,255,255,0.82); }
+.alpha-cell:hover .alpha-bubble {
+  background: rgba(255,255,255,0.13);
+  border-color: rgba(255,255,255,0.65);
+  box-shadow:
+    0 0 14px rgba(255,255,255,0.28),
+    0 0 32px rgba(180,220,255,0.20),
+    inset 0 0 12px rgba(255,255,255,0.12);
+}
+/* 選択済み：result/index と同じガラス板光 */
+.alpha-cell.selected .alpha-bubble {
+  isolation: isolate;
+}
+.alpha-cell.selected .alpha-bubble::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+.alpha-cell.selected .alpha-bubble[data-bright="1"]::before {
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.48) 0%,
+    rgba(255,255,255,0.22) 22%,
+    rgba(255,255,255,0.08) 42%,
+    transparent 65%
+  );
+}
 </style>
 </head>
 <body>
@@ -996,6 +1054,11 @@ function isAchromatic(hex) {
 function isBright(hex) {
   return getLuminance(hex) > 0.88;
 }
+// 明色を少し暗くしてガラスグラデーションが見えるようにする（彩度を落として色みを中立に）
+function subtleDarken(hex) {
+  const { h, s, l } = rgbToHsl(hex);
+  return `hsl(${Math.round(h)},0%,${Math.round(l*0.82*100)}%)`;
+}
 // 選択色を暗くした「縁取り用カラー」を生成（黒にならないよう下限あり）
 function getDarkenedColor(hex) {
   const { h, s, l } = rgbToHsl(hex);
@@ -1020,32 +1083,34 @@ function applyColor(letter, color) {
   const span   = bubble.querySelector('span');
   if (color) {
     cell.classList.add('selected');
-    bubble.style.background = color;
     if (isBright(color)) {
-      // 淡色：白文字＋4方向shadowで袋文字
-      // 白の場合はパレット黒（#2b2d38）を縁取り色にする
-      const dark = color.toLowerCase() === '#fffdf9' ? '#2b2d38' : getDarkenedColor(color);
-      bubble.style.border = `1.5px solid ${dark}`;
-      bubble.style.boxShadow = 'none';
-      span.style.color = '#fffdf9';
-      span.style.textShadow = `1px 0 0 ${dark}, -1px 0 0 ${dark}, 0 1px 0 ${dark}, 0 -1px 0 ${dark}`;
+      // 淡色：少し暗くしてガラスグラデーションを可視化、ダーク文字＋inset縁（resultと同じ）
+      bubble.style.background = color;
+      bubble.setAttribute('data-bright', '1');
+      bubble.style.border = 'none';
+      bubble.style.boxShadow = '0 0 12px rgba(180,220,255,0.12), inset 0 0 0 1px rgba(0,0,0,0.08)';
+      span.style.color = '#9698a8';
+      span.style.textShadow = 'none';
       span.style.webkitTextStroke = '0';
     } else {
-      // 濃色：白文字、縁取りなし
+      // 濃色：白文字＋ガラス発光
+      bubble.style.background = color;
+      bubble.setAttribute('data-bright', '0');
       bubble.style.border = 'none';
-      bubble.style.boxShadow = 'none';
+      bubble.style.boxShadow = '0 0 12px rgba(180,220,255,0.12), inset 0 1px 0 rgba(255,255,255,0.20)';
       span.style.color = '#fffdf9';
       span.style.textShadow = 'none';
       span.style.webkitTextStroke = '0';
     }
   } else {
     cell.classList.remove('selected');
-    bubble.style.background = 'var(--white)';
-    bubble.style.border = '2.5px solid var(--border)';
-    bubble.style.boxShadow = 'none';
-    span.style.color = 'var(--ink3)';
-    span.style.textShadow = 'none';
-    span.style.webkitTextStroke = '0';
+    bubble.removeAttribute('data-bright');
+    bubble.style.background = '';
+    bubble.style.border = '';
+    bubble.style.boxShadow = '';
+    span.style.color = '';
+    span.style.textShadow = '';
+    span.style.webkitTextStroke = '';
   }
 }
 
@@ -1058,8 +1123,10 @@ function updateProgress() {
   const countEl = document.querySelector('.progress-count');
   if (done === total) {
     countEl.innerHTML = `<span style="color:#fffdf9">${done}</span> / <span style="color:#fffdf9">${total}</span>`;
+  } else if (done === 0) {
+    countEl.innerHTML = `<span style="color:var(--c1)">${done}</span> / ${total}`;
   } else {
-    countEl.innerHTML = `<span>${done}</span> / ${total}`;
+    countEl.innerHTML = `<span style="color:#fffdf9">${done}</span> / ${total}`;
   }
   progressFill.style.width = (done / total * 100) + '%';
   btnResult.disabled = done === 0;

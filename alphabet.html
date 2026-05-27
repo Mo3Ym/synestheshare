@@ -326,6 +326,11 @@ nav ul a:hover { color: var(--ink); }
   grid-template-columns: repeat(6, 1fr);
   max-width: 100%;
 }
+/* PC：円を少し小さく */
+@media (min-width: 641px) {
+  .alpha-grid.mode-10 { max-width: 360px; }
+  .alpha-grid.mode-26 { max-width: 440px; }
+}
 
 /* 正円 padding-topトリック */
 .alpha-cell { position: relative; cursor: pointer; }

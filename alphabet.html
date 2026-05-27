@@ -436,6 +436,10 @@ nav ul a:hover { color: var(--ink); }
   pointer-events: none;
   z-index: -1;
 }
+/* 透明色選択時：::before を非表示にして未選択円と同じ外観に */
+.picker-letter-preview.is-empty::before {
+  display: none;
+}
 .picker-title { font-family: var(--jp); font-weight: 700; font-size: 1rem; color: rgba(255,255,255,0.92); }
 .picker-title small { display: block; font-size: 0.75rem; color: rgba(255,255,255,0.45); font-weight: 300; margin-top: 0.1rem; }
 .picker-close {
@@ -447,7 +451,6 @@ nav ul a:hover { color: var(--ink); }
 
 /* プリセットカラースウォッチ */
 .swatches-section { margin-bottom: 1.25rem; }
-.swatches-label { font-family: var(--outfit); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 0.6rem; }
 .swatches {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -460,19 +463,16 @@ nav ul a:hover { color: var(--ink); }
 .swatch:hover { transform: scale(1.15); }
 .swatch.active { border-color: rgba(255,255,255,0.88); transform: scale(1.1); }
 
-/* 「色なし」スウォッチ */
+/* 「色なし」スウォッチ：alphabet 未選択円と同じダークガラス */
 .swatch-none {
-  background: white;
-  border: 2px solid var(--border) !important;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.45) !important;
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.15),
+    inset 0 0 8px rgba(255,255,255,0.06);
   position: relative;
-}
-.swatch-none::after {
-  content: '';
-  position: absolute; inset: 3px;
-  background: repeating-linear-gradient(
-    -45deg, rgba(180,180,180,0.4) 0px, rgba(180,180,180,0.4) 1.5px, transparent 1.5px, transparent 6px
-  );
-  border-radius: 50%;
 }
 
 /* カスタムカラー */
@@ -839,7 +839,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     </div>
 
     <div class="swatches-section">
-      <div class="swatches-label">よく使う色</div>
       <div class="swatches" id="swatches"></div>
     </div>
 
@@ -1001,12 +1000,14 @@ function selectPendingColor(color) {
 
 function updatePickerPreview(color) {
   if (color === null) {
+    pickerPreview.classList.add('is-empty');
     pickerPreview.style.background = '';
     pickerPreview.style.color = '';
     pickerPreview.style.border = '';
     pickerPreview.style.boxShadow = '';
     pickerPreview.style.textShadow = '';
   } else if (isBright(color)) {
+    pickerPreview.classList.remove('is-empty');
     const dark = color.toLowerCase() === '#fffdf9' ? '#2b2d38' : getDarkenedColor(color);
     pickerPreview.style.background = color;
     pickerPreview.style.color = dark;
@@ -1014,6 +1015,7 @@ function updatePickerPreview(color) {
     pickerPreview.style.boxShadow = '0 0 12px rgba(180,220,255,0.12), inset 0 0 0 1px rgba(0,0,0,0.08)';
     pickerPreview.style.textShadow = 'none';
   } else {
+    pickerPreview.classList.remove('is-empty');
     pickerPreview.style.background = color;
     pickerPreview.style.color = '#fffdf9';
     pickerPreview.style.border = 'none';

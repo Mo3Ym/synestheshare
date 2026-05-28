@@ -251,6 +251,23 @@ nav ul a:hover { color: var(--ink); }
 .main-outer {
   position: relative;
   background: transparent;
+  isolation: isolate;
+  min-height: 100svh;
+}
+/* 空気の膜：UI背後だけ静かに落ち着かせる */
+.main-outer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(8,10,20,0.12),
+    rgba(8,10,20,0.28)
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: none;
+  z-index: 0;
 }
 /* ABOUTセクション風blob */
 .main-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
@@ -706,23 +723,23 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   color: #fff;
 }
 .alpha-bubble {
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.45);
+  border: 2px solid rgba(255,255,255,0.38);
   box-shadow:
-    0 0 10px rgba(255,255,255,0.18),
-    0 0 24px rgba(180,220,255,0.14),
-    inset 0 0 10px rgba(255,255,255,0.08);
+    0 0 10px rgba(255,255,255,0.20),
+    0 0 24px rgba(180,220,255,0.16),
+    inset 0 0 10px rgba(255,255,255,0.06);
 }
 .alpha-bubble span { color: rgba(255,255,255,0.82); }
 .alpha-cell:hover .alpha-bubble {
-  background: rgba(255,255,255,0.13);
-  border-color: rgba(255,255,255,0.65);
+  background: rgba(255,255,255,0.11);
+  border-color: rgba(255,255,255,0.62);
   box-shadow:
     0 0 14px rgba(255,255,255,0.28),
     0 0 32px rgba(180,220,255,0.20),
-    inset 0 0 12px rgba(255,255,255,0.12);
+    inset 0 0 12px rgba(255,255,255,0.10);
 }
 /* 選択済み：result/index と同じガラス板光 */
 .alpha-cell.selected .alpha-bubble {

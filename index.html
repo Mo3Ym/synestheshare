@@ -316,20 +316,20 @@ nav ul a:hover { color: var(--ink); }
   z-index: 0;
 }
 /* 手前ほど大きく動き、奥ほど小さく動く（遠近感） */
-.wave-g1 { animation: waveDrift1 22s ease-in-out infinite alternate; }
-.wave-g2 { animation: waveDrift2 30s ease-in-out infinite alternate-reverse; }
-.wave-g3 { animation: waveDrift3 26s ease-in-out infinite alternate; }
+.wave-g1 { animation: waveDrift1 10s ease-in-out infinite alternate; }
+.wave-g2 { animation: waveDrift2 14s ease-in-out infinite alternate-reverse; }
+.wave-g3 { animation: waveDrift3 12s ease-in-out infinite alternate; }
 @keyframes waveDrift1 {
   0%   { transform: translateY(  0px); }
-  100% { transform: translateY(-30px); }
+  100% { transform: translateY(-42px); }
 }
 @keyframes waveDrift2 {
   0%   { transform: translateY( 0px); }
-  100% { transform: translateY(20px); }
+  100% { transform: translateY(32px); }
 }
 @keyframes waveDrift3 {
   0%   { transform: translateY(  0px); }
-  100% { transform: translateY(-14px); }
+  100% { transform: translateY(-24px); }
 }
 
 .hero {

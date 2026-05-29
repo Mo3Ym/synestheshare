@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Font Weight Tester — alphabet.html</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #111; color: #eee;
+  display: flex; height: 100vh; overflow: hidden;
+}
+#panel {
+  width: 300px; flex-shrink: 0; display: flex; flex-direction: column;
+  background: #1a1a1a; border-right: 1px solid #333; overflow-y: auto;
+}
+#panel-header {
+  padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid #2a2a2a;
+  position: sticky; top: 0; background: #1a1a1a; z-index: 10;
+}
+#panel-header h1 { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #888; }
+#status { font-size: 0.62rem; color: #555; margin-top: 0.3rem; }
+#status.ok  { color: #67bf92; }
+#status.err { color: #ff7f7f; }
+.group { padding: 0.9rem 1.25rem; border-bottom: 1px solid #222; }
+.group-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 0.75rem; }
+.row { display: flex; flex-direction: column; gap: 0.2rem; margin-bottom: 0.75rem; }
+.row:last-child { margin-bottom: 0; }
+.row-top { display: flex; justify-content: space-between; align-items: baseline; }
+.row-name { font-size: 0.72rem; color: #aaa; }
+.row-val  { font-size: 0.8rem; font-weight: 600; color: #fff; min-width: 32px; text-align: right; }
+.row-reset {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.6rem; color: #444; padding: 0 0 0 0.4rem;
+  line-height: 1; transition: color 0.15s; flex-shrink: 0;
+}
+.row-reset:hover { color: #ff7f7f; }
+.row-reset.changed { color: #666; }
+input[type=range] {
+  width: 100%; appearance: none; height: 3px; border-radius: 2px;
+  background: #333; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: #ff7f7f; cursor: pointer; transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+#copy-btn {
+  margin: 1rem 1.25rem; padding: 0.6rem;
+  background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px;
+  color: #aaa; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: background 0.15s, color 0.15s; text-align: center;
+}
+#copy-btn:hover { background: #333; color: #fff; }
+#copy-btn.copied { color: #67bf92; border-color: #67bf92; }
+#preview-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #1a1a1a; }
+#device-bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 0.75rem; background: #1a1a1a; border-bottom: 1px solid #2a2a2a; flex-shrink: 0;
+}
+.device-btn {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.7rem; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 4px;
+  color: #666; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+  cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; white-space: nowrap;
+}
+.device-btn:hover { background: #333; color: #aaa; }
+.device-btn.active { background: #2e2e2e; border-color: #ff7f7f; color: #ff7f7f; }
+#device-size-label { margin-left: auto; font-size: 0.62rem; color: #444; letter-spacing: 0.06em; }
+#preview-container { flex: 1; overflow: auto; display: flex; justify-content: center; background: #222; }
+#preview {
+  border: none; display: block; height: 100%; flex-shrink: 0; background: #fff;
+  transition: width 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s ease;
+}
+#preview.device-mobile, #preview.device-tablet {
+  box-shadow: 0 0 0 1px #333, 0 8px 40px rgba(0,0,0,0.5);
+  margin: 1rem auto; height: calc(100% - 2rem);
+}
+</style>
+</head>
+<body>
+<div id="panel">
+  <div id="panel-header">
+    <h1>Font Tester — alphabet</h1>
+    <div id="status">読み込み待機中...</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="group">
+    <div class="group-label">Page Hero</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">page-title ベース</span><span class="row-val" id="v-page-title">340</span><button class="row-reset" onclick="resetSlider('page-title')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="page-title" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">page-title strong / hl-red</span><span class="row-val" id="v-page-title-strong">340</span><button class="row-reset" onclick="resetSlider('page-title-strong')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="page-title-strong" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">page-lead</span><span class="row-val" id="v-page-lead">340</span><button class="row-reset" onclick="resetSlider('page-lead')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="page-lead" data-default="340" oninput="update(this)">
+    </div>
+  </div>
+
+  <!-- UI -->
+  <div class="group">
+    <div class="group-label">文字選択 UI</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">mode-label strong</span><span class="row-val" id="v-mode-label-strong">340</span><button class="row-reset" onclick="resetSlider('mode-label-strong')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="mode-label-strong" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">result-title</span><span class="row-val" id="v-result-title">340</span><button class="row-reset" onclick="resetSlider('result-title')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="result-title" data-default="340" oninput="update(this)">
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="group">
+    <div class="group-label">ボタン</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">btn-mode-toggle</span><span class="row-val" id="v-btn-mode">400</span><button class="row-reset" onclick="resetSlider('btn-mode')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="btn-mode" data-default="400" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">btn-result（結果を見る）</span><span class="row-val" id="v-btn-result">400</span><button class="row-reset" onclick="resetSlider('btn-result')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="btn-result" data-default="400" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">btn-reset（リセット）</span><span class="row-val" id="v-btn-reset">400</span><button class="row-reset" onclick="resetSlider('btn-reset')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="btn-reset" data-default="400" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">btn-clear / btn-decide（ピッカー）</span><span class="row-val" id="v-btn-picker">400</span><button class="row-reset" onclick="resetSlider('btn-picker')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="btn-picker" data-default="400" oninput="update(this)">
+    </div>
+  </div>
+
+  <!-- EFFECTS -->
+  <div class="group">
+    <div class="group-label">背景・演出</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">黒い膜の暗さ（底辺 opacity %）</span><span class="row-val" id="v-membrane">28</span><button class="row-reset" onclick="resetSlider('membrane')" title="↺">↺</button></div>
+      <input type="range" min="0" max="100" step="1" value="28" data-target="membrane" data-default="28" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">タイトルブラー半径（px）</span><span class="row-val" id="v-title-blur">22</span><button class="row-reset" onclick="resetSlider('title-blur')" title="↺">↺</button></div>
+      <input type="range" min="0" max="80" step="1" value="22" data-target="title-blur" data-default="22" oninput="update(this)">
+    </div>
+  </div>
+
+  <button id="copy-btn" onclick="copyCSS()">CSS をコピー</button>
+</div>
+
+<div id="preview-area">
+  <div id="device-bar">
+    <button class="device-btn" onclick="setDevice('pc')" id="btn-pc">🖥 PC</button>
+    <button class="device-btn" onclick="setDevice('tablet')" id="btn-tablet">▭ タブレット <span style="opacity:.5">768px</span></button>
+    <button class="device-btn active" onclick="setDevice('mobile')" id="btn-mobile">📱 スマホ <span style="opacity:.5">390px</span></button>
+    <span id="device-size-label">390px（スマホ）</span>
+  </div>
+  <div id="preview-container">
+    <iframe id="preview" src="alphabet.html"></iframe>
+  </div>
+</div>
+
+<script>
+const weights = {
+  'page-title':        340,
+  'page-title-strong': 340,
+  'page-lead':         340,
+  'mode-label-strong': 340,
+  'result-title':      340,
+  'btn-mode':          400,
+  'btn-result':        400,
+  'btn-reset':         400,
+  'btn-picker':        400,
+  'membrane':          28,
+  'title-blur':        22,
+};
+
+function buildCSS(w) {
+  // 膜の暗さ：値がそのまま bottom opacity(%)。top は bottom × (12/28) の比率
+  const bottomOp = (w['membrane'] / 100).toFixed(3);
+  const topOp    = (w['membrane'] / 100 * (12 / 28)).toFixed(3);
+
+  // タイトルブラー：内側=v, 外側=v×2.3
+  const b1 = w['title-blur'];
+  const b2 = Math.round(b1 * 2.3);
+  const br1 = Math.round(b1 * 0.82);
+  const br2 = Math.round(b1 * 1.73);
+
+  return `
+.page-title { font-weight: ${w['page-title']} !important; }
+.page-title strong, .page-title .hl-red { font-weight: ${w['page-title-strong']} !important; }
+.page-lead { font-weight: ${w['page-lead']} !important; }
+.mode-label strong { font-weight: ${w['mode-label-strong']} !important; }
+.result-title { font-weight: ${w['result-title']} !important; }
+.btn-mode-toggle { font-weight: ${w['btn-mode']} !important; }
+.btn-result { font-weight: ${w['btn-result']} !important; }
+.btn-reset { font-weight: ${w['btn-reset']} !important; }
+.btn-clear, .btn-decide { font-weight: ${w['btn-picker']} !important; }
+.main-outer::before { background: linear-gradient(to bottom, rgba(8,10,20,${topOp}), rgba(8,10,20,${bottomOp})) !important; }
+.page-title { text-shadow: 0 0 ${b1}px rgba(255,255,255,0.20), 0 0 ${b2}px rgba(255,255,255,0.09) !important; }
+.page-title .hl-red { text-shadow: 0 0 ${br1}px rgba(255,127,127,0.50), 0 0 ${br2}px rgba(255,127,127,0.25) !important; }
+`.trim();
+}
+
+const iframe  = document.getElementById('preview');
+const status  = document.getElementById('status');
+const sizeLabel = document.getElementById('device-size-label');
+
+const DEVICES = {
+  pc:     { width: null, label: 'PC（全幅）' },
+  tablet: { width: 768,  label: '768px（タブレット）' },
+  mobile: { width: 390,  label: '390px（スマホ）' },
+};
+
+function setDevice(key) {
+  const d = DEVICES[key];
+  ['pc','tablet','mobile'].forEach(k => document.getElementById('btn-'+k).classList.toggle('active', k===key));
+  if (d.width) {
+    iframe.style.width = d.width + 'px';
+    iframe.classList.add('device-' + (key==='tablet'?'tablet':'mobile'));
+    iframe.classList.remove('device-' + (key==='tablet'?'mobile':'tablet'));
+    document.getElementById('preview-container').style.alignItems = 'flex-start';
+  } else {
+    iframe.style.width = '100%';
+    iframe.classList.remove('device-mobile','device-tablet');
+    iframe.style.margin = ''; iframe.style.height = '100%';
+    document.getElementById('preview-container').style.alignItems = '';
+  }
+  sizeLabel.textContent = d.label;
+}
+setDevice('mobile');
+
+function inject() {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    let tag = doc.getElementById('__fw');
+    if (!tag) { tag = doc.createElement('style'); tag.id = '__fw'; doc.head.appendChild(tag); }
+    tag.textContent = buildCSS(weights);
+    status.textContent = '✓ 読み込み完了 — スライダーで調整';
+    status.className = 'ok';
+  } catch(e) {
+    status.textContent = '⚠ http://localhost:3000/font-tester-alphabet.html で開いてください';
+    status.className = 'err';
+  }
+}
+iframe.addEventListener('load', inject);
+
+function update(input) {
+  const key = input.dataset.target;
+  weights[key] = parseInt(input.value);
+  document.getElementById('v-' + key).textContent = input.value;
+  const btn = input.closest('.row').querySelector('.row-reset');
+  if (btn) btn.classList.toggle('changed', parseInt(input.value) !== parseInt(input.dataset.default));
+  inject();
+}
+
+function resetSlider(key) {
+  const input = document.querySelector(`input[data-target="${key}"]`);
+  if (!input) return;
+  const def = parseInt(input.dataset.default);
+  input.value = def; weights[key] = def;
+  document.getElementById('v-' + key).textContent = def;
+  input.closest('.row').querySelector('.row-reset').classList.remove('changed');
+  inject();
+}
+
+function copyCSS() {
+  navigator.clipboard.writeText(buildCSS(weights)).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ コピーしました'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'CSS をコピー'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

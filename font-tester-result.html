@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Font Weight Tester — result.html</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #111; color: #eee;
+  display: flex; height: 100vh; overflow: hidden;
+}
+#panel {
+  width: 300px; flex-shrink: 0; display: flex; flex-direction: column;
+  background: #1a1a1a; border-right: 1px solid #333; overflow-y: auto;
+}
+#panel-header {
+  padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid #2a2a2a;
+  position: sticky; top: 0; background: #1a1a1a; z-index: 10;
+}
+#panel-header h1 { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #888; }
+#status { font-size: 0.62rem; color: #555; margin-top: 0.3rem; }
+#status.ok  { color: #67bf92; }
+#status.err { color: #ff7f7f; }
+.group { padding: 0.9rem 1.25rem; border-bottom: 1px solid #222; }
+.group-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 0.75rem; }
+.row { display: flex; flex-direction: column; gap: 0.2rem; margin-bottom: 0.75rem; }
+.row:last-child { margin-bottom: 0; }
+.row-top { display: flex; justify-content: space-between; align-items: baseline; }
+.row-name { font-size: 0.72rem; color: #aaa; }
+.row-val  { font-size: 0.8rem; font-weight: 600; color: #fff; min-width: 32px; text-align: right; }
+.row-reset {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.6rem; color: #444; padding: 0 0 0 0.4rem;
+  line-height: 1; transition: color 0.15s; flex-shrink: 0;
+}
+.row-reset:hover { color: #ff7f7f; }
+.row-reset.changed { color: #666; }
+input[type=range] {
+  width: 100%; appearance: none; height: 3px; border-radius: 2px;
+  background: #333; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: #ff7f7f; cursor: pointer; transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+#copy-btn {
+  margin: 1rem 1.25rem; padding: 0.6rem;
+  background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px;
+  color: #aaa; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: background 0.15s, color 0.15s; text-align: center;
+}
+#copy-btn:hover { background: #333; color: #fff; }
+#copy-btn.copied { color: #67bf92; border-color: #67bf92; }
+#preview-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #1a1a1a; }
+#device-bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 0.75rem; background: #1a1a1a; border-bottom: 1px solid #2a2a2a; flex-shrink: 0;
+}
+.device-btn {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.7rem; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 4px;
+  color: #666; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+  cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; white-space: nowrap;
+}
+.device-btn:hover { background: #333; color: #aaa; }
+.device-btn.active { background: #2e2e2e; border-color: #ff7f7f; color: #ff7f7f; }
+#device-size-label { margin-left: auto; font-size: 0.62rem; color: #444; letter-spacing: 0.06em; }
+#preview-container { flex: 1; overflow: auto; display: flex; justify-content: center; background: #222; }
+#preview {
+  border: none; display: block; height: 100%; flex-shrink: 0; background: #fff;
+  transition: width 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s ease;
+}
+#preview.device-mobile, #preview.device-tablet {
+  box-shadow: 0 0 0 1px #333, 0 8px 40px rgba(0,0,0,0.5);
+  margin: 1rem auto; height: calc(100% - 2rem);
+}
+</style>
+</head>
+<body>
+<div id="panel">
+  <div id="panel-header">
+    <h1>Font Tester — result</h1>
+    <div id="status">読み込み待機中...</div>
+  </div>
+
+  <!-- TYPE HERO -->
+  <div class="group">
+    <div class="group-label">Type Hero</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">type-label（あなたの共感覚タイプ）</span><span class="row-val" id="v-type-label">340</span><button class="row-reset" onclick="resetSlider('type-label')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="type-label" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">type-name-diag（診断名）</span><span class="row-val" id="v-type-name-diag">340</span><button class="row-reset" onclick="resetSlider('type-name-diag')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="type-name-diag" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">type-stat-type（統計タイプ）</span><span class="row-val" id="v-type-stat-type">400</span><button class="row-reset" onclick="resetSlider('type-stat-type')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="type-stat-type" data-default="400" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">type-tagline</span><span class="row-val" id="v-type-tagline">340</span><button class="row-reset" onclick="resetSlider('type-tagline')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="type-tagline" data-default="340" oninput="update(this)">
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="group">
+    <div class="group-label">コンテンツセクション</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">section-title</span><span class="row-val" id="v-section-title">340</span><button class="row-reset" onclick="resetSlider('section-title')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="section-title" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">sense-col-label</span><span class="row-val" id="v-sense-col-label">340</span><button class="row-reset" onclick="resetSlider('sense-col-label')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="sense-col-label" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">diag-type-main（診断コメント見出し）</span><span class="row-val" id="v-diag-type-main">340</span><button class="row-reset" onclick="resetSlider('diag-type-main')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="diag-type-main" data-default="340" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">diag-basis strong</span><span class="row-val" id="v-diag-basis-strong">340</span><button class="row-reset" onclick="resetSlider('diag-basis-strong')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="diag-basis-strong" data-default="340" oninput="update(this)">
+    </div>
+  </div>
+
+  <!-- SHARE -->
+  <div class="group">
+    <div class="group-label">シェアカード</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">share-card-title</span><span class="row-val" id="v-share-card-title">340</span><button class="row-reset" onclick="resetSlider('share-card-title')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="340" data-target="share-card-title" data-default="340" oninput="update(this)">
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="group">
+    <div class="group-label">ボタン</div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">btn-diag（最初から診断する）</span><span class="row-val" id="v-btn-diag">400</span><button class="row-reset" onclick="resetSlider('btn-diag')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="btn-diag" data-default="400" oninput="update(this)">
+    </div>
+    <div class="row">
+      <div class="row-top"><span class="row-name">btn-back（診断に戻る）</span><span class="row-val" id="v-btn-back">400</span><button class="row-reset" onclick="resetSlider('btn-back')" title="↺">↺</button></div>
+      <input type="range" min="100" max="900" step="10" value="400" data-target="btn-back" data-default="400" oninput="update(this)">
+    </div>
+  </div>
+
+  <button id="copy-btn" onclick="copyCSS()">CSS をコピー</button>
+</div>
+
+<div id="preview-area">
+  <div id="device-bar">
+    <button class="device-btn" onclick="setDevice('pc')" id="btn-pc">🖥 PC</button>
+    <button class="device-btn" onclick="setDevice('tablet')" id="btn-tablet">▭ タブレット <span style="opacity:.5">768px</span></button>
+    <button class="device-btn active" onclick="setDevice('mobile')" id="btn-mobile">📱 スマホ <span style="opacity:.5">390px</span></button>
+    <span id="device-size-label">390px（スマホ）</span>
+  </div>
+  <div id="preview-container">
+    <iframe id="preview" src="result.html?id=test"></iframe>
+  </div>
+</div>
+
+<script>
+const weights = {
+  'type-label':        340,
+  'type-name-diag':    340,
+  'type-stat-type':    400,
+  'type-tagline':      340,
+  'section-title':     340,
+  'sense-col-label':   340,
+  'diag-type-main':    340,
+  'diag-basis-strong': 340,
+  'share-card-title':  340,
+  'btn-diag':          400,
+  'btn-back':          400,
+};
+
+function buildCSS(w) {
+  return `
+.type-label { font-weight: ${w['type-label']} !important; }
+.type-name-diag { font-weight: ${w['type-name-diag']} !important; }
+.type-stat-type { font-weight: ${w['type-stat-type']} !important; }
+.type-tagline { font-weight: ${w['type-tagline']} !important; }
+.section-title { font-weight: ${w['section-title']} !important; }
+.sense-col-label { font-weight: ${w['sense-col-label']} !important; }
+.diag-type-main { font-weight: ${w['diag-type-main']} !important; }
+.diag-basis strong { font-weight: ${w['diag-basis-strong']} !important; }
+.share-card-title { font-weight: ${w['share-card-title']} !important; }
+.btn-diag { font-weight: ${w['btn-diag']} !important; }
+.btn-back { font-weight: ${w['btn-back']} !important; }
+`.trim();
+}
+
+const iframe  = document.getElementById('preview');
+const status  = document.getElementById('status');
+const sizeLabel = document.getElementById('device-size-label');
+
+const DEVICES = {
+  pc:     { width: null, label: 'PC（全幅）' },
+  tablet: { width: 768,  label: '768px（タブレット）' },
+  mobile: { width: 390,  label: '390px（スマホ）' },
+};
+
+function setDevice(key) {
+  const d = DEVICES[key];
+  ['pc','tablet','mobile'].forEach(k => document.getElementById('btn-'+k).classList.toggle('active', k===key));
+  if (d.width) {
+    iframe.style.width = d.width + 'px';
+    iframe.classList.add('device-' + (key==='tablet'?'tablet':'mobile'));
+    iframe.classList.remove('device-' + (key==='tablet'?'mobile':'tablet'));
+    document.getElementById('preview-container').style.alignItems = 'flex-start';
+  } else {
+    iframe.style.width = '100%';
+    iframe.classList.remove('device-mobile','device-tablet');
+    iframe.style.margin = ''; iframe.style.height = '100%';
+    document.getElementById('preview-container').style.alignItems = '';
+  }
+  sizeLabel.textContent = d.label;
+}
+setDevice('mobile');
+
+function inject() {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    let tag = doc.getElementById('__fw');
+    if (!tag) { tag = doc.createElement('style'); tag.id = '__fw'; doc.head.appendChild(tag); }
+    tag.textContent = buildCSS(weights);
+    status.textContent = '✓ 読み込み完了 — スライダーで調整';
+    status.className = 'ok';
+  } catch(e) {
+    status.textContent = '⚠ http://localhost:3000/font-tester-result.html で開いてください';
+    status.className = 'err';
+  }
+}
+iframe.addEventListener('load', inject);
+
+function update(input) {
+  const key = input.dataset.target;
+  weights[key] = parseInt(input.value);
+  document.getElementById('v-' + key).textContent = input.value;
+  const btn = input.closest('.row').querySelector('.row-reset');
+  if (btn) btn.classList.toggle('changed', parseInt(input.value) !== parseInt(input.dataset.default));
+  inject();
+}
+
+function resetSlider(key) {
+  const input = document.querySelector(`input[data-target="${key}"]`);
+  if (!input) return;
+  const def = parseInt(input.dataset.default);
+  input.value = def; weights[key] = def;
+  document.getElementById('v-' + key).textContent = def;
+  input.closest('.row').querySelector('.row-reset').classList.remove('changed');
+  inject();
+}
+
+function copyCSS() {
+  navigator.clipboard.writeText(buildCSS(weights)).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ コピーしました'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'CSS をコピー'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

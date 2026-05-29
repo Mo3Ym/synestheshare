@@ -696,8 +696,18 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 /* ── テキスト白文字化 ── */
 .page-eyebrow { color: rgba(255,255,255,0.72); }
 .page-eyebrow::before { background: rgba(255,255,255,0.35); }
-.page-title { color: rgba(255,255,255,0.95); }
-.page-title .hl-red { color: var(--c1); }
+.page-title {
+  color: rgba(255,255,255,0.95);
+  text-shadow:
+    0 0 22px rgba(255,255,255,0.20),
+    0 0 50px rgba(255,255,255,0.09);
+}
+.page-title .hl-red {
+  color: var(--c1);
+  text-shadow:
+    0 0 18px rgba(255,127,127,0.50),
+    0 0 38px rgba(255,127,127,0.25);
+}
 .page-lead { color: rgba(255,255,255,0.62); }
 .progress-label { color: rgba(255,255,255,0.55); }
 .progress-count { color: rgba(255,255,255,0.75); }

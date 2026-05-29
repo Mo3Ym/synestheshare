@@ -192,7 +192,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* あなたの共感覚タイプ ラベル */
 .type-label {
-  font-family: var(--jp); font-weight: 340;
+  font-family: var(--jp); font-weight: 500;
   font-size: 0.69rem; line-height: 1;
   letter-spacing: 0.02em;
   margin-top: -3px;
@@ -640,7 +640,7 @@ nav ul a:hover { color: var(--ink); }
   margin-bottom: 0.35rem;
 }
 .section-title {
-  font-family: var(--jp); font-weight: 340; font-size: 1rem;
+  font-family: var(--jp); font-weight: 500; font-size: 1rem;
   margin-bottom: 1.25rem; color: var(--ink);
 }
 
@@ -715,8 +715,8 @@ nav ul a:hover { color: var(--ink); }
 }
 .sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
 .sense-col-label {
-  font-family: var(--jp); font-weight: 340; font-size: 1rem;
-  color: var(--c1);
+  font-family: var(--jp); font-weight: 500; font-size: 1rem;
+  color: var(--ink);
 }
 .sense-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
 
@@ -832,8 +832,8 @@ nav ul a:hover { color: var(--ink); }
   padding-left: calc(28px + 0.6rem);
 }
 .vote-legend-item { display: flex; align-items: baseline; gap: 0.28rem; }
-.vote-legend-item.is-mine .vote-legend-label { font-weight: 700; color: var(--ink); }
-.vote-legend-item.is-mine .vote-legend-pct { color: var(--ink); }
+.vote-legend-item.is-mine .vote-legend-label { }
+.vote-legend-item.is-mine .vote-legend-pct { }
 .vote-legend-dot {
   width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.08); align-self: center;
@@ -918,12 +918,12 @@ nav ul a:hover { color: var(--ink); }
   display: flex; flex-direction: column; gap: 0.6rem;
 }
 .diag-type-main {
-  font-family: var(--jp); font-weight: 340;
+  font-family: var(--jp); font-weight: 700;
   font-size: clamp(1.35rem, 4vw, 1.7rem);
   color: var(--c1); line-height: 1.2; letter-spacing: -0.01em;
 }
 .diag-type-desc {
-  font-size: 0.8rem; color: var(--ink3);
+  font-size: 0.8rem; color: var(--ink);
   line-height: 1.8; border-left: 2.5px solid var(--border);
   padding-left: 0.85rem; margin-top: 0.1rem;
 }
@@ -935,7 +935,7 @@ nav ul a:hover { color: var(--ink); }
   font-size: 0.72rem; color: var(--ink3); line-height: 1.7;
   display: block;
 }
-.diag-basis strong { color: var(--c1); font-weight: 340; }
+.diag-basis strong { color: var(--ink3); font-weight: 700; }
 .diag-basis-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.12em; text-transform: uppercase;

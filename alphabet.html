@@ -31,7 +31,7 @@
 <title>アルファベット診断 — SynestheShare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -192,17 +192,17 @@ nav ul a:hover { color: var(--ink); }
 .page-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
 
 .page-title {
-  font-family: var(--jp); font-weight: 300;
+  font-family: var(--jp); font-weight: 340;
   font-size: clamp(2rem, 4.5vw, 3.2rem);
   line-height: 1.2; letter-spacing: -0.01em;
   word-break: keep-all; overflow-wrap: break-word;
 }
-.page-title strong { font-weight: 700; }
-.page-title .hl-red  { color: var(--c1); font-weight: 700; }
+.page-title strong { font-weight: 340; }
+.page-title .hl-red  { color: var(--c1); font-weight: 340; }
 
 .page-lead {
   font-size: 0.88rem; color: var(--ink2); line-height: 1.85;
-  max-width: 480px; font-weight: 300;
+  max-width: 480px; font-weight: 340;
   word-break: keep-all; overflow-wrap: break-word;
 }
 
@@ -307,14 +307,14 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3);
 }
-.mode-label strong { color: var(--ink2); font-size: 0.85rem; letter-spacing: 0; text-transform: none; font-family: var(--jp); }
+.mode-label strong { color: var(--c1); font-size: 0.85rem; letter-spacing: 0; text-transform: none; font-family: var(--jp); font-weight: 340; }
 .btn-mode-toggle {
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.45rem 1.1rem; border-radius: 100px;
   border: 1.5px solid var(--border);
   background: rgba(255,255,255,0.7);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  cursor: pointer; font-family: var(--jp); font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; font-family: var(--jp); font-size: 0.78rem; font-weight: 400;
   color: var(--ink2); transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
 }
@@ -509,14 +509,14 @@ nav ul a:hover { color: var(--ink); }
 .btn-clear {
   flex: 1; padding: 0.7rem; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.20); background: rgba(255,255,255,0.06); cursor: pointer;
-  font-family: var(--jp); font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.70);
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 400; color: rgba(255,255,255,0.70);
   transition: background 0.15s, color 0.15s;
 }
 .btn-clear:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); }
 .btn-decide {
   flex: 2; padding: 0.7rem; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.28); cursor: pointer;
-  font-family: var(--jp); font-size: 0.82rem; font-weight: 700; color: #fff;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 400; color: #fff;
   background: rgba(255,90,90,0.88);
   backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.28);
@@ -533,7 +533,7 @@ nav ul a:hover { color: var(--ink); }
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
 }
-.result-title { font-family: var(--jp); font-weight: 700; font-size: 1rem; }
+.result-title { font-family: var(--jp); font-weight: 340; font-size: 1rem; color: rgba(255,255,255,0.92); }
 .result-meta { font-family: var(--outfit); font-size: 0.72rem; color: var(--ink3); letter-spacing: 0.06em; }
 
 .result-palette {
@@ -565,7 +565,7 @@ nav ul a:hover { color: var(--ink); }
   backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%);
   border: 1px solid rgba(255,255,255,0.28);
   border-radius: 100px; color: #fff;
-  font-family: var(--jp); font-weight: 700; font-size: 0.9rem;
+  font-family: var(--jp); font-weight: 400; font-size: 0.9rem;
   letter-spacing: 0.04em;
   transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   display: inline-flex; align-items: center; gap: 0.4rem;
@@ -614,7 +614,7 @@ nav ul a:hover { color: var(--ink); }
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
-  font-family: var(--jp); font-size: 0.82rem; font-weight: 700;
+  font-family: var(--jp); font-size: 0.82rem; font-weight: 400;
   color: rgba(255,255,255,0.65);
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
@@ -702,7 +702,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 .progress-label { color: rgba(255,255,255,0.55); }
 .progress-count { color: rgba(255,255,255,0.75); }
 .mode-label { color: rgba(255,255,255,0.72); }
-.mode-label strong { color: rgba(255,255,255,0.9); }
+.mode-label strong { color: var(--c1); font-weight: 340; }
 .btn-mode-toggle {
   color: rgba(255,255,255,0.85);
   background: rgba(255,255,255,0.12);

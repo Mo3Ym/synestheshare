@@ -47,7 +47,7 @@
 <title>診断結果 — SynestheShare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
 <!-- Firebase SDK -->
 <script type="importmap">
 {
@@ -192,7 +192,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* あなたの共感覚タイプ ラベル */
 .type-label {
-  font-family: var(--jp); font-weight: 300;
+  font-family: var(--jp); font-weight: 340;
   font-size: 0.69rem; line-height: 1;
   letter-spacing: 0.02em;
   margin-top: -3px;
@@ -203,7 +203,7 @@ nav ul a:hover { color: var(--ink); }
   display: flex; flex-direction: column; gap: 0.1em;
 }
 .type-name-diag {
-  font-family: var(--jp); font-weight: 700;
+  font-family: var(--jp); font-weight: 340;
   font-size: 1.3rem;
   line-height: 1.15; letter-spacing: -0.02em;
   margin-top: 17px;
@@ -308,7 +308,7 @@ nav ul a:hover { color: var(--ink); }
 .type-stat-sub { font-size: 0.62rem; color: var(--ink3); line-height: 1.3; }
 /* タイプ診断欄（日本語は視覚的に圧力が強いため数値より少し小さく） */
 .type-stat-type {
-  font-family: var(--jp); font-weight: 700;
+  font-family: var(--jp); font-weight: 400;
   font-size: clamp(1.15rem, 3.5vw, 1.55rem); line-height: 1.15;
   color: var(--ink);
   margin-top: 0.05rem;
@@ -324,7 +324,7 @@ nav ul a:hover { color: var(--ink); }
 /* タグライン */
 .type-tagline {
   font-size: 0.8rem; color: var(--ink2);
-  line-height: 1.9; font-weight: 300;
+  line-height: 1.9; font-weight: 340;
 }
 
 /* ── 統合統計カード（“空気の層”として背景に溶け込む半透明ガラス） ── */
@@ -640,7 +640,7 @@ nav ul a:hover { color: var(--ink); }
   margin-bottom: 0.35rem;
 }
 .section-title {
-  font-family: var(--jp); font-weight: 700; font-size: 1rem;
+  font-family: var(--jp); font-weight: 340; font-size: 1rem;
   margin-bottom: 1.25rem; color: var(--ink);
 }
 
@@ -715,8 +715,8 @@ nav ul a:hover { color: var(--ink); }
 }
 .sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
 .sense-col-label {
-  font-family: var(--jp); font-weight: 700; font-size: 1rem;
-  color: var(--ink);
+  font-family: var(--jp); font-weight: 340; font-size: 1rem;
+  color: var(--c1);
 }
 .sense-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
 
@@ -918,9 +918,9 @@ nav ul a:hover { color: var(--ink); }
   display: flex; flex-direction: column; gap: 0.6rem;
 }
 .diag-type-main {
-  font-family: var(--jp); font-weight: 700;
+  font-family: var(--jp); font-weight: 340;
   font-size: clamp(1.35rem, 4vw, 1.7rem);
-  color: var(--ink); line-height: 1.2; letter-spacing: -0.01em;
+  color: var(--c1); line-height: 1.2; letter-spacing: -0.01em;
 }
 .diag-type-desc {
   font-size: 0.8rem; color: var(--ink3);
@@ -935,7 +935,7 @@ nav ul a:hover { color: var(--ink); }
   font-size: 0.72rem; color: var(--ink3); line-height: 1.7;
   display: block;
 }
-.diag-basis strong { color: var(--ink2); font-weight: 700; }
+.diag-basis strong { color: var(--c1); font-weight: 340; }
 .diag-basis-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.12em; text-transform: uppercase;
@@ -962,7 +962,7 @@ nav ul a:hover { color: var(--ink); }
   text-transform: uppercase; color: var(--ink3);
 }
 .share-card-title {
-  font-family: var(--jp); font-weight: 700; font-size: 1rem;
+  font-family: var(--jp); font-weight: 340; font-size: 1rem;
   color: var(--ink); line-height: 1.3;
 }
 .share-card-palette { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 0.15rem; }
@@ -1011,7 +1011,7 @@ nav ul a:hover { color: var(--ink); }
   padding: 0.7rem 1.3rem; border-radius: 100px;
   background: transparent; color: var(--ink3);
   border: 1.5px solid var(--border); cursor: pointer;
-  font-family: var(--jp); font-weight: 700; font-size: 0.78rem;
+  font-family: var(--jp); font-weight: 400; font-size: 0.78rem;
   text-decoration: none; transition: background 0.15s, color 0.15s;
 }
 .btn-back:hover { background: var(--border); color: var(--ink); }
@@ -1020,7 +1020,7 @@ nav ul a:hover { color: var(--ink); }
   position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: var(--white);
   padding: 0.65rem 1.3rem; border-radius: 100px;
-  font-family: var(--jp); font-size: 0.8rem; font-weight: 700;
+  font-family: var(--jp); font-size: 0.8rem; font-weight: 400;
   opacity: 0; transition: opacity 0.2s, transform 0.3s;
   pointer-events: none; white-space: nowrap; z-index: 500;
 }
@@ -1046,7 +1046,7 @@ nav ul a:hover { color: var(--ink); }
   backdrop-filter: blur(10px) saturate(140%);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
   border: 1px solid rgba(255,255,255,0.28);
-  font-family: var(--jp); font-weight: 700; font-size: 0.9rem;
+  font-family: var(--jp); font-weight: 400; font-size: 0.9rem;
   text-decoration: none; letter-spacing: 0.04em;
   box-shadow:
     0 0  8px rgba(255, 90, 80,0.70),

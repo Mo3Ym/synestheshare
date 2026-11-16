@@ -953,8 +953,14 @@ nav ul a:hover { color: var(--ink); }
 .share-card-preview {
   border-radius: 10px; overflow: hidden;
   border: 1px solid rgba(0,0,0,0.08);
-  background: var(--bg); padding: 1.25rem;
+  background: var(--bg);
   position: relative;
+}
+.share-card-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
 }
 .share-card-inner { display: flex; flex-direction: column; gap: 0.5rem; position: relative; z-index: 1; }
 .share-card-eyebrow {
@@ -2167,17 +2173,6 @@ function buildShareSection(diag, coloredLetters) {
   const colorType = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
   const diagType = getDiagType(diag.majorityRate, diag.rareScore);
 
-  // blob用の上位2色
-  const counts = {};
-  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
-  const topColors = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
-  const typeColor = colorType.color || '#2b2d38';
-
-  // シェアカードのドット
-  const dots = coloredLetters.map(l =>
-    `<div class="share-card-dot"${isBright(colorMap[l])?' data-bright="1"':''} style="background:${colorMap[l]}"></div>`
-  ).join('');
-
   // STEP2: 「感覚を見せる」方向のXシェアテキスト
   // result URL（自分の結果が開く）をシェア
   const sharedResult = new URL(location.href);
@@ -2198,15 +2193,9 @@ function buildShareSection(diag, coloredLetters) {
     <div class="section-title">結果を<wbr>シェアする</div>
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
-        <div class="share-card-blob" style="width:200px;height:200px;top:-40px;right:-40px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[0]||'#ff7f7f');return `${r},${g},${b}`})()},0.2) 0%,transparent 70%)"></div>
-        <div class="share-card-blob" style="width:160px;height:160px;bottom:-30px;left:-30px;background:radial-gradient(circle,rgba(${(()=>{const {r,g,b}=hexToRgb(topColors[1]||topColors[0]||'#4da8e8');return `${r},${g},${b}`})()},0.15) 0%,transparent 70%)"></div>
-        <div class="share-card-inner">
-          <div class="share-card-eyebrow">SynestheShare — Alphabet</div>
-          <div class="share-card-title"><span style="color:${diagType.color}">${diagType.label}</span><span style="color:var(--ink3);font-weight:300;margin:0 0.2em">/</span><span style="color:${typeColor};opacity:0.7">${colorType.name}</span></div>
-          <div class="share-card-palette">${dots}</div>
-          <div class="share-card-stats">多数派一致率 ${diag.majorityRate}% ／ ${calcRareStat(diag).label} 上位${calcRareStat(diag).value}%</div>
-          <div class="share-card-tag">#SynestheShare</div>
-        </div>
+        <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
+          alt="私の文字色は ${rareStat.label} 上位${rareStat.value}%：選んだ文字の色と診断結果"
+          decoding="async">
       </div>
       <div class="share-btn-row">
         <button class="btn-save-image" id="btnSaveImage" style="display:none">

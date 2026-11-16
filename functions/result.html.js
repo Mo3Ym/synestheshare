@@ -79,7 +79,7 @@ export async function onRequest(context) {
 
   const ogImageUrl = buildOgImageUrl(url.href);
   const pageUrl    = url.href;
-  const title      = '私のAは何色?　―SynestheShare';
+  const title      = 'あなたのAは何色?　―SynestheShare';
   const desc       = `あなたの文字には、どんな色が見えますか？`;
 
   // HTMLRewriterでOGPタグを書き換え（コンマ区切りセレクタは非対応のため個別に指定）

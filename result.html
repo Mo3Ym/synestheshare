@@ -16,14 +16,14 @@
 ═════════════════════════════════════════════════════════════════ -->
 <meta property="og:type"        content="website">
 <meta property="og:site_name"   content="SynestheShare">
-<meta property="og:title"       id="ogTitle"       content="私のAは何色?　―SynestheShare">
+<meta property="og:title"       id="ogTitle"       content="あなたのAは何色?　―SynestheShare">
 <meta property="og:description" id="ogDesc"        content="あなたの文字には、どんな色が見えますか？">
 <meta property="og:url"         id="ogUrl"         content="">
 <meta property="og:image"       id="ogImage"       content="">
 <meta property="og:image:width"                    content="1200">
 <meta property="og:image:height"                   content="630">
 <meta name="twitter:card"                          content="summary_large_image">
-<meta name="twitter:title"      id="twTitle"       content="私のAは何色?　―SynestheShare">
+<meta name="twitter:title"      id="twTitle"       content="あなたのAは何色?　―SynestheShare">
 <meta name="twitter:description" id="twDesc"       content="あなたの文字には、どんな色が見えますか？">
 <meta name="twitter:image"      id="twImage"       content="">
 <script>
@@ -44,7 +44,7 @@
 })();
 </script>
 
-<title>私のAは何色?　―SynestheShare</title>
+<title>あなたのAは何色?　―SynestheShare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
@@ -2185,7 +2185,7 @@ function buildShareSection(diag, coloredLetters) {
   ogUrl.searchParams.set('v', '2');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
-  const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${calcRareStat(diag).label}: 上位${calcRareStat(diag).value}%\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
+  const shareText = `私の色感覚は${rareStat.label} 上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${rareStat.label}: 上位${rareStat.value}%\n\nあなたは文字に、どんな色が見えますか？\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -2194,7 +2194,7 @@ function buildShareSection(diag, coloredLetters) {
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
-          alt="私の文字色は ${rareStat.label} 上位${rareStat.value}%：選んだ文字の色と診断結果"
+          alt="私の色感覚は${rareStat.label} 上位${rareStat.value}%でした。選んだ文字の色と診断結果"
           decoding="async">
       </div>
       <div class="share-btn-row">
@@ -2438,12 +2438,12 @@ function render() {
       const diagName = typeHero?.querySelector('.type-name-diag')?.textContent?.trim() || '';
       const desc = `${typeName} / ${diagName} — あなたの文字には、どんな色が見えますか？`;
       const url  = location.href;
-      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', '私のAは何色?　―SynestheShare');
+      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', 'あなたのAは何色?　―SynestheShare');
       document.querySelector('meta[property="og:description"]') ?.setAttribute('content', desc);
       document.querySelector('meta[property="og:url"]')         ?.setAttribute('content', url);
-      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', '私のAは何色?　―SynestheShare');
+      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', 'あなたのAは何色?　―SynestheShare');
       document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', desc);
-      document.title = '私のAは何色?　―SynestheShare';
+      document.title = 'あなたのAは何色?　―SynestheShare';
     })();
   }, 500);
 }

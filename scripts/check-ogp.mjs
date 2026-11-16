@@ -32,7 +32,7 @@ for (const id of '0123456789ABC') {
   const browserType = vm.runInNewContext(`${detectCode}; detectColorType(Object.keys(colorMap))`, { colorMap });
   assert.equal(detectTheme(answer), themes[browserType]);
 }
-for (const query of ['r=5566476C25&score=28', 'r=0&score=0', 'r=ABC567CABC&score=100&stat=rarity', 'r=0123456789ABC0123456789ABC&mode=26&score=50', 'r=0-5']) {
+for (const query of ['r=5566476C25&score=40', 'r=0&score=0', 'r=ABC567CABC&score=100&stat=rarity', 'r=0123456789ABC0123456789ABC&mode=26&score=50', 'r=0-5']) {
   const response = await request(query);
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Content-Type'), 'image/png');

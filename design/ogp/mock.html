@@ -74,7 +74,7 @@
     const letters = 'ABCDEFGXYZ'.split('');
     const initialColors = ['#4da8e8', '#4da8e8', '#8edfff', '#8edfff', '#67bf92', '#9272ff', '#8edfff', '#fffdf9', '#f5dc72', '#4da8e8'];
     document.getElementById('colors').innerHTML = letters.map((letter, index) => `
-      <label class="color">${letter}<input type="color" name="color${index}" value="${initialColors[index]}" aria-label="${letter}の色"></label>
+      <label class="color">${letter}<input type="color" name="color${index}" value="${initialColors[index]}" aria-label="${letter}の色"><input type="checkbox" name="selected${index}" checked aria-label="${letter}を選択済みにする"></label>
     `).join('');
 
     function escapeXml(value) {
@@ -88,10 +88,13 @@
         const color = fields[`color${index}`].value;
         const x = 109 + index * 109;
         const y = 403;
+        if (!fields[`selected${index}`].checked) {
+          return `<g filter="url(#empty-glow)"><circle cx="${x}" cy="${y}" r="39" fill="white" fill-opacity=".06" stroke="white" stroke-width="2" stroke-opacity=".38"/><text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle" font-family="Outfit,sans-serif" font-size="34.32" font-weight="700" fill="white" fill-opacity=".82">${letter}</text></g>`;
+        }
         const rgb = color.match(/\w\w/g).map(channel => parseInt(channel, 16));
         const linear = rgb.map(value => value / 255 <= .03928 ? value / 255 / 12.92 : ((value / 255 + .055) / 1.055) ** 2.4);
         const bright = linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722 > .88;
-        return `<g><circle cx="${x}" cy="${y}" r="39" fill="${color}"/><circle cx="${x}" cy="${y}" r="39" fill="url(#${bright ? 'glass-bright' : 'glass'})"/><circle cx="${x}" cy="${y}" r="38" fill="none" stroke="${bright ? 'black' : 'white'}" stroke-opacity="${bright ? '.08' : '.20'}"/><text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle" font-family="Outfit,sans-serif" font-size="32.3" font-weight="700" fill="${bright ? '#9698a8' : '#fffdf9'}">${letter}</text></g>`;
+        return `<g><circle cx="${x}" cy="${y}" r="39" fill="${color}"/><circle cx="${x}" cy="${y}" r="39" fill="url(#${bright ? 'glass-bright' : 'glass'})"/><circle cx="${x}" cy="${y}" r="38" fill="none" stroke="${bright ? 'black' : 'white'}" stroke-opacity="${bright ? '.08' : '.20'}"/><text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle" font-family="Outfit,sans-serif" font-size="34.32" font-weight="700" fill="${bright ? '#9698a8' : '#fffdf9'}">${letter}</text></g>`;
       }).join('');
       const prefix = fields.headline.value;
       const score = Math.max(0, Math.min(100, Number(fields.score.value) || 0));
@@ -101,6 +104,7 @@
       preview.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="card-title">
         <title id="card-title">SynestheShareの共有用OGPモック</title>
         <defs>
+          <filter id="empty-glow" x="-100%" y="-100%" width="300%" height="300%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="white" flood-opacity=".20"/></filter>
           <linearGradient id="depth" x2="1" y2="1"><stop stop-color="#0e1d34" stop-opacity=".85"/><stop offset="1" stop-color="#302b51" stop-opacity=".65"/></linearGradient>
           <linearGradient id="type-gradient"><stop stop-color="#a9f1ff"/><stop offset=".5" stop-color="#fffdf9"/><stop offset="1" stop-color="#e2caff"/></linearGradient>
           <linearGradient id="glass" x1="15.85%" y1="-9.15%" x2="84.15%" y2="109.15%"><stop stop-color="white" stop-opacity=".62"/><stop offset=".22" stop-color="white" stop-opacity=".32"/><stop offset=".42" stop-color="white" stop-opacity=".10"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>

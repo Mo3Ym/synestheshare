@@ -20,8 +20,11 @@ for (const [tag] of html.matchAll(/<input\b[^>]+>/g)) {
 const preview = { innerHTML: '', style: {} };
 const form = { elements: fields, addEventListener() {} };
 const colors = { set innerHTML(value) {
-  for (const match of value.matchAll(/name="([^"]+)" value="([^"]+)"/g)) {
-    fields[match[1]] = { value: match[2] };
+  for (const [tag] of value.matchAll(/<input\b[^>]+>/g)) {
+    fields[tag.match(/name="([^"]+)"/)[1]] = {
+      value: tag.match(/value="([^"]*)"/)?.[1] || '',
+      checked: tag.includes('checked'),
+    };
   }
 } };
 const context = vm.createContext({
@@ -67,7 +70,7 @@ async function writePixels(name, svg, channels) {
   }
   const masks = [];
   for (const letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="50"><text x="24" y="36" text-anchor="middle" font-family="Outfit,sans-serif" font-size="32.3" font-weight="700" fill="white">${letter}</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="50"><text x="24" y="37" text-anchor="middle" font-family="Outfit,sans-serif" font-size="34.32" font-weight="700" fill="white">${letter}</text></svg>`;
     const rgba = await sharp(Buffer.from(svg)).ensureAlpha().raw().toBuffer();
     masks.push(Buffer.from(Array.from({ length: 48 * 50 }, (_, i) => rgba[i * 4 + 3])));
   }

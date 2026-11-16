@@ -16,14 +16,14 @@
 ═════════════════════════════════════════════════════════════════ -->
 <meta property="og:type"        content="website">
 <meta property="og:site_name"   content="SynestheShare">
-<meta property="og:title"       id="ogTitle"       content="診断結果 — SynestheShare">
+<meta property="og:title"       id="ogTitle"       content="私のAは何色?　―SynestheShare">
 <meta property="og:description" id="ogDesc"        content="あなたの文字には、どんな色が見えますか？">
 <meta property="og:url"         id="ogUrl"         content="">
 <meta property="og:image"       id="ogImage"       content="">
 <meta property="og:image:width"                    content="1200">
 <meta property="og:image:height"                   content="630">
 <meta name="twitter:card"                          content="summary_large_image">
-<meta name="twitter:title"      id="twTitle"       content="診断結果 — SynestheShare">
+<meta name="twitter:title"      id="twTitle"       content="私のAは何色?　―SynestheShare">
 <meta name="twitter:description" id="twDesc"       content="あなたの文字には、どんな色が見えますか？">
 <meta name="twitter:image"      id="twImage"       content="">
 <script>
@@ -44,7 +44,7 @@
 })();
 </script>
 
-<title>診断結果 — SynestheShare</title>
+<title>私のAは何色?　―SynestheShare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
@@ -2438,12 +2438,12 @@ function render() {
       const diagName = typeHero?.querySelector('.type-name-diag')?.textContent?.trim() || '';
       const desc = `${typeName} / ${diagName} — あなたの文字には、どんな色が見えますか？`;
       const url  = location.href;
-      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', `${typeName} — SynestheShare`);
+      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', '私のAは何色?　―SynestheShare');
       document.querySelector('meta[property="og:description"]') ?.setAttribute('content', desc);
       document.querySelector('meta[property="og:url"]')         ?.setAttribute('content', url);
-      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', `${typeName} — SynestheShare`);
+      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', '私のAは何色?　―SynestheShare');
       document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', desc);
-      document.title = `${typeName} — SynestheShare`;
+      document.title = '私のAは何色?　―SynestheShare';
     })();
   }, 500);
 }

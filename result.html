@@ -2198,7 +2198,7 @@ function buildShareSection(diag, coloredLetters) {
   const uniqueText = isAllMajority ? 'すべての文字で世間と一致' : mostUnique || '該当なし';
   const empathyText = mostEmpathy || '該当なし';
   const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
-  const shareText = `🎨あなたの持っている色彩感覚は、${rareStat.label}上位${rareStat.value}%です。\n\n${colorType.name} / ${diagName}/ 多数派一致率: ${diag.majorityRate}%\n最も個性的だった文字：${uniqueText}\n最も共感された文字：${empathyText}\n\nあなたは文字に、どんな色が見えますか？\n${resultUrl}`;
+  const shareText = `🎨あなたの色彩感覚は、${rareStat.label}上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagName}\n最も個性的な文字：${uniqueText}\n最も共感された文字：${empathyText}\n\n―あなたの「A」は、何色ですか？\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">

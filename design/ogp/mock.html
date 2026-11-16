@@ -89,8 +89,9 @@
         const x = 109 + index * 109;
         const y = 403;
         const rgb = color.match(/\w\w/g).map(channel => parseInt(channel, 16));
-        const light = rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722 > 165;
-        return `<g><circle cx="${x}" cy="${y}" r="39" fill="${color}"/><circle cx="${x}" cy="${y}" r="39" fill="url(#glass)" stroke="white" stroke-opacity=".25"/><text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="${light ? '#213345' : '#fffdf9'}">${letter}</text></g>`;
+        const linear = rgb.map(value => value / 255 <= .03928 ? value / 255 / 12.92 : ((value / 255 + .055) / 1.055) ** 2.4);
+        const bright = linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722 > .88;
+        return `<g><circle cx="${x}" cy="${y}" r="39" fill="${color}"/><circle cx="${x}" cy="${y}" r="39" fill="url(#${bright ? 'glass-bright' : 'glass'})"/><circle cx="${x}" cy="${y}" r="38" fill="none" stroke="${bright ? 'black' : 'white'}" stroke-opacity="${bright ? '.08' : '.20'}"/><text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle" font-family="Outfit,sans-serif" font-size="32.3" font-weight="700" fill="${bright ? '#9698a8' : '#fffdf9'}">${letter}</text></g>`;
       }).join('');
       const prefix = fields.headline.value;
       const score = Math.max(0, Math.min(100, Number(fields.score.value) || 0));
@@ -102,7 +103,8 @@
         <defs>
           <linearGradient id="depth" x2="1" y2="1"><stop stop-color="#0e1d34" stop-opacity=".85"/><stop offset="1" stop-color="#302b51" stop-opacity=".65"/></linearGradient>
           <linearGradient id="type-gradient"><stop stop-color="#a9f1ff"/><stop offset=".5" stop-color="#fffdf9"/><stop offset="1" stop-color="#e2caff"/></linearGradient>
-          <linearGradient id="glass" x2=".6" y2="1"><stop stop-color="white" stop-opacity=".4"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
+          <linearGradient id="glass" x1="15.85%" y1="-9.15%" x2="84.15%" y2="109.15%"><stop stop-color="white" stop-opacity=".62"/><stop offset=".22" stop-color="white" stop-opacity=".32"/><stop offset=".42" stop-color="white" stop-opacity=".10"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
+          <linearGradient id="glass-bright" x1="15.85%" y1="-9.15%" x2="84.15%" y2="109.15%"><stop stop-color="white" stop-opacity=".48"/><stop offset=".22" stop-color="white" stop-opacity=".22"/><stop offset=".42" stop-color="white" stop-opacity=".08"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
         </defs>
         <image href="../../assets/backgrounds/ocean.webp" width="1200" height="630" preserveAspectRatio="xMidYMid slice"/>
         <rect width="1200" height="630" fill="url(#depth)"/>

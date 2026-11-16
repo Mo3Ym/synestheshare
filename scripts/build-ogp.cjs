@@ -67,7 +67,7 @@ async function writePixels(name, svg, channels) {
   }
   const masks = [];
   for (const letter of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="50"><text x="24" y="37" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="white">${letter}</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="50"><text x="24" y="36" text-anchor="middle" font-family="Outfit,sans-serif" font-size="32.3" font-weight="700" fill="white">${letter}</text></svg>`;
     const rgba = await sharp(Buffer.from(svg)).ensureAlpha().raw().toBuffer();
     masks.push(Buffer.from(Array.from({ length: 48 * 50 }, (_, i) => rgba[i * 4 + 3])));
   }

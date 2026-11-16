@@ -2185,7 +2185,20 @@ function buildShareSection(diag, coloredLetters) {
   ogUrl.searchParams.set('v', '2');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
-  const shareText = `あなたの色彩感覚は...${rareStat.label} 上位${rareStat.value}%\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${rareStat.label}: 上位${rareStat.value}%\n\nあなたは文字に、どんな色が見えますか？\n${resultUrl}`;
+  const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
+  let mostEmpathy = null;
+  let highestPct = -1;
+  coloredLetters.forEach(letter => {
+    const votes = DUMMY_VOTES[letter] || [];
+    if (votes[0]?.color === colorMap[letter] && votes[0].pct > highestPct) {
+      mostEmpathy = letter;
+      highestPct = votes[0].pct;
+    }
+  });
+  const uniqueText = isAllMajority ? 'すべての文字で世間と一致' : mostUnique || '該当なし';
+  const empathyText = mostEmpathy || '該当なし';
+  const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
+  const shareText = `🎨あなたの持っている色彩感覚は、${rareStat.label}上位${rareStat.value}%です。\n\n${colorType.name} / ${diagName}/ 多数派一致率: ${diag.majorityRate}%\n最も個性的だった文字：${uniqueText}\n最も共感された文字：${empathyText}\n\nあなたは文字に、どんな色が見えますか？\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">

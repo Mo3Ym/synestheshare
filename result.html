@@ -2185,7 +2185,7 @@ function buildShareSection(diag, coloredLetters) {
   ogUrl.searchParams.set('v', '2');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
-  const shareText = `私の色感覚は${rareStat.label} 上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${rareStat.label}: 上位${rareStat.value}%\n\nあなたは文字に、どんな色が見えますか？\n${resultUrl}`;
+  const shareText = `あなたの色彩感覚は...${rareStat.label} 上位${rareStat.value}%\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${rareStat.label}: 上位${rareStat.value}%\n\nあなたは文字に、どんな色が見えますか？\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -2194,7 +2194,7 @@ function buildShareSection(diag, coloredLetters) {
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
-          alt="私の色感覚は${rareStat.label} 上位${rareStat.value}%でした。選んだ文字の色と診断結果"
+          alt="あなたの色彩感覚は...${rareStat.label} 上位${rareStat.value}%選んだ文字の色と診断結果"
           decoding="async">
       </div>
       <div class="share-btn-row">

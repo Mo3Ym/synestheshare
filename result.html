@@ -35,7 +35,7 @@
   const r      = params.get('r') || '';
   const mode   = params.get('mode') || '10';
   const ogImageUrl = r
-    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${mode}`
+    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${encodeURIComponent(mode)}&v=2${params.has('score') ? `&score=${encodeURIComponent(params.get('score'))}&stat=${encodeURIComponent(params.get('stat') || 'empathy')}` : ''}`
     : `${base}/ogp.png`;
   const pageUrl = location.href;
   document.getElementById('ogUrl')   ?.setAttribute('content', pageUrl);
@@ -1792,7 +1792,7 @@ function buildEmpathyCard(coloredLetters) {
       <div class="section-eyebrow">Shared Sense</div>
       <div class="section-title">あなたが最も<wbr>共感された文字</div>
       <div class="empathy-card">
-        <div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>
+        <div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
         <div class="empathy-body">
           <div class="empathy-pct-label">すべての文字で世間と異なる色を選んでいました。</div>
           <div class="empathy-comment">あなたの感覚は、誰とも違う独自の宇宙を持っています。</div>
@@ -1873,7 +1873,7 @@ function buildHighlightCard(coloredLetters) {
     : '世間とは少し違う、<wbr>独自の感覚。';
 
   const badgeHtml = isAllMajority
-    ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
+    ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
     : `<div class="highlight-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${mostUnique}</span></div>`;
 
   const barHtml = isAllMajority ? '' : `
@@ -1909,9 +1909,9 @@ function buildSenseCard(coloredLetters) {
   const uMyPct = (uMatchIdx >= 0) ? uVotes[uMatchIdx]?.pct || 0 : 0;
   const uTopPct = uVotes[0]?.pct || 0;
 
-  // バッジ：isAllMajorityのみ🎯、それ以外は常にアルファベット円
+  // バッジ：isAllMajorityのみ共通の的アイコン、それ以外は常にアルファベット円
   const uniqueBadge = isAllMajority
-    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🎯</div>`
+    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
     : `<div class="empathy-badge"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${mostUnique}</span></div>`;
 
   const uTopColorName = getColorName(uVotes[0]?.color || '');
@@ -1952,7 +1952,7 @@ function buildSenseCard(coloredLetters) {
 
   const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
   const empathyBadge = !mostEmpathy
-    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none">🌀</div>`
+    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
     : `<div class="empathy-badge"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>`;
 
   const empathyComment = !mostEmpathy ? 'あなたの感覚は、<wbr>誰とも違う独自の宇宙を<wbr>持っています。'
@@ -1974,7 +1974,7 @@ function buildSenseCard(coloredLetters) {
   const uTopColorHex2 = uVotes[0]?.color || '#9698a8';
   const uCirclesHtml = isAllMajority
     ? `<div class="sense-circle-wrap">
-         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
+         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
        </div>`
     : `<div class="sense-circle-wrap">
          <div class="sense-circle mine"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${mostUnique}</span></div>
@@ -1989,7 +1989,7 @@ function buildSenseCard(coloredLetters) {
   // ── 共感：色円HTML ──
   const eCirclesHtml = !mostEmpathy
     ? `<div class="sense-circle-wrap">
-         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🌀</div>
+         <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
        </div>`
     : `<div class="sense-circle-wrap">
          <div class="sense-circle mine"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>
@@ -2008,7 +2008,7 @@ function buildSenseCard(coloredLetters) {
         <div class="sense-col-label">最も個性的だった文字</div>
         ${isAllMajority
           ? `<div class="sense-row">
-               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center">🎯</div>
+               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
                <div class="sense-text">${uniqueText}</div>
              </div>`
           : `<div class="sense-row">
@@ -2022,7 +2022,7 @@ function buildSenseCard(coloredLetters) {
         <div class="sense-col-label">最も共感された文字</div>
         ${!mostEmpathy
           ? `<div class="sense-row">
-               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center">🌀</div>
+               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
                <div class="sense-text">${empathyText}</div>
              </div>`
           : `<div class="sense-row">
@@ -2180,7 +2180,16 @@ function buildShareSection(diag, coloredLetters) {
 
   // STEP2: 「感覚を見せる」方向のXシェアテキスト
   // result URL（自分の結果が開く）をシェア
-  const resultUrl = `${location.origin}${location.pathname}${location.search}`;
+  const sharedResult = new URL(location.href);
+  const rareStat = calcRareStat(diag);
+  sharedResult.searchParams.set('score', rareStat.value);
+  sharedResult.searchParams.set('stat', rareStat.label === '珍しさ' ? 'rarity' : 'empathy');
+  const resultUrl = sharedResult.href;
+  const ogUrl = new URL('/api/og', location.origin);
+  ogUrl.search = sharedResult.search;
+  ogUrl.searchParams.set('v', '2');
+  document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
+  document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const shareText = `私の文字には、こんな色が見えています。\n\n${colorType.name} / ${diagType.label}\n多数派一致率: ${diag.majorityRate}% ／ ${calcRareStat(diag).label}: 上位${calcRareStat(diag).value}%\n\nあなたの文字には、どんな色が見えますか？\n#SynestheShare #共感覚\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 

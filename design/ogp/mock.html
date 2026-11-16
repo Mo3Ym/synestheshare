@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SynestheShare — OGPモック</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f0f0ec; color: #2b2d38; font-family: 'Meiryo', sans-serif; }
+    main { max-width: 1540px; margin: auto; padding: 32px; }
+    h1 { margin: 0 0 8px; font-size: 24px; font-weight: 600; }
+    .intro { margin: 0 0 28px; color: #666975; font-size: 13px; line-height: 1.8; }
+    .workspace { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 28px; align-items: start; }
+    form { background: #fffdf9; border: 1px solid #deded8; border-radius: 16px; padding: 8px 20px 20px; }
+    fieldset { padding: 16px 0; border: 0; border-bottom: 1px solid #e7e7e0; margin: 0; min-width: 0; }
+    fieldset:last-of-type { border: 0; }
+    .toggle { display: flex; gap: 9px; align-items: center; font-size: 14px; font-weight: 600; cursor: pointer; }
+    input[type="checkbox"] { width: 16px; height: 16px; accent-color: #526a91; }
+    input[type="text"], input[type="number"] { width: 100%; margin-top: 10px; padding: 10px 11px; border: 1px solid #d6d8df; background: white; border-radius: 8px; color: #2b2d38; font: inherit; font-size: 13px; }
+    input:focus-visible, button:focus-visible { outline: 3px solid #9badd6; outline-offset: 3px; }
+    button { border: 1px solid #d2d5df; background: #fffdf9; color: #47516a; border-radius: 8px; padding: 9px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+    button:hover { background: #e8edf5; }
+    button[aria-pressed="true"] { background: #263e61; color: white; border-color: #263e61; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+    .toolbar span { margin-right: 6px; font-size: 13px; color: #666975; }
+    .preview { width: 100%; max-width: 600px; transition: max-width .2s; }
+    .preview svg { display: block; width: 100%; height: auto; box-shadow: 0 12px 32px #22365220; border-radius: 8px; }
+    .note { margin-top: 16px; font-size: 12px; color: #777b88; line-height: 1.9; }
+    .colors { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
+    .color { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: #666975; }
+    .color input { width: 34px; height: 28px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+    .reset { width: 100%; margin-top: 10px; }
+    @media (max-width: 850px) { main { padding: 24px 16px; } .workspace { grid-template-columns: 1fr; } .display { grid-row: 1; } form { max-width: 600px; } }
+    @media (prefers-reduced-motion: reduce) { .preview { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>OGPの情報を整理する</h1>
+    <p class="intro">共感度を主役にした構成です。文言や表示項目を変えて確認できます。</p>
+    <div class="workspace">
+      <form id="controls">
+        <fieldset>
+          <label class="toggle"><input type="checkbox" name="headlineVisible" checked>結果の一文</label>
+          <input type="text" name="headline" value="私の文字色は" maxlength="48" aria-label="結果の一文">
+          <input type="text" name="scoreLabel" value="共感度 上位" maxlength="10" aria-label="数値のラベル">
+          <input type="number" name="score" value="28" min="0" max="100" aria-label="共感度（%）">
+        </fieldset>
+        <fieldset>
+          <label class="toggle"><input type="checkbox" name="paletteVisible" checked>文字の色</label>
+          <div class="colors" id="colors"></div>
+        </fieldset>
+        <fieldset>
+          <label class="toggle"><input type="checkbox" name="ctaVisible" checked>診断への誘い</label>
+          <input type="text" name="cta" value="自分の感覚も調べてみる →" maxlength="22" aria-label="診断への誘いの文言">
+        </fieldset>
+        <button type="reset" class="reset">初期状態に戻す</button>
+      </form>
+      <section class="display" aria-label="OGPプレビュー">
+        <div class="toolbar" role="group" aria-label="プレビューの幅">
+          <span>表示幅</span>
+          <button type="button" data-width="360" aria-pressed="false">360px</button>
+          <button type="button" data-width="600" aria-pressed="true">600px</button>
+          <button type="button" data-width="1200" aria-pressed="false">原寸</button>
+        </div>
+        <div class="preview" id="preview"></div>
+        <p class="note">1200 × 630のデザインモック。回答と一致率はサンプルです。<br>文字の色や表示項目の変更はこの画面で確認できます。画面幅が狭い場合は、収まるサイズまで縮小します。</p>
+      </section>
+    </div>
+  </main>
+  <script>
+    const form = document.getElementById('controls');
+    const preview = document.getElementById('preview');
+    const letters = 'ABCDEFGXYZ'.split('');
+    const initialColors = ['#4da8e8', '#4da8e8', '#8edfff', '#8edfff', '#67bf92', '#9272ff', '#8edfff', '#fffdf9', '#f5dc72', '#4da8e8'];
+    document.getElementById('colors').innerHTML = letters.map((letter, index) => `
+      <label class="color">${letter}<input type="color" name="color${index}" value="${initialColors[index]}" aria-label="${letter}の色"></label>
+    `).join('');
+
+    function escapeXml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[character]));
+    }
+
+    function render() {
+      const fields = form.elements;
+      const text = (name) => escapeXml(fields[name].value);
+      const dots = letters.map((letter, index) => {
+        const color = fields[`color${index}`].value;
+        const x = 109 + index * 109;
+        const y = 403;
+        const rgb = color.match(/\w\w/g).map(channel => parseInt(channel, 16));
+        const light = rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722 > 165;
+        return `<g><circle cx="${x}" cy="${y}" r="39" fill="${color}"/><circle cx="${x}" cy="${y}" r="39" fill="url(#glass)" stroke="white" stroke-opacity=".25"/><text x="${x}" y="${y + 1}" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="${light ? '#213345' : '#fffdf9'}">${letter}</text></g>`;
+      }).join('');
+      const prefix = fields.headline.value;
+      const score = Math.max(0, Math.min(100, Number(fields.score.value) || 0));
+      const headlineSize = Math.min(44, 1070 / Math.max(1, Array.from(prefix).length));
+      const labelSize = Math.min(190 / 3, 350 / Math.max(1, Array.from(fields.scoreLabel.value).length));
+      const ctaSize = Math.min(52, 960 / Math.max(1, Array.from(fields.cta.value).length));
+      preview.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="card-title">
+        <title id="card-title">SynestheShareの共有用OGPモック</title>
+        <defs>
+          <linearGradient id="depth" x2="1" y2="1"><stop stop-color="#0e1d34" stop-opacity=".85"/><stop offset="1" stop-color="#302b51" stop-opacity=".65"/></linearGradient>
+          <linearGradient id="type-gradient"><stop stop-color="#a9f1ff"/><stop offset=".5" stop-color="#fffdf9"/><stop offset="1" stop-color="#e2caff"/></linearGradient>
+          <linearGradient id="glass" x2=".6" y2="1"><stop stop-color="white" stop-opacity=".4"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
+        </defs>
+        <image href="../../assets/backgrounds/ocean.webp" width="1200" height="630" preserveAspectRatio="xMidYMid slice"/>
+        <rect width="1200" height="630" fill="url(#depth)"/>
+        <g font-family="Noto Sans JP,Meiryo,sans-serif" fill="#fffdf9">
+          ${fields.headlineVisible.checked ? `<text x="600" y="87" text-anchor="middle" font-size="${headlineSize}" font-weight="600">${escapeXml(prefix)}</text><text x="600" y="270" text-anchor="middle" font-size="190" font-family="Arial,Meiryo,sans-serif" font-weight="700" fill="url(#type-gradient)"><tspan font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${text('scoreLabel')}</tspan><tspan dx="18">${score}%</tspan></text>` : ''}
+          ${fields.paletteVisible.checked ? dots : ''}
+          ${fields.ctaVisible.checked ? `<rect x="64" y="485" width="1072" height="112" rx="56" fill="#fffdf9"/><text x="600" y="541" text-anchor="middle" dominant-baseline="middle" font-size="${ctaSize}" font-weight="700" fill="#294269">${text('cta')}</text>` : ''}
+        </g>
+      </svg>`;
+    }
+
+    form.addEventListener('input', render);
+    form.addEventListener('submit', event => event.preventDefault());
+    form.addEventListener('reset', () => requestAnimationFrame(render));
+    document.querySelectorAll('[data-width]').forEach(button => {
+      button.addEventListener('click', () => {
+        preview.style.maxWidth = `${button.dataset.width}px`;
+        document.querySelectorAll('[data-width]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      });
+    });
+    render();
+  </script>
+</body>
+</html>

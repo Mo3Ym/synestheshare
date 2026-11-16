@@ -1,8 +1,8 @@
+import { ogImageUrl as buildOgImageUrl } from '../lib/og-url.js';
 /**
- * functions/result.js
- * /result（Pretty URL）へのリクエスト時にOGPタグを動的注入
- * CF Pagesが /result.html → /result にリダイレクトするため、
- * result.html.js とは別に /result 用のハンドラが必要。
+ * functions/result.html.js
+ * result.html へのリクエスト時にOGPタグを動的注入する
+ * Cloudflare Pages Functions として動作
  */
 
 const PRESET_COLORS = [
@@ -41,7 +41,7 @@ function detectType(colorMap) {
   const values = Object.values(colorMap);
   const total  = values.length;
   if (total === 0) return 'warm';
-  const count  = (arr) => arr.filter(c => values.includes(c)).length / total;
+  const count = (arr) => values.filter(c => arr.includes(c)).length / total;
   const warm   = count(['#ff7f7f','#ffae66','#f5dc72']);
   const cool   = count(['#4da8e8','#8edfff','#9272ff']);
   const nature = count(['#67bf92','#a8d85c']);
@@ -62,38 +62,35 @@ function detectType(colorMap) {
 }
 
 export async function onRequest(context) {
-  const url  = new URL(context.request.url);
-  const r    = url.searchParams.get('r') || '';
-  const mode = url.searchParams.get('mode') || '10';
+  const url    = new URL(context.request.url);
+  const r      = url.searchParams.get('r') || '';
+  const mode   = url.searchParams.get('mode') || '10';
 
+  // 通常のHTMLを取得
   const response = await context.next();
 
+  // rパラメータがない場合はそのまま返す
   if (!r) return response;
 
+  // タイプ名を取得
   const colorMap = parseColors(r, mode);
   const typeId   = detectType(colorMap);
   const typeName = COLOR_TYPES[typeId]?.name || 'SynestheShare';
 
-  const ogImageUrl = `${url.origin}/api/og?r=${encodeURIComponent(r)}&mode=${mode}`;
+  const ogImageUrl = buildOgImageUrl(url.href);
   const pageUrl    = url.href;
   const title      = `${typeName} — SynestheShare`;
   const desc       = `あなたの文字には、どんな色が見えますか？`;
 
+  // HTMLRewriterでOGPタグを書き換え（コンマ区切りセレクタは非対応のため個別に指定）
   return new HTMLRewriter()
-    .on('meta[property="og:title"], meta[name="twitter:title"]', {
-      element(el) { el.setAttribute('content', title); }
-    })
-    .on('meta[property="og:description"], meta[name="twitter:description"]', {
-      element(el) { el.setAttribute('content', desc); }
-    })
-    .on('meta[property="og:url"]', {
-      element(el) { el.setAttribute('content', pageUrl); }
-    })
-    .on('meta[property="og:image"], meta[name="twitter:image"]', {
-      element(el) { el.setAttribute('content', ogImageUrl); }
-    })
-    .on('title', {
-      element(el) { el.setInnerContent(title); }
-    })
+    .on('meta[property="og:title"]',       { element(el) { el.setAttribute('content', title); } })
+    .on('meta[name="twitter:title"]',      { element(el) { el.setAttribute('content', title); } })
+    .on('meta[property="og:description"]', { element(el) { el.setAttribute('content', desc);  } })
+    .on('meta[name="twitter:description"]',{ element(el) { el.setAttribute('content', desc);  } })
+    .on('meta[property="og:url"]',         { element(el) { el.setAttribute('content', pageUrl); } })
+    .on('meta[property="og:image"]',       { element(el) { el.setAttribute('content', ogImageUrl); } })
+    .on('meta[name="twitter:image"]',      { element(el) { el.setAttribute('content', ogImageUrl); } })
+    .on('title',                           { element(el) { el.setInnerContent(title); } })
     .transform(response);
 }

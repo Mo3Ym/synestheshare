@@ -1,3 +1,4 @@
+import { ogImageUrl as buildOgImageUrl } from '../lib/og-url.js';
 /**
  * functions/result.html.js
  * result.html へのリクエスト時にOGPタグを動的注入する
@@ -40,7 +41,7 @@ function detectType(colorMap) {
   const values = Object.values(colorMap);
   const total  = values.length;
   if (total === 0) return 'warm';
-  const count = (arr) => arr.filter(c => values.includes(c)).length / total;
+  const count = (arr) => values.filter(c => arr.includes(c)).length / total;
   const warm   = count(['#ff7f7f','#ffae66','#f5dc72']);
   const cool   = count(['#4da8e8','#8edfff','#9272ff']);
   const nature = count(['#67bf92','#a8d85c']);
@@ -76,7 +77,7 @@ export async function onRequest(context) {
   const typeId   = detectType(colorMap);
   const typeName = COLOR_TYPES[typeId]?.name || 'SynestheShare';
 
-  const ogImageUrl = `${url.origin}/api/og?r=${encodeURIComponent(r)}&mode=${mode}`;
+  const ogImageUrl = buildOgImageUrl(url.href);
   const pageUrl    = url.href;
   const title      = `${typeName} — SynestheShare`;
   const desc       = `あなたの文字には、どんな色が見えますか？`;

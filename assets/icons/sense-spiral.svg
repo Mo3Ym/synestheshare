@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="palette" x1="6" y1="4" x2="42" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ee9fd0"/>
+      <stop offset=".5" stop-color="#b29aef"/>
+      <stop offset="1" stop-color="#9272ff"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="8" y1="3" x2="38" y2="45" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity=".62"/>
+      <stop offset=".22" stop-color="white" stop-opacity=".32"/>
+      <stop offset=".42" stop-color="white" stop-opacity=".1"/>
+      <stop offset=".65" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="swirl" x1="12" y1="10" x2="35" y2="38" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffdf9"/>
+      <stop offset="1" stop-color="#f0eaff"/>
+    </linearGradient>
+  </defs>
+  <circle cx="24" cy="24" r="23" fill="url(#palette)"/>
+  <path d="M24 24C26.5 21 30 23 29 26.5C27.5 31.5 19.5 31.5 17 26C13.5 18 21 12 28 14C39 17 37 32 28 36C17 41 7 31 10 20C13 9 26 6 35 12" stroke="url(#swirl)" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="24" cy="24" r="23" fill="url(#glass)"/>
+  <circle cx="24" cy="24" r="22.5" stroke="white" stroke-opacity=".2"/>
+</svg>

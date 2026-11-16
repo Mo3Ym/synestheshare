@@ -1,3 +1,4 @@
+import { ogImageUrl as buildOgImageUrl } from '../lib/og-url.js';
 /**
  * functions/_middleware.js
  * result.html の OGP meta タグをサーバー側で書き換える
@@ -24,7 +25,7 @@ export async function onRequest(context) {
   if (!r) return next();
 
   // OGP 画像 URL（og.js エンドポイント）
-  const ogImageUrl = `${url.origin}/api/og?r=${encodeURIComponent(r)}&mode=${mode}`;
+  const ogImageUrl = buildOgImageUrl(url.href);
   const pageUrl    = url.href;
 
   // 静的ファイルを取得

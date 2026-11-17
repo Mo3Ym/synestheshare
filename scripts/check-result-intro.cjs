@@ -16,7 +16,7 @@ const assert=require('node:assert/strict');
   assert(box.scroll<=box.client+1,JSON.stringify({english,mode,viewport,box}));
   assert(box.width<viewport.width&&box.height<viewport.height);
   assert((await page.locator('.result-intro-actions a').getAttribute('href')).includes(english?'index-en':'index'));
-  assert(await page.locator('.result-intro-view').evaluate(el=>el===document.activeElement));
+  assert(await dialog.evaluate(el=>el===document.activeElement));
   if(!english&&mode==='10'&&viewport.width===390)await dialog.screenshot({path:'design/ogp/result-intro-mobile.png'});
   await page.keyboard.press('Escape');assert(!await dialog.isVisible());
   await page.waitForFunction(()=>!document.documentElement.classList.contains('result-intro-open'));

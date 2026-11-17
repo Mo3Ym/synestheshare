@@ -42,13 +42,21 @@ html.result-intro-open { overflow: hidden; }
 }
 .result-intro-actions .result-intro-view {
   background: linear-gradient(155deg,rgba(255,255,255,.58),rgba(255,255,255,.42));
-  border-color: rgba(255,255,255,.6); color: #263e61;
+  border-color: rgba(255,160,100,.45); color: #263e61;
   backdrop-filter: blur(28px) saturate(140%); -webkit-backdrop-filter: blur(28px) saturate(140%);
-  box-shadow: 0 8px 28px #0000000a, inset 0 1px 0 #ffffff8c;
+  box-shadow:
+    0 0 0 1px rgba(255,127,127,.14),
+    0 0 18px rgba(255,127,127,.26),
+    0 0 42px rgba(255,174,102,.20),
+    0 12px 40px rgba(0,0,0,.06),
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(255,255,255,.18),
+    inset 0 0 18px rgba(255,170,100,.10);
 }
 .result-intro-actions .result-intro-view:hover { background: rgba(255,255,255,.65); }
 .result-intro-actions a:hover { background: #ffffff30; }
 .result-intro :focus-visible { outline: 2px solid #9272ff; outline-offset: 3px; }
+.result-intro:focus { outline: none; }
 @media (max-width: 360px), (max-height: 620px) {
   .result-intro { padding: 22px 20px 20px; }
   .result-intro-colors { margin-bottom: 12px; }

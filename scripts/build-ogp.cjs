@@ -61,7 +61,7 @@ async function writePixels(name, svg, channels) {
   for (const language of ['ja', 'en']) {
   const prefix = language === 'en' ? 'en-' : '';
   fields.headline.value = language === 'en' ? 'Your letter-color sense...' : japanese.headline;
-  fields.cta.value = language === 'en' ? 'See results & find your colors (2 min) →' : japanese.cta;
+  fields.cta.value = language === 'en' ? 'See results & find your colors (2 min)' : japanese.cta;
   for (const theme of ['sunset', 'ocean', 'forest', 'void', 'bloom', 'neon', 'dream', 'earth']) {
     const background = await sharp(path.join(root, `assets/backgrounds/${theme}.webp`)).png().toBuffer();
     for (const mode of ['alphabet', 'number', 'subject']) {

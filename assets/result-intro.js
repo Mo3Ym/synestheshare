@@ -26,10 +26,11 @@
   };
   const dialog = document.createElement('dialog');
   dialog.className = 'result-intro';
+  dialog.tabIndex = -1;
   dialog.dataset.mode = mode;
   dialog.setAttribute('aria-labelledby', 'result-intro-title');
   dialog.setAttribute('aria-describedby', 'result-intro-description');
-  dialog.innerHTML = `<button class="result-intro-close" type="button" aria-label="${copy.close}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div class="result-intro-colors" aria-hidden="true">${['#ff7f7f','#8edfff','#f5dc72'].map(color => `<span class="type-palette-dot result-intro-dot" style="background:${color};color:#fffdf9"><span>${sample}</span></span>`).join('')}</div><h2 id="result-intro-title">${copy.title}</h2><p id="result-intro-description" class="result-intro-description">${copy.description}</p><div class="result-intro-actions"><button class="result-intro-view" type="button" autofocus>${copy.view}</button><a href="${english ? 'index-en' : 'index'}.html#themes">${copy.start}</a></div>`;
+  dialog.innerHTML = `<button class="result-intro-close" type="button" aria-label="${copy.close}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div class="result-intro-colors" aria-hidden="true">${['#ff7f7f','#8edfff','#f5dc72'].map(color => `<span class="type-palette-dot result-intro-dot" style="background:${color};color:#fffdf9"><span>${sample}</span></span>`).join('')}</div><h2 id="result-intro-title">${copy.title}</h2><p id="result-intro-description" class="result-intro-description">${copy.description}</p><div class="result-intro-actions"><button class="result-intro-view" type="button">${copy.view}</button><a href="${english ? 'index-en' : 'index'}.html#themes">${copy.start}</a></div>`;
   document.body.appendChild(dialog);
   const remember = () => { try { sessionStorage.setItem(key, '1'); } catch {} };
   dialog.querySelector('.result-intro-close').addEventListener('click', () => dialog.close());
@@ -48,4 +49,5 @@
   });
   document.documentElement.classList.add('result-intro-open');
   dialog.showModal();
+  dialog.focus({ preventScroll: true });
 })();

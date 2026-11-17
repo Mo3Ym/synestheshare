@@ -131,6 +131,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* ══ タイプカード（ファーストビュー・明るい背景） ══ */
 .type-hero {
+  --hero-shade: 0.50;
   position: relative; overflow: hidden;
   padding: 55px 1.5rem 2.5rem;
   display: flex; flex-direction: column; justify-content: center;
@@ -139,6 +140,23 @@ nav ul a:hover { color: var(--ink); }
   background-position: center;
   background-repeat: no-repeat;
 }
+/* Darken only the background, keeping the palette and text at full brightness. */
+.type-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(10,16,30,var(--hero-shade));
+}
+.type-hero[data-type="dream"] { --hero-shade: 0.62; }
+.type-hero[data-type="pastel"] { --hero-shade: 0.66; }
+.type-hero[data-type="cool"],
+.type-hero[data-type="warm"] { --hero-shade: 0.52; }
+.type-hero[data-type="nature"],
+.type-hero[data-type="earth"] { --hero-shade: 0.56; }
+.type-hero[data-type="mono"] { --hero-shade: 0.60; }
+.type-hero[data-type="neon"] { --hero-shade: 0.58; }
 /* デスクトップ寄りの幅では hero 領域を 1.5 倍ほどの高さに伸ばす */
 @media (min-width: 600px) {
   .type-hero { min-height: 780px; }
@@ -173,7 +191,8 @@ nav ul a:hover { color: var(--ink); }
 .type-hero .type-stat-value,
 .type-hero .type-palette-label { color: #fffdf9 !important; }
 .type-hero .type-stat-label,
-.type-hero .type-stat-sub { color: rgba(255,255,255,0.6) !important; }
+.type-hero .type-stat-sub,
+.type-hero .type-stat-card-label { color: rgba(255,255,255,0.8) !important; }
 
 .type-eyebrow { color: var(--hero-ink3); }
 .type-eyebrow::before { background: var(--hero-ink3); }

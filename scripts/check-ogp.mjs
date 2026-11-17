@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { inflateSync } from 'node:zlib';
 import { onRequest } from '../functions/api/og.js';
-import { detectTheme, parseAnswer, displayAnswer } from '../lib/og-renderer.js';
+import { detectTheme, parseAnswer, displayAnswer, renderPixels, SCORE_GRADIENTS } from '../lib/og-renderer.js';
 import { ogImageUrl } from '../lib/og-url.js';
 
 const assets = { async fetch(url) {
@@ -43,6 +44,29 @@ for (const query of ['r=5566476C25&score=40', 'r=5566476C25&score=40&lang=en', '
   if (query === 'r=0-5') await writeFile(new URL('../design/ogp/partial.png', import.meta.url), png);
 }
 const image = new URL(ogImageUrl('https://example.test/result?r=5566476C25&score=28&stat=empathy'));
+const mock = await readFile(new URL('../design/ogp/mock.html', import.meta.url), 'utf8');
+const mockColors = vm.runInNewContext(`(${mock.match(/const themeScores = (\{[\s\S]*?\});/)[1]})`);
+assert.equal(JSON.stringify(mockColors), JSON.stringify(SCORE_GRADIENTS));
+const strip = inflateSync(await readFile(new URL('../assets/ogp/empathy-40.rgba.deflate', import.meta.url)));
+let rankPixel = null, labelPixel = null;
+for (let offset = 0; offset < strip.length; offset += 4) {
+  if (strip[offset + 3] !== 255) continue;
+  const x = offset / 4 % 1200, y = Math.floor(offset / 4 / 1200);
+  if (strip[offset] === 0 && strip[offset + 1] === 0 && strip[offset + 2] === 255) {
+    if (!rankPixel || x < rankPixel.x) rankPixel = { x, y };
+  } else if (!labelPixel) labelPixel = { x, y };
+}
+assert(rankPixel && labelPixel);
+for (const [theme, r] of Object.entries({sunset:'0',ocean:'5664',forest:'4',void:'A',bloom:'8',neon:'054',dream:'7',earth:'9'})) {
+  const answer = parseAnswer(r, '10');
+  assert.equal(detectTheme(answer), theme);
+  const pixels = await renderPixels({request:new Request('https://example.test/api/og'),env:{ASSETS:assets}}, answer, '10', 40, 'empathy');
+  const rankOffset = ((rankPixel.y + 100) * 1200 + rankPixel.x) * 3;
+  const expected = [1,3,5].map(index => parseInt(SCORE_GRADIENTS[theme][0].slice(index,index+2),16));
+  for (let channel = 0; channel < 3; channel++) assert(Math.abs(pixels[rankOffset+channel]-expected[channel]) <= 3, theme);
+  const labelOffset = ((labelPixel.y + 100) * 1200 + labelPixel.x) * 3;
+  assert.deepEqual(Array.from(pixels.subarray(labelOffset,labelOffset+3)), [255,253,249]);
+}
 assert.equal(image.searchParams.get('score'), '28');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(new URL(ogImageUrl('https://example.test/result-en?r=5&score=28')).searchParams.get('lang'), 'en');

@@ -79,7 +79,9 @@ async function writePixels(name, svg, channels) {
     for (let score = 0; score <= 100; score++) {
       fields.score.value = String(score);
       const svg = render();
-      const text = svg.match(/<text x="600" y="270"[\s\S]*?<\/text>/)[0];
+      // Solid blue identifies tintable rank/numeral pixels. The runtime applies
+      // the detected theme's gradient while keeping the Japanese label white.
+      const text = svg.match(/<text x="600" y="270"[\s\S]*?<\/text>/)[0].replaceAll('url(#type-gradient)', '#0000ff');
       const defs = svg.match(/<defs>[\s\S]*?<\/defs>/)[0];
       await writePixels(`${prefix}${kind}-${score}.rgba.deflate`, `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="220" viewBox="0 100 1200 220">${defs}${text}</svg>`, 4);
     }

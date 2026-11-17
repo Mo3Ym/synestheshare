@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const os = require('node:os');
 const { deflateSync } = require('node:zlib');
 const sharp = require('sharp');
 
@@ -50,6 +51,12 @@ async function writePixels(name, svg, channels) {
 }
 
 (async () => {
+  // User-installed Windows fonts are not discovered by sharp's SVG renderer.
+  // Register Outfit with Pango before rasterizing SVG text, rather than silently
+  // falling back to Arial. Other environments can supply their installed font.
+  const outfitFont = process.env.OGP_OUTFIT_FONT || path.join(os.homedir(), 'AppData/Local/Microsoft/Windows/Fonts/Outfit-Bold.ttf');
+  if (!fs.existsSync(outfitFont)) throw new Error('Set OGP_OUTFIT_FONT to an Outfit Bold .ttf file before building OGP images.');
+  await sharp({ text: { text: '40%', font: 'Outfit Bold', fontfile: outfitFont, rgba: true } }).png().toBuffer();
   const japanese = { headline: fields.headline.value, cta: fields.cta.value };
   for (const language of ['ja', 'en']) {
   const prefix = language === 'en' ? 'en-' : '';

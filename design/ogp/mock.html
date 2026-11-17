@@ -115,6 +115,9 @@
       const english = fields.scoreLabel.value.endsWith(' Top');
       const statLabel = fields.scoreLabel.value.replace(/\s*(上位|Top)\s*$/, '');
       const labelSize = Math.min(scoreSize / 3, 350 / Math.max(1, Array.from(statLabel).length));
+      // At 100px, Outfit's digit "1" is 71px high and Noto Sans JP's
+      // "上位" is 93px high. Match visible glyph height rather than font size.
+      const rankSize = scoreSize / 2 * (english ? 1 : 71 / 93);
       const ctaSize = Math.min(52, 960 / Math.max(1, textUnits(fields.cta.value)));
       const stars = [[86,151,7],[1084,106,9],[1042,310,6],[165,416,5],[969,412,6],[1128,397,4],[310,117,4],[754,314,5]];
       const sparkle = stars.map(([x,y,size]) => `<g transform="translate(${x} ${y})"><circle r="${size * 3}" fill="url(#starlight)"/><path d="M0 ${-size}Q1 -1 ${size} 0Q1 1 0 ${size}Q-1 1 ${-size} 0Q-1 -1 0 ${-size}Z" fill="#fff3d7" fill-opacity=".85"/></g>`).join('');

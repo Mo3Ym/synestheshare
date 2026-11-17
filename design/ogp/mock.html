@@ -98,11 +98,13 @@
       }).join('');
       const prefix = fields.headline.value;
       const score = Math.max(0, Math.min(100, Number(fields.score.value) || 0));
-      const headlineSize = Math.min(44, 1070 / Math.max(1, Array.from(prefix).length));
+      const textUnits = value => Array.from(value).reduce((total, character) => total + (character.charCodeAt(0) < 128 ? .56 : 1), 0);
+      const headlineSize = Math.min(44, 1070 / Math.max(1, textUnits(prefix)));
       const scoreSize = score === 100 ? 180 : 190;
-      const statLabel = fields.scoreLabel.value.replace(/\s*上位\s*$/, '');
+      const english = fields.scoreLabel.value.endsWith(' Top');
+      const statLabel = fields.scoreLabel.value.replace(/\s*(上位|Top)\s*$/, '');
       const labelSize = Math.min(scoreSize / 3, 350 / Math.max(1, Array.from(statLabel).length));
-      const ctaSize = Math.min(52, 960 / Math.max(1, Array.from(fields.cta.value).length));
+      const ctaSize = Math.min(52, 960 / Math.max(1, textUnits(fields.cta.value)));
       const stars = [[86,151,7],[1084,106,9],[1042,310,6],[165,416,5],[969,412,6],[1128,397,4],[310,117,4],[754,314,5]];
       const sparkle = stars.map(([x,y,size]) => `<g transform="translate(${x} ${y})"><circle r="${size * 3}" fill="url(#starlight)"/><path d="M0 ${-size}Q1 -1 ${size} 0Q1 1 0 ${size}Q-1 1 ${-size} 0Q-1 -1 0 ${-size}Z" fill="#fff3d7" fill-opacity=".85"/></g>`).join('');
       const dust = Array.from({length: 48}, (_, index) => {
@@ -134,7 +136,7 @@
         </g>
         ${dust}${sparkle}
         <g font-family="Noto Sans JP,Meiryo,sans-serif" fill="#fffdf9">
-          ${fields.headlineVisible.checked ? `<text x="600" y="87" text-anchor="middle" font-size="${headlineSize}" font-weight="600">${escapeXml(prefix)}</text><text x="600" y="270" text-anchor="middle" font-size="${scoreSize}" font-family="Arial,Meiryo,sans-serif" font-weight="700" fill="url(#type-gradient)"><tspan font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${escapeXml(statLabel)}</tspan><tspan dx="10" font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">上位</tspan><tspan dx="18">${score}%</tspan></text>` : ''}
+          ${fields.headlineVisible.checked ? `<text x="600" y="87" text-anchor="middle" font-size="${headlineSize}" font-weight="600">${escapeXml(prefix)}</text><text x="600" y="270" text-anchor="middle" font-size="${scoreSize}" font-family="Arial,Meiryo,sans-serif" font-weight="700" fill="url(#type-gradient)"><tspan font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${escapeXml(statLabel)}</tspan><tspan dx="10" font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${english ? 'Top' : '上位'}</tspan><tspan dx="18">${score}%</tspan></text>` : ''}
           ${fields.paletteVisible.checked ? dots : ''}
           ${fields.ctaVisible.checked ? `<rect x="64" y="455" width="1072" height="112" rx="56" fill="#11213b" fill-opacity=".36"/><rect x="64" y="455" width="1072" height="112" rx="56" fill="url(#cta-glass)" stroke="url(#cta-edge)" stroke-width="1.5"/><text x="600" y="511" text-anchor="middle" dominant-baseline="middle" font-size="${ctaSize}" font-weight="600" fill="#fffdf9">${text('cta')}</text>` : ''}
         </g>

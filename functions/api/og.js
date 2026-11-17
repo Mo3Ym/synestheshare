@@ -44,14 +44,14 @@ async function encodePNG(pixels, W, H) {
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const mode = url.searchParams.get('mode') || '10';
-  if (!['10', '26'].includes(mode)) return new Response('Invalid mode', { status: 400 });
+  if (!['10', '26', 'number', 'subject'].includes(mode)) return new Response('Invalid mode', { status: 400 });
   const answer = parseAnswer(url.searchParams.get('r'), mode);
   if (!answer?.length) return new Response('Valid r parameter required', { status: 400 });
   const rawScore = url.searchParams.get('score');
   const score = rawScore !== null && /^\d{1,3}$/.test(rawScore) && Number(rawScore) <= 100 ? Number(rawScore) : null;
   const stat = url.searchParams.get('stat') === 'rarity' ? 'rarity' : 'empathy';
   try {
-    const pixels = await renderPixels(context, answer, mode, score, stat);
+    const pixels = await renderPixels(context, answer, mode, score, stat, url.searchParams.get('lang') === 'en' ? 'en' : 'ja');
     const png = await encodePNG(pixels, 1200, 630);
     return new Response(png, { headers: {
       'Content-Type': 'image/png',

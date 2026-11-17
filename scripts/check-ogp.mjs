@@ -32,17 +32,18 @@ for (const id of '0123456789ABC') {
   const browserType = vm.runInNewContext(`${detectCode}; detectColorType(Object.keys(colorMap))`, { colorMap });
   assert.equal(detectTheme(answer), themes[browserType]);
 }
-for (const query of ['r=5566476C25&score=40', 'r=0&score=0', 'r=ABC567CABC&score=100&stat=rarity', 'r=0123456789ABC0123456789ABC&mode=26&score=50', 'r=0-5']) {
+for (const query of ['r=5566476C25&score=40', 'r=5566476C25&score=40&lang=en', 'r=0&score=0', 'r=ABC567CABC&score=100&stat=rarity', 'r=0123456789ABC0123456789ABC&mode=26&score=50', 'r=0-5']) {
   const response = await request(query);
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Content-Type'), 'image/png');
   const png = Buffer.from(await response.arrayBuffer());
   assert.equal(png.readUInt32BE(16), 1200);
   assert.equal(png.readUInt32BE(20), 630);
-  if (query.startsWith('r=5566')) await writeFile(new URL('../design/ogp/final.png', import.meta.url), png);
+  if (query.startsWith('r=5566')) await writeFile(new URL(`../design/ogp/${query.includes('lang=en') ? 'final-en' : 'final'}.png`, import.meta.url), png);
   if (query === 'r=0-5') await writeFile(new URL('../design/ogp/partial.png', import.meta.url), png);
 }
 const image = new URL(ogImageUrl('https://example.test/result?r=5566476C25&score=28&stat=empathy'));
 assert.equal(image.searchParams.get('score'), '28');
 assert.equal(image.searchParams.get('stat'), 'empathy');
+assert.equal(new URL(ogImageUrl('https://example.test/result-en?r=5&score=28')).searchParams.get('lang'), 'en');
 console.log('OGP checks passed: PNG output, 10/26 letters, partial and invalid answers, score limits, theme agreement and share URL.');

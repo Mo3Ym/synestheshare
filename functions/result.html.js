@@ -24,7 +24,7 @@ const COLOR_TYPES = {
 };
 
 function parseColors(r, mode) {
-  const letters = mode === '26'
+  const letters = mode === 'subject' ? ['language','math','science','social','english'] : mode === 'number' ? '1234567890'.split('') : mode === '26'
     ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
     : ['A','B','C','D','E','F','G','X','Y','Z'];
   const map = {};
@@ -79,8 +79,10 @@ export async function onRequest(context) {
 
   const ogImageUrl = buildOgImageUrl(url.href);
   const pageUrl    = url.href;
-  const title      = 'あなたのAは何色?　―SynestheShare';
-  const desc       = `あなたの文字には、どんな色が見えますか？`;
+  const english = /\/result-en(?:\.html)?$/.test(url.pathname) || url.searchParams.get('lang') === 'en';
+  const symbol = mode === 'subject' ? (english ? 'school subjects' : '教科') : mode === 'number' ? '1' : 'A';
+  const title = english ? `What color is your ${symbol}? — SynestheShare` : `あなたの${symbol}は何色?　―SynestheShare`;
+  const desc = english ? 'What colors do you see in letters?' : 'あなたの文字には、どんな色が見えますか？';
 
   // HTMLRewriterでOGPタグを書き換え（コンマ区切りセレクタは非対応のため個別に指定）
   return new HTMLRewriter()

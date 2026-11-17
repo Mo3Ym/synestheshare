@@ -30,7 +30,7 @@
 // OGPメタタグをURLから動的に設定
 // Cloudflare Workers側でHTMLにog:imageを注入する際もこの構造を参照
 (function() {
-  const base   = location.origin;
+  const base   = location.protocol === 'file:' ? 'https://synestheshare.pages.dev' : location.origin;
   const params = new URLSearchParams(location.search);
   const r      = params.get('r') || '';
   const mode   = params.get('mode') || '10';
@@ -94,7 +94,26 @@ nav {
   display: flex; align-items: center; text-decoration: none; height: 26px;
 }
 .nav-logo img { height: 100%; width: auto; display: block; }
-.nav-right { position: absolute; right: 1.5rem; }
+.nav-right { position: absolute; right: 1.5rem; display: flex; align-items: center; gap: 0.9rem; }
+.nav-language {
+  min-height: 32px;
+  max-width: 92px;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid rgba(43,45,56,0.18);
+  border-radius: 8px;
+  background: rgba(255,253,249,0.75);
+  color: var(--ink2);
+  font-family: var(--jp);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.nav-language:focus-visible { outline: 2px solid #9272ff; outline-offset: 3px; }
+@media (max-width: 480px) {
+  .nav-logo { left: 0.75rem; height: 26px; }
+  .nav-right { right: 0.75rem; gap: 0.5rem; }
+  .nav-language { max-width: 80px; font-size: 0.66rem; }
+  .nav-right .nav-back { font-size: 0.65rem; letter-spacing: 0; }
+}
 nav ul { list-style: none; display: flex; gap: 1.8rem; }
 nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
 nav ul a:hover { color: var(--ink); }
@@ -416,6 +435,10 @@ nav ul a:hover { color: var(--ink); }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
+.subject-mode .type-palette-strip { grid-template-columns: repeat(auto-fill, 72px); }
+.subject-mode .type-palette-dot { width: 72px; height: 72px; font-size: 1rem; }
+.subject-mode .sense-circle { font-size: 0.7rem; }
+.subject-mode .vote-letter-badge { width: 42px; height: 42px; font-size: 0.65rem; }
 
 /* ════════════════════════════════════
    共通: 色円のガラス板光（左上から差し込む光のシート）
@@ -1262,6 +1285,8 @@ footer {
 .rh-wave-g3 { animation: rWaveDrift3 12s ease-in-out infinite alternate; }
 
 </style>
+<link rel="stylesheet" href="assets/language.css">
+<script src="assets/language.js" defer></script>
 </head>
 <body>
 
@@ -1276,7 +1301,7 @@ footer {
     <li><a href="#shareOuter">シェア</a></li>
   </ul>
   <div class="nav-right">
-    <a class="nav-back" href="alphabet.html">診断に戻る ←</a>
+
   </div>
 </nav>
 
@@ -1375,9 +1400,18 @@ function snapToPreset(hex) {
 /* ══ URLパラメータ解析 ══ */
 const params = new URLSearchParams(location.search);
 const isFullMode = params.get('mode') === '26';
+const isNumberMode = params.get('mode') === 'number';
+const isSubjectMode = params.get('mode') === 'subject';
+const shareOrigin = location.protocol === 'file:' ? 'https://synestheshare.pages.dev' : location.origin;
+const SUBJECT_LABELS = { language:'国語', math:'数学', science:'理科', social:'社会', english:'英語' };
+const SUBJECT_SHORT_LABELS = { language:'国語', math:'数学', science:'理科', social:'社会', english:'英語' };
+function itemLabel(item, compact = false) {
+  return (compact ? SUBJECT_SHORT_LABELS : SUBJECT_LABELS)[item] || item;
+}
+if (isSubjectMode) document.body?.classList.add('subject-mode');
 const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];
 const LETTERS_26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-const letters = isFullMode ? LETTERS_26 : LETTERS_10;
+const letters = isSubjectMode ? Object.keys(SUBJECT_LABELS) : isNumberMode ? '1234567890'.split('') : isFullMode ? LETTERS_26 : LETTERS_10;
 
 /* 色IDマップ */
 const COLOR_IDS = '0123456789ABC';
@@ -1685,7 +1719,7 @@ function buildTypeHero(coloredLetters, diag) {
     const c = colorMap[l];
     const tc = textColorFor(c);
     const brightAttr = isBright(c) ? ' data-bright="1"' : '';
-    return `<div class="type-palette-dot"${brightAttr} style="background:${c};color:${tc}"><span>${l}</span></div>`;
+    return `<div class="type-palette-dot"${brightAttr} style="background:${c};color:${tc}"><span>${itemLabel(l, true)}</span></div>`;
   }).join('');
 
   const taglineHtml = type.tagline.replace(/(<wbr>)?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');
@@ -1728,7 +1762,7 @@ function buildTypeHero(coloredLetters, diag) {
       <g class="rh-wave-g3" filter="url(#wfr)"><path d="M -100,800 C 160,730 440,650 740,585 C 990,530 1250,506 1540,498" fill="none" stroke="white" stroke-width="1.3" opacity="0.11"/></g>
     </svg>
     <div class="type-hero-inner">
-      <div class="type-eyebrow">Color Personality<wbr> — Alphabet</div>
+      <div class="type-eyebrow">Color Personality<wbr> — ${isSubjectMode ? 'Subjects' : isNumberMode ? 'Numbers' : 'Alphabet'}</div>
       <div class="type-label">あなたの<wbr>共感覚タイプ</div>
       <div class="type-name">
         <span class="type-name-diag" style="color:${diagColor}">${diagType.label}</span>
@@ -1747,16 +1781,16 @@ function buildTypeHero(coloredLetters, diag) {
           </div>
           <div class="type-stat-sep"></div>
           <div class="type-stat-item">
-            <span class="type-stat-card-label">最も個性的な文字</span>
+            <span class="type-stat-card-label">${isNumberMode ? '最も個性的だった数字' : '最も個性的な文字'}</span>
             ${uniqueResult.isAllMajority
               ? `<span class="type-stat-card-value" style="color:rgba(255,255,255,0.4)">-</span>`
-              : `<span class="type-stat-card-value" style="color:${uniqueColor}">${uniqueResult.mostUnique}</span>`
+              : `<span class="type-stat-card-value" style="color:${uniqueColor}">${itemLabel(uniqueResult.mostUnique)}</span>`
             }
           </div>
         </div>
         <div class="type-stat-desc">${diagType.desc.replace(/<wbr>/g, '')}</div>
       </div>
-      <div class="type-palette-label">あなたのアルファベットの色</div>
+      <div class="type-palette-label">${isSubjectMode ? 'あなたの教科の色' : isNumberMode ? 'あなたの数字の色' : 'あなたのアルファベットの色'}</div>
       <div class="type-palette-strip">${dots}</div>
     </div>
     <a class="scroll-indicator" href="#contentOuter">
@@ -1840,7 +1874,7 @@ function buildEmpathyCard(coloredLetters) {
     <div class="section-eyebrow">Shared Sense</div>
     <div class="section-title">あなたが最も<wbr>共感された文字</div>
     <div class="empathy-card">
-      <div class="empathy-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${mostEmpathy}</span></div>
+      <div class="empathy-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>
       <div class="empathy-body">
         <div class="empathy-pct">${highestPct}<span style="font-size:0.55em;font-weight:400;color:var(--ink3);margin-left:2px">%</span></div>
         <div class="empathy-pct-label">の人が、<wbr>あなたと同じ色を<wbr>感じていました。</div>
@@ -1879,13 +1913,13 @@ function buildHighlightCard(coloredLetters) {
     `<div class="highlight-bar-seg" style="background:${v.color}" data-pct="${v.pct}"></div>`
   ).join('');
 
-  const sectionTitle = 'あなたが最も個性的だった文字';
+  const sectionTitle = isNumberMode ? 'あなたが最も個性的だった数字' : 'あなたが最も個性的だった文字';
 
   const gapText = isAllMajority
     ? 'すべての文字で<wbr>世間と一致'
     : isOutlier
-    ? `世間の${topPct}%が<wbr>${votes[0].name}を選ぶ${mostUnique}に、<wbr>あなたは${getColorName(myColor)}を<wbr>見ていました。`
-    : `世間の${topPct}%が<wbr>${votes[0].name}を選ぶ${mostUnique}に、<wbr>あなたは${getColorName(myColor)}を<wbr>見ていました。`;
+    ? `世間の${topPct}%が<wbr>${votes[0].name}を選ぶ${itemLabel(mostUnique)}に、<wbr>あなたは${getColorName(myColor)}を<wbr>見ていました。`
+    : `世間の${topPct}%が<wbr>${votes[0].name}を選ぶ${itemLabel(mostUnique)}に、<wbr>あなたは${getColorName(myColor)}を<wbr>見ていました。`;
 
   const comment = isAllMajority
     ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
@@ -1899,7 +1933,7 @@ function buildHighlightCard(coloredLetters) {
 
   const badgeHtml = isAllMajority
     ? `<div class="highlight-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
-    : `<div class="highlight-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${mostUnique}</span></div>`;
+    : `<div class="highlight-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${itemLabel(mostUnique, true)}</span></div>`;
 
   const barHtml = isAllMajority ? '' : `
     <div class="highlight-bar-wrap">
@@ -1937,7 +1971,7 @@ function buildSenseCard(coloredLetters) {
   // バッジ：isAllMajorityのみ共通の的アイコン、それ以外は常にアルファベット円
   const uniqueBadge = isAllMajority
     ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
-    : `<div class="empathy-badge"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${mostUnique}</span></div>`;
+    : `<div class="empathy-badge"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${itemLabel(mostUnique, true)}</span></div>`;
 
   const uTopColorName = getColorName(uVotes[0]?.color || '');
   const uMyColorName  = getColorName(uColor || '');
@@ -1949,7 +1983,7 @@ function buildSenseCard(coloredLetters) {
   const uniqueLabelHtml = isAllMajority
     ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と一致</div>`
     : `<div class="sense-sentence">
-        <span class="sense-strong">${uTopPct}%</span>が<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を選ぶ${mostUnique}に、
+        <span class="sense-strong">${uTopPct}%</span>が<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を選ぶ${itemLabel(mostUnique)}に、
       </div>
       <div class="sense-sentence">
         <span class="sense-strong">あなた</span>は<span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>を見ていました。
@@ -1978,7 +2012,7 @@ function buildSenseCard(coloredLetters) {
   const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
   const empathyBadge = !mostEmpathy
     ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
-    : `<div class="empathy-badge"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>`;
+    : `<div class="empathy-badge"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>`;
 
   const empathyComment = !mostEmpathy ? 'あなたの感覚は、<wbr>誰とも違う独自の宇宙を<wbr>持っています。'
     : highestPct >= 70 ? 'その感覚は、<wbr>多くの人の心と<wbr>静かに重なっています。'
@@ -1990,7 +2024,7 @@ function buildSenseCard(coloredLetters) {
   const empathyLabelHtml = !mostEmpathy
     ? `<div class="empathy-pct-label">すべての文字で<wbr>世間と異なる色を<wbr>選んでいました。</div>`
     : `<div class="sense-sentence">
-        <span class="sense-strong">${highestPct}%</span>の人が、${mostEmpathy}にあなたと同じ<span class="sense-color-word" style="color:${isBright(eColor)?'var(--ink)':eColor}">${eColorName}</span>を感じていました。
+        <span class="sense-strong">${highestPct}%</span>の人が、${itemLabel(mostEmpathy)}にあなたと同じ<span class="sense-color-word" style="color:${isBright(eColor)?'var(--ink)':eColor}">${eColorName}</span>を感じていました。
       </div>`;
 
   const empathyText = `${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
@@ -2002,12 +2036,12 @@ function buildSenseCard(coloredLetters) {
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
        </div>`
     : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${mostUnique}</span></div>
+         <div class="sense-circle mine"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${itemLabel(mostUnique, true)}</span></div>
          <span class="sense-circle-label">あなた</span>
        </div>
        <div class="sense-op">vs</div>
        <div class="sense-circle-wrap">
-         <div class="sense-circle theirs"${isBright(uTopColorHex2)?' data-bright="1"':''} style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)}"><span>${mostUnique}</span></div>
+         <div class="sense-circle theirs"${isBright(uTopColorHex2)?' data-bright="1"':''} style="background:${uTopColorHex2};color:${textColorFor(uTopColorHex2)}"><span>${itemLabel(mostUnique, true)}</span></div>
          <span class="sense-circle-label">みんな</span>
        </div>`;
 
@@ -2017,12 +2051,12 @@ function buildSenseCard(coloredLetters) {
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
        </div>`
     : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>
+         <div class="sense-circle mine"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>
          <span class="sense-circle-label">あなた</span>
        </div>
        <div class="sense-op">=</div>
        <div class="sense-circle-wrap">
-         <div class="sense-circle theirs"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${mostEmpathy}</span></div>
+         <div class="sense-circle theirs"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>
          <span class="sense-circle-label">みんな</span>
        </div>`;
 
@@ -2030,7 +2064,7 @@ function buildSenseCard(coloredLetters) {
     <div class="section-eyebrow">Your Sense</div>
     <div class="sense-grid">
       <div class="sense-col">
-        <div class="sense-col-label">最も個性的だった文字</div>
+        <div class="sense-col-label">${isNumberMode ? '最も個性的だった数字' : '最も個性的だった文字'}</div>
         ${isAllMajority
           ? `<div class="sense-row">
                <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
@@ -2105,7 +2139,7 @@ function buildVoteSection(coloredLetters) {
 
     return `<div class="vote-item">
       <div class="vote-item-row">
-        <div class="vote-letter-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${l}</span></div>
+        <div class="vote-letter-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${itemLabel(l, true)}</span></div>
         <div class="vote-stacked-outer">
           <div class="vote-marker-row">${markerHtml}</div>
           <div class="vote-stacked-track">${segsHtml}</div>
@@ -2195,11 +2229,13 @@ function buildShareSection(diag, coloredLetters) {
   // STEP2: 「感覚を見せる」方向のXシェアテキスト
   // result URL（自分の結果が開く）をシェア
   const sharedResult = new URL(location.href);
+  sharedResult.hash = '';
+  if (sharedResult.protocol === 'file:') sharedResult.href = `${shareOrigin}/${sharedResult.pathname.split('/').pop()}${sharedResult.search}`;
   const rareStat = calcRareStat(diag);
   sharedResult.searchParams.set('score', rareStat.value);
   sharedResult.searchParams.set('stat', rareStat.label === '珍しさ' ? 'rarity' : 'empathy');
   const resultUrl = sharedResult.href;
-  const ogUrl = new URL('/api/og', location.origin);
+  const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
   ogUrl.searchParams.set('v', '2');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
@@ -2214,10 +2250,11 @@ function buildShareSection(diag, coloredLetters) {
       highestPct = votes[0].pct;
     }
   });
-  const uniqueText = isAllMajority ? 'すべての文字で世間と一致' : mostUnique || '該当なし';
-  const empathyText = mostEmpathy || '該当なし';
+  const uniqueText = isAllMajority ? 'すべての文字で世間と一致' : itemLabel(mostUnique) || '該当なし';
+  const empathyText = itemLabel(mostEmpathy) || '該当なし';
   const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
-  const shareText = `🎨あなたの文字色感覚は、${rareStat.label}上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagName}\n最も個性的な文字：${uniqueText}\n最も共感された文字：${empathyText}\n\n――あなたの「A」は、何色ですか？\n\n${resultUrl}`;
+  const senseName = isSubjectMode ? '教科色感覚' : isNumberMode ? '数字色感覚' : '文字色感覚';
+  const shareText = `🎨あなたの${senseName}は、${rareStat.label}上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagName}\n${isNumberMode ? '最も個性的だった数字：' : '最も個性的な文字：'}${uniqueText}\n最も共感された文字：${empathyText}\n\n――あなたの「${isSubjectMode ? '国語' : isNumberMode ? '1' : 'A'}」は、何色ですか？\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -2268,6 +2305,34 @@ function fitTypeName() {
 window.addEventListener('resize', () => requestAnimationFrame(fitTypeName));
 
 /* ══ メイン描画 ══ */
+function renderWithoutStats(coloredLetters) {
+  const type = COLOR_TYPES.find(item => item.id === detectColorType(coloredLetters));
+  const themeName = isSubjectMode ? '教科' : '数字';
+  const themeLabel = isSubjectMode ? 'あなたの教科の色' : 'あなたの数字の色';
+  const pickerUrl = isSubjectMode ? 'subject.html' : 'number.html';
+  const sampleItem = isSubjectMode ? '国語' : '1';
+  const status = window.themeStatsStatus || 'loading';
+  const message = window.themeVoteError ? '投票を保存できませんでした。接続設定またはデータベースの権限を確認してください。'
+    : status === 'loading' ? '投票データを読み込んでいます…'
+    : status === 'error' ? '投票データを取得できませんでした。時間をおいて再度お試しください。'
+    : '選んだ項目の投票データがまだないため、共感度は未集計です。色のタイプと選んだ色は、下の結果からシェアできます。';
+  const dots = coloredLetters.map(letter => `<div class="type-palette-dot" style="background:${colorMap[letter]};color:${textColorFor(colorMap[letter])}"><span>${itemLabel(letter, true)}</span></div>`).join('');
+  document.getElementById('typeHeroArea').innerHTML = `<div class="type-hero" data-type="${type.id}" data-theme="dark" style="background-image:url('assets/backgrounds/${TYPE_BG[type.id]}.webp')"><div class="type-hero-inner"><div class="type-label">${themeLabel}</div><div class="type-name-color">${type.name}</div><div class="type-palette-strip">${dots}</div></div></div>`;
+  document.getElementById('mainWrap').innerHTML = `<div class="card"><p>${message}</p>${window.themeVoteError ? '<p class="statistics-error-code"></p>' : ''}<a class="btn-back" href="${pickerUrl}${location.search}">← 色を選び直す</a></div>`;
+  const errorCode = document.querySelector?.('.statistics-error-code');
+  if (errorCode) errorCode.textContent = window.themeVoteError;
+  const url = new URL(location.href);
+  url.hash = '';
+  if (url.protocol === 'file:') url.href = `${shareOrigin}/${url.pathname.split('/').pop()}${url.search}`;
+  if (/\/result-en(?:\.html)?$/.test(url.pathname)) url.searchParams.set('lang', 'en');
+  url.searchParams.delete('score');
+  url.searchParams.delete('stat');
+  const image = new URL('/api/og', shareOrigin);
+  image.search = url.search;
+  const shareText = `🎨私の${themeName}の色は ${type.name} でした。\n\n――あなたの「${sampleItem}」は、何色ですか？\n\n${url.href}`;
+  document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">結果をシェアする</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Xにシェア</a></div></div>`;
+}
+
 function render() {
   const typeHeroArea = document.getElementById('typeHeroArea');
   const mainWrap = document.getElementById('mainWrap');
@@ -2282,6 +2347,10 @@ function render() {
     return;
   }
 
+  if ((isNumberMode || isSubjectMode) && coloredLetters.some(letter => !DUMMY_VOTES[letter]?.length)) {
+    renderWithoutStats(coloredLetters);
+    return;
+  }
   const diag = calcDiagnosis();
 
   // blob用の上位2色（typeHero・shareOuter共用）
@@ -2291,7 +2360,10 @@ function render() {
 
   setTimeout(() => {
     // ① ファーストビュー
-    typeHeroArea.innerHTML = buildTypeHero(coloredLetters, diag);
+    const voteErrorNotice = window.themeVoteError ? '<div role="status" style="padding:1rem;text-align:center;color:white;background:#28384d">投票を保存できませんでした。接続設定またはデータベースの権限を確認してください。<br><span id="voteSaveErrorCode"></span></div>' : '';
+    typeHeroArea.innerHTML = voteErrorNotice + buildTypeHero(coloredLetters, diag);
+    const voteSaveErrorCode = document.getElementById('voteSaveErrorCode');
+    if (voteSaveErrorCode) voteSaveErrorCode.textContent = window.themeVoteError;
     setTimeout(fitTypeName, 0);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTypeName);
 
@@ -2470,12 +2542,12 @@ function render() {
       const diagName = typeHero?.querySelector('.type-name-diag')?.textContent?.trim() || '';
       const desc = `${typeName} / ${diagName} — あなたの文字には、どんな色が見えますか？`;
       const url  = location.href;
-      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', 'あなたのAは何色?　―SynestheShare');
+      document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', (isSubjectMode ? 'あなたの教科は何色?　―SynestheShare' : isNumberMode ? 'あなたの1は何色?　―SynestheShare' : 'あなたのAは何色?　―SynestheShare'));
       document.querySelector('meta[property="og:description"]') ?.setAttribute('content', desc);
       document.querySelector('meta[property="og:url"]')         ?.setAttribute('content', url);
-      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', 'あなたのAは何色?　―SynestheShare');
+      document.querySelector('meta[name="twitter:title"]')      ?.setAttribute('content', (isSubjectMode ? 'あなたの教科は何色?　―SynestheShare' : isNumberMode ? 'あなたの1は何色?　―SynestheShare' : 'あなたのAは何色?　―SynestheShare'));
       document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', desc);
-      document.title = 'あなたのAは何色?　―SynestheShare';
+      document.title = (isSubjectMode ? 'あなたの教科は何色?　―SynestheShare' : isNumberMode ? 'あなたの1は何色?　―SynestheShare' : 'あなたのAは何色?　―SynestheShare');
     })();
   }, 500);
 }
@@ -2682,11 +2754,10 @@ render();
 </script>
 
 <!-- ══ Firebase 投票・集計ロジック ══ -->
-<script type="module">
+<script type="module" onerror="window.themeStatsStatus='error';window.themeVoteError='firebase-module-load';window.render?.()">
 import { initializeApp }                          from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc,
-         updateDoc, increment, collection,
-         addDoc, serverTimestamp }                from 'firebase/firestore';
+import { getFirestore, doc, getDoc, writeBatch,
+         increment, collection, serverTimestamp } from 'firebase/firestore';
 
 /* ── Firebase 設定（firebase-config.js の値をここに貼る） ── */
 const firebaseConfig = {
@@ -2719,7 +2790,7 @@ function parseColorMap() {
   const params = new URLSearchParams(location.search);
   const r = params.get('r') || '';
   const mode = params.get('mode') || '10';
-  const letters = mode === '26'
+  const letters = mode === 'subject' ? ['language','math','science','social','english'] : mode === 'number' ? '1234567890'.split('') : mode === '26'
     ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
     : ['A','B','C','D','E','F','G','X','Y','Z'];
   const map = {};
@@ -2736,11 +2807,14 @@ function parseColorMap() {
    ・かつ、この結果でまだ投票していない（ss_vote_key が未完）
 ──────────────────────────────────────────────── */
 function shouldVote() {
-  if (localStorage.getItem('ss_submitted') === '1') return false;
-  const fromAlphabet = sessionStorage.getItem('ss_from_alphabet') === '1';
+  const mode = new URLSearchParams(location.search).get('mode');
+  const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
+  if (localStorage.getItem(submissionKey) === '1') return false;
+  const explicitSubmission = ['number','subject'].includes(mode) && location.hash === '#submit';
+  const fromAlphabet = explicitSubmission || sessionStorage.getItem('ss_from_alphabet') === '1';
   if (!fromAlphabet) return false;
   const voteKey = sessionStorage.getItem('ss_vote_key');
-  if (!voteKey) return false;
+  if (!voteKey && !explicitSubmission) return false;
   if (sessionStorage.getItem(voteKey) === 'done') return false;
   return true;
 }
@@ -2749,7 +2823,10 @@ function markVoteDone() {
   const voteKey = sessionStorage.getItem('ss_vote_key');
   if (voteKey) sessionStorage.setItem(voteKey, 'done');
   sessionStorage.removeItem('ss_from_alphabet');
-  localStorage.setItem('ss_submitted', '1'); // 同ブラウザからの再投票を永続ブロック
+  const mode = new URLSearchParams(location.search).get('mode');
+  const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
+  localStorage.setItem(submissionKey, '1'); // Same browser, once per theme.
+  if (location.hash === '#submit') history.replaceState(null, '', location.pathname + location.search);
 }
 
 /* ────────────────────────────────────────────────
@@ -2808,38 +2885,38 @@ function statsToVotes(statsData) {
   /* ── STEP 1: 投票を保存（alphabet→result の直接遷移時のみ） ── */
   if (shouldVote()) {
     try {
+      window.themeVoteError = '';
       /* responses コレクションに1件追加 */
-      await addDoc(collection(db, 'responses'), {
+      const batch = writeBatch(db);
+      batch.set(doc(collection(db, 'responses')), {
         r:         new URLSearchParams(location.search).get('r') || '',
         mode:      new URLSearchParams(location.search).get('mode') || '10',
         timestamp: serverTimestamp(),
       });
 
       /* statistics/{letter} に各色の票数をインクリメント（キー=色名） */
-      const updates = letters.map(async l => {
+      letters.forEach(l => {
         const hex = colorMap[l];
         if (!hex) return;
         const colorName = COLOR_NAME[hex] || hex;
-        const ref = doc(db, 'statistics', l);
-        try {
-          await updateDoc(ref, { [colorName]: increment(1) });
-        } catch {
-          await setDoc(ref, { [colorName]: 1 });
-        }
+        const ref = doc(db, 'statistics', (new URLSearchParams(location.search).get('mode') === 'subject' ? 'subject-' : '') + l);
+        batch.set(ref, { [colorName]: increment(1) }, { merge: true });
       });
-      await Promise.all(updates);
+      await batch.commit();
 
       markVoteDone();
       console.info('[SynestheShare] 投票完了');
     } catch (e) {
+      window.themeVoteError = e.code || 'unknown';
       console.warn('[SynestheShare] 投票エラー:', e);
     }
   }
 
   /* ── STEP 2: 統計データを取得してUIを更新 ── */
   try {
-    const allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', l)));
+    const statsMode = new URLSearchParams(location.search).get('mode');
+    const allLetters = statsMode === 'subject' ? ['language','math','science','social','english'] : (statsMode === 'number' ? '1234567890' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ').split('');
+    const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', (new URLSearchParams(location.search).get('mode') === 'subject' ? 'subject-' : '') + l)));
     const snaps   = await Promise.all(fetches);
 
     const statsData = {};
@@ -2849,11 +2926,16 @@ function statsToVotes(statsData) {
 
     const hasData = Object.keys(statsData).length > 0;
     if (!hasData) {
+      if (new URLSearchParams(location.search).get('mode') !== '10' && ['number','subject'].includes(new URLSearchParams(location.search).get('mode'))) {
+        window.themeStatsStatus = 'empty';
+        window.render();
+      }
       console.info('[SynestheShare] 統計データなし（まだ誰も投票していない）');
       return;
     }
 
     const liveVotes = statsToVotes(statsData);
+    window.themeStatsStatus = 'ready';
 
     /* グローバルの DUMMY_VOTES をリアルデータで上書き */
     if (typeof window.DUMMY_VOTES !== 'undefined') {
@@ -2867,6 +2949,10 @@ function statsToVotes(statsData) {
 
     console.info('[SynestheShare] リアルデータで更新完了');
   } catch (e) {
+    if (new URLSearchParams(location.search).get('mode') !== '10' && ['number','subject'].includes(new URLSearchParams(location.search).get('mode'))) {
+      window.themeStatsStatus = 'error';
+      window.render();
+    }
     console.warn('[SynestheShare] 統計取得エラー（ダミーデータで表示）:', e);
   }
 })();

@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ファビコン -->
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/favicon-16.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/favicon-180.png">
+<meta property="og:title" content="SynestheShare — What color is your A?">
+<meta property="og:description" content="Explore the colors you associate with letters and numbers. Create your palette and compare it with others.">
+<meta property="og:url" content="https://mo3ym.github.io/synestheshare/">
+<meta name="twitter:card" content="summary_large_image">
+<title>SynestheShare — What color is your A?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:  #ffffff;
+  --bg:     #f7f7f5;
+  --ink:    #181818;
+  --ink2:   #555550;
+  --ink3:   #aaaaaa;
+  --border: #e0e0dc;
+  --c1: #ff7f7f;
+  --c2: #ffae66;
+  --c3: #f5dc72;
+  --c4: #67bf92;
+  --c5: #4da8e8;
+  --c6: #9272ff;
+  --c7: #ee9fd0;
+  --mint: #1aaeaa;
+  --outfit: 'Outfit', sans-serif;
+  --jp: 'Noto Sans JP', "HiraginoUDSansN-W3", "ヒラギノUD角ゴ ProN W3",
+        "Hiragino Sans", "ヒラギノ角ゴシック",
+        "Meiryo UI", "Meiryo", sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; }
+
+/* ══════════════════════════════════════
+   NAV
+══════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 1.5rem;
+  background: rgba(247,247,245,0.88);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
+}
+/* ①ロゴを左端に固定してulが真ん中に来るよう absolute 配置 */
+.nav-logo {
+  position: absolute; left: 1.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 26px;
+}
+.nav-logo img { height: 100%; width: auto; display: block; }
+/* ①右端ボタンも absolute 配置 */
+.nav-right { position: absolute; right: 1.5rem; }
+nav ul { list-style: none; display: flex; gap: 1.8rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+nav ul a:hover { color: var(--ink); }
+
+/* ── ボタン共通: 珊瑚色ガラスCTA ── */
+.btn-primary, .nav-cta {
+  position: relative;
+  isolation: isolate;
+  background: rgba(255,90,90,0.88);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 100px; color: #fff;
+  font-family: var(--jp); font-weight: 400;
+  text-decoration: none; letter-spacing: 0.04em;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  white-space: nowrap;
+  box-shadow:
+    0 0  8px rgba(255, 90, 80,0.70),
+    0 0 22px rgba(255,110,90,0.48),
+    0 0 50px rgba(255,120,80,0.28),
+    0 0 90px rgba(255,100,70,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+}
+.btn-primary::before, .nav-cta::before {
+  content: '';
+  position: absolute;
+  inset: -14px -20px;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 60%,
+    rgba(255,100,80,0.42) 0%,
+    rgba(255,130,80,0.22) 40%,
+    transparent 72%);
+  filter: blur(22px);
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.btn-primary { padding: 0.82rem 1.85rem; font-size: 0.9rem; }
+.nav-cta     { padding: 0.48rem 1.25rem; font-size: 0.82rem; }
+.btn-primary:hover, .nav-cta:hover {
+  background: rgba(255,105,95,0.94);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 10px rgba(255, 90, 80,0.80),
+    0 0 30px rgba(255,110,90,0.58),
+    0 0 65px rgba(255,120,80,0.36),
+    0 0 110px rgba(255,100,70,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.32);
+}
+.btn-primary:hover::before, .nav-cta:hover::before {
+  background: radial-gradient(ellipse at 50% 60%,
+    rgba(255,110,85,0.55) 0%,
+    rgba(255,135,85,0.30) 40%,
+    transparent 72%);
+}
+
+/* CTAバンド内ボタン（暗背景） */
+.btn-primary-dark {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1.5px solid rgba(255,255,255,0.35); border-radius: 100px;
+  color: var(--white); font-family: var(--jp); font-weight: 400; font-size: 0.9rem;
+  text-decoration: none; letter-spacing: 0.04em; padding: 0.82rem 1.85rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: background 0.15s, transform 0.12s;
+}
+.btn-primary-dark:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
+
+/* ══════════════════════════════════════
+   HERO — 背景・大気エフェクト
+══════════════════════════════════════ */
+.hero-wrap {
+  position: relative; overflow: hidden;
+  background-image: url('assets/backgrounds/index_hero.webp');
+  background-size: cover;
+  background-position: center top;
+}
+.hero-blob { display: none; }
+.hero-blob-1 { width: max(420px, 85vw); height: max(420px, 85vw); top: -15%; left: -15%; }
+.hero-blob-2 { width: max(360px, 70vw); height: max(360px, 70vw); top: 20%; right: -15%; }
+.hero-blob-3 { width: max(300px, 60vw); height: max(300px, 60vw); bottom: 0; left: 25%; }
+
+@keyframes blobdrift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(24px,18px) scale(1.06); }
+}
+
+/* ── 底辺ヴィネット：空気の重さ ── */
+.hero-wrap::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    ellipse 110% 42% at 50% 108%,
+    rgba(8,6,20,0.22) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 大気層：2枚の光膜がゆっくり呼吸する ── */
+.hero-atmo {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+}
+.hero-atmo::before {
+  content: '';
+  position: absolute;
+  width: 130%; height: 130%;
+  top: -15%; left: -15%;
+  background: radial-gradient(
+    ellipse 65% 55% at 38% 48%,
+    rgba(255,110,80,0.52) 0%,
+    rgba(210,80,170,0.28) 42%,
+    transparent 68%
+  );
+  filter: blur(55px);
+  animation: atmoA 38s ease-in-out infinite alternate;
+}
+.hero-atmo::after {
+  content: '';
+  position: absolute;
+  width: 130%; height: 130%;
+  top: -15%; right: -20%;
+  background: radial-gradient(
+    ellipse 58% 62% at 62% 52%,
+    rgba(70,130,255,0.44) 0%,
+    rgba(130,70,220,0.26) 48%,
+    transparent 70%
+  );
+  filter: blur(65px);
+  animation: atmoB 52s ease-in-out infinite alternate-reverse;
+}
+@keyframes atmoA {
+  0%   { transform: translate(0,0)    scale(1)    rotate(0deg); }
+  40%  { transform: translate(7%,5%)  scale(1.05) rotate(10deg); }
+  70%  { transform: translate(-4%,8%) scale(0.97) rotate(-6deg); }
+  100% { transform: translate(4%,-6%) scale(1.03) rotate(14deg); }
+}
+@keyframes atmoB {
+  0%   { transform: translate(0,0)    scale(1); }
+  55%  { transform: translate(-9%,6%) scale(1.07); }
+  100% { transform: translate(5%,-4%) scale(0.96); }
+}
+
+/* ── 微粒子フィールド（背景画像の光点に合わせ白グロー） ── */
+.hero-p-a, .hero-p-b, .hero-p-c, .hero-p-d {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 小さな白光点 グループA（10個） */
+.hero-p-a {
+  box-shadow:
+     8vw  15vh 5px 1px rgba(255,255,255,0.88),
+    22vw  72vh 4px 1px rgba(255,255,255,0.82),
+    38vw  28vh 5px 1px rgba(255,255,255,0.85),
+    55vw  85vh 4px 1px rgba(255,255,255,0.80),
+    72vw  42vh 5px 1px rgba(255,255,255,0.86),
+    88vw  18vh 4px 1px rgba(255,255,255,0.82),
+    16vw  55vh 5px 1px rgba(255,255,255,0.88),
+    48vw  62vh 4px 1px rgba(255,255,255,0.80),
+    64vw   8vh 5px 1px rgba(255,255,255,0.84),
+    92vw  58vh 4px 1px rgba(255,255,255,0.82);
+  animation: particleDrift1 12s ease-in-out infinite alternate,
+             particlePulse   4s ease-in-out infinite -0.8s;
+}
+
+/* 小さな白光点 グループB（10個） */
+.hero-p-b {
+  box-shadow:
+    14vw  38vh 5px 1px rgba(255,255,255,0.84),
+    32vw   5vh 4px 1px rgba(255,255,255,0.80),
+    50vw  75vh 5px 1px rgba(255,255,255,0.88),
+    68vw  32vh 4px 1px rgba(255,255,255,0.82),
+    85vw  65vh 5px 1px rgba(255,255,255,0.85),
+     5vw  82vh 4px 1px rgba(255,255,255,0.80),
+    42vw  45vh 5px 1px rgba(255,255,255,0.86),
+    78vw  88vh 4px 1px rgba(255,255,255,0.82),
+    26vw  22vh 5px 1px rgba(255,255,255,0.88),
+    95vw  12vh 4px 1px rgba(255,255,255,0.80);
+  animation: particleDrift2 17s ease-in-out infinite alternate-reverse,
+             particlePulse   5s ease-in-out infinite -2.5s;
+}
+
+/* 中サイズ・温かみグロー（8個） */
+.hero-p-c {
+  box-shadow:
+    18vw  48vh  9px 2px rgba(255,215,190,0.70),
+    45vw  20vh  8px 2px rgba(255,205,178,0.65),
+    72vw  68vh  9px 2px rgba(255,218,192,0.72),
+    30vw  90vh  8px 2px rgba(255,210,182,0.64),
+    60vw  35vh  9px 2px rgba(255,215,188,0.68),
+    10vw  62vh  8px 2px rgba(255,205,178,0.66),
+    88vw  40vh  9px 2px rgba(255,218,192,0.70),
+    52vw  78vh  8px 2px rgba(255,210,182,0.64);
+  animation: particleDrift3 14s ease-in-out infinite alternate,
+             particlePulse   5s ease-in-out infinite -1.3s;
+}
+
+/* 大きなボケ光点（6個） */
+.hero-p-d {
+  box-shadow:
+    25vw  60vh 18px 5px rgba(255,222,205,0.52),
+    62vw  15vh 16px 4px rgba(218,205,255,0.48),
+    80vw  78vh 20px 6px rgba(255,222,205,0.54),
+    10vw  30vh 15px 4px rgba(205,218,255,0.46),
+    48vw  50vh 18px 5px rgba(255,218,198,0.52),
+    90vw  25vh 16px 4px rgba(218,205,255,0.50);
+  animation: particleDrift4 20s ease-in-out infinite alternate-reverse,
+             particlePulse   6s ease-in-out infinite -3.0s;
+}
+
+@keyframes particleDrift1 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate( 28px,-45px); }
+}
+@keyframes particleDrift2 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate(-32px,-50px); }
+}
+@keyframes particleDrift3 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate( 22px,-38px); }
+}
+@keyframes particleDrift4 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate(-20px,-32px); }
+}
+@keyframes particlePulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.20; }
+}
+
+/* ── 波リボン（SVG・透視収束） ── */
+.hero-wave-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+/* 手前ほど大きく動き、奥ほど小さく動く（遠近感） */
+.wave-g1 { animation: waveDrift1 10s ease-in-out infinite alternate; }
+.wave-g2 { animation: waveDrift2 14s ease-in-out infinite alternate-reverse; }
+.wave-g3 { animation: waveDrift3 12s ease-in-out infinite alternate; }
+@keyframes waveDrift1 {
+  0%   { transform: translateY(  0px); }
+  100% { transform: translateY(-42px); }
+}
+@keyframes waveDrift2 {
+  0%   { transform: translateY( 0px); }
+  100% { transform: translateY(32px); }
+}
+@keyframes waveDrift3 {
+  0%   { transform: translateY(  0px); }
+  100% { transform: translateY(-24px); }
+}
+
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100svh;
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; gap: 3rem;
+  padding: 8rem 2.5rem 4rem;
+  max-width: 1200px; margin: 0 auto;
+}
+
+.hero-label {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.hero-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
+
+.hero h1 {
+  font-family: var(--jp); font-weight: 340;
+  font-size: clamp(2.6rem, 5vw, 4.5rem);
+  line-height: 1.25; letter-spacing: -0.01em; margin-bottom: 1.5rem;
+  word-break: keep-all; overflow-wrap: break-word;
+  text-shadow: 0 0 22px rgba(255,255,255,0.20), 0 0 50px rgba(255,255,255,0.09);
+}
+.hero h1 strong { font-weight: 340; }
+.hero h1 .hl-red  { color: var(--c1); font-weight: 340; text-shadow: 0 0 18px rgba(255,127,127,0.50), 0 0 38px rgba(255,127,127,0.25); }
+.hero h1 .hl-mint { color: var(--mint); font-weight: 340; text-shadow: 0 0 18px rgba(26,174,170,0.50), 0 0 38px rgba(26,174,170,0.25); }
+
+.hero-body {
+  font-size: 0.92rem; color: var(--ink2);
+  line-height: 1.9; max-width: 340px;
+  margin-bottom: 2rem; font-weight: 340;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+.hero-ctas { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+
+/* ── スクロールインジケーター ── */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  animation: scrollIndicatorFade 0.8s ease 1.2s both;
+}
+.scroll-indicator.hidden { opacity: 0; pointer-events: none; }
+@keyframes scrollIndicatorFade {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.scroll-indicator-label {
+  font-family: var(--outfit);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.scroll-indicator-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.13);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  box-shadow: 0 8px 28px rgba(60,100,220,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.scroll-indicator:hover .scroll-indicator-icon {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.22);
+  transform: translateY(2px);
+}
+.scroll-indicator-icon svg {
+  display: block;
+  animation: arrowBounce 2.4s cubic-bezier(.45,.05,.55,.95) infinite;
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
+
+/* ◯グリッド */
+.hero-visual {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 10px; padding: 0.5rem;
+  width: 100%; max-width: 440px; align-self: center;
+}
+.bubble-cell { position: relative; }
+.bubble-cell::before { content: ''; display: block; padding-top: 100%; }
+.bubble-cell .letter-bubble { position: absolute; inset: 0; width: 100%; height: 100%; }
+.letter-bubble {
+  position: relative; isolation: isolate;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; color: white;
+  font-size: 1rem; transition: transform 0.28s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+  cursor: default; overflow: hidden;
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+}
+.letter-bubble::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none; z-index: -1;
+}
+.letter-bubble span { display: block; line-height: 1; text-align: center; white-space: nowrap; }
+
+/* ══════════════════════════════════════
+   THEMES — グラデーション背景付き
+══════════════════════════════════════ */
+.themes-wrap {
+  position: relative; overflow: hidden;
+  background-image: url('assets/backgrounds/index_themes.webp');
+  background-size: cover;
+  background-position: center top;
+}
+.themes-blob { display: none; }
+
+/* ④テーマ背景blob（黄〜緑系でヒーローと差別化）*/
+.themes-blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
+.themes-blob-1 {
+  width: max(500px, 60vw); height: max(500px, 60vw);
+  background: radial-gradient(circle, rgba(212,184,0,0.18) 0%, transparent 70%);
+  top: -10%; right: -10%;
+  animation: blobdrift 12s ease-in-out infinite alternate;
+}
+.themes-blob-2 {
+  width: max(400px, 50vw); height: max(400px, 50vw);
+  background: radial-gradient(circle, rgba(42,158,96,0.15) 0%, transparent 70%);
+  bottom: -5%; left: -8%;
+  animation: blobdrift 10s ease-in-out infinite alternate-reverse;
+}
+
+.themes {
+  position: relative; z-index: 1;
+  padding: 9rem 1.75rem 7rem; max-width: 720px; margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .themes { padding: 10rem 2.5rem 8rem; }
+}
+
+.sec-eyebrow {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.6rem;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+.sec-eyebrow::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
+
+.sec-title {
+  font-family: var(--jp); font-weight: 340; font-size: clamp(2rem, 3.5vw, 2.8rem);
+  letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 0.75rem;
+  word-break: keep-all; overflow-wrap: break-word;
+  text-shadow: 0 0 22px rgba(255,255,255,0.20), 0 0 50px rgba(255,255,255,0.09);
+}
+.sec-title strong { font-weight: 340; color: var(--c1); text-shadow: 0 0 18px rgba(255,127,127,0.50), 0 0 38px rgba(255,127,127,0.25); }
+
+.themes-lead {
+  font-size: 0.88rem; color: var(--ink2); font-weight: 340;
+  margin-bottom: 3.5rem; line-height: 1.7;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
+/* 2x2 グリッド。スマホ最優先で、PCでも同じ列数を維持 */
+.theme-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 768px) { .theme-grid { gap: 1.5rem; } }
+
+.theme-card {
+  /* すりガラス：強い blur + 半透明グラデーション */
+  background: linear-gradient(
+    155deg,
+    rgba(255,255,255,0.58) 0%,
+    rgba(255,255,255,0.42) 100%
+  );
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 18px;
+  padding: 1.6rem 1.4rem 1.5rem;
+  text-decoration: none; color: var(--ink);
+  display: flex; flex-direction: column;
+  /* ふんわりした影 + 内側に薄いハイライト */
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.18);
+  transition: box-shadow 0.35s ease, transform 0.35s ease, background 0.35s ease;
+  position: relative; overflow: hidden;
+  isolation: isolate;
+}
+@media (min-width: 768px) {
+  .theme-card { padding: 2rem 1.75rem 1.75rem; border-radius: 22px; }
+}
+.theme-card:hover {
+  background: linear-gradient(
+    155deg,
+    rgba(255,255,255,0.65) 0%,
+    rgba(255,255,255,0.48) 100%
+  );
+  box-shadow:
+    0 18px 54px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 0 0 1px rgba(255,255,255,0.22);
+  transform: translateY(-2px);
+}
+/* No.01（人気）カードのみ：赤〜オレンジの漏れ光ハロー（すりガラス維持） */
+.theme-card:has(.badge-popular) {
+  border-color: rgba(255,160,100,0.45);
+  box-shadow:
+    0 0 0 1px rgba(255,127,127,0.14),
+    0 0 18px rgba(255,127,127,0.26),
+    0 0 42px rgba(255,174,102,0.20),
+    0 12px 40px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 0 0 1px rgba(255,255,255,0.18),
+    inset 0 0 18px rgba(255,170,100,0.10);
+}
+.theme-card:has(.badge-popular):hover {
+  border-color: rgba(255,160,100,0.58);
+  box-shadow:
+    0 0 0 1px rgba(255,127,127,0.20),
+    0 0 26px rgba(255,127,127,0.34),
+    0 0 58px rgba(255,174,102,0.24),
+    0 18px 54px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 0 0 1px rgba(255,255,255,0.22),
+    inset 0 0 20px rgba(255,170,100,0.13);
+}
+
+/* No. ラベルは控えめに（管理番号感を弱める） */
+.theme-header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 1rem; margin-bottom: 1.4rem;
+}
+.theme-no {
+  font-family: var(--outfit); font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.18em; color: var(--ink3); opacity: 0.7;
+}
+.badge-popular {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: rgba(255,127,127,0.10); border: 1px solid rgba(255,127,127,0.28);
+  color: var(--c1); font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.2rem 0.55rem; border-radius: 100px; white-space: nowrap;
+}
+.badge-popular::before { content: '★'; font-size: 0.6rem; }
+
+/* 上部の細いグラデーションライン：もう少し繊細に */
+.theme-accent-bar {
+  height: 2px; border-radius: 2px; margin-bottom: 1.5rem;
+  opacity: 0.85;
+}
+.theme-bubble-row { display: flex; gap: 7px; margin-bottom: 1.5rem; align-items: flex-start; }
+.tbubble-cell { position: relative; width: 36px; flex-shrink: 0; }
+.tbubble-cell::before { content:''; display:block; padding-top:100%; }
+.tbubble {
+  position: absolute; inset: 0; isolation: isolate; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.85rem; color: white; overflow: hidden;
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+  transition: box-shadow 0.25s ease;
+}
+.tbubble::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none; z-index: -1;
+}
+/* ⑧ テーマカード内アウトライン◯ */
+.tbubble-outline {
+  background: var(--white) !important;
+  box-sizing: border-box;
+}
+/* タイポ階層を明確に：テーマ名は大きく、本文は細く */
+.theme-name {
+  font-family: var(--jp); font-weight: 500;
+  font-size: 1.05rem; line-height: 1.35; letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+@media (min-width: 768px) {
+  .theme-name { font-size: 1.2rem; }
+}
+.theme-desc {
+  font-size: 0.78rem; color: var(--ink2); line-height: 1.7;
+  font-weight: 300; flex: 1;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+
+/* 「→」だけのミニマルなCTA */
+.theme-cta {
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1.6rem;
+  padding: 0;
+  color: var(--ink3);
+  transition: color 0.3s ease;
+}
+.theme-card:hover .theme-cta { color: var(--ink); }
+.theme-cta-arrow {
+  font-family: var(--outfit); font-size: 1.05rem; font-weight: 400;
+  transition: transform 0.35s ease;
+  display: inline-block; opacity: 0.7;
+}
+.theme-card:hover .theme-cta-arrow {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════
+   HOW — グラデーション背景付き（CTA系だが青紫寄りで差別化）
+══════════════════════════════════════ */
+.how {
+  position: relative; overflow: hidden;
+  background: var(--ink); color: var(--white); padding: 7rem 2.5rem;
+}
+/* CTAは赤中心、HOWは青紫寄りのblobで差別化 */
+.how::before {
+  content: '';
+  position: absolute;
+  width: max(600px, 80vw); height: max(600px, 80vw);
+  background: radial-gradient(circle, rgba(26,136,200,0.15) 0%, rgba(112,40,192,0.10) 45%, transparent 70%);
+  top: 50%; left: 30%; transform: translate(-50%,-50%);
+  border-radius: 50%; filter: blur(80px); pointer-events: none;
+}
+.how::after {
+  content: '';
+  position: absolute;
+  width: max(300px, 40vw); height: max(300px, 40vw);
+  background: radial-gradient(circle, rgba(26,174,170,0.12) 0%, transparent 70%);
+  bottom: -10%; right: -5%;
+  border-radius: 50%; filter: blur(60px); pointer-events: none;
+}
+.how-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+.how .sec-eyebrow { color: rgba(255,255,255,0.3); }
+.how .sec-eyebrow::before { background: rgba(255,255,255,0.2); }
+.how .sec-title { color: var(--white); margin-bottom: 3.5rem; }
+.how .sec-title strong { color: var(--c3); }
+
+.steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem; }
+.step { display: flex; flex-direction: column; gap: 0.6rem; }
+.step-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 0.25rem; }
+.step-num { font-family: var(--outfit); font-weight: 700; font-size: 0.65rem; letter-spacing: 0.14em; color: rgba(255,255,255,0.28); text-transform: uppercase; }
+.step-title { font-family: var(--jp); font-weight: 400; font-size: 0.88rem; word-break: keep-all; overflow-wrap: break-word; }
+.step-desc { font-size: 0.76rem; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 340; word-break: keep-all; overflow-wrap: break-word; }
+
+/* ══════════════════════════════════════
+   ABOUT — Blob背景グラデーション
+══════════════════════════════════════ */
+.about-wrap {
+  position: relative; overflow: hidden;
+  background-image: url('assets/backgrounds/index_about.webp');
+  background-size: cover;
+  background-position: center top;
+  border-top: 1px solid var(--border);
+}
+.about-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+.about-blob-1 {
+  width: min(480px, 52vw); height: min(480px, 52vw);
+  background: radial-gradient(circle, rgba(26,174,170,0.14) 0%, transparent 70%);
+  top: -20%; right: -5%; animation: blobdrift 10s ease-in-out infinite alternate;
+}
+.about-blob-2 {
+  width: min(360px, 40vw); height: min(360px, 40vw);
+  background: radial-gradient(circle, rgba(112,40,192,0.11) 0%, transparent 70%);
+  bottom: 0; left: -5%; animation: blobdrift 12s ease-in-out infinite alternate-reverse;
+}
+.about { position: relative; z-index: 1; padding: 7rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+.about .sec-title { margin-bottom: 2.5rem; }
+
+.fact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.fact-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: 1px solid rgba(255,255,255,0.55);
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;
+  position: relative; overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.05),
+    0 0 1px rgba(255,255,255,0.6) inset;
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+@media (min-width: 768px) {
+  .fact-card { border-radius: 22px; padding: 2rem 1.75rem; }
+}
+.fact-card:hover {
+  box-shadow:
+    0 18px 50px rgba(0,0,0,0.07),
+    0 0 1px rgba(255,255,255,0.7) inset;
+  transform: translateY(-2px);
+}
+/* ⑤ 各カードに右下から薄いカラーのグラデーション */
+.fact-card::before {
+  content: ''; position: absolute;
+  width: 160px; height: 160px; border-radius: 50%;
+  bottom: -40px; right: -40px; filter: blur(40px);
+  opacity: 0.18; pointer-events: none;
+}
+.fact-card:nth-child(1)::before { background: var(--c1); }
+.fact-card:nth-child(2)::before { background: var(--c5); }
+.fact-card:nth-child(3)::before { background: var(--c4); }
+.fact-icon { font-size: 1.8rem; line-height: 1; position: relative; }
+.fact-num { font-family: var(--outfit); font-weight: 700; font-size: 1.6rem; line-height: 1; letter-spacing: -0.02em; position: relative; }
+.fact-label { font-family: var(--jp); font-weight: 340; font-size: 0.85rem; position: relative; word-break: keep-all; overflow-wrap: break-word; }
+.fact-sub { font-size: 0.76rem; color: var(--ink3); line-height: 1.55; font-weight: 340; position: relative; word-break: keep-all; overflow-wrap: break-word; }
+
+/* ══════════════════════════════════════
+   CTA BAND — 赤中心のblob
+══════════════════════════════════════ */
+.cta-band {
+  border-top: 1px solid var(--border);
+  background: var(--ink); padding: 6rem 2.5rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-band::before {
+  content: ''; position: absolute;
+  width: max(600px,80vw); height: max(600px,80vw);
+  background: radial-gradient(circle, rgba(224,58,42,0.18) 0%, transparent 65%);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  border-radius: 50%; filter: blur(60px); pointer-events: none;
+}
+.cta-band::after {
+  content: ''; position: absolute;
+  width: max(300px,40vw); height: max(300px,40vw);
+  background: radial-gradient(circle, rgba(216,48,106,0.12) 0%, transparent 70%);
+  top: -20%; right: -10%;
+  border-radius: 50%; filter: blur(50px); pointer-events: none;
+}
+.cta-band h2 {
+  font-family: var(--jp); font-weight: 340;
+  font-size: clamp(2rem,4vw,3rem); color: var(--white);
+  letter-spacing: -0.01em; line-height: 1.25; margin-bottom: 0.6rem;
+  position: relative; z-index: 1;
+  text-shadow: 0 0 22px rgba(255,255,255,0.20), 0 0 50px rgba(255,255,255,0.09);
+}
+.cta-band h2 strong { font-weight: 340; color: var(--c1); text-shadow: 0 0 18px rgba(255,127,127,0.50), 0 0 38px rgba(255,127,127,0.25); }
+.cta-band p { font-size: 0.88rem; color: rgba(255,255,255,0.5); margin-bottom: 2.5rem; font-weight: 340; position: relative; z-index: 1; }
+.cta-bubbles { display: flex; gap: 8px; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; position: relative; z-index: 1; }
+.cta-bubble-cell { position: relative; width: 44px; flex-shrink: 0; }
+.cta-bubble-cell::before { content:''; display:block; padding-top:100%; }
+.cta-bubble {
+  position: absolute; inset: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 1rem; color: white;
+}
+.cta-actions { position: relative; z-index: 1; }
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer {
+  background: var(--ink); color: rgba(255,255,255,0.35);
+  padding: 2rem 2.5rem; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
+}
+.footer-logo { font-family: var(--outfit); font-weight: 600; font-size: 0.95rem; color: rgba(255,255,255,0.6); }
+footer a { color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.15s; }
+footer a:hover { color: rgba(255,255,255,0.65); }
+
+/* ══════════════════════════════════════
+   SCROLL INDICATOR
+══════════════════════════════════════ */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  animation: scrollIndicatorFade 0.8s ease 1.2s both;
+}
+@keyframes scrollIndicatorFade {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.scroll-indicator-line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, transparent, rgba(100,100,96,0.35));
+}
+.scroll-indicator-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(100,100,96,0.18);
+  background: rgba(247,247,245,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.scroll-indicator:hover .scroll-indicator-icon {
+  border-color: rgba(100,100,96,0.4);
+  background: rgba(247,247,245,0.85);
+  transform: translateY(2px);
+}
+.scroll-indicator-icon svg {
+  display: block;
+  animation: arrowBounce 2.4s cubic-bezier(.45,.05,.55,.95) infinite;
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 960px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; padding: 12.6rem 1.75rem 5.4rem; gap: 2.5rem; }
+  .hero-visual { display: none; }
+  .theme-grid { grid-template-columns: repeat(2,1fr); }
+  .steps { grid-template-columns: repeat(2,1fr); }
+  .fact-grid { grid-template-columns: repeat(3,1fr); }
+  nav ul { display: none; }
+}
+
+@media (max-width: 600px) {
+  /* ── NAV ── */
+  nav { padding: 0 1.25rem; }
+  /* ①スマホ: ロゴをnavの高さに収まるよう縮小 */
+  .nav-logo { left: 1.25rem; height: 26px; }
+  /* スマホ: nav右上ボタン非表示 */
+  .nav-cta { display: none; }
+
+  /* ── HERO: 中央揃え ── */
+  .hero {
+    padding: 0 1.5rem;
+    padding-top: 15.0rem;
+    padding-bottom: 11.0rem;
+    gap: 0;
+    text-align: center;
+    min-height: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    grid-template-columns: unset;
+  }
+  .hero-text {
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .hero-label { display: none; }
+  .hero-visual { display: none !important; }
+
+  .hero h1 {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+    margin-bottom: 2.0rem;
+  }
+  .hero-body {
+    max-width: 92%;
+    text-align: center;
+    font-size: 0.86rem;
+    margin-bottom: 4.0rem;
+  }
+  .hero-ctas { justify-content: center; }
+
+  /* ── THEMES: 2×2グリッド ── */
+  .themes { padding: 4rem 1.25rem; }
+  .themes .sec-eyebrow { justify-content: center; }
+  .themes .sec-eyebrow::before { display: none; }
+  .themes .sec-title { text-align: center; }
+  .themes-lead { text-align: center; }
+  .theme-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; } /* 2×2 */
+
+  /* ── HOW ── */
+  .how { padding: 4rem 1.25rem; text-align: center; }
+  .how .sec-eyebrow { justify-content: center; }
+  .how .sec-eyebrow::before { display: none; }
+  .how .sec-title { text-align: center; }
+  .steps { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .step { align-items: center; text-align: center; }
+
+  /* ── ABOUT ── */
+  .about { padding: 4rem 1.25rem; }
+  .about .sec-eyebrow { justify-content: center; }
+  .about .sec-eyebrow::before { display: none; }
+  .about .sec-title { text-align: center; }
+  .fact-grid { grid-template-columns: 1fr; }
+
+  /* ── CTA ── */
+  .cta-band { padding: 4rem 1.25rem; }
+  .cta-bubble-cell { width: 36px; }
+}
+
+@media (max-width: 390px) {
+  /* hero-visual は960px以下で既に非表示のため指定不要 */
+}
+</style>
+<link rel="stylesheet" href="assets/language.css">
+<script src="assets/language.js" defer></script>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-logo" href="index-en.html">
+    <img src="images/logo.png" alt="SynestheShare">
+  </a>
+  <!-- ①logoに関わらず中央揃え -->
+  <ul>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#themes">Themes</a></li>
+    <li><a href="#about">About synesthesia</a></li>
+  </ul>
+  <div class="nav-right">
+    <a class="nav-cta" href="#themes">Try it now</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="hero-wrap">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+
+  <!-- 大気エフェクト：光膜 + 微粒子 -->
+  <div class="hero-atmo" aria-hidden="true"></div>
+  <div class="hero-p-a" aria-hidden="true"></div>
+  <div class="hero-p-b" aria-hidden="true"></div>
+  <div class="hero-p-c" aria-hidden="true"></div>
+  <div class="hero-p-d" aria-hidden="true"></div>
+
+  <!-- 波リボン：手前から奥へ収束する透視図法 -->
+  <svg class="hero-wave-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"
+       xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <filter id="wf" x="-10%" y="-100%" width="120%" height="300%">
+        <feGaussianBlur stdDeviation="2.0"/>
+      </filter>
+    </defs>
+    <!-- 波1：手前（低い・太い・明るい）→ 右奥へ収束 -->
+    <g class="wave-g1" filter="url(#wf)">
+      <path d="M -100,780 C 180,720 480,620 760,555 C 1000,500 1260,472 1540,465"
+            fill="none" stroke="white" stroke-width="3.0" opacity="0.34"/>
+    </g>
+    <!-- 波2：中間距離（間隔が広くまばら） -->
+    <g class="wave-g2" filter="url(#wf)">
+      <path d="M -100,620 C 200,590 460,558 750,530 C 1000,508 1260,496 1540,490"
+            fill="none" stroke="white" stroke-width="1.8" opacity="0.20"/>
+    </g>
+    <!-- 波3：一番奥（細く・薄く・手前と間隔大） -->
+    <g class="wave-g3" filter="url(#wf)">
+      <path d="M -100,900 C 160,830 440,720 740,648 C 990,592 1250,568 1540,558"
+            fill="none" stroke="white" stroke-width="1.3" opacity="0.13"/>
+    </g>
+  </svg>
+
+  <section class="hero">
+    <div class="hero-text">
+      <!-- スマホでは非表示（CSSで .hero-label { display:none } ） -->
+      <div class="hero-label">Color Synesthesia</div>
+
+      <h1>
+        What <strong class="hl-mint">color</strong> is your <strong class="hl-red">A</strong>?
+      </h1>
+      <p class="hero-body">
+        Do letters and numbers have colors for you? Follow your intuition, create your palette, and compare it with people around the world.
+      </p>
+      <div class="hero-ctas">
+        <!-- クリックでChoose a themeセクションへスクロール。ボタン内に2分を記載 -->
+        <a href="#themes" class="btn-primary">Find your colors in 2 minutes →</a>
+      </div>
+    </div>
+
+    <div class="hero-visual" id="heroVisual"></div>
+  </section>
+
+  <!-- スクロールインジケーター -->
+  <a href="#how" class="scroll-indicator" id="scrollIndicator">
+    <span class="scroll-indicator-label">Scroll</span>
+    <span class="scroll-indicator-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,0.7)">
+        <polyline points="2,4 7,10 12,4"/>
+      </svg>
+    </span>
+  </a>
+</div>
+
+<!-- ══ HOW ══ -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="sec-eyebrow">How it works</div>
+    <h2 class="sec-title">Your colors in <strong>2 minutes</strong></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">🎯</div>
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Choose a theme</div>
+        <div class="step-desc">Explore letters, numbers, hiragana, or school subjects.</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🎨</div>
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Choose your colors</div>
+        <div class="step-desc">A feels red? Follow your intuition. You can skip any item.</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Compare your palette</div>
+        <div class="step-desc">See which choices you share with others and which stand out.</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📤</div>
+        <div class="step-num">Step 04</div>
+        <div class="step-title">Share your results</div>
+        <div class="step-desc">Share your palette in a tap.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ THEMES ══ -->
+<div class="themes-wrap">
+  <div class="themes-blob themes-blob-1"></div>
+  <div class="themes-blob themes-blob-2"></div>
+
+  <section class="themes" id="themes">
+    <div class="sec-eyebrow">Choose a theme</div>
+    <h2 class="sec-title">Find your colors. <strong>Choose a theme.</strong></h2>
+    <p class="themes-lead"></p>
+    <div class="theme-grid">
+
+      <a href="alphabet-en.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c1),var(--c2))"></div>
+        <!-- ⑧ No.とバッジを同行に -->
+        <div class="theme-header-row">
+          <span class="theme-no">No. 01</span>
+          <span class="badge-popular">Popular</span>
+        </div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">A</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">B</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">C</div></div>
+        </div>
+        <div class="theme-name">Alphabet</div>
+        <div class="theme-desc">What colors are A–Z?</div>
+        <!-- ③“このThemesで診断”ボタン -->
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
+      </a>
+
+      <a href="number-en.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c3),var(--c2))"></div>
+        <div class="theme-header-row">
+          <span class="theme-no">No. 02</span>
+        </div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c2)">1</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">2</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c3)">3</div></div>
+        </div>
+        <div class="theme-name">Numbers</div>
+        <div class="theme-desc">What colors are 0–9?</div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
+      </a>
+
+      <a href="consonant.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c4),var(--c5))"></div>
+        <div class="theme-header-row">
+          <span class="theme-no">No. 03</span>
+        </div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c6)">あ</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c2)">い</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">う</div></div>
+        </div>
+        <div class="theme-name">Hiragana</div>
+        <div class="theme-desc">What colors are あ–お?</div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
+      </a>
+
+      <a href="subject-en.html" class="theme-card">
+        <div class="theme-accent-bar" style="background:linear-gradient(90deg,var(--c6),var(--c7))"></div>
+        <div class="theme-header-row">
+          <span class="theme-no">No. 04</span>
+        </div>
+        <div class="theme-bubble-row">
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c1)">国</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c5)">数</div></div>
+          <div class="tbubble-cell"><div class="tbubble" style="background:var(--c4)">理</div></div>
+        </div>
+        <div class="theme-name">School subjects</div>
+        <div class="theme-desc">What colors are language and math?</div>
+        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
+</div>
+
+<!-- ══ ABOUT ══ -->
+<div class="about-wrap">
+  <div class="about-blob about-blob-1"></div>
+  <div class="about-blob about-blob-2"></div>
+  <section class="about" id="about">
+    <div class="sec-eyebrow">What is synesthesia?</div>
+    <h2 class="sec-title">A surprisingly <strong>familiar</strong> feeling</h2>
+    <div class="fact-grid">
+      <div class="fact-card">
+        <div class="fact-icon">🔴</div>
+        <div class="fact-num" style="color:var(--c1)">A = Red</div>
+        <div class="fact-label">The most common answer</div>
+        <div class="fact-sub">Many people associate A with a shade of red.</div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">👥</div>
+        <div class="fact-num" style="color:var(--c5)">〜4%</div>
+        <div class="fact-label">People with grapheme–color synesthesia</div>
+        <div class="fact-sub">Around 1–4 in 100 people. Closer to home than you might think.</div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">🌈</div>
+        <div class="fact-num" style="color:var(--c4)">Endless∞</div>
+        <div class="fact-label">Possible combinations</div>
+        <div class="fact-sub">Your combination of colors is personal to you.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══ CTA ══ -->
+<div class="cta-band">
+  <div class="cta-bubbles" id="ctaBubbles"></div>
+  <h2>Discover <strong>your colors</strong></h2>
+  <p>Discover your own world of letter colors.</p>
+  <div class="cta-actions">
+    <!-- Choose a themeページは存在しないためthemes セクションへスクロール -->
+    <a href="#themes" class="btn-primary-dark" style="font-size:1rem;padding:0.9rem 2.2rem;">
+      Find your colors in 2 minutes →
+    </a>
+  </div>
+</div>
+
+
+<script>
+const HERO_LETTERS = ['A','B','C','D','E','F','G','X','Y','Z'];
+const PALETTE = [
+  '#ff7f7f','#ffae66','#f5dc72','#a8d85c','#67bf92',
+  '#4da8e8','#8edfff','#9272ff','#ee9fd0','#9f6f4f',
+];
+
+/* ── ヒーロー◯ ── */
+const heroVisual = document.getElementById('heroVisual');
+const heroBubbleData = [];
+HERO_LETTERS.forEach((l, i) => {
+  const cell = document.createElement('div');
+  cell.className = 'bubble-cell';
+  const bubble = document.createElement('div');
+  bubble.className = 'letter-bubble';
+  bubble.style.background = PALETTE[i];
+  const span = document.createElement('span');
+  span.textContent = l;
+  bubble.appendChild(span);
+  cell.appendChild(bubble);
+  heroVisual.appendChild(cell);
+  heroBubbleData.push({ bubble, span });
+});
+
+function syncFontSize(items, ratio) {
+  items.forEach(({ bubble, span }) => {
+    const d = bubble.offsetWidth;
+    if (d > 0) span.style.fontSize = (d * ratio) + 'px';
+  });
+}
+
+function syncHero() { syncFontSize(heroBubbleData, 0.44); }
+new ResizeObserver(syncHero).observe(heroVisual);
+requestAnimationFrame(() => { syncHero(); requestAnimationFrame(() => { syncHero(); setTimeout(syncHero, 100); setTimeout(syncHero, 400); }); });
+window.addEventListener('load', () => { syncHero(); setTimeout(syncHero, 200); });
+
+/* ── Themesカード◯ ── */
+function syncTbubble() {
+  document.querySelectorAll('.tbubble-cell').forEach(cell => {
+    const d = cell.offsetWidth;
+    const b = cell.querySelector('.tbubble');
+    if (b && d > 0) b.style.fontSize = (d * 0.42) + 'px';
+  });
+}
+const themeGrid = document.querySelector('.theme-grid');
+if (themeGrid) new ResizeObserver(syncTbubble).observe(themeGrid);
+requestAnimationFrame(() => { syncTbubble(); requestAnimationFrame(syncTbubble); });
+window.addEventListener('load', () => { syncTbubble(); setTimeout(syncTbubble, 200); });
+
+/* ── CTA バブル ── */
+const ctaBubblesEl = document.getElementById('ctaBubbles');
+const ctaBubbleData = [];
+'ABCDEFG'.split('').forEach((l, i) => {
+  const cell = document.createElement('div');
+  cell.className = 'cta-bubble-cell';
+  const b = document.createElement('div');
+  b.className = 'cta-bubble';
+  b.style.background = PALETTE[i];
+  b.textContent = l;
+  cell.appendChild(b);
+  ctaBubblesEl.appendChild(cell);
+  ctaBubbleData.push({ bubble: cell, span: b });
+});
+function syncCta() { syncFontSize(ctaBubbleData, 0.44); }
+new ResizeObserver(syncCta).observe(ctaBubblesEl);
+requestAnimationFrame(() => { syncCta(); requestAnimationFrame(syncCta); });
+window.addEventListener('load', () => { syncCta(); setTimeout(syncCta, 200); });
+
+/* ══ HERO BLOB カラーアニメーション ══
+   3つのblobがそれぞれ独立したスピードで色相を巡回する。
+   hslToRgb で RGBA  letters列を生成し radial-gradient を上書き。
+   ─────────────────────────────────── */
+(function() {
+  const b1 = document.querySelector('.hero-blob-1');
+  const b2 = document.querySelector('.hero-blob-2');
+  const b3 = document.querySelector('.hero-blob-3');
+  if (!b1 || !b2 || !b3) return;
+
+  // 各blobの初期色相（度）とアニメーション速度（度/ seconds）
+  const blobs = [
+    { el: b1, hue: 0,   speed: 72, alpha: 0.30 },   // Red first · 5 seconds per cycle
+    { el: b2, hue: 170, speed: 60, alpha: 0.26 },   // Cyan first · 6 seconds per cycle
+    { el: b3, hue: 270, speed: 90, alpha: 0.20 },   // Purple first · 4 seconds per cycle
+  ];
+
+  function hslToRgba(h, s, l, a) {
+    h = h % 360;
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const f = n => l - Math.min(l, 1 - l) * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    const r = Math.round(f(0) * 255);
+    const g = Math.round(f(8) * 255);
+    const b = Math.round(f(4) * 255);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function setBlobColor(blob) {
+    const rgba = hslToRgba(blob.hue, 85, 58, blob.alpha);
+    blob.el.style.background = `radial-gradient(circle, ${rgba} 0%, transparent 70%)`;
+  }
+
+  // 初期描画
+  blobs.forEach(setBlobColor);
+
+  let last = null;
+  function tick(ts) {
+    if (last !== null) {
+      const dt = (ts - last) / 1000; //  seconds
+      blobs.forEach(b => {
+        b.hue = (b.hue + b.speed * dt) % 360;
+        setBlobColor(b);
+      });
+    }
+    last = ts;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

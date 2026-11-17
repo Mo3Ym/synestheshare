@@ -435,10 +435,11 @@ nav ul a:hover { color: var(--ink); }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
-.subject-mode .type-palette-strip { grid-template-columns: repeat(auto-fill, 72px); }
-.subject-mode .type-palette-dot { width: 72px; height: 72px; font-size: 1rem; }
-.subject-mode .sense-circle { font-size: 0.7rem; }
-.subject-mode .vote-letter-badge { width: 42px; height: 42px; font-size: 0.65rem; }
+.subject-mode .type-palette-dot { font-size: 0.6rem; }
+.subject-mode .sense-circle { font-size: 0.65rem; }
+.subject-mode .vote-letter-badge { font-size: 0.6rem; }
+.subject-mode .empathy-badge,
+.subject-mode .highlight-badge { font-size: 0.8rem; }
 
 /* ════════════════════════════════════
    共通: 色円のガラス板光（左上から差し込む光のシート）
@@ -2806,10 +2807,27 @@ function parseColorMap() {
    ・alphabet.htmlから来た（sessionStorage に ss_from_alphabet=1）
    ・かつ、この結果でまだ投票していない（ss_vote_key が未完）
 ──────────────────────────────────────────────── */
+function subjectVoteRecord() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('ss_subject_votes_v1'));
+    if (saved && typeof saved.items === 'object' && saved.items) return saved;
+  } catch {}
+  const items = {};
+  const ids = ['language','math','science','social','english'];
+  // Recover acknowledgements written by the previous version in this session.
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (!key?.startsWith('ss_voted_subject_') || sessionStorage.getItem(key) !== 'done') continue;
+    const answer = key.slice('ss_voted_subject_'.length);
+    ids.forEach((id, index) => { if (COLOR_HEX[answer[index]]) items[id] = true; });
+  }
+  return { items, legacyUnknown: localStorage.getItem('ss_submitted_subject') === '1' && !Object.keys(items).length };
+}
+
 function shouldVote() {
   const mode = new URLSearchParams(location.search).get('mode');
   const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
-  if (localStorage.getItem(submissionKey) === '1') return false;
+  if (mode !== 'subject' && localStorage.getItem(submissionKey) === '1') return false;
   const explicitSubmission = ['number','subject'].includes(mode) && location.hash === '#submit';
   const fromAlphabet = explicitSubmission || sessionStorage.getItem('ss_from_alphabet') === '1';
   if (!fromAlphabet) return false;
@@ -2819,11 +2837,16 @@ function shouldVote() {
   return true;
 }
 
-function markVoteDone() {
+function markVoteDone(votedLetters = []) {
   const voteKey = sessionStorage.getItem('ss_vote_key');
   if (voteKey) sessionStorage.setItem(voteKey, 'done');
   sessionStorage.removeItem('ss_from_alphabet');
   const mode = new URLSearchParams(location.search).get('mode');
+  if (mode === 'subject') {
+    const record = subjectVoteRecord();
+    votedLetters.forEach(letter => { record.items[letter] = true; });
+    localStorage.setItem('ss_subject_votes_v1', JSON.stringify(record));
+  }
   const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
   localStorage.setItem(submissionKey, '1'); // Same browser, once per theme.
   if (location.hash === '#submit') history.replaceState(null, '', location.pathname + location.search);
@@ -2886,6 +2909,18 @@ function statsToVotes(statsData) {
   if (shouldVote()) {
     try {
       window.themeVoteError = '';
+      let voteLetters = letters;
+      if (new URLSearchParams(location.search).get('mode') === 'subject') {
+        const record = subjectVoteRecord();
+        voteLetters = letters.filter(letter => !record.items[letter]);
+        // Older installs only recorded a theme-wide flag. Avoid recounting any
+        // existing subject while allowing genuinely missing subjects to be added.
+        if (record.legacyUnknown) {
+          const existing = await Promise.all(voteLetters.map(letter => getDoc(doc(db, 'statistics', 'subject-' + letter))));
+          voteLetters = voteLetters.filter((letter, index) => !existing[index].exists());
+        }
+      }
+      if (voteLetters.length) {
       /* responses コレクションに1件追加 */
       const batch = writeBatch(db);
       batch.set(doc(collection(db, 'responses')), {
@@ -2895,7 +2930,7 @@ function statsToVotes(statsData) {
       });
 
       /* statistics/{letter} に各色の票数をインクリメント（キー=色名） */
-      letters.forEach(l => {
+      voteLetters.forEach(l => {
         const hex = colorMap[l];
         if (!hex) return;
         const colorName = COLOR_NAME[hex] || hex;
@@ -2903,8 +2938,9 @@ function statsToVotes(statsData) {
         batch.set(ref, { [colorName]: increment(1) }, { merge: true });
       });
       await batch.commit();
+      }
 
-      markVoteDone();
+      markVoteDone(voteLetters);
       console.info('[SynestheShare] 投票完了');
     } catch (e) {
       window.themeVoteError = e.code || 'unknown';

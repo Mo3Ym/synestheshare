@@ -1,4 +1,5 @@
 module.exports = {
+  'アルファベット・数字・教科の3種類から選ぼう': 'Choose from letters, numbers, or school subjects.',
   '投票を保存できませんでした。接続設定またはデータベースの権限を確認してください。': 'Your vote could not be saved. Check the connection settings or database permissions.',
   'ローカルプレビュー': 'Local preview',
   'サンプル集計のため、この数値は共有できません。実際の結果は公開サイトで診断してください。': 'These sample scores cannot be shared. Take the test on the published site for actual results.',

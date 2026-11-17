@@ -781,9 +781,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     transparent 65%
   );
 }
-.alpha-grid.mode-10 { grid-template-columns: repeat(3, 1fr); max-width: 480px; }
 .alpha-bubble span { white-space: normal; line-height: 1.15; max-width: 88%; }
-.picker-letter-preview { font-size: 0.85rem; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
+.picker-letter-preview { font-size: 0.75rem; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
 </style>
 <link rel="stylesheet" href="assets/language.css">
 <script src="assets/language.js" defer></script>
@@ -807,7 +806,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="page-blob page-blob-3" id="pageBlob3"></div>
 
   <div class="page-hero">
-    <div class="page-eyebrow">No. 04 — Subjects</div>
+    <div class="page-eyebrow">No. 03 — Subjects</div>
     <h1 class="page-title">
       <strong class="hl-red">教科</strong>は<wbr>何色ですか？
     </h1>
@@ -986,7 +985,7 @@ function syncFontSize() {
   document.querySelectorAll('.alpha-cell').forEach(cell => {
     const bubble = cell.querySelector('.alpha-bubble');
     const d = bubble.offsetWidth;
-    if (d > 0) bubble.querySelector('span').style.fontSize = Math.min(d * 0.36, d * 1.4 / Math.max(...cell.querySelector('span').textContent.split(/\s+/).map(word => word.length))) + 'px';
+    if (d > 0) bubble.querySelector('span').style.fontSize = Math.min(d * 0.26, d * 1.15 / Math.max(...cell.querySelector('span').textContent.split(/\s+/).map(word => word.length))) + 'px';
   });
 }
 new ResizeObserver(syncFontSize).observe(alphaGrid);

@@ -885,6 +885,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 <script>
 /* ══ 定数 ══ */
 const LETTER_LABELS = {"language":"Language","math":"Math","science":"Science","social":"Social studies","english":"English"};
+const BUBBLE_LABELS = { language:"国語", math:"数学", science:"理科", social:"社会", english:"英語" };
 const LETTERS_10 = Object.keys(LETTER_LABELS);
 const PRESET_COLORS = [
   '#ff7f7f', // Red
@@ -967,7 +968,7 @@ function buildGrid() {
     const cell = document.createElement('div');
     cell.className = 'alpha-cell';
     cell.dataset.letter = l;
-    cell.innerHTML = `<div class="alpha-bubble"><span>${LETTER_LABELS[l]}</span></div>`;
+    cell.innerHTML = `<div class="alpha-bubble"><span lang="ja" title="${LETTER_LABELS[l]}">${BUBBLE_LABELS[l]}</span></div>`;
     cell.addEventListener('click', () => openPicker(l));
     alphaGrid.appendChild(cell);
     // appendChild後に色を反映（DOM挿入後でないとquerySelectorが効かない）
@@ -1055,7 +1056,7 @@ function openPicker(letter) {
   pendingColor = colorMap[letter] || null;
 
   pickerTitle.textContent = `Choose a color for ${LETTER_LABELS[letter]}`;
-  pickerPreview.textContent = LETTER_LABELS[letter];
+  pickerPreview.textContent = BUBBLE_LABELS[letter];
   updatePickerPreview(pendingColor);
 
   // スウォッチ初期選択

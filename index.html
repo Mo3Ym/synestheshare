@@ -713,69 +713,6 @@ nav ul a:hover { color: var(--ink); }
 .step-desc { font-size: 0.76rem; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 340; word-break: keep-all; overflow-wrap: break-word; }
 
 /* ══════════════════════════════════════
-   ABOUT — Blob背景グラデーション
-══════════════════════════════════════ */
-.about-wrap {
-  position: relative; overflow: hidden;
-  background-image: url('assets/backgrounds/index_about.webp');
-  background-size: cover;
-  background-position: center top;
-  border-top: 1px solid var(--border);
-}
-.about-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
-.about-blob-1 {
-  width: min(480px, 52vw); height: min(480px, 52vw);
-  background: radial-gradient(circle, rgba(26,174,170,0.14) 0%, transparent 70%);
-  top: -20%; right: -5%; animation: blobdrift 10s ease-in-out infinite alternate;
-}
-.about-blob-2 {
-  width: min(360px, 40vw); height: min(360px, 40vw);
-  background: radial-gradient(circle, rgba(112,40,192,0.11) 0%, transparent 70%);
-  bottom: 0; left: -5%; animation: blobdrift 12s ease-in-out infinite alternate-reverse;
-}
-.about { position: relative; z-index: 1; padding: 7rem 2.5rem; max-width: 1200px; margin: 0 auto; }
-.about .sec-title { margin-bottom: 2.5rem; }
-
-.fact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-.fact-card {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  border: 1px solid rgba(255,255,255,0.55);
-  border-radius: 18px;
-  padding: 1.75rem 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;
-  position: relative; overflow: hidden;
-  isolation: isolate;
-  box-shadow:
-    0 12px 40px rgba(0,0,0,0.05),
-    0 0 1px rgba(255,255,255,0.6) inset;
-  transition: box-shadow 0.35s ease, transform 0.35s ease;
-}
-@media (min-width: 768px) {
-  .fact-card { border-radius: 22px; padding: 2rem 1.75rem; }
-}
-.fact-card:hover {
-  box-shadow:
-    0 18px 50px rgba(0,0,0,0.07),
-    0 0 1px rgba(255,255,255,0.7) inset;
-  transform: translateY(-2px);
-}
-/* ⑤ 各カードに右下から薄いカラーのグラデーション */
-.fact-card::before {
-  content: ''; position: absolute;
-  width: 160px; height: 160px; border-radius: 50%;
-  bottom: -40px; right: -40px; filter: blur(40px);
-  opacity: 0.18; pointer-events: none;
-}
-.fact-card:nth-child(1)::before { background: var(--c1); }
-.fact-card:nth-child(2)::before { background: var(--c5); }
-.fact-card:nth-child(3)::before { background: var(--c4); }
-.fact-icon { font-size: 1.8rem; line-height: 1; position: relative; }
-.fact-num { font-family: var(--outfit); font-weight: 700; font-size: 1.6rem; line-height: 1; letter-spacing: -0.02em; position: relative; }
-.fact-label { font-family: var(--jp); font-weight: 340; font-size: 0.85rem; position: relative; word-break: keep-all; overflow-wrap: break-word; }
-.fact-sub { font-size: 0.76rem; color: var(--ink3); line-height: 1.55; font-weight: 340; position: relative; word-break: keep-all; overflow-wrap: break-word; }
-
-/* ══════════════════════════════════════
    CTA BAND — 赤中心のblob
 ══════════════════════════════════════ */
 .cta-band {
@@ -891,7 +828,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .hero-visual { display: none; }
   .theme-grid { grid-template-columns: repeat(2,1fr); }
   .steps { grid-template-columns: repeat(2,1fr); }
-  .fact-grid { grid-template-columns: repeat(3,1fr); }
   nav ul { display: none; }
 }
 
@@ -951,13 +887,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .steps { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .step { align-items: center; text-align: center; }
 
-  /* ── ABOUT ── */
-  .about { padding: 4rem 1.25rem; }
-  .about .sec-eyebrow { justify-content: center; }
-  .about .sec-eyebrow::before { display: none; }
-  .about .sec-title { text-align: center; }
-  .fact-grid { grid-template-columns: 1fr; }
-
   /* ── CTA ── */
   .cta-band { padding: 4rem 1.25rem; }
   .cta-bubble-cell { width: 36px; }
@@ -981,7 +910,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <ul>
     <li><a href="#how">使い方</a></li>
     <li><a href="#themes">テーマ</a></li>
-    <li><a href="#about">共感覚とは</a></li>
   </ul>
   <div class="nav-right">
     <a class="nav-cta" href="#themes">今すぐ診断</a>
@@ -1150,36 +1078,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
-    </div>
-  </section>
-</div>
-
-<!-- ══ ABOUT ══ -->
-<div class="about-wrap">
-  <div class="about-blob about-blob-1"></div>
-  <div class="about-blob about-blob-2"></div>
-  <section class="about" id="about">
-    <div class="sec-eyebrow">共感覚とは？</div>
-    <h2 class="sec-title">思ったより<strong>身近</strong>な<wbr>感覚</h2>
-    <div class="fact-grid">
-      <div class="fact-card">
-        <div class="fact-icon">🔴</div>
-        <div class="fact-num" style="color:var(--c1)">A = 赤</div>
-        <div class="fact-label">最も多い<wbr>回答</div>
-        <div class="fact-sub">多くの人がAに<wbr>赤系を感じる<wbr>傾向があります</div>
-      </div>
-      <div class="fact-card">
-        <div class="fact-icon">👥</div>
-        <div class="fact-num" style="color:var(--c5)">〜4%</div>
-        <div class="fact-label">色字共感覚を<wbr>持つ人数</div>
-        <div class="fact-sub">100人に1〜4人。<wbr>思ったより身近な<wbr>感覚です</div>
-      </div>
-      <div class="fact-card">
-        <div class="fact-icon">🌈</div>
-        <div class="fact-num" style="color:var(--c4)">無限大∞</div>
-        <div class="fact-label">組み合わせの<wbr>数</div>
-        <div class="fact-sub">まったく同じ共感覚を<wbr>持つ人は<wbr>2人といません</div>
-      </div>
     </div>
   </section>
 </div>

@@ -1,4 +1,9 @@
 module.exports = {
+  'Aは何色？': 'What color is A?',
+  '同じ文字でも、思い浮かべる色は人によって違います。': 'The same letter can bring different colors to mind for different people.',
+  '正解はない': 'No right answer',
+  '色が浮かばない文字は、選ばなくても大丈夫です。': 'If no color comes to mind for a letter, you can skip it.',
+  '同じ色を選んだところも、違う色を選んだところも楽しめます。': 'See where your color choices match and where they differ.',
   '新しく診断する(2分) →': 'Take a new test (2 min) →',
   'リンクを送って、あなたの結果をシェアしよう。': 'Send a link and share your results.',
   '世間と全一致': 'All match the majority',

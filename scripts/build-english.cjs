@@ -63,6 +63,14 @@ for (const page of pages) {
   if (page === 'number' || page === 'subject') {
     source = source.replace('https://mo3ym.github.io/synestheshare/', 'https://synestheshare.pages.dev/index-en.html');
   }
+  if (page === 'index') {
+    source = source.replace('What colors are language and math?', 'For Japanese participants only');
+  }
+  if (page === 'subject') {
+    source = source.replace('const LETTERS_10 = Object.keys(LETTER_LABELS);', 'const BUBBLE_LABELS = { language:"国語", math:"数学", science:"理科", social:"社会", english:"英語" };\nconst LETTERS_10 = Object.keys(LETTER_LABELS);');
+    source = source.replace('<span>${LETTER_LABELS[l]}</span>', '<span lang="ja" title="${LETTER_LABELS[l]}">${BUBBLE_LABELS[l]}</span>');
+    source = source.replace('pickerPreview.textContent = LETTER_LABELS[letter];', 'pickerPreview.textContent = BUBBLE_LABELS[letter];');
+  }
   fs.writeFileSync(path.join(root, `${page}-en.html`), source.replace(/\r\n/g, '\n').replace(/[ \t]+$/gm, ''));
 }
 console.log('Built English home, alphabet, result, number and subject pages.');

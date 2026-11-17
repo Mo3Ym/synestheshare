@@ -706,7 +706,8 @@ nav ul a:hover { color: var(--ink); }
 
 .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem; }
 .step { display: flex; flex-direction: column; gap: 0.6rem; }
-.step-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 0.25rem; }
+.step-icon { width: 48px; height: 48px; line-height: 1; margin-bottom: 0.25rem; }
+.step-icon img { display: block; width: 100%; height: 100%; }
 .step-num { font-family: var(--outfit); font-weight: 700; font-size: 0.65rem; letter-spacing: 0.14em; color: rgba(255,255,255,0.28); text-transform: uppercase; }
 .step-title { font-family: var(--jp); font-weight: 400; font-size: 0.88rem; word-break: keep-all; overflow-wrap: break-word; }
 .step-desc { font-size: 0.76rem; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 340; word-break: keep-all; overflow-wrap: break-word; }
@@ -1063,25 +1064,25 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <h2 class="sec-title">4ステップ、<strong>2分</strong>で<wbr>完成</h2>
     <div class="steps">
       <div class="step">
-        <div class="step-icon">🎯</div>
+        <div class="step-icon"><img src="assets/icons/step-theme.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 01</div>
         <div class="step-title">テーマを<wbr>選ぶ</div>
         <div class="step-desc">アルファベット・数字・<wbr>教科の<wbr>3種類から選ぼう</div>
       </div>
       <div class="step">
-        <div class="step-icon">🎨</div>
+        <div class="step-icon"><img src="assets/icons/step-color.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 02</div>
         <div class="step-title">色を<wbr>割り当てる</div>
         <div class="step-desc">「Aは赤」など<wbr>直感で選ぶだけ。<wbr>全部でなくてもOK</div>
       </div>
       <div class="step">
-        <div class="step-icon">📊</div>
+        <div class="step-icon"><img src="assets/icons/step-compare.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 03</div>
         <div class="step-title">みんなと<wbr>比べる</div>
         <div class="step-desc">多数派・少数派が<wbr>すぐわかる<wbr>グラフを確認</div>
       </div>
       <div class="step">
-        <div class="step-icon">📤</div>
+        <div class="step-icon"><img src="assets/icons/step-share.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 04</div>
         <div class="step-title">SNSで<wbr>シェア</div>
         <div class="step-desc">ワンタップで<wbr>結果を投稿</div>

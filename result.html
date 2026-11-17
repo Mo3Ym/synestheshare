@@ -35,7 +35,7 @@
   const r      = params.get('r') || '';
   const mode   = params.get('mode') || '10';
   const ogImageUrl = r
-    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${encodeURIComponent(mode)}&v=11${params.has('score') ? `&score=${encodeURIComponent(params.get('score'))}&stat=${encodeURIComponent(params.get('stat') || 'empathy')}` : ''}`
+    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${encodeURIComponent(mode)}&v=12${params.has('score') ? `&score=${encodeURIComponent(params.get('score'))}&stat=${encodeURIComponent(params.get('stat') || 'empathy')}` : ''}`
     : `${base}/ogp.png`;
   const pageUrl = location.href;
   document.getElementById('ogUrl')   ?.setAttribute('content', pageUrl);
@@ -2238,7 +2238,7 @@ function buildShareSection(diag, coloredLetters) {
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '11');
+  ogUrl.searchParams.set('v', '12');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2330,7 +2330,7 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('stat');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '11');
+  image.searchParams.set('v', '12');
   const shareText = `🎨私の${themeName}の色は ${type.name} でした。\n\n――あなたの「${sampleItem}」は、何色ですか？\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">結果をシェアする</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Xにシェア</a></div></div>`;
 }

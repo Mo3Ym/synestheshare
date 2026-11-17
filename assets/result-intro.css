@@ -6,16 +6,16 @@
   margin: auto;
   padding: 30px 28px 26px;
   overflow-y: auto;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  border: 1px solid rgba(255,255,255,.65);
+  border-radius: 22px;
+  background: #f7f7f5 url('backgrounds/index_themes.webp') center top / cover no-repeat;
   color: #263e61;
-  box-shadow: none;
+  box-shadow: 0 16px 48px rgba(10,22,40,.24);
   font-family: var(--jp, sans-serif);
   text-align: center;
 }
 .result-intro::backdrop {
-  background: #f7f7f5 url('backgrounds/index_themes.webp') center top / cover no-repeat;
+  background: rgba(10,22,40,.42);
 }
 html.result-intro-open { overflow: hidden; }
 .result-intro-close {

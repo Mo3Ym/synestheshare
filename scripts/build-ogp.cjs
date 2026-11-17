@@ -38,8 +38,8 @@ const context = vm.createContext({
 vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1], context);
 fields.paletteVisible.checked = false;
 
-function render() {
-  vm.runInContext('render()', context);
+function render(theme = 'ocean') {
+  vm.runInContext(`render(${JSON.stringify(theme)})`, context);
   return preview.innerHTML;
 }
 
@@ -67,7 +67,7 @@ async function writePixels(name, svg, channels) {
     for (const mode of ['alphabet', 'number', 'subject']) {
     fields.headline.value = language === 'en' ? (mode === 'subject' ? 'Your school-subject colors...' : mode === 'number' ? 'Your number-color sense...' : 'Your letter-color sense...')
       : mode === 'subject' ? 'あなたの教科色感覚は...' : mode === 'number' ? 'あなたの数字色感覚は...' : japanese.headline;
-    const svg = render()
+    const svg = render(theme)
       .replace(/<text x="600" y="270"[\s\S]*?<\/text>/, '')
       .replace('../../assets/backgrounds/ocean.webp', `data:image/png;base64,${background.toString('base64')}`);
     await writePixels(`${prefix}${mode !== 'alphabet' ? mode + '-' : ''}${theme}.rgb.deflate`, svg, 3);

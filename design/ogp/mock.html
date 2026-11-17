@@ -81,7 +81,18 @@
       return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[character]));
     }
 
-    function render() {
+    const themeEdges = {
+      sunset: ['#f46b67', '#ef6f9c', '#e78cb9'],
+      ocean: ['#56bee5', '#5f9de5', '#89addf'],
+      forest: ['#68b78a', '#73bda2', '#acd27a'],
+      void: ['#9b9fb3', '#aaa3be', '#797f99'],
+      bloom: ['#e6a0c6', '#b995de', '#e9bd91'],
+      neon: ['#ad77f5', '#6ccddd', '#e878c2'],
+      dream: ['#9c89df', '#b095e1', '#88b9e0'],
+      earth: ['#bb986d', '#c3a077', '#9da879'],
+    };
+    function render(theme = 'ocean') {
+      const edge = themeEdges[theme] || themeEdges.ocean;
       const fields = form.elements;
       const text = (name) => escapeXml(fields[name].value);
       const dots = letters.map((letter, index) => {
@@ -120,8 +131,8 @@
           <radialGradient id="starlight"><stop stop-color="#fff3da" stop-opacity=".42"/><stop offset=".25" stop-color="#ddd0ff" stop-opacity=".14"/><stop offset="1" stop-color="#ddd0ff" stop-opacity="0"/></radialGradient>
           <linearGradient id="ribbon"><stop stop-color="#a8efff" stop-opacity="0"/><stop offset=".25" stop-color="#bdeaff" stop-opacity=".42"/><stop offset=".65" stop-color="#eed4ff" stop-opacity=".48"/><stop offset="1" stop-color="#ffe2b9" stop-opacity="0"/></linearGradient>
           <linearGradient id="cta-glass" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="white" stop-opacity=".15"/><stop offset="1" stop-color="white" stop-opacity=".045"/></linearGradient>
-          <linearGradient id="cta-edge"><stop stop-color="#69b9ee"/><stop offset=".45" stop-color="#70d9c4"/><stop offset="1" stop-color="#b097f0"/></linearGradient>
-          <filter id="cta-glow" x="-20%" y="-100%" width="140%" height="300%"><feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#8edfff" flood-opacity=".24"/><feDropShadow dx="0" dy="0" stdDeviation="21" flood-color="#b097f0" flood-opacity=".18"/><feDropShadow dx="0" dy="6" stdDeviation="20" flood-color="#000000" flood-opacity=".06"/></filter>
+          <linearGradient id="cta-edge"><stop stop-color="${edge[0]}"/><stop offset=".45" stop-color="${edge[1]}"/><stop offset="1" stop-color="${edge[2]}"/></linearGradient>
+          <filter id="cta-glow" x="-20%" y="-100%" width="140%" height="300%"><feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="${edge[0]}" flood-opacity=".24"/><feDropShadow dx="0" dy="0" stdDeviation="21" flood-color="${edge[2]}" flood-opacity=".18"/><feDropShadow dx="0" dy="6" stdDeviation="20" flood-color="#000000" flood-opacity=".06"/></filter>
           <filter id="ribbon-glow" x="-10%" y="-100%" width="120%" height="300%"><feGaussianBlur stdDeviation="12"/></filter>
           <linearGradient id="type-gradient"><stop stop-color="#a9f1ff"/><stop offset=".5" stop-color="#fffdf9"/><stop offset="1" stop-color="#e2caff"/></linearGradient>
           <linearGradient id="glass" x1="15.85%" y1="-9.15%" x2="84.15%" y2="109.15%"><stop stop-color="white" stop-opacity=".62"/><stop offset=".22" stop-color="white" stop-opacity=".32"/><stop offset=".42" stop-color="white" stop-opacity=".10"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
@@ -137,7 +148,7 @@
         </g>
         ${dust}${sparkle}
         <g font-family="Noto Sans JP,Meiryo,sans-serif" fill="#fffdf9">
-          ${fields.headlineVisible.checked ? `<text x="600" y="87" text-anchor="middle" font-size="${headlineSize}" font-weight="600">${escapeXml(prefix)}</text><text x="600" y="270" text-anchor="middle" font-size="${scoreSize}" font-family="Outfit,Arial,sans-serif" font-weight="700" fill="url(#type-gradient)"><tspan font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${escapeXml(statLabel)}</tspan><tspan dx="10" font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${english ? 'Top' : '上位'}</tspan><tspan dx="18">${score}%</tspan></text>` : ''}
+          ${fields.headlineVisible.checked ? `<text x="600" y="87" text-anchor="middle" font-size="${headlineSize}" font-weight="600">${escapeXml(prefix)}</text><text x="600" y="270" text-anchor="middle" font-size="${scoreSize}" font-family="Outfit,Arial,sans-serif" font-weight="700" fill="url(#type-gradient)"><tspan font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${escapeXml(statLabel)}</tspan><tspan dx="10" font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${english ? 'Top' : '上位'}</tspan><tspan dx="18">${score}</tspan><tspan font-size="${scoreSize * 2 / 3}">%</tspan></text>` : ''}
           ${fields.paletteVisible.checked ? dots : ''}
           ${fields.ctaVisible.checked ? `<rect x="64" y="455" width="1072" height="112" rx="56" fill="#fffdf9" fill-opacity=".96" filter="url(#cta-glow)"/><rect x="64" y="455" width="1072" height="112" rx="56" fill="url(#cta-glass)" stroke="url(#cta-edge)" stroke-width="6"/><rect x="66" y="457" width="1068" height="108" rx="54" fill="none" stroke="white" stroke-opacity=".55"/><text x="600" y="511" text-anchor="middle" dominant-baseline="middle" font-size="${ctaSize}" font-weight="600" fill="#263e61">${text('cta')}</text>` : ''}
         </g>

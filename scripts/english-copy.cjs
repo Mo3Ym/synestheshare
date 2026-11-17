@@ -1,4 +1,6 @@
 module.exports = {
+  '新しく診断する(2分) →': 'Take a new test (2 min) →',
+  'リンクを送って、あなたの結果をシェアしよう。': 'Send a link and share your results.',
   '世間と全一致': 'All match the majority',
   'アルファベット・数字・教科の3種類から選ぼう': 'Choose from letters, numbers, or school subjects.',
   '投票を保存できませんでした。接続設定またはデータベースの権限を確認してください。': 'Your vote could not be saved. Check the connection settings or database permissions.',

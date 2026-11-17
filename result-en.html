@@ -1139,11 +1139,11 @@ nav ul a:hover { color: var(--ink); }
 .diag-btn-wrap {
   position: relative; z-index: 1;
   max-width: 640px; margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  padding: 0 1.5rem 6.5rem;
   display: flex; justify-content: center;
 }
 @media (max-width: 600px) {
-  .diag-btn-wrap { padding: 0 1.25rem 2.5rem; }
+  .diag-btn-wrap { padding: 0 1.25rem 6.5rem; }
 }
 
 /* ══ FOOTER ══ */
@@ -2263,7 +2263,7 @@ function buildShareSection(diag, coloredLetters) {
 
   return `<div class="card">
     <div class="section-eyebrow">Share</div>
-    <div class="section-title">Share your results</div>
+    <div class="section-title">Send a link and share your results.</div>
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
@@ -2335,7 +2335,7 @@ function renderWithoutStats(coloredLetters) {
   image.search = url.search;
   image.searchParams.set('v', '13');
   const shareText = `🎨My ${isSubjectMode ? 'school-subject' : 'number'} colors are ${type.name}.\n\n— What color is your “${sampleItem}”?\n\n${url.href}`;
-  document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Share your results</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
+  document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
 }
 
 function render() {
@@ -2395,7 +2395,7 @@ function render() {
       <div class="share-blob" style="position:absolute;width:max(320px,75vw);height:max(320px,75vw);border-radius:50%;filter:blur(60px);pointer-events:none;bottom:-15%;left:-15%;background:radial-gradient(circle,rgba(${r2},${g2},${b2},0.38) 0%,transparent 65%)"></div>
       <div class="content-wrap">${buildShareSection(diag, coloredLetters)}</div>
       <div class="diag-btn-wrap">
-        <a class="btn-diag" href="index-en.html#themes">Find your own colors →</a>
+        <a class="btn-diag" href="index-en.html#themes">Take a new test (2 min) →</a>
       </div>`;
 
     // バーアニメーション（最初の3件）

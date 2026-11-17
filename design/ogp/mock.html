@@ -103,21 +103,40 @@
       const statLabel = fields.scoreLabel.value.replace(/\s*上位\s*$/, '');
       const labelSize = Math.min(scoreSize / 3, 350 / Math.max(1, Array.from(statLabel).length));
       const ctaSize = Math.min(52, 960 / Math.max(1, Array.from(fields.cta.value).length));
+      const stars = [[86,151,7],[1084,106,9],[1042,310,6],[165,416,5],[969,412,6],[1128,397,4],[310,117,4],[754,314,5]];
+      const sparkle = stars.map(([x,y,size]) => `<g transform="translate(${x} ${y})"><circle r="${size * 3}" fill="url(#starlight)"/><path d="M0 ${-size}Q1 -1 ${size} 0Q1 1 0 ${size}Q-1 1 ${-size} 0Q-1 -1 0 ${-size}Z" fill="#fff3d7" fill-opacity=".85"/></g>`).join('');
+      const dust = Array.from({length: 48}, (_, index) => {
+        const x = (index * 173 + 41) % 1160 + 20;
+        const y = (index * 97 + 19) % 560 + 25;
+        return `<circle cx="${x}" cy="${y}" r="${index % 3 === 0 ? 1.8 : .9}" fill="${index % 2 ? '#e3d5ff' : '#fff2ce'}" opacity="${index % 3 === 0 ? .5 : .24}"/>`;
+      }).join('');
       preview.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="card-title">
         <title id="card-title">SynestheShareの共有用OGPモック</title>
         <defs>
           <filter id="empty-glow" x="-100%" y="-100%" width="300%" height="300%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="white" flood-opacity=".20"/></filter>
-          <linearGradient id="depth" x2="1" y2="1"><stop stop-color="#0e1d34" stop-opacity=".85"/><stop offset="1" stop-color="#302b51" stop-opacity=".65"/></linearGradient>
+          <linearGradient id="depth" x2="1" y2="1"><stop stop-color="#0e1d34" stop-opacity=".76"/><stop offset=".5" stop-color="#1a2847" stop-opacity=".66"/><stop offset="1" stop-color="#302b51" stop-opacity=".60"/></linearGradient>
+          <radialGradient id="starlight"><stop stop-color="#fff3da" stop-opacity=".42"/><stop offset=".25" stop-color="#ddd0ff" stop-opacity=".14"/><stop offset="1" stop-color="#ddd0ff" stop-opacity="0"/></radialGradient>
+          <linearGradient id="ribbon"><stop stop-color="#a8efff" stop-opacity="0"/><stop offset=".25" stop-color="#bdeaff" stop-opacity=".42"/><stop offset=".65" stop-color="#eed4ff" stop-opacity=".48"/><stop offset="1" stop-color="#ffe2b9" stop-opacity="0"/></linearGradient>
+          <linearGradient id="cta-glass" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="white" stop-opacity=".15"/><stop offset="1" stop-color="white" stop-opacity=".045"/></linearGradient>
+          <linearGradient id="cta-edge"><stop stop-color="white" stop-opacity=".10"/><stop offset=".45" stop-color="#def4ff" stop-opacity=".48"/><stop offset="1" stop-color="#f0dfff" stop-opacity=".16"/></linearGradient>
+          <filter id="ribbon-glow" x="-10%" y="-100%" width="120%" height="300%"><feGaussianBlur stdDeviation="12"/></filter>
           <linearGradient id="type-gradient"><stop stop-color="#a9f1ff"/><stop offset=".5" stop-color="#fffdf9"/><stop offset="1" stop-color="#e2caff"/></linearGradient>
           <linearGradient id="glass" x1="15.85%" y1="-9.15%" x2="84.15%" y2="109.15%"><stop stop-color="white" stop-opacity=".62"/><stop offset=".22" stop-color="white" stop-opacity=".32"/><stop offset=".42" stop-color="white" stop-opacity=".10"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
           <linearGradient id="glass-bright" x1="15.85%" y1="-9.15%" x2="84.15%" y2="109.15%"><stop stop-color="white" stop-opacity=".48"/><stop offset=".22" stop-color="white" stop-opacity=".22"/><stop offset=".42" stop-color="white" stop-opacity=".08"/><stop offset=".65" stop-color="white" stop-opacity="0"/></linearGradient>
         </defs>
         <image href="../../assets/backgrounds/ocean.webp" width="1200" height="630" preserveAspectRatio="xMidYMid slice"/>
         <rect width="1200" height="630" fill="url(#depth)"/>
+        <g fill="none" stroke="url(#ribbon)">
+          <path d="M-80 402C200 187 354 492 654 380S1038 265 1290 370" stroke-width="28" opacity=".30" filter="url(#ribbon-glow)"/>
+          <path d="M-80 402C200 187 354 492 654 380S1038 265 1290 370" stroke-width="1.5"/>
+          <path d="M-70 433C185 251 385 472 675 397S1042 247 1280 347" stroke-width=".8" opacity=".64"/>
+          <path d="M-50 528C212 585 399 365 691 340S1056 467 1280 341" stroke-width="1" opacity=".44"/>
+        </g>
+        ${dust}${sparkle}
         <g font-family="Noto Sans JP,Meiryo,sans-serif" fill="#fffdf9">
           ${fields.headlineVisible.checked ? `<text x="600" y="87" text-anchor="middle" font-size="${headlineSize}" font-weight="600">${escapeXml(prefix)}</text><text x="600" y="270" text-anchor="middle" font-size="${scoreSize}" font-family="Arial,Meiryo,sans-serif" font-weight="700" fill="url(#type-gradient)"><tspan font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">${escapeXml(statLabel)}</tspan><tspan dx="10" font-family="Noto Sans JP,Meiryo,sans-serif" font-size="${labelSize}" font-weight="500" fill="#fffdf9">上位</tspan><tspan dx="18">${score}%</tspan></text>` : ''}
           ${fields.paletteVisible.checked ? dots : ''}
-          ${fields.ctaVisible.checked ? `<rect x="64" y="455" width="1072" height="112" rx="56" fill="#fffdf9"/><text x="600" y="511" text-anchor="middle" dominant-baseline="middle" font-size="${ctaSize}" font-weight="700" fill="#294269">${text('cta')}</text>` : ''}
+          ${fields.ctaVisible.checked ? `<rect x="64" y="455" width="1072" height="112" rx="56" fill="#11213b" fill-opacity=".36"/><rect x="64" y="455" width="1072" height="112" rx="56" fill="url(#cta-glass)" stroke="url(#cta-edge)" stroke-width="1.5"/><text x="600" y="511" text-anchor="middle" dominant-baseline="middle" font-size="${ctaSize}" font-weight="600" fill="#fffdf9">${text('cta')}</text>` : ''}
         </g>
       </svg>`;
     }

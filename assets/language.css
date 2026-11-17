@@ -1,26 +1,30 @@
 .language-menu { position: relative; flex-shrink: 0; font-family: 'Outfit',Arial,sans-serif; }
 .language-trigger {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 34px;
-  padding: 5px 10px; border: 1px solid rgba(43,45,56,.18); border-radius: 8px;
-  background: rgba(255,253,249,.85); color: #555550; font: inherit; font-size: 12px;
-  font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px;
+  padding: 6px 5px; border: 0; border-radius: 5px;
+  background: transparent; color: #566071; font: inherit; font-size: 12px;
+  font-weight: 500; letter-spacing: .06em; cursor: pointer;
+  transition: color .18s ease, background .18s ease;
 }
-.language-menu svg { width: 16px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+.language-trigger:hover, .language-trigger[aria-expanded="true"] { color: #263e61; background: rgba(38,62,97,.045); }
+.language-menu svg { width: 15px; height: 15px; flex-shrink: 0; }
+.language-menu .language-flag { width: 18px; height: 12px; border-radius: 1px; }
+.language-menu .language-globe { width: 16px; height: 16px; }
 .language-trigger::after {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   margin-left: 2px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
   transform: translateY(-1.5px) rotate(45deg);
   flex-shrink: 0;
 }
 .language-trigger:focus-visible, .language-options a:focus-visible { outline: 2px solid #9272ff; outline-offset: 3px; }
 .language-options {
   position: absolute; top: calc(100% + 7px); right: 0; z-index: 150;
-  min-width: 92px; padding: 5px; border: 1px solid #e0e0dc; border-radius: 9px;
-  background: #fffdf9; box-shadow: 0 8px 24px #172c4a20;
+  min-width: 84px; padding: 4px; border: 1px solid rgba(38,62,97,.10); border-radius: 6px;
+  background: #fffdf9; box-shadow: 0 6px 18px #172c4a12;
 }
 .language-options[hidden] { display: none; }
 .language-options a { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 5px; color: #2b2d38; text-decoration: none; font-size: 13px; }
@@ -34,5 +38,5 @@ html[lang="en"] .type-name-diag { line-height: 1.4; }
 @media(max-width:480px) {
   nav .nav-logo { left: 12px; height: 26px; }
   nav .nav-right { right: 12px; gap: 8px; }
-  .language-trigger { padding: 5px 8px; }
+  .language-trigger { padding: 6px 4px; }
 }

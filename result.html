@@ -2198,7 +2198,7 @@ function buildShareSection(diag, coloredLetters) {
   const uniqueText = isAllMajority ? 'すべての文字で世間と一致' : mostUnique || '該当なし';
   const empathyText = mostEmpathy || '該当なし';
   const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
-  const shareText = `🎨あなたの色彩感覚は、${rareStat.label}上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagName}\n最も個性的な文字：${uniqueText}\n最も共感された文字：${empathyText}\n\n――あなたの「A」は、何色ですか？\n\n${resultUrl}`;
+  const shareText = `🎨あなたの文字色感覚は、${rareStat.label}上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagName}\n最も個性的な文字：${uniqueText}\n最も共感された文字：${empathyText}\n\n――あなたの「A」は、何色ですか？\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -2207,7 +2207,7 @@ function buildShareSection(diag, coloredLetters) {
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
-          alt="あなたの色彩感覚は...${rareStat.label} 上位${rareStat.value}%選んだ文字の色と診断結果"
+          alt="あなたの文字色感覚は...${rareStat.label} 上位${rareStat.value}%選んだ文字の色と診断結果"
           decoding="async">
       </div>
       <div class="share-btn-row">

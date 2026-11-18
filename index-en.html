@@ -513,6 +513,11 @@ nav ul a:hover { color: var(--ink); }
   justify-self: center;
 }
 @media (min-width: 768px) { .theme-grid { --theme-gap: 1.5rem; } }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+  .themes { max-width: 1052px; }
+  .theme-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .theme-card[href="subject-en.html"] { grid-column: auto; width: auto; justify-self: stretch; }
+}
 
 .theme-card {
   /* すりガラス：強い blur + 半透明グラデーション */

@@ -436,6 +436,7 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
 .subject-mode .type-palette-dot { font-size: 0.72rem; }
+.subject-mode .type-stat-subject > span { font-family: 'Noto Sans JP', sans-serif; font-size: 0.82em; }
 .subject-mode .sense-circle { font-size: 0.86rem; }
 .subject-mode .vote-letter-badge { font-size: 0.64rem; }
 .subject-mode .empathy-badge { font-size: 1.07rem; }
@@ -1789,7 +1790,7 @@ function buildTypeHero(coloredLetters, diag) {
             <span class="type-stat-card-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Your most distinctive letter'}</span>
             ${uniqueResult.isAllMajority
               ? `<span class="type-stat-card-value" style="color:rgba(255,255,255,0.4)">-</span>`
-              : `<span class="type-stat-card-value" style="color:${uniqueColor}">${itemLabel(uniqueResult.mostUnique)}</span>`
+              : `<span class="type-stat-card-value${isSubjectMode ? ' type-stat-subject' : ''}" style="color:${uniqueColor}">${isSubjectMode ? `<span>${itemLabel(uniqueResult.mostUnique, true)}</span>` : itemLabel(uniqueResult.mostUnique)}</span>`
             }
           </div>
         </div>

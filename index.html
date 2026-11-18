@@ -127,7 +127,7 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 .hero-wrap {
   position: relative; overflow: hidden;
-  background-image: url('assets/backgrounds/index_hero.webp');
+  background-image: linear-gradient(rgba(255,255,255,.12), rgba(255,255,255,.20)), url('assets/backgrounds/index_hero.webp');
   background-size: cover;
   background-position: center top;
 }
@@ -147,7 +147,7 @@ nav ul a:hover { color: var(--ink); }
   position: absolute; inset: 0;
   background: radial-gradient(
     ellipse 110% 42% at 50% 108%,
-    rgba(8,6,20,0.22) 0%,
+    rgba(8,6,20,0.10) 0%,
     transparent 100%
   );
   pointer-events: none;
@@ -330,12 +330,12 @@ nav ul a:hover { color: var(--ink); }
 }
 
 .hero-label {
-  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink3); margin-bottom: 1.5rem;
+  color: #60478a; margin-bottom: 1.5rem;
   display: flex; align-items: center; gap: 0.6rem;
 }
-.hero-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--ink3); }
+.hero-label::before { content: ''; display: block; width: 24px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #ed747b, #9172cf, #24a7a6); }
 
 .hero h1 {
   font-family: var(--jp); font-weight: 340;
@@ -345,13 +345,13 @@ nav ul a:hover { color: var(--ink); }
   text-shadow: 0 0 22px rgba(255,255,255,0.20), 0 0 50px rgba(255,255,255,0.09);
 }
 .hero h1 strong { font-weight: 340; }
-.hero h1 .hl-red  { color: var(--c1); font-weight: 340; text-shadow: 0 0 18px rgba(255,127,127,0.50), 0 0 38px rgba(255,127,127,0.25); }
-.hero h1 .hl-mint { color: var(--mint); font-weight: 340; text-shadow: 0 0 18px rgba(26,174,170,0.50), 0 0 38px rgba(26,174,170,0.25); }
+.hero h1 .hl-red  { color: #ef6378; font-weight: 500; text-shadow: 0 0 14px rgba(255,220,225,.65); }
+.hero h1 .hl-mint { color: #009da6; font-weight: 500; text-shadow: 0 0 14px rgba(207,255,249,.65); }
 
 .hero-body {
-  font-size: 0.92rem; color: var(--ink2);
+  font-size: 0.92rem; color: #323c4b;
   line-height: 1.9; max-width: 340px;
-  margin-bottom: 2rem; font-weight: 340;
+  margin-bottom: 2rem; font-weight: 450;
   word-break: keep-all; overflow-wrap: break-word;
 }
 .hero-ctas { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }

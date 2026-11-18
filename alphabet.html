@@ -863,7 +863,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     <div class="picker-header">
       <div class="picker-letter-preview" id="pickerPreview">A</div>
       <div>
-        <div class="picker-title" id="pickerTitle">A の色を選ぶ</div>
+        <div class="picker-title" id="pickerTitle">A の色を選択</div>
         <div><small class="picker-title" style="font-size:0.75rem;color:var(--ink3);font-weight:300;display:block;margin-top:0.1rem;">直感で選んでOK</small></div>
       </div>
       <button class="picker-close" id="pickerClose">✕</button>
@@ -1060,7 +1060,7 @@ function openPicker(letter) {
   activeLetter = letter;
   pendingColor = colorMap[letter] || null;
 
-  pickerTitle.textContent = `${letter} の色を選ぶ`;
+  pickerTitle.textContent = `${letter} の色を選択`;
   pickerPreview.textContent = letter;
   updatePickerPreview(pendingColor);
 

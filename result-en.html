@@ -1026,6 +1026,7 @@ nav ul a:hover { color: var(--ink); }
 }
 
 .share-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.share-vote-note { font-style: normal; }
 
 /* 画像保存ボタン */
 .btn-save-image {
@@ -2268,6 +2269,7 @@ function buildShareSection(diag, coloredLetters) {
     <div class="section-eyebrow">Share</div>
     <div class="section-title">Send a link and share your results.</div>
     <div class="share-section">
+      <p class="empathy-comment share-vote-note">Scores may change as more votes are submitted.</p>
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
           alt="${isSubjectMode ? 'Your subject colors and results' : `Your letter-color sense: top ${rareStat.value}% for ${rareStat.label.toLowerCase()}. Your colors and results.`}"

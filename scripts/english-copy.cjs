@@ -1,4 +1,5 @@
 module.exports = {
+  '※投票により、数値は変動する可能性があります。': 'Scores may change as more votes are submitted.',
   '教科の色と診断結果': 'Your subject colors and results',
   '教科には、どんな色を感じますか？': 'What colors do you associate with school subjects?',
   '最も共感された文字：': 'Most shared letter: ',
@@ -159,7 +160,7 @@ module.exports = {
   '国語': 'Japanese', '数学': 'Math', '理科': 'Science', '社会': 'Social studies', '英語': 'English',
   'ロゴ': 'logo', 'お題': 'Theme',
   'あなた': 'You', 'みんな': 'Others', '上位': 'Top ', '世間': 'Others',
-  '文字': ' letters', 'の色を選ぶ': ' — choose a color', 'の色を': ' color ', 'しました': 'ed',
+  '文字': ' letters', 'の色を選択': ' — choose a color', 'の色を': ' color ', 'しました': 'ed',
   'から始まる・': ' first · ', 'シアンから始まる・': 'Cyan first · ', '秒で一巡': ' seconds per cycle', '秒': ' seconds',
   '「': '“', '」': '”',
 };

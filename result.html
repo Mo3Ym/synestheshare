@@ -1026,6 +1026,7 @@ nav ul a:hover { color: var(--ink); }
 }
 
 .share-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.share-vote-note { font-style: normal; }
 
 /* 画像保存ボタン */
 .btn-save-image {
@@ -2267,6 +2268,7 @@ function buildShareSection(diag, coloredLetters) {
     <div class="section-eyebrow">Share</div>
     <div class="section-title">リンクを送って、<wbr>あなたの結果をシェアしよう。</div>
     <div class="share-section">
+      <p class="empathy-comment share-vote-note">※投票により、数値は変動する可能性があります。</p>
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
           alt="${isSubjectMode ? '教科の色と診断結果' : `あなたの文字色感覚は...${rareStat.label} 上位${rareStat.value}%選んだ文字の色と診断結果`}"

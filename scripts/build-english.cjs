@@ -39,7 +39,7 @@ for (const page of pages) {
     '🎨あなたの文字色感覚は、${rareStat.label}上位${rareStat.value}%でした。': '🎨Your letter-color sense ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.',
     '🎨あなたの${senseName}は、${rareStat.label}上位${rareStat.value}%でした。': '🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.',
     '――あなたの「${isNumberMode ? \'1\' : \'A\'}」は、何色ですか？': '— What color is your “${isNumberMode ? \'1\' : \'A\'}”?',
-    '――あなたの「${isSubjectMode ? \'国語\' : isNumberMode ? \'1\' : \'A\'}」は、何色ですか？': '— What color is your “${isSubjectMode ? \'Language\' : isNumberMode ? \'1\' : \'A\'}”?',
+    '――あなたの「${isSubjectMode ? \'国語\' : isNumberMode ? \'1\' : \'A\'}」は、何色ですか？': '— What color is your “${isSubjectMode ? \'Japanese\' : isNumberMode ? \'1\' : \'A\'}”?',
     '🎨私の数字の色は ${type.name} でした。': '🎨My number colors are ${type.name}.',
     '🎨私の${themeName}の色は ${type.name} でした。': '🎨My ${isSubjectMode ? \'school-subject\' : \'number\'} colors are ${type.name}.',
     '――あなたの「${sampleItem}」は、何色ですか？': '— What color is your “${sampleItem}”?',
@@ -55,7 +55,6 @@ for (const page of pages) {
   source = source.replace('<html lang="ja">', '<html lang="en">');
   for (const target of pages) source = source.split(`${target}.html`).join(`${target}-en.html`);
   if (page === 'result') {
-    source = source.replace(/const SUBJECT_SHORT_LABELS = .*?;/, 'const SUBJECT_SHORT_LABELS = {language:"Lang",math:"Math",science:"Sci",social:"Soc",english:"Eng"};');
     source = source.replace("const sharedResult = new URL(location.href);", "const sharedResult = new URL(location.href);\n  sharedResult.searchParams.set('lang', 'en');");
     const colorNames = Object.fromEntries(['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'].map(name => [name,copy[name]]));
     source = source.replace('votes[letter] = entries.map(({ color, name, pct }) => ({ color, name, pct }));', `votes[letter] = entries.map(({ color, name, pct }) => ({ color, name: (${JSON.stringify(colorNames)})[name] || name, pct }));`);
@@ -64,12 +63,10 @@ for (const page of pages) {
     source = source.replace('https://mo3ym.github.io/synestheshare/', 'https://synestheshare.pages.dev/index-en.html');
   }
   if (page === 'index') {
-    source = source.replace('What colors are language and math?', 'For Japanese participants only');
+    source = source.replace('What colors are Japanese and math?', 'What colors are Japanese and math?<br>(For Japanese participants only)');
   }
   if (page === 'subject') {
-    source = source.replace('const LETTERS_10 = Object.keys(LETTER_LABELS);', 'const BUBBLE_LABELS = { language:"国語", math:"数学", science:"理科", social:"社会", english:"英語" };\nconst LETTERS_10 = Object.keys(LETTER_LABELS);');
-    source = source.replace('<span>${LETTER_LABELS[l]}</span>', '<span lang="ja" title="${LETTER_LABELS[l]}">${BUBBLE_LABELS[l]}</span>');
-    source = source.replace('pickerPreview.textContent = LETTER_LABELS[letter];', 'pickerPreview.textContent = BUBBLE_LABELS[letter];');
+    source = source.replace('params.get(LETTER_LABELS[digit])', "params.get(LETTER_LABELS[digit]) || (digit === 'language' ? params.get('Language') || params.get('国語') : null)");
   }
   fs.writeFileSync(path.join(root, `${page}-en.html`), source.replace(/\r\n/g, '\n').replace(/[ \t]+$/gm, ''));
 }

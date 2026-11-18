@@ -14,13 +14,13 @@
   } catch { if (fromDiagnosis) return; }
 
   const subject = mode === 'subject', number = mode === 'number';
-  const sample = subject ? (english ? 'Lang' : '国語') : number ? '1' : 'A';
+  const sample = subject ? '国' : number ? '1' : 'A';
   const copy = english ? {
-    title: `What color is your “${subject ? 'Language' : sample}”?`,
+    title: `What color is your “${subject ? 'Japanese' : sample}”?`,
     description: `Compare the colors you associate with ${subject ? 'school subjects' : number ? 'numbers' : 'letters'}.`,
     view: 'See their results', start: 'Try it yourself (2 min) →', close: 'Close introduction',
   } : {
-    title: `あなたの「${sample}」は、何色？`,
+    title: `あなたの「${subject ? '国語' : sample}」は、何色？`,
     description: `${subject ? '教科' : number ? '数字' : '文字'}に感じる色を、みんなと比べるサイトです。`,
     view: 'この人の結果を見る', start: '診断してみる（2分）', close: '説明を閉じる',
   };

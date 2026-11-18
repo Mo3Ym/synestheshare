@@ -30,7 +30,7 @@ html.result-intro-open { overflow: hidden; }
   display: grid; place-items: center; width: 48px; height: 48px;
   font-family: 'Outfit','Noto Sans JP',sans-serif; font-size: 21px; font-weight: 700;
 }
-.result-intro[data-mode="subject"] .result-intro-dot { font-size: 14px; }
+.result-intro[data-mode="subject"] .result-intro-dot { font-size: 17.25px; }
 .result-intro h2 { margin: 0 0 14px; color: #263e61; font-size: 25px; line-height: 1.5; font-weight: 400; letter-spacing: -.02em; }
 .result-intro-description { margin: 0; color: #425574; font-size: 14px; line-height: 1.85; }
 .result-intro-actions { display: grid; gap: 10px; margin-top: 28px; }

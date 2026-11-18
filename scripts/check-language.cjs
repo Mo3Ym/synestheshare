@@ -41,7 +41,7 @@ for (const page of ['index', 'alphabet', 'result', 'number', 'subject']) {
   if (page === 'alphabet') assert(source.includes('result-en.html?mode='));
   if (page === 'subject') {
     assert(source.includes('const LETTERS_10 = Object.keys(LETTER_LABELS)'));
-    assert(source.includes('"language":"Language"'));
+    assert(source.includes('"language":"Japanese"'));
   }
   if (page === 'result') {
     const script = [...source.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(match => match[2].includes('const DUMMY_VOTES'))[2].split('window.DUMMY_VOTES =')[0];

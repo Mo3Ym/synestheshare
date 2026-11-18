@@ -781,8 +781,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     transparent 65%
   );
 }
-.alpha-bubble span { white-space: normal; line-height: 1.15; max-width: 88%; }
-.picker-letter-preview { font-size: 0.75rem; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
+.alpha-bubble span { font-family: "Noto Sans JP", sans-serif; white-space: normal; line-height: 1.15; max-width: 88%; }
+.picker-letter-preview { font-family: "Noto Sans JP", sans-serif; font-size: 1.23rem; line-height: 1.15; text-align: center; overflow-wrap: anywhere; }
 </style>
 <link rel="stylesheet" href="assets/language.css">
 <script src="assets/language.js" defer></script>
@@ -884,8 +884,8 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 
 <script>
 /* ══ 定数 ══ */
-const LETTER_LABELS = {"language":"Language","math":"Math","science":"Science","social":"Social studies","english":"English"};
-const BUBBLE_LABELS = { language:"国語", math:"数学", science:"理科", social:"社会", english:"英語" };
+const LETTER_LABELS = {"language":"Japanese","math":"Math","science":"Science","social":"Social studies","english":"English"};
+const BUBBLE_LABELS = { language:"国", math:"数", science:"理", social:"社", english:"英" };
 const LETTERS_10 = Object.keys(LETTER_LABELS);
 const PRESET_COLORS = [
   '#ff7f7f', // Red
@@ -918,7 +918,7 @@ let pendingColor = null;
   if (!rParam) {
     // Preserve choices from the previous number page's per-digit color URLs.
     for (const digit of LETTERS_10) {
-      const value = params.get(digit) || params.get(LETTER_LABELS[digit]);
+      const value = params.get(digit) || params.get(LETTER_LABELS[digit]) || (digit === 'language' ? params.get('Language') || params.get('国語') : null);
       if (!/^#[0-9a-f]{6}$/i.test(value || '')) continue;
       const rgb = hex => [1,3,5].map(offset => parseInt(hex.slice(offset,offset+2),16));
       const selected = rgb(value);
@@ -986,7 +986,7 @@ function syncFontSize() {
   document.querySelectorAll('.alpha-cell').forEach(cell => {
     const bubble = cell.querySelector('.alpha-bubble');
     const d = bubble.offsetWidth;
-    if (d > 0) bubble.querySelector('span').style.fontSize = Math.min(d * 0.26, d * 1.15 / Math.max(...cell.querySelector('span').textContent.split(/\s+/).map(word => word.length))) + 'px';
+    if (d > 0) bubble.querySelector('span').style.fontSize = (d * 0.36) + 'px';
   });
 }
 new ResizeObserver(syncFontSize).observe(alphaGrid);

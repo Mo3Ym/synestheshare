@@ -35,7 +35,7 @@
   const r      = params.get('r') || '';
   const mode   = params.get('mode') || '10';
   const ogImageUrl = r
-    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${encodeURIComponent(mode)}&v=13${params.has('score') ? `&score=${encodeURIComponent(params.get('score'))}&stat=${encodeURIComponent(params.get('stat') || 'empathy')}` : ''}`
+    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${encodeURIComponent(mode)}&v=16${params.has('score') ? `&score=${encodeURIComponent(params.get('score'))}&stat=${encodeURIComponent(params.get('stat') || 'empathy')}` : ''}`
     : `${base}/ogp.png`;
   const pageUrl = location.href;
   document.getElementById('ogUrl')   ?.setAttribute('content', pageUrl);
@@ -435,11 +435,11 @@ nav ul a:hover { color: var(--ink); }
   display: flex; align-items: center; justify-content: center;
   font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
 }
-.subject-mode .type-palette-dot { font-size: 0.6rem; }
-.subject-mode .sense-circle { font-size: 0.65rem; }
-.subject-mode .vote-letter-badge { font-size: 0.6rem; }
-.subject-mode .empathy-badge,
-.subject-mode .highlight-badge { font-size: 0.8rem; }
+.subject-mode .type-palette-dot { font-size: 0.72rem; }
+.subject-mode .sense-circle { font-size: 0.86rem; }
+.subject-mode .vote-letter-badge { font-size: 0.64rem; }
+.subject-mode .empathy-badge { font-size: 1.07rem; }
+.subject-mode .highlight-badge { font-size: 1.15rem; }
 
 /* ════════════════════════════════════
    共通: 色円のガラス板光（左上から差し込む光のシート）
@@ -1290,6 +1290,8 @@ footer {
 <script src="assets/language.js" defer></script>
 <link rel="stylesheet" href="assets/result-intro.css">
 <script src="assets/result-intro.js" defer></script>
+<link rel="stylesheet" href="assets/section-nav.css">
+<script src="assets/section-nav.js" defer></script>
 </head>
 <body>
 
@@ -1298,8 +1300,8 @@ footer {
   <a class="nav-logo" href="index-en.html">
     <img src="images/logo.png" alt="SynestheShare">
   </a>
-  <ul>
-    <li><a href="#typeHeroArea">TOP</a></li>
+  <ul class="section-nav">
+    <li><a href="#typeHeroArea" aria-current="location">TOP</a></li>
     <li><a href="#contentOuter">Details</a></li>
     <li><a href="#shareOuter">Share</a></li>
   </ul>
@@ -1406,8 +1408,8 @@ const isFullMode = params.get('mode') === '26';
 const isNumberMode = params.get('mode') === 'number';
 const isSubjectMode = params.get('mode') === 'subject';
 const shareOrigin = location.protocol === 'file:' ? 'https://synestheshare.pages.dev' : location.origin;
-const SUBJECT_LABELS = { language:'Language', math:'Math', science:'Science', social:'Social studies', english:'English' };
-const SUBJECT_SHORT_LABELS = {language:"Lang",math:"Math",science:"Sci",social:"Soc",english:"Eng"};
+const SUBJECT_LABELS = { language:'Japanese', math:'Math', science:'Science', social:'Social studies', english:'English' };
+const SUBJECT_SHORT_LABELS = { language:'国', math:'数', science:'理', social:'社', english:'英' };
 function itemLabel(item, compact = false) {
   return (compact ? SUBJECT_SHORT_LABELS : SUBJECT_LABELS)[item] || item;
 }
@@ -1784,7 +1786,7 @@ function buildTypeHero(coloredLetters, diag) {
           </div>
           <div class="type-stat-sep"></div>
           <div class="type-stat-item">
-            <span class="type-stat-card-label">${isNumberMode ? 'Most distinctive number' : 'Your most distinctive letter'}</span>
+            <span class="type-stat-card-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Your most distinctive letter'}</span>
             ${uniqueResult.isAllMajority
               ? `<span class="type-stat-card-value" style="color:rgba(255,255,255,0.4)">-</span>`
               : `<span class="type-stat-card-value" style="color:${uniqueColor}">${itemLabel(uniqueResult.mostUnique)}</span>`
@@ -1852,11 +1854,11 @@ function buildEmpathyCard(coloredLetters) {
   if (!mostEmpathy) {
     return `<div class="card">
       <div class="section-eyebrow">Shared Sense</div>
-      <div class="section-title">Your most shared letter</div>
+      <div class="section-title">${isSubjectMode ? 'Most shared subject' : 'Your most shared letter'}</div>
       <div class="empathy-card">
         <div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
         <div class="empathy-body">
-          <div class="empathy-pct-label">None of your colors matched the most popular choice.</div>
+          <div class="empathy-pct-label">${isSubjectMode ? 'None of your subject colors matched the most popular choice.' : 'None of your colors matched the most popular choice.'}</div>
           <div class="empathy-comment">Your sense of color has a universe all its own.</div>
         </div>
       </div>
@@ -1875,7 +1877,7 @@ function buildEmpathyCard(coloredLetters) {
 
   return `<div class="card">
     <div class="section-eyebrow">Shared Sense</div>
-    <div class="section-title">Your most shared letter</div>
+    <div class="section-title">${isSubjectMode ? 'Most shared subject' : 'Your most shared letter'}</div>
     <div class="empathy-card">
       <div class="empathy-badge"${isBright(myColor)?' data-bright="1"':''} style="background:${myColor};color:${textColorFor(myColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>
       <div class="empathy-body">
@@ -1916,10 +1918,10 @@ function buildHighlightCard(coloredLetters) {
     `<div class="highlight-bar-seg" style="background:${v.color}" data-pct="${v.pct}"></div>`
   ).join('');
 
-  const sectionTitle = isNumberMode ? 'Your most distinctive number' : 'Your most distinctive letter';
+  const sectionTitle = isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Your most distinctive number' : 'Your most distinctive letter';
 
   const gapText = isAllMajority
-    ? 'All your colors match the majority'
+    ? (isSubjectMode ? 'All your subject colors match the majority' : 'All your colors match the majority')
     : isOutlier
     ? `${topPct}% chose ${votes[0].name} for ${itemLabel(mostUnique)}. You saw ${getColorName(myColor)}.`
     : `${topPct}% chose ${votes[0].name} for ${itemLabel(mostUnique)}. You saw ${getColorName(myColor)}.`;
@@ -1984,7 +1986,7 @@ function buildSenseCard(coloredLetters) {
   const uniquePctHtml = isAllMajority ? '' : '';
 
   const uniqueLabelHtml = isAllMajority
-    ? `<div class="empathy-pct-label">All your colors match the majority</div>`
+    ? `<div class="empathy-pct-label">${isSubjectMode ? 'All your subject colors match the majority' : 'All your colors match the majority'}</div>`
     : `<div class="sense-sentence">
         <span class="sense-strong">${uTopPct}%</span> chose <span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span> for ${itemLabel(mostUnique)}.
       </div>
@@ -2025,7 +2027,7 @@ function buildSenseCard(coloredLetters) {
   const eColorName = eColor ? getColorName(eColor) : '';
 
   const empathyLabelHtml = !mostEmpathy
-    ? `<div class="empathy-pct-label">None of your colors matched the most popular choice.</div>`
+    ? `<div class="empathy-pct-label">${isSubjectMode ? 'None of your subject colors matched the most popular choice.' : 'None of your colors matched the most popular choice.'}</div>`
     : `<div class="sense-sentence">
         <span class="sense-strong">${highestPct}%</span> chose the same <span class="sense-color-word" style="color:${isBright(eColor)?'var(--ink)':eColor}">${eColorName}</span> as you for ${itemLabel(mostEmpathy)}.
       </div>`;
@@ -2067,7 +2069,7 @@ function buildSenseCard(coloredLetters) {
     <div class="section-eyebrow">Your Sense</div>
     <div class="sense-grid">
       <div class="sense-col">
-        <div class="sense-col-label">${isNumberMode ? 'Most distinctive number' : 'Most distinctive letter'}</div>
+        <div class="sense-col-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Most distinctive letter'}</div>
         ${isAllMajority
           ? `<div class="sense-row">
                <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
@@ -2081,7 +2083,7 @@ function buildSenseCard(coloredLetters) {
       </div>
       <div class="sense-divider"></div>
       <div class="sense-col">
-        <div class="sense-col-label">Most shared letter</div>
+        <div class="sense-col-label">${isSubjectMode ? 'Most shared subject' : 'Most shared letter'}</div>
         ${!mostEmpathy
           ? `<div class="sense-row">
                <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
@@ -2158,7 +2160,7 @@ function buildVoteSection(coloredLetters) {
 
   let html = `<div class="card">
     <div class="section-eyebrow">Vote</div>
-    <div class="section-title">Each letter’s colors — Compared with others</div>
+    <div class="section-title">${isSubjectMode ? 'Each subject’s colors' : 'Each letter’s colors'} — Compared with others</div>
     <div class="vote-collapse-wrap" id="voteCollapseWrap">
       <div class="vote-list">
         ${visible.map(buildItem).join('')}
@@ -2190,7 +2192,7 @@ function buildDiagSection(diag) {
       <div class="diag-type-desc">${type.descFull.replace(/。/g, '。<br>')}</div>
     </div>
     <div class="diag-basis">
-      Majority match：<strong>${diag.majorityRate}%</strong>(${diag.majorityCount}/${diag.total} letters match the majority)<br>${calcRareStat(diag).label}：<strong>Top ${calcRareStat(diag).value}%</strong>
+      Majority match：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}${isSubjectMode ? ' subjects match the majority' : ' letters match the majority'}）<br>${calcRareStat(diag).label}：<strong>Top ${calcRareStat(diag).value}%</strong>
     </div>
   </div>`;
 }
@@ -2207,7 +2209,7 @@ function buildColorTypeSection(coloredLetters, diag) {
   const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const basisDots = sorted.map(([c, n]) => {
     const shadow = isBright(c) ? 'box-shadow:inset 0 0 0 1px rgba(0,0,0,0.12)' : '';
-    return `<span class="diag-basis-dot" style="background:${c};${shadow}"></span>${getColorName(c)}（${n} letters）`;
+    return `<span class="diag-basis-dot" style="background:${c};${shadow}"></span>${getColorName(c)}（${n}${isSubjectMode ? 'School subjects' : ' letters'}）`;
   }).join('、');
 
   return `<div class="card">
@@ -2241,7 +2243,7 @@ function buildShareSection(diag, coloredLetters) {
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '13');
+  ogUrl.searchParams.set('v', '16');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2258,7 +2260,7 @@ function buildShareSection(diag, coloredLetters) {
   const empathyText = itemLabel(mostEmpathy) || 'None';
   const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
   const senseName = isSubjectMode ? 'school-subject color sense' : isNumberMode ? 'number-color sense' : 'letter-color sense';
-  const shareText = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.\n\n${colorType.name} / ${diagName}\n${isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: '}${uniqueText}\nMost shared letter: ${empathyText}\n\n— What color is your “${isSubjectMode ? 'Language' : isNumberMode ? '1' : 'A'}”?\n\n${resultUrl}`;
+  const shareText = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.\n\n${colorType.name} / ${diagName}\n${isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: '}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n\n— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">
@@ -2267,7 +2269,7 @@ function buildShareSection(diag, coloredLetters) {
     <div class="share-section">
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
-          alt="Your letter-color sense: top ${rareStat.value}% for ${rareStat.label.toLowerCase()}. Your colors and results."
+          alt="${isSubjectMode ? 'Your subject colors and results' : `Your letter-color sense: top ${rareStat.value}% for ${rareStat.label.toLowerCase()}. Your colors and results.`}"
           decoding="async">
       </div>
       <div class="share-btn-row">
@@ -2314,7 +2316,7 @@ function renderWithoutStats(coloredLetters) {
   const themeName = isSubjectMode ? 'School subjects' : 'Numbers';
   const themeLabel = isSubjectMode ? 'Your school-subject colors' : 'Your number colors';
   const pickerUrl = isSubjectMode ? 'subject-en.html' : 'number-en.html';
-  const sampleItem = isSubjectMode ? 'Language' : '1';
+  const sampleItem = isSubjectMode ? 'Japanese' : '1';
   const status = window.themeStatsStatus || 'loading';
   const message = window.themeVoteError ? 'Your vote could not be saved. Check the connection settings or database permissions.'
     : status === 'loading' ? 'Loading votes…'
@@ -2333,7 +2335,7 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('stat');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '13');
+  image.searchParams.set('v', '16');
   const shareText = `🎨My ${isSubjectMode ? 'school-subject' : 'number'} colors are ${type.name}.\n\n— What color is your “${sampleItem}”?\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
 }
@@ -2545,7 +2547,7 @@ function render() {
       const typeHero = document.querySelector('.type-hero');
       const typeName = typeHero?.querySelector('.type-name-color')?.textContent?.trim() || '';
       const diagName = typeHero?.querySelector('.type-name-diag')?.textContent?.trim() || '';
-      const desc = `${typeName} / ${diagName} — What colors do you see in letters?`;
+      const desc = `${typeName} / ${diagName} — ${isSubjectMode ? 'What colors do you associate with school subjects?' : 'What colors do you see in letters?'}`;
       const url  = location.href;
       document.querySelector('meta[property="og:title"]')      ?.setAttribute('content', (isSubjectMode ? 'What colors are your school subjects? — SynestheShare' : isNumberMode ? 'What color is your 1? — SynestheShare' : 'What color is your A? — SynestheShare'));
       document.querySelector('meta[property="og:description"]') ?.setAttribute('content', desc);
@@ -2811,6 +2813,14 @@ function parseColorMap() {
    ・alphabet-en.htmlから来た（sessionStorage に ss_from_alphabet=1）
    ・かつ、この結果でまだ投票していない（ss_vote_key が未完）
 ──────────────────────────────────────────────── */
+function subjectVoteKey(letter) {
+  return letter === 'language' ? 'japanese' : letter;
+}
+
+function statisticsId(mode, letter) {
+  return mode === 'subject' ? 'subject-' + subjectVoteKey(letter) : letter;
+}
+
 function subjectVoteRecord() {
   try {
     const saved = JSON.parse(localStorage.getItem('ss_subject_votes_v1'));
@@ -2823,7 +2833,7 @@ function subjectVoteRecord() {
     const key = sessionStorage.key(i);
     if (!key?.startsWith('ss_voted_subject_') || sessionStorage.getItem(key) !== 'done') continue;
     const answer = key.slice('ss_voted_subject_'.length);
-    ids.forEach((id, index) => { if (COLOR_HEX[answer[index]]) items[id] = true; });
+    ids.forEach((id, index) => { if (id !== 'language' && COLOR_HEX[answer[index]]) items[id] = true; });
   }
   return { items, legacyUnknown: localStorage.getItem('ss_submitted_subject') === '1' && !Object.keys(items).length };
 }
@@ -2837,7 +2847,10 @@ function shouldVote() {
   if (!fromAlphabet) return false;
   const voteKey = sessionStorage.getItem('ss_vote_key');
   if (!voteKey && !explicitSubmission) return false;
-  if (sessionStorage.getItem(voteKey) === 'done') return false;
+  // Subject submissions are deduplicated per item, including after a key change.
+  if (!explicitSubmission || mode !== 'subject') {
+    if (sessionStorage.getItem(voteKey) === 'done') return false;
+  }
   return true;
 }
 
@@ -2848,7 +2861,7 @@ function markVoteDone(votedLetters = []) {
   const mode = new URLSearchParams(location.search).get('mode');
   if (mode === 'subject') {
     const record = subjectVoteRecord();
-    votedLetters.forEach(letter => { record.items[letter] = true; });
+    votedLetters.forEach(letter => { record.items[subjectVoteKey(letter)] = true; });
     localStorage.setItem('ss_subject_votes_v1', JSON.stringify(record));
   }
   const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
@@ -2916,11 +2929,11 @@ function statsToVotes(statsData) {
       let voteLetters = letters;
       if (new URLSearchParams(location.search).get('mode') === 'subject') {
         const record = subjectVoteRecord();
-        voteLetters = letters.filter(letter => !record.items[letter]);
+        voteLetters = letters.filter(letter => !record.items[subjectVoteKey(letter)]);
         // Older installs only recorded a theme-wide flag. Avoid recounting any
         // existing subject while allowing genuinely missing subjects to be added.
         if (record.legacyUnknown) {
-          const existing = await Promise.all(voteLetters.map(letter => getDoc(doc(db, 'statistics', 'subject-' + letter))));
+          const existing = await Promise.all(voteLetters.map(letter => getDoc(doc(db, 'statistics', statisticsId('subject', letter)))));
           voteLetters = voteLetters.filter((letter, index) => !existing[index].exists());
         }
       }
@@ -2938,7 +2951,7 @@ function statsToVotes(statsData) {
         const hex = colorMap[l];
         if (!hex) return;
         const colorName = COLOR_NAME[hex] || hex;
-        const ref = doc(db, 'statistics', (new URLSearchParams(location.search).get('mode') === 'subject' ? 'subject-' : '') + l);
+        const ref = doc(db, 'statistics', statisticsId(new URLSearchParams(location.search).get('mode'), l));
         batch.set(ref, { [colorName]: increment(1) }, { merge: true });
       });
       await batch.commit();
@@ -2956,7 +2969,7 @@ function statsToVotes(statsData) {
   try {
     const statsMode = new URLSearchParams(location.search).get('mode');
     const allLetters = statsMode === 'subject' ? ['language','math','science','social','english'] : (statsMode === 'number' ? '1234567890' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ').split('');
-    const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', (new URLSearchParams(location.search).get('mode') === 'subject' ? 'subject-' : '') + l)));
+    const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', statisticsId(statsMode, l))));
     const snaps   = await Promise.all(fetches);
 
     const statsData = {};

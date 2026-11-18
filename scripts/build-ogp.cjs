@@ -94,10 +94,10 @@ async function writePixels(name, svg, channels) {
     masks.push(Buffer.from(Array.from({ length: 48 * 50 }, (_, i) => rgba[i * 4 + 3])));
   }
   fs.writeFileSync(path.join(output, 'letters.alpha.deflate'), deflateSync(Buffer.concat(masks)));
-  for (const [language, labels] of [['ja',['国語','数学','理科','社会','英語']],['en',['Lang','Math','Sci','Soc','Eng']]]) {
+  for (const [language, labels] of ['ja','en'].map(language => [language, ['国','数','理','社','英']])) {
     const subjectMasks = [];
     for (const label of labels) {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="78" height="50"><text x="39" y="35" text-anchor="middle" font-family="Outfit,Noto Sans JP,sans-serif" font-size="${language === 'ja' ? 28 : 22}" font-weight="700" fill="white">${label}</text></svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="78" height="50"><text x="39" y="36" text-anchor="middle" font-family="Noto Sans JP,Meiryo,sans-serif" font-size="30" font-weight="700" fill="white">${label}</text></svg>`;
       const rgba = await sharp(Buffer.from(svg)).ensureAlpha().raw().toBuffer();
       subjectMasks.push(Buffer.from(Array.from({length:78*50},(_,i)=>rgba[i*4+3])));
     }

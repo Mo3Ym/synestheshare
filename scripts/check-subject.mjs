@@ -34,7 +34,7 @@ for(const english of [false,true]) {
   vm.runInContext('letters.forEach(l=>DUMMY_VOTES[l]=[{color:colorMap[l],pct:100,name:"Red"}])',context);
   for(const builder of ['buildTypeHero(letters,calcDiagnosis())','buildSenseCard(letters)','buildVoteSection(letters)','buildShareSection(calcDiagnosis(),letters)']) {
     const output=vm.runInContext(builder,context);
-    if(english) assert(!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(output),builder);
+    if(english) assert(!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(output.replace(/<span>[国数理社英]<\/span>/g, '')),builder);
   }
 }
 const env={ASSETS:{fetch:async url=>{try{return new Response(await readFile(new URL(`..${new URL(url).pathname}`,import.meta.url)))}catch{return new Response('missing',{status:404})}}}};

@@ -82,7 +82,9 @@ export async function onRequest(context) {
   const english = /\/result-en(?:\.html)?$/.test(url.pathname) || url.searchParams.get('lang') === 'en';
   const symbol = mode === 'subject' ? (english ? 'school subjects' : '教科') : mode === 'number' ? '1' : 'A';
   const title = english ? `What color is your ${symbol}? — SynestheShare` : `あなたの${symbol}は何色?　―SynestheShare`;
-  const desc = english ? 'What colors do you see in letters?' : 'あなたの文字には、どんな色が見えますか？';
+  const desc = mode === 'subject'
+    ? (english ? 'What colors do you associate with school subjects?' : '教科には、どんな色を感じますか？')
+    : english ? 'What colors do you see in letters?' : 'あなたの文字には、どんな色が見えますか？';
 
   // HTMLRewriterでOGPタグを書き換え（コンマ区切りセレクタは非対応のため個別に指定）
   return new HTMLRewriter()

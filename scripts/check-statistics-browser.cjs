@@ -25,11 +25,14 @@ export const getDoc=async ref=>({exists:()=>!!window.__fixtureDB[ref.path],data:
 (async () => {
  const browser = await chromium.launch({channel:'chrome',headless:true});
  try {
- const cases=[{mode:'number',answer:'---3------'},{mode:'number',answer:'4C45111111'},{mode:'subject',answer:'0----'},{mode:'subject',answer:'0531-',legacy:true}];
+ const cases=[{mode:'number',answer:'---3------'},{mode:'number',answer:'4C45111111'},{mode:'subject',answer:'0----'},{mode:'subject',answer:'0531-',legacy:true},{mode:'subject',answer:'0----',legacy:true}];
  for(const english of [false,true]) for(const {mode,answer,legacy} of cases) {
  const context=await browser.newContext();
  await context.addInitScript(legacy=>{window.__fixtureDB=JSON.parse(sessionStorage.getItem('fixtureDB')||(legacy?'{"statistics/subject-language":{"赤":2}}':'{"statistics/4":{"赤":2}}'));window.__commits=0;if(legacy)localStorage.setItem('ss_submitted_subject','1');},legacy);
  const page=await context.newPage();const errors=[];
+ if(legacy && answer==='0----') await context.addInitScript(answer => {
+   sessionStorage.setItem('ss_voted_subject_'+answer,'done');
+ }, answer);
  page.on('pageerror',error=>errors.push(error.message));
  await page.route(/^https?:/,async route=>{
  const url=route.request().url();
@@ -40,8 +43,9 @@ export const getDoc=async ref=>({exists:()=>!!window.__fixtureDB[ref.path],data:
  await page.goto(url.href);await page.locator('#btnResult').click();
  await page.locator('.type-stat-card').waitFor();await page.locator('#mainWrap .sense-grid').waitFor();
  assert.equal(await page.evaluate(()=>window.__commits),1);
- const stats=await page.evaluate(()=>window.__fixtureDB);const ids=mode==='subject'?['language','math','science','social','english']:'1234567890'.split('');
- for(let i=0;i<answer.length;i++) if(answer[i]!=='-') assert.equal(Object.values(stats['statistics/'+(mode==='subject'?'subject-':'')+ids[i]]).reduce((a,b)=>a+b,0),mode==='number'&&ids[i]==='4'?3:legacy&&ids[i]==='language'?2:1);
+ const stats=await page.evaluate(()=>window.__fixtureDB);
+ if(mode==='subject')assert.deepEqual(stats['statistics/subject-language'],legacy?{'赤':2}:undefined);const ids=mode==='subject'?['language','math','science','social','english']:'1234567890'.split('');
+ for(let i=0;i<answer.length;i++) if(answer[i]!=='-') assert.equal(Object.values(stats['statistics/'+(mode==='subject'?'subject-':'')+(ids[i]==='language'?'japanese':ids[i])]).reduce((a,b)=>a+b,0),mode==='number'&&ids[i]==='4'?3:1);
  assert.equal(await page.locator('.type-palette-dot').count(),answer.replaceAll('-','').length);
  if(mode==='number')assert.match(await page.locator('.type-stat-card-label').last().innerText(),english?/number/i:/数字/);
  assert.equal(new URL(page.url()).hash,'');
@@ -53,7 +57,7 @@ export const getDoc=async ref=>({exists:()=>!!window.__fixtureDB[ref.path],data:
  url.search='?mode=subject&r=0531-';await page.goto(url.href);await page.locator('#btnResult').click();
  await page.locator('.type-stat-card').waitFor();
  const completed=await page.evaluate(()=>window.__fixtureDB);
- for(const id of ['language','math','science','social'])assert.equal(Object.values(completed['statistics/subject-'+id]).reduce((a,b)=>a+b,0),1);
+ for(const id of ['japanese','math','science','social'])assert.equal(Object.values(completed['statistics/subject-'+id]).reduce((a,b)=>a+b,0),1);
  assert(!completed['statistics/subject-english']);
  }
  await context.close();

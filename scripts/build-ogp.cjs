@@ -24,7 +24,7 @@ function save(name, pixels) {
   fs.writeFileSync(path.join(output, name), deflateSync(pixels));
 }
 
-function card(title, question, english) {
+function card(title, question, english, logoMark) {
   const family = english ? fontLatin : fontJP;
   return svg(1200, 630, `
     <defs>
@@ -46,7 +46,8 @@ function card(title, question, english) {
     <path d="M-40 552C295 449 344 657 740 580s325-170 495-188v246H-40Z" fill="#fff" fill-opacity=".11"/>
     <path d="M-40 552C295 449 344 657 740 580s325-170 495-188M-50 590C334 515 450 673 866 580q220-73 368-90"
       fill="none" stroke="url(#wave)" stroke-width="1.5"/>
-    <text x="48" y="55" font-family="${fontLatin}" font-size="35" font-weight="500" fill="${ink}">SynestheShare</text>
+    <image x="48" y="25" width="36" height="36" href="${logoMark}"/>
+    <text x="94" y="55" font-family="${fontLatin}" font-size="35" font-weight="500" fill="${ink}">SynestheShare</text>
     <path d="M240 141h48m626 0h48" fill="none" stroke="${ink}" stroke-opacity=".7"/>
     <text x="600" y="157" text-anchor="middle" font-family="${family}" font-size="${english ? 44 : 47}"
       letter-spacing="${english ? 1 : 7}" fill="${ink}">${escape(title)}</text>
@@ -71,6 +72,14 @@ async function saveSheet(name, items, makeTile) {
     await sharp({ text: { text: '81%', font: 'Outfit', fontfile: outfitRegular, rgba: true } }).png().toBuffer();
   }
 
+  // Reuse the S badge from the navigation logo, which also contains the wordmark and version text.
+  const logoMarkPng = await sharp(path.resolve(__dirname, '../images/logo.png'))
+    .extract({ left: 0, top: 81, width: 306, height: 306 })
+    .resize(72, 72)
+    .png()
+    .toBuffer();
+  const logoMark = `data:image/png;base64,${logoMarkPng.toString('base64')}`;
+
   const copy = {
     ja: {
       alphabet: ['あなたの文字色感覚', 'あなたの A は、何色ですか？'],
@@ -87,7 +96,7 @@ async function saveSheet(name, items, makeTile) {
   };
   for (const [locale, text] of Object.entries(copy)) {
     for (const mode of ['alphabet', 'number', 'subject']) {
-      save(`v17-${mode}-${locale}.rgb.deflate`, await raster(card(...text[mode], locale === 'en')));
+      save(`v17-${mode}-${locale}.rgb.deflate`, await raster(card(...text[mode], locale === 'en', logoMark)));
     }
     await saveSheet(`v17-labels-${locale}.alpha.deflate`, text.labels, (label) => {
       const isMatch = label === text.labels[0];

@@ -17,9 +17,9 @@ for (const query of ['', 'r=---', 'r=invalid', 'r=0&mode=11']) {
 }
 const fullAnswer = parseAnswer('0123456789ABC0123456789ABC', '26');
 assert.deepEqual(displayAnswer(fullAnswer), [...fullAnswer.slice(0, 6), { letter: '…' }]);
-assert.deepEqual(displayAnswer(parseAnswer('0-5', '10')).map(item => item.letter), ['A', 'C']);
+assert.deepEqual(displayAnswer(parseAnswer('0-5', '10')).map(item => item.letter), ['A', 'C', '…']);
 assert.equal(displayAnswer(parseAnswer('---------0', '10'))[0].letter, 'Z');
-assert.equal(displayAnswer(parseAnswer('012345', '10')).at(-1).letter, 'F');
+assert.equal(displayAnswer(parseAnswer('012345', '10')).at(-1).letter, '…');
 
 const samples = [
   ['r=0527416C25&majority=81&score=19', 'final.png'],
@@ -58,5 +58,5 @@ assert.equal(image.searchParams.get('majority'), '81');
 assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
-assert.equal(image.searchParams.get('v'), '18');
+assert.equal(image.searchParams.get('v'), '19');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');

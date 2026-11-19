@@ -131,10 +131,6 @@ nav ul a:hover { color: var(--ink); }
   background-size: cover;
   background-position: center top;
 }
-.hero-blob { display: none; }
-.hero-blob-1 { width: max(420px, 85vw); height: max(420px, 85vw); top: -15%; left: -15%; }
-.hero-blob-2 { width: max(360px, 70vw); height: max(360px, 70vw); top: 20%; right: -15%; }
-.hero-blob-3 { width: max(300px, 60vw); height: max(300px, 60vw); bottom: 0; left: 25%; }
 
 @keyframes blobdrift {
   from { transform: translate(0,0) scale(1); }
@@ -154,51 +150,25 @@ nav ul a:hover { color: var(--ink); }
   z-index: 0;
 }
 
-/* ── 大気層：2枚の光膜がゆっくり呼吸する ── */
+/* ── 色の光 ── */
 .hero-atmo {
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: -12% -39%;
   pointer-events: none;
   z-index: 0;
-  mix-blend-mode: multiply;
+  background:
+    radial-gradient(ellipse at 45% 29%, rgba(255,179,155,.70), transparent 34%),
+    radial-gradient(ellipse at 68% 51%, rgba(116,217,240,.72), transparent 37%),
+    radial-gradient(ellipse at 37% 73%, rgba(184,166,246,.48), transparent 30%);
+  animation: hero-light-drift 9s ease-in-out infinite alternate;
 }
-.hero-atmo::before {
-  content: '';
-  position: absolute;
-  width: 130%; height: 130%;
-  top: -15%; left: -15%;
-  background: radial-gradient(
-    ellipse 65% 55% at 38% 48%,
-    rgba(255,110,80,0.52) 0%,
-    rgba(210,80,170,0.28) 42%,
-    transparent 68%
-  );
-  filter: blur(55px);
-  animation: atmoA 38s ease-in-out infinite alternate;
+@keyframes hero-light-drift {
+  from { transform: translate3d(-19%, -3%, 0); }
+  to { transform: translate3d(19%, 3%, 0); }
 }
-.hero-atmo::after {
-  content: '';
-  position: absolute;
-  width: 130%; height: 130%;
-  top: -15%; right: -20%;
-  background: radial-gradient(
-    ellipse 58% 62% at 62% 52%,
-    rgba(70,130,255,0.44) 0%,
-    rgba(130,70,220,0.26) 48%,
-    transparent 70%
-  );
-  filter: blur(65px);
-  animation: atmoB 52s ease-in-out infinite alternate-reverse;
-}
-@keyframes atmoA {
-  0%   { transform: translate(0,0)    scale(1)    rotate(0deg); }
-  40%  { transform: translate(7%,5%)  scale(1.05) rotate(10deg); }
-  70%  { transform: translate(-4%,8%) scale(0.97) rotate(-6deg); }
-  100% { transform: translate(4%,-6%) scale(1.03) rotate(14deg); }
-}
-@keyframes atmoB {
-  0%   { transform: translate(0,0)    scale(1); }
-  55%  { transform: translate(-9%,6%) scale(1.07); }
-  100% { transform: translate(5%,-4%) scale(0.96); }
+.hero-wrap.hero-offscreen .hero-atmo { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-atmo { animation: none; }
 }
 
 /* ── 微粒子フィールド（背景画像の光点に合わせ白グロー） ── */
@@ -225,8 +195,6 @@ nav ul a:hover { color: var(--ink); }
     48vw  62vh 4px 1px rgba(255,255,255,0.80),
     64vw   8vh 5px 1px rgba(255,255,255,0.84),
     92vw  58vh 4px 1px rgba(255,255,255,0.82);
-  animation: particleDrift1 12s ease-in-out infinite alternate,
-             particlePulse   4s ease-in-out infinite -0.8s;
 }
 
 /* 小さな白光点 グループB（10個） */
@@ -242,8 +210,6 @@ nav ul a:hover { color: var(--ink); }
     78vw  88vh 4px 1px rgba(255,255,255,0.82),
     26vw  22vh 5px 1px rgba(255,255,255,0.88),
     95vw  12vh 4px 1px rgba(255,255,255,0.80);
-  animation: particleDrift2 17s ease-in-out infinite alternate-reverse,
-             particlePulse   5s ease-in-out infinite -2.5s;
 }
 
 /* 中サイズ・温かみグロー（8個） */
@@ -257,8 +223,6 @@ nav ul a:hover { color: var(--ink); }
     10vw  62vh  8px 2px rgba(255,205,178,0.66),
     88vw  40vh  9px 2px rgba(255,218,192,0.70),
     52vw  78vh  8px 2px rgba(255,210,182,0.64);
-  animation: particleDrift3 14s ease-in-out infinite alternate,
-             particlePulse   5s ease-in-out infinite -1.3s;
 }
 
 /* 大きなボケ光点（6個） */
@@ -270,29 +234,6 @@ nav ul a:hover { color: var(--ink); }
     10vw  30vh 15px 4px rgba(205,218,255,0.46),
     48vw  50vh 18px 5px rgba(255,218,198,0.52),
     90vw  25vh 16px 4px rgba(218,205,255,0.50);
-  animation: particleDrift4 20s ease-in-out infinite alternate-reverse,
-             particlePulse   6s ease-in-out infinite -3.0s;
-}
-
-@keyframes particleDrift1 {
-  0%   { transform: translate(  0px,  0px); }
-  100% { transform: translate( 28px,-45px); }
-}
-@keyframes particleDrift2 {
-  0%   { transform: translate(  0px,  0px); }
-  100% { transform: translate(-32px,-50px); }
-}
-@keyframes particleDrift3 {
-  0%   { transform: translate(  0px,  0px); }
-  100% { transform: translate( 22px,-38px); }
-}
-@keyframes particleDrift4 {
-  0%   { transform: translate(  0px,  0px); }
-  100% { transform: translate(-20px,-32px); }
-}
-@keyframes particlePulse {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0.20; }
 }
 
 .hero {
@@ -861,9 +802,6 @@ nav ul a:hover { color: var(--ink); }
 
 <!-- ══ HERO ══ -->
 <div class="hero-wrap">
-  <div class="hero-blob hero-blob-1"></div>
-  <div class="hero-blob hero-blob-2"></div>
-  <div class="hero-blob hero-blob-3"></div>
 
   <!-- 大気エフェクト：光膜 + 微粒子 -->
   <div class="hero-atmo" aria-hidden="true"></div>
@@ -1053,56 +991,14 @@ if (themeGrid) new ResizeObserver(syncTbubble).observe(themeGrid);
 requestAnimationFrame(() => { syncTbubble(); requestAnimationFrame(syncTbubble); });
 window.addEventListener('load', () => { syncTbubble(); setTimeout(syncTbubble, 200); });
 
-/* ══ HERO BLOB カラーアニメーション ══
-   3つのblobがそれぞれ独立したスピードで色相を巡回する。
-   hslToRgb で RGBA  letters列を生成し radial-gradient を上書き。
-   ─────────────────────────────────── */
-(function() {
-  const b1 = document.querySelector('.hero-blob-1');
-  const b2 = document.querySelector('.hero-blob-2');
-  const b3 = document.querySelector('.hero-blob-3');
-  if (!b1 || !b2 || !b3) return;
-
-  // 各blobの初期色相（度）とアニメーション速度（度/ seconds）
-  const blobs = [
-    { el: b1, hue: 0,   speed: 72, alpha: 0.30 },   // Red first · 5 seconds per cycle
-    { el: b2, hue: 170, speed: 60, alpha: 0.26 },   // Cyan first · 6 seconds per cycle
-    { el: b3, hue: 270, speed: 90, alpha: 0.20 },   // Purple first · 4 seconds per cycle
-  ];
-
-  function hslToRgba(h, s, l, a) {
-    h = h % 360;
-    s /= 100; l /= 100;
-    const k = n => (n + h / 30) % 12;
-    const f = n => l - Math.min(l, 1 - l) * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-    const r = Math.round(f(0) * 255);
-    const g = Math.round(f(8) * 255);
-    const b = Math.round(f(4) * 255);
-    return `rgba(${r},${g},${b},${a})`;
-  }
-
-  function setBlobColor(blob) {
-    const rgba = hslToRgba(blob.hue, 85, 58, blob.alpha);
-    blob.el.style.background = `radial-gradient(circle, ${rgba} 0%, transparent 70%)`;
-  }
-
-  // 初期描画
-  blobs.forEach(setBlobColor);
-
-  let last = null;
-  function tick(ts) {
-    if (last !== null) {
-      const dt = (ts - last) / 1000; //  seconds
-      blobs.forEach(b => {
-        b.hue = (b.hue + b.speed * dt) % 360;
-        setBlobColor(b);
-      });
-    }
-    last = ts;
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-})();
+// Pause the hero light when its section leaves the viewport.
+const heroBackground = document.querySelector('.hero-wrap');
+if (heroBackground && 'IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(([entry]) => {
+    heroBackground.classList.toggle('hero-offscreen', !entry.isIntersecting);
+  });
+  observer.observe(heroBackground);
+}
 </script>
 </body>
 </html>

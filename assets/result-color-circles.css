@@ -1,0 +1,95 @@
+.type-palette-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--outfit); font-weight: 700; font-size: 0.88rem;
+}
+
+/* 色円のガラス風ハイライト */
+.type-palette-dot,
+.vote-letter-badge,
+.empathy-badge,
+.highlight-badge,
+.share-card-dot,
+.sense-circle {
+  position: relative;
+  isolation: isolate;
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+  transition: box-shadow 0.25s ease;
+}
+.share-card-dot {
+  box-shadow:
+    0 0 6px rgba(180,220,255,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+}
+.type-palette-dot::before,
+.vote-letter-badge::before,
+.empathy-badge::before,
+.highlight-badge::before,
+.share-card-dot::before,
+.sense-circle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.62) 0%,
+    rgba(255,255,255,0.32) 22%,
+    rgba(255,255,255,0.10) 42%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+/* 明色（白・パステル）：ハイライト弱め＋黒い極薄縁で輪郭維持 */
+.type-palette-dot[data-bright="1"],
+.vote-letter-badge[data-bright="1"],
+.empathy-badge[data-bright="1"],
+.highlight-badge[data-bright="1"],
+.share-card-dot[data-bright="1"],
+.sense-circle[data-bright="1"] {
+  box-shadow:
+    0 0 12px rgba(180,220,255,0.12),
+    inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+.share-card-dot[data-bright="1"] {
+  box-shadow:
+    0 0 6px rgba(180,220,255,0.10),
+    inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+.type-palette-dot[data-bright="1"]::before,
+.vote-letter-badge[data-bright="1"]::before,
+.empathy-badge[data-bright="1"]::before,
+.highlight-badge[data-bright="1"]::before,
+.share-card-dot[data-bright="1"]::before,
+.sense-circle[data-bright="1"]::before {
+  background: linear-gradient(
+    150deg,
+    rgba(255,255,255,0.48) 0%,
+    rgba(255,255,255,0.22) 22%,
+    rgba(255,255,255,0.08) 42%,
+    transparent 65%
+  );
+}
+.type-palette-dot:hover,
+.vote-letter-badge:hover,
+.empathy-badge:hover,
+.highlight-badge:hover,
+.sense-circle:hover {
+  box-shadow:
+    0 0 18px rgba(180,220,255,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.24);
+}
+.type-palette-dot[data-bright="1"]:hover,
+.vote-letter-badge[data-bright="1"]:hover,
+.empathy-badge[data-bright="1"]:hover,
+.highlight-badge[data-bright="1"]:hover,
+.sense-circle[data-bright="1"]:hover {
+  box-shadow:
+    0 0 18px rgba(180,220,255,0.20),
+    inset 0 0 0 1px rgba(0,0,0,0.08);
+}

@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/result-color-circles.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -591,7 +592,7 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 .how {
   position: relative; overflow: hidden;
-  background: var(--ink); color: var(--white); padding: 7rem 2.5rem;
+  background: #201e2b; color: var(--white); padding: clamp(3rem, 6vw, 5rem) 1.25rem;
 }
 /* CTAは赤中心、HOWは青紫寄りのblobで差別化 */
 .how::before {
@@ -610,19 +611,64 @@ nav ul a:hover { color: var(--ink); }
   bottom: -10%; right: -5%;
   border-radius: 50%; filter: blur(60px); pointer-events: none;
 }
-.how-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
-.how .sec-eyebrow { color: rgba(255,255,255,0.3); }
-.how .sec-eyebrow::before { background: rgba(255,255,255,0.2); }
-.how .sec-title { color: var(--white); margin-bottom: 3.5rem; }
-.how .sec-title strong { color: var(--c3); }
+.how-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; text-align: center; }
+.how .sec-eyebrow { justify-content: center; color: #c4bfcd; }
+.how .sec-eyebrow::before { display: none; }
+.how .sec-title { color: var(--white); font-size: clamp(1.65rem, 4vw, 2.65rem); margin-bottom: 1.6rem; }
+.how .sec-title strong { color: var(--c3); text-shadow: 0 0 20px #f5dc7229; }
 
-.steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem; }
-.step { display: flex; flex-direction: column; gap: 0.6rem; }
-.step-icon { width: 48px; height: 48px; line-height: 1; margin-bottom: 0.25rem; }
+.steps { display: grid; grid-template-columns: repeat(4,1fr); gap: .35rem; }
+.step { display: flex; align-items: center; flex-direction: column; gap: .2rem; }
+.step-icon { width: clamp(34px, 6vw, 48px); aspect-ratio: 1; }
 .step-icon img { display: block; width: 100%; height: 100%; }
-.step-num { font-family: var(--outfit); font-weight: 700; font-size: 0.65rem; letter-spacing: 0.14em; color: rgba(255,255,255,0.28); text-transform: uppercase; }
-.step-title { font-family: var(--jp); font-weight: 400; font-size: 0.88rem; word-break: keep-all; overflow-wrap: break-word; }
-.step-desc { font-size: 0.76rem; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 340; word-break: keep-all; overflow-wrap: break-word; }
+.step-num { font: 600 .64rem var(--outfit); letter-spacing: .14em; color: #b5afc2; text-transform: uppercase; }
+.step-title { font-size: clamp(.73rem, 2vw, .95rem); word-break: keep-all; overflow-wrap: break-word; }
+.try-divider { display: flex; align-items: center; gap: 1rem; margin: 1.65rem auto 1rem; color: #d9d4e4; font-size: .82rem; letter-spacing: .08em; }
+.try-divider::before, .try-divider::after { content: ''; height: 1px; flex: 1; background: #ffffff40; }
+.try-card {
+  margin-inline: -.5rem;
+  padding: clamp(1.3rem, 4vw, 2.3rem) clamp(.65rem, 3vw, 1.75rem) clamp(.85rem, 2.5vw, 1.15rem);
+  border: 1px solid #f0eaff45;
+  border-radius: 22px;
+  background: linear-gradient(130deg, #ffffff0e, #ffffff03 55%, #ddd0ff0c);
+}
+.try-card h3 { font-weight: 450; font-size: clamp(1rem, 3.4vw, 1.6rem); letter-spacing: .025em; }
+.try-palette { --gap: 8px; display: flex; flex-wrap: wrap; gap: var(--gap); justify-content: center; max-width: calc(5 * 44px + 4 * var(--gap)); margin: 1.4rem auto .8rem; }
+.try-choice { position: relative; display: grid; place-items: center; width: 44px; height: 44px; }
+.try-choice input { position: absolute; inset: 0; z-index: 1; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.try-choice input:disabled { cursor: default; }
+.try-orb { pointer-events: none; background: var(--swatch); color: #fffdf9; transition: opacity .18s; }
+.try-orb[data-bright="1"] { color: #9698a8; }
+.try-palette.has-choice input:not(:checked) + .try-orb { opacity: .38; }
+.try-choice input:checked + .try-orb { outline: 1px solid #ffffffb0; outline-offset: 3px; }
+.try-choice input:focus-visible + .try-orb { outline: 3px solid white; outline-offset: 3px; }
+.try-feedback {
+  --expand-duration: .28s;
+  display: flex; flex-direction: column; justify-content: center;
+  height: 1.75rem; max-width: 480px; margin: 0 auto;
+  font-size: .85rem; color: #e2ddeb;
+  transition: height var(--expand-duration) ease-out;
+  clip-path: inset(0 -1.5rem);
+}
+.try-feedback.has-results { width: 90%; max-width: 440px; height: 4.85rem; justify-content: flex-start; }
+.try-hint { display: flex; align-items: center; justify-content: center; gap: .55rem; }
+.try-hint svg { flex: none; }
+.try-summary { font-size: .8rem; font-weight: 550; color: white; text-align: left; }
+.try-track { position: relative; display: flex; flex: 0 0 .85rem; margin: .95rem 0 .35rem; border-radius: 1rem; background: #ffffff12; box-shadow: 0 0 0 1px #ffffff44; }
+.try-track span { flex-shrink: 0; width: var(--share); background: var(--swatch); animation: try-bar-fill .75s cubic-bezier(.34,1.1,.64,1) calc(var(--expand-duration) + var(--delay)) both; }
+@keyframes try-bar-fill { from { width: 0; } }
+.try-track span:first-of-type { border-radius: 1rem 0 0 1rem; }
+.try-track span:last-of-type { border-radius: 0 1rem 1rem 0; }
+.try-track span:only-of-type { border-radius: inherit; }
+.try-marker { position: absolute; bottom: calc(100% + 2px); left: var(--marker); transform: translateX(-50%); display: grid; justify-items: center; white-space: nowrap; font: 700 .52rem/1.3 var(--outfit); color: #fff; animation: try-marker-in .15s ease-out calc(var(--expand-duration) + var(--marker-delay)) both; }
+.try-marker::after { content: '▼'; font-size: .48rem; line-height: 1; }
+@keyframes try-marker-in { from { opacity: 0; } }
+.try-legend { display: flex; flex-wrap: wrap; gap: .2rem .85rem; overflow-y: auto; list-style: none; font-size: .76rem; }
+.try-legend li::before { content: ''; display: inline-block; margin-right: .3em; width: .65em; height: .65em; border-radius: 50%; background: var(--swatch); box-shadow: 0 0 0 1px #ffffff44; }
+@media (prefers-reduced-motion: reduce) {
+  .try-orb, .try-feedback { transition: none; }
+  .try-track span, .try-marker { animation: none; }
+}
 
 /* ══════════════════════════════════════
    FOOTER
@@ -714,7 +760,6 @@ nav ul a:hover { color: var(--ink); }
   .hero { grid-template-columns: 1fr; min-height: auto; padding: 12.6rem 1.75rem 5.4rem; gap: 2.5rem; }
   .hero-visual { display: none; }
   .theme-grid { grid-template-columns: repeat(2,1fr); }
-  .steps { grid-template-columns: repeat(2,1fr); }
   nav ul { display: none; }
 }
 
@@ -767,12 +812,7 @@ nav ul a:hover { color: var(--ink); }
   .theme-grid { grid-template-columns: 1fr 1fr; --theme-gap: 0.75rem; }
 
   /* ── HOW ── */
-  .how { padding: 4rem 1.25rem; text-align: center; }
-  .how .sec-eyebrow { justify-content: center; }
-  .how .sec-eyebrow::before { display: none; }
-  .how .sec-title { text-align: center; }
-  .steps { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .step { align-items: center; text-align: center; }
+  .how { padding-inline: 1rem; }
 
 }
 
@@ -854,29 +894,40 @@ nav ul a:hover { color: var(--ink); }
         <div class="step-icon"><img src="assets/icons/step-theme.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 01</div>
         <div class="step-title">Choose a theme</div>
-        <div class="step-desc">Choose from letters, numbers, or school subjects.</div>
       </div>
       <div class="step">
         <div class="step-icon"><img src="assets/icons/step-color.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 02</div>
-        <div class="step-title">Choose your colors</div>
-        <div class="step-desc">A feels red? Follow your intuition. You can skip any item.</div>
+        <div class="step-title">Pick a color</div>
       </div>
       <div class="step">
         <div class="step-icon"><img src="assets/icons/step-compare.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 03</div>
         <div class="step-title">Compare your palette</div>
-        <div class="step-desc">See which choices you share with others and which stand out.</div>
       </div>
       <div class="step">
         <div class="step-icon"><img src="assets/icons/step-share.svg" width="48" height="48" alt="" aria-hidden="true"></div>
         <div class="step-num">Step 04</div>
         <div class="step-title">Share your results</div>
-        <div class="step-desc">Share your palette in a tap.</div>
+      </div>
+    </div>
+    <div class="try-divider">Try it for yourself</div>
+    <div class="try-card">
+      <h3 id="try-question">Which color feels right for A?</h3>
+      <div class="try-palette" role="radiogroup" aria-labelledby="try-question"></div>
+      <div class="try-feedback" aria-live="polite" aria-atomic="true">
+        <p class="try-hint">
+          <svg width="27" height="27" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 25h5.5a3 3 0 0 0 3-3v-5a1.7 1.7 0 0 0-3.4 0v-1.3a1.7 1.7 0 0 0-3.4 0v-1.2a1.7 1.7 0 0 0-3.4 0V9a1.7 1.7 0 0 0-3.4 0v10l-2.1-2a1.7 1.7 0 0 0-2.5 2.3l4.8 4.6A4 4 0 0 0 13 25Z"/>
+            <path d="M11.6 2v2M6 4l1.5 1.5M3.5 9h2M17.1 4l-1.5 1.5M19.7 9h-2"/>
+          </svg>
+          Pick a color to compare
+        </p>
       </div>
     </div>
   </div>
 </section>
+<script defer src="assets/how-demo.js"></script>
 
 <!-- ══ THEMES ══ -->
 <div class="themes-wrap">

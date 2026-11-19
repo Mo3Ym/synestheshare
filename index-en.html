@@ -623,15 +623,18 @@ nav ul a:hover { color: var(--ink); }
 .step-icon img { display: block; width: 100%; height: 100%; }
 .step-num { font: 600 .64rem var(--outfit); letter-spacing: .14em; color: #b5afc2; text-transform: uppercase; }
 .step-title { font-size: clamp(.73rem, 2vw, .95rem); word-break: keep-all; overflow-wrap: break-word; }
-.try-divider { display: flex; align-items: center; gap: 1rem; margin: 1.65rem auto 1rem; color: #d9d4e4; font-size: .82rem; letter-spacing: .08em; }
+.try-divider { display: flex; align-items: center; gap: 1rem; margin: 1.65rem auto 0; padding-bottom: 1rem; color: #d9d4e4; font-size: .82rem; letter-spacing: .08em; }
 .try-divider::before, .try-divider::after { content: ''; height: 1px; flex: 1; background: #ffffff40; }
 .try-card {
-  margin-inline: -.5rem;
-  padding: clamp(1.3rem, 4vw, 2.3rem) clamp(.65rem, 3vw, 1.75rem) clamp(.85rem, 2.5vw, 1.15rem);
+  --expand-duration: .28s;
+  margin: .5rem clamp(.35rem, 2.5vw - .15rem, 1rem) 0;
+  padding: clamp(1.3rem, 4vw, 2.3rem) clamp(.65rem, 3vw, 1.75rem);
   border: 1px solid #f0eaff45;
   border-radius: 22px;
   background: linear-gradient(130deg, #ffffff0e, #ffffff03 55%, #ddd0ff0c);
+  transition: margin var(--expand-duration) ease-out;
 }
+.try-card.has-results { margin: 0 -.5rem; }
 .try-card h3 { font-weight: 450; font-size: clamp(1rem, 3.4vw, 1.6rem); letter-spacing: .025em; }
 .try-palette { --gap: 8px; display: flex; flex-wrap: wrap; gap: var(--gap); justify-content: center; max-width: calc(5 * 44px + 4 * var(--gap)); margin: 1.4rem auto .8rem; }
 .try-choice { position: relative; display: grid; place-items: center; width: 44px; height: 44px; }
@@ -643,19 +646,24 @@ nav ul a:hover { color: var(--ink); }
 .try-choice input:checked + .try-orb { outline: 1px solid #ffffffb0; outline-offset: 3px; }
 .try-choice input:focus-visible + .try-orb { outline: 3px solid white; outline-offset: 3px; }
 .try-feedback {
-  --expand-duration: .28s;
-  display: flex; flex-direction: column; justify-content: center;
-  height: 1.75rem; max-width: 480px; margin: 0 auto;
+  --bar-duration: .75s;
+  --result-delay: calc(var(--expand-duration) + var(--bar-duration) + var(--last-segment-delay));
+  display: grid; grid-template-rows: minmax(1.75rem, 0fr); align-items: center;
+  max-width: 480px; margin: 0 auto;
   font-size: .85rem; color: #e2ddeb;
-  transition: height var(--expand-duration) ease-out;
+  transition: grid-template-rows var(--expand-duration) ease-out;
   clip-path: inset(0 -1.5rem);
 }
-.try-feedback.has-results { width: 90%; max-width: 440px; height: 4.85rem; justify-content: flex-start; }
+.try-card.has-results .try-feedback {
+  width: 90%; max-width: 440px;
+  grid-template-rows: minmax(1.75rem, 1fr); align-items: stretch;
+}
+.try-results { display: flex; flex-direction: column; }
 .try-hint { display: flex; align-items: center; justify-content: center; gap: .55rem; }
 .try-hint svg { flex: none; }
 .try-summary { font-size: .8rem; font-weight: 550; color: white; text-align: left; }
 .try-track { position: relative; display: flex; flex: 0 0 .85rem; margin: .95rem 0 .35rem; border-radius: 1rem; background: #ffffff12; box-shadow: 0 0 0 1px #ffffff44; }
-.try-track span { flex-shrink: 0; width: var(--share); background: var(--swatch); animation: try-bar-fill .75s cubic-bezier(.34,1.1,.64,1) calc(var(--expand-duration) + var(--delay)) both; }
+.try-track span { flex-shrink: 0; width: var(--share); background: var(--swatch); animation: try-bar-fill var(--bar-duration) cubic-bezier(.34,1.1,.64,1) calc(var(--expand-duration) + var(--delay)) both; }
 @keyframes try-bar-fill { from { width: 0; } }
 .try-track span:first-of-type { border-radius: 1rem 0 0 1rem; }
 .try-track span:last-of-type { border-radius: 0 1rem 1rem 0; }
@@ -663,11 +671,23 @@ nav ul a:hover { color: var(--ink); }
 .try-marker { position: absolute; bottom: calc(100% + 2px); left: var(--marker); transform: translateX(-50%); display: grid; justify-items: center; white-space: nowrap; font: 700 .52rem/1.3 var(--outfit); color: #fff; animation: try-marker-in .15s ease-out calc(var(--expand-duration) + var(--marker-delay)) both; }
 .try-marker::after { content: '▼'; font-size: .48rem; line-height: 1; }
 @keyframes try-marker-in { from { opacity: 0; } }
-.try-legend { display: flex; flex-wrap: wrap; gap: .2rem .85rem; overflow-y: auto; list-style: none; font-size: .76rem; }
+.try-legend { display: flex; flex-wrap: wrap; gap: .2rem .85rem; max-height: 2.65rem; overflow-y: auto; list-style: none; font-size: .76rem; }
 .try-legend li::before { content: ''; display: inline-block; margin-right: .3em; width: .65em; height: .65em; border-radius: 50%; background: var(--swatch); box-shadow: 0 0 0 1px #ffffff44; }
+.try-match {
+  flex-shrink: 0; margin-top: 1.25rem; color: #e2ddeb; font-size: .8rem; text-align: left;
+  animation: try-marker-in .25s ease-out var(--result-delay) both;
+}
+.try-match strong { font-weight: 700; }
+.try-match-percent { color: var(--c3); }
+.try-match-color.on-light { padding-inline: .15em; border-radius: .2em; background: #fffdf9; }
+.try-reflection {
+  flex-shrink: 0; margin-top: .25rem; color: #e2ddeb; opacity: .66;
+  font-size: .73rem; font-style: italic; line-height: 1.5; text-align: left;
+  animation: try-marker-in .3s ease-out calc(var(--result-delay) + .5s) both;
+}
 @media (prefers-reduced-motion: reduce) {
-  .try-orb, .try-feedback { transition: none; }
-  .try-track span, .try-marker { animation: none; }
+  .try-orb, .try-card, .try-feedback { transition: none; }
+  .try-track span, .try-marker, .try-match, .try-reflection { animation: none; }
 }
 
 /* ══════════════════════════════════════
@@ -917,9 +937,9 @@ nav ul a:hover { color: var(--ink); }
       <div class="try-palette" role="radiogroup" aria-labelledby="try-question"></div>
       <div class="try-feedback" aria-live="polite" aria-atomic="true">
         <p class="try-hint">
-          <svg width="27" height="27" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M15 25h5.5a3 3 0 0 0 3-3v-5a1.7 1.7 0 0 0-3.4 0v-1.3a1.7 1.7 0 0 0-3.4 0v-1.2a1.7 1.7 0 0 0-3.4 0V9a1.7 1.7 0 0 0-3.4 0v10l-2.1-2a1.7 1.7 0 0 0-2.5 2.3l4.8 4.6A4 4 0 0 0 13 25Z"/>
-            <path d="M11.6 2v2M6 4l1.5 1.5M3.5 9h2M17.1 4l-1.5 1.5M19.7 9h-2"/>
+          <svg width="27" height="27" viewBox="7 13 70 74" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M40 67 31 41c-1.1-3.2.3-5.3 2.5-6 2.4-.7 4.4.6 5.4 3.6l5.2 15.1-1-3c-.6-1.8.4-3.4 2.2-4 2-.7 3.9.2 4.6 2.2l1.4 4.1-.7-2.1c-.6-1.9.5-3.4 2.3-4 2-.6 3.7.5 4.4 2.5l1.5 4.2-.5-1.7c-.5-1.7.4-3.2 2.2-3.8 2-.6 4 .5 4.7 2.5l4.9 14.3c2.7 8-.1 13.3-6.9 15.7l-8.7 3c-4.4 1.4-7.6-.3-11.1-3.1L31.2 70c-2.1-1.9-2.2-4.2-.5-5.9 1.5-1.4 3.4-1.4 5.4-.1Z"/>
+            <path d="M35 16v9M19.5 23l5.8 5.8M12.5 37.5h9M19 52l6.1-6.1M50 23l-5.7 5.9M48.5 37.5h8.8"/>
           </svg>
           Pick a color to compare
         </p>

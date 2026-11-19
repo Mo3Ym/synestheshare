@@ -48,6 +48,15 @@
     return { counts: colors.map(({ key }) => ({ 赤: 92, 青: 8 })[key] || 0), sample: true };
   }
 
+  function colorText(color) {
+    const name = document.createElement('span');
+    name.className = 'try-match-color';
+    name.style.color = color.hex;
+    name.textContent = english ? color.name.toLowerCase() : color.name;
+    if (['黒', '茶色'].includes(color.key)) name.classList.add('on-light');
+    return name;
+  }
+
   function draw({ counts, sample }, choice) {
     const total = counts.reduce((sum, count) => sum + count, 0);
     const rows = colors.map((color, i) => ({ ...color, share: counts[i] * 100 / total }))
@@ -60,7 +69,7 @@
 
     const summary = document.createElement('p');
     summary.className = 'try-summary';
-    summary.textContent = sample ? (english ? 'Example distribution' : '回答の分布（例）') : (english ? 'Colors people chose for A' : 'みんなが選んだAの色');
+    summary.textContent = sample ? (english ? 'Example distribution' : '回答の分布（例）') : (english ? 'Colors people see' : 'みんなが感じた色');
     const selected = rows.find(row => row.key === choice);
 
     const bar = document.createElement('div');
@@ -74,7 +83,7 @@
       segment.style.setProperty('--delay', index * 40 + 'ms');
       segment.style.setProperty('--swatch', row.hex);
       bar.append(segment);
-      if (row === selected && row.pct > 0) {
+      if (row === selected) {
         const marker = document.createElement('div');
         marker.className = 'try-marker';
         marker.textContent = english ? 'You' : 'あなた';
@@ -88,8 +97,37 @@
       item.textContent = row.name + ' ' + row.pct + '%';
       legend.append(item);
     }
-    feedback.classList.add('has-results');
-    feedback.replaceChildren(summary, bar, legend);
+    feedback.closest('.try-card').classList.add('has-results');
+    const result = document.createElement('p');
+    result.className = 'try-match';
+    const comparison = selected ?? rows[0];
+    const percentage = document.createElement('strong');
+    percentage.className = 'try-match-percent';
+    percentage.textContent = comparison.pct ? `${comparison.pct}%` : '<1%';
+    const letter = document.createElement('strong');
+    letter.textContent = 'A';
+    const reflection = document.createElement('p');
+    reflection.className = 'try-reflection';
+    if (selected) {
+      const color = colorText(selected);
+      if (english) result.append(percentage, ' of people saw the same ', color, ' in ', letter, ' as you.');
+      else result.append(percentage, 'の人が、', letter, 'にあなたと同じ', color, 'を感じていました。');
+      reflection.textContent = english
+        ? 'That feeling quietly resonates with others.'
+        : 'その感覚は、多くの人の心と静かに重なっています。';
+    } else {
+      const popularColor = colorText(comparison);
+      const chosenColor = colorText(colors.find(color => color.key === choice));
+      const wrapOpportunity = document.createElement('wbr');
+      if (english) result.append(percentage, ' saw ', popularColor, ' in ', letter, '.', wrapOpportunity, ' You saw ', chosenColor, '.');
+      else result.append(percentage, 'が', popularColor, 'を選ぶ', letter, 'に、', wrapOpportunity, 'あなたは', chosenColor, 'を見ていました。');
+      reflection.textContent = english ? 'A color all your own.' : '誰とも重ならない、あなただけの色。';
+    }
+    const results = document.createElement('div');
+    results.className = 'try-results';
+    results.append(summary, bar, legend, result, reflection);
+    feedback.style.setProperty('--last-segment-delay', (rows.length - 1) * 40 + 'ms');
+    feedback.replaceChildren(results);
     const updateLegendFocus = () => {
       if (legend.scrollHeight > legend.clientHeight) legend.tabIndex = 0;
       else legend.removeAttribute('tabindex');

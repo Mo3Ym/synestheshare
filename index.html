@@ -157,14 +157,17 @@ nav ul a:hover { color: var(--ink); }
   pointer-events: none;
   z-index: 0;
   background:
+    radial-gradient(ellipse 17% 26% at 57% 42%, rgba(255,255,255,.83), rgba(239,251,255,.49) 39%, transparent 100%),
+    radial-gradient(ellipse 12% 18% at 39% 55%, rgba(255,239,250,.56), transparent 100%),
     radial-gradient(ellipse at 45% 29%, rgba(255,179,155,.70), transparent 34%),
     radial-gradient(ellipse at 68% 51%, rgba(116,217,240,.72), transparent 37%),
     radial-gradient(ellipse at 37% 73%, rgba(184,166,246,.48), transparent 30%);
-  animation: hero-light-drift 9s ease-in-out infinite alternate;
+  animation: hero-light-drift 6.4s cubic-bezier(.32,.22,.68,.78) infinite alternate;
 }
 @keyframes hero-light-drift {
-  from { transform: translate3d(-19%, -3%, 0); }
-  to { transform: translate3d(19%, 3%, 0); }
+  0% { transform: translate3d(-21%, 2%, 0) rotate(-5deg); }
+  46% { transform: translate3d(-1%, -7%, 0) rotate(1deg); }
+  100% { transform: translate3d(21%, 2%, 0) rotate(5deg); }
 }
 .hero-wrap.hero-offscreen .hero-atmo { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {

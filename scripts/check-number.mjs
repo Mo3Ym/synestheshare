@@ -18,7 +18,7 @@ assert(page.includes('result.html?mode=number&r='));
 assert(page.includes('ss_submitted_number'));
 const answer = parseAnswer('0123456789', 'number');
 assert.equal(answer.map(item=>item.letter).join(''), '1234567890');
-assert.equal(displayAnswer(parseAnswer('0-', 'number'), 'number').length,10);
+assert.equal(displayAnswer(parseAnswer('0-', 'number'), 'number').length,1);
 for (const english of [false,true]) for (const local of [false,true]) {
   const html = await readFile(new URL(`../result${english?'-en':''}.html`, import.meta.url),'utf8');
   const script = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(match=>match[2].includes('const DUMMY_VOTES'))[2].split('window.DUMMY_VOTES =')[0];
@@ -32,6 +32,7 @@ for (const english of [false,true]) for (const local of [false,true]) {
   assert.equal(vm.runInContext('letters.join("")',context),'1234567890');
   vm.runInContext('renderWithoutStats(letters.filter(l=>colorMap[l]))',context);
   assert(!elements.shareOuter.innerHTML.includes('score='));
+  assert(!elements.shareOuter.innerHTML.includes('majority='));
   assert(!elements.shareOuter.innerHTML.includes('null/api/og'));
   assert(elements.mainWrap.innerHTML.includes('r=---3------'));
   if(english) assert(elements.shareOuter.innerHTML.includes('lang=en'));
@@ -44,12 +45,17 @@ for (const english of [false,true]) for (const local of [false,true]) {
   assert(share.includes('mode=number'));
   const title = english ? 'Most shared letter' : '最も共感された文字';
   const tweetUrl = share.match(/id="btnXShare" data-url="([^"]+)"/)[1];
-  assert(new URL(tweetUrl).searchParams.get('text').includes(title));
+  const tweet = new URL(tweetUrl).searchParams.get('text');
+  assert(tweet.includes(title));
+  assert.equal(new URL(tweet.trim().split(/\s+/).at(-1)).searchParams.get('majority'), '100');
+  const rarityShare = vm.runInContext('buildShareSection({ majorityRate: 27, rareScore: 81 }, colored)', context);
+  assert.match(rarityShare, /majority=27/);
+  assert.match(rarityShare, /stat=rarity/);
   if(english) assert(!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(share));
 }
 const env={ASSETS:{fetch:async url=>{try{return new Response(await readFile(new URL(`..${new URL(url).pathname}`,import.meta.url)))}catch{return new Response('missing',{status:404})}}}};
 for(const language of ['ja','en']) {
-  const response=await onRequest({request:new Request(`https://example.test/api/og?mode=number&r=0123456789&score=40&lang=${language}`),env});
+  const response=await onRequest({request:new Request(`https://example.test/api/og?mode=number&r=0123456789&majority=81&score=19&lang=${language}`),env});
   assert.equal(response.status,200);
   const png=Buffer.from(await response.arrayBuffer());
   assert.equal(png.readUInt32BE(16),1200);

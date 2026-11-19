@@ -33,10 +33,15 @@
   const base   = location.protocol === 'file:' ? 'https://synestheshare.pages.dev' : location.origin;
   const params = new URLSearchParams(location.search);
   const r      = params.get('r') || '';
-  const mode   = params.get('mode') || '10';
-  const ogImageUrl = r
-    ? `${base}/api/og?r=${encodeURIComponent(r)}&mode=${encodeURIComponent(mode)}&v=16${params.has('score') ? `&score=${encodeURIComponent(params.get('score'))}&stat=${encodeURIComponent(params.get('stat') || 'empathy')}` : ''}`
-    : `${base}/ogp.png`;
+  const image = new URL(r ? '/api/og' : '/ogp.png', base);
+  if (r) {
+    for (const key of ['r', 'mode', 'majority', 'score', 'stat', 'lang']) {
+      if (params.has(key)) image.searchParams.set(key, params.get(key));
+    }
+    if (document.documentElement.lang === 'en') image.searchParams.set('lang', 'en');
+    image.searchParams.set('v', '18');
+  }
+  const ogImageUrl = image.href;
   const pageUrl = location.href;
   document.getElementById('ogUrl')   ?.setAttribute('content', pageUrl);
   document.getElementById('ogImage') ?.setAttribute('content', ogImageUrl);
@@ -1605,9 +1610,9 @@ function getDiagType(majorityRate, rareScore) {
 function calcRareStat(diag) {
   const x = diag.rareScore;
   if (x >= 50) {
-    return { label: '珍しさ', value: Math.max(1, 100 - x) };
+    return { kind: 'rarity', label: '珍しさ', value: Math.max(1, 100 - x) };
   }
-  return { label: '共感度', value: Math.max(1, x) };
+  return { kind: 'empathy', label: '共感度', value: Math.max(1, x) };
 }
 
 /* ══ 色傾向タイプ判定 ══ */
@@ -2240,11 +2245,12 @@ function buildShareSection(diag, coloredLetters) {
   if (sharedResult.protocol === 'file:') sharedResult.href = `${shareOrigin}/${sharedResult.pathname.split('/').pop()}${sharedResult.search}`;
   const rareStat = calcRareStat(diag);
   sharedResult.searchParams.set('score', rareStat.value);
-  sharedResult.searchParams.set('stat', rareStat.label === '珍しさ' ? 'rarity' : 'empathy');
+  sharedResult.searchParams.set('stat', rareStat.kind);
+  sharedResult.searchParams.set('majority', diag.majorityRate);
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '16');
+  ogUrl.searchParams.set('v', '18');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2271,7 +2277,7 @@ function buildShareSection(diag, coloredLetters) {
       <p class="empathy-comment share-vote-note">※投票により、数値は変動する可能性があります。</p>
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
-          alt="${isSubjectMode ? '教科の色と診断結果' : `あなたの文字色感覚は...${rareStat.label} 上位${rareStat.value}%選んだ文字の色と診断結果`}"
+          alt="診断結果。多数派一致率 ${diag.majorityRate}%、${rareStat.label} 上位${rareStat.value}%"
           decoding="async">
       </div>
       <div class="share-btn-row">
@@ -2335,9 +2341,10 @@ function renderWithoutStats(coloredLetters) {
   if (/\/result-en(?:\.html)?$/.test(url.pathname)) url.searchParams.set('lang', 'en');
   url.searchParams.delete('score');
   url.searchParams.delete('stat');
+  url.searchParams.delete('majority');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '16');
+  image.searchParams.set('v', '18');
   const shareText = `🎨私の${themeName}の色は ${type.name} でした。\n\n――あなたの「${sampleItem}」は、何色ですか？\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">リンクを送って、<wbr>あなたの結果をシェアしよう。</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Xにシェア</a></div></div>`;
 }

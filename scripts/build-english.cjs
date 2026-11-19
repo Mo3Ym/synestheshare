@@ -18,6 +18,7 @@ for (const page of pages) {
     .replace(/<wbr\s*\/?\s*>/g, '');
   // Translate complete templates where English requires a different word order.
   const templates = {
+    '診断結果。多数派一致率 ${diag.majorityRate}%、${rareStat.label} 上位${rareStat.value}%': '${diag.majorityRate}% majority match. ${rareStat.label}: top ${rareStat.value}%.',
     '${done}文字に色が設定されています': '${done} letters colored',
     '${done}教科に色が設定されています': '${done} subjects colored',
     '${letter} の色を選択': 'Choose a color for ${letter}',

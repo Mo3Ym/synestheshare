@@ -6,6 +6,11 @@ const CRC_TABLE = (() => {
   return t;
 })();
 
+function readPercentage(params, key) {
+  const value = params.get(key);
+  return value !== null && /^\d{1,3}$/.test(value) && Number(value) <= 100 ? Number(value) : null;
+}
+
 function crc32(buf) {
   let c=0xFFFFFFFF;
   for (let i=0; i<buf.length; i++) c=CRC_TABLE[(c^buf[i])&0xFF]^(c>>>8);
@@ -47,11 +52,11 @@ export async function onRequest(context) {
   if (!['10', '26', 'number', 'subject'].includes(mode)) return new Response('Invalid mode', { status: 400 });
   const answer = parseAnswer(url.searchParams.get('r'), mode);
   if (!answer?.length) return new Response('Valid r parameter required', { status: 400 });
-  const rawScore = url.searchParams.get('score');
-  const score = rawScore !== null && /^\d{1,3}$/.test(rawScore) && Number(rawScore) <= 100 ? Number(rawScore) : null;
+  const score = readPercentage(url.searchParams, 'score');
+  const majority = readPercentage(url.searchParams, 'majority');
   const stat = url.searchParams.get('stat') === 'rarity' ? 'rarity' : 'empathy';
   try {
-    const pixels = await renderPixels(context, answer, mode, score, stat, url.searchParams.get('lang') === 'en' ? 'en' : 'ja');
+    const pixels = await renderPixels(context, answer, mode, score, stat, url.searchParams.get('lang') === 'en' ? 'en' : 'ja', majority);
     const png = await encodePNG(pixels, 1200, 630);
     return new Response(png, { headers: {
       'Content-Type': 'image/png',

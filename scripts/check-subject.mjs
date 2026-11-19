@@ -17,7 +17,7 @@ assert(picker.includes('result.html?mode=subject&r='));
 assert(picker.includes('ss_submitted_subject'));
 assert(!picker.includes('images_sub/'));
 assert.deepEqual(parseAnswer('01234','subject').map(item=>item.letter),ids);
-assert.equal(displayAnswer(parseAnswer('0----','subject'),'subject').filter(item=>!item.color).length,4);
+assert.equal(displayAnswer(parseAnswer('0----','subject'),'subject').length,1);
 
 for(const english of [false,true]) {
   const html=await readFile(new URL(`../result${english?'-en':''}.html`,import.meta.url),'utf8');
@@ -39,7 +39,7 @@ for(const english of [false,true]) {
 }
 const env={ASSETS:{fetch:async url=>{try{return new Response(await readFile(new URL(`..${new URL(url).pathname}`,import.meta.url)))}catch{return new Response('missing',{status:404})}}}};
 for(const language of ['ja','en']) {
-  const response=await onRequest({request:new Request(`https://example.test/api/og?mode=subject&r=01234&score=40&lang=${language}`),env});
+  const response=await onRequest({request:new Request(`https://example.test/api/og?mode=subject&r=01234&majority=81&score=19&lang=${language}`),env});
   assert.equal(response.status,200);
   const png=Buffer.from(await response.arrayBuffer());
   assert.equal(png.readUInt32BE(16),1200);

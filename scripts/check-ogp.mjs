@@ -59,5 +59,5 @@ assert.equal(image.searchParams.get('majority'), '81');
 assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
-assert.equal(image.searchParams.get('v'), '22');
+assert.equal(image.searchParams.get('v'), '23');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');

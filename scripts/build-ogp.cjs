@@ -107,8 +107,8 @@ async function saveSheet(name, items, makeTile) {
   await saveSheet('v17-values.alpha.deflate', Array.from({length: 101}, (_, value) => value), value =>
     svg(190, 88, `<text x="3" y="73" font-family="${fontLatin}" font-size="76">${value}<tspan font-size="47" dx="2">%</tspan></text>`));
   await saveSheet('v17-letters.alpha.deflate', [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'], letter =>
-    svg(72, 72, `<text x="36" y="55" text-anchor="middle" font-family="${fontLatin}" font-size="53" font-weight="500">${letter}</text>`));
+    svg(72, 72, `<text x="36" y="52" text-anchor="middle" font-family="${fontLatin}" font-size="45" font-weight="700">${letter}</text>`));
   await saveSheet('v17-subjects.alpha.deflate', ['国','数','理','社','英'], letter =>
-    svg(72, 72, `<text x="36" y="53" text-anchor="middle" font-family="${fontJP}" font-size="42" font-weight="600">${letter}</text>`));
+    svg(72, 72, `<text x="36" y="50" text-anchor="middle" font-family="${fontJP}" font-size="37" font-weight="700">${letter}</text>`));
   console.log('Built v17 OGP backgrounds, stats and palette glyphs.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

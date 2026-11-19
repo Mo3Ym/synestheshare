@@ -30,7 +30,28 @@ const assert=require('node:assert/strict');
   const page=await context.newPage();await page.route(/^https?:/,route=>route.abort());
   const url=pathToFileURL(path.resolve('result.html'));url.search=`?mode=${mode}&r=0531-`;url.hash=hash;
   await page.goto(url.href);assert.equal(await page.locator('dialog.result-intro').count(),0);
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('ss_result_intro_seen')),'1');
+  assert.equal(await page.evaluate(()=>history.state.skipResultIntro),true);
+  assert.equal(await page.evaluate(()=>sessionStorage.getItem('ss_result_intro_seen')),null);
+  await context.close();
+ }
+ for (const suffix of ['', '-en']) for (const mode of ['10','26']) {
+  const context = await browser.newContext();
+  await context.addInitScript(() => localStorage.setItem('ss_submitted', '1'));
+  const page = await context.newPage();
+  await page.route(/^https?:/, route => route.abort());
+  const picker = pathToFileURL(path.resolve('alphabet' + suffix + '.html'));
+  picker.search = '?mode=' + mode + '&r=05';
+  await page.goto(picker.href);
+  await page.locator('#btnResult').click();
+  await page.waitForFunction(() => history.state?.skipResultIntro === true);
+  assert.equal(await page.locator('.result-intro').count(), 0);
+  assert.equal(new URL(page.url()).hash, '');
+  await page.reload();
+  assert.equal(await page.locator('.result-intro').count(), 0);
+  const shared = new URL(page.url());
+  shared.searchParams.set('r', '123');
+  await page.goto(shared.href);
+  await page.locator('dialog.result-intro').waitFor();
   await context.close();
  }
  console.log('Result introduction checks passed: shared entries, own-result suppression, 3 modes, 2 languages, one-screen mobile/desktop layout, focus, Escape and session dismissal.');

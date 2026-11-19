@@ -17,7 +17,6 @@ page = page.replace(/\s*<button class="btn-mode-toggle"[\s\S]*?<\/button>/, '')
   .replace(/const modeToggleLabel\s*=.*?;\r?\n/, '')
   .replace(/btnModeToggle\.addEventListener\('click',[\s\S]*?\n\}\);/, '');
 page = page.replace("localStorage.getItem('ss_submitted')", "localStorage.getItem('ss_submitted_number')")
-  .replace('result.html?mode=number&r=${encoded}', 'result.html?mode=number&r=${encoded}#submit')
   .replace('`ss_voted_${encoded}`', '`ss_voted_number_${encoded}`');
 page = page.replace('  if (rParam) {', `  if (!rParam) {
     // Preserve choices from the previous number page's per-digit color URLs.

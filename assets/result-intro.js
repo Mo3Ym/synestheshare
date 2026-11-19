@@ -5,13 +5,22 @@
   const mode = params.get('mode') || '10';
   const key = 'ss_result_intro_seen';
   const english = document.documentElement.lang === 'en';
-  let fromDiagnosis = location.hash === '#submit';
+  const fromSite = document.referrer && location.protocol !== 'file:' && new URL(document.referrer).origin === location.origin;
+  let fromDiagnosis = location.hash === '#submit' || history.state?.skipResultIntro === true;
   try {
     const voteKey = `ss_voted_${mode === 'number' || mode === 'subject' ? mode + '_' : ''}${answer}`;
-    fromDiagnosis ||= sessionStorage.getItem('ss_from_alphabet') === '1' && sessionStorage.getItem('ss_vote_key') === voteKey;
-    if (fromDiagnosis) { sessionStorage.setItem(key, '1'); return; }
+    fromDiagnosis ||= !document.referrer && sessionStorage.getItem('ss_from_alphabet') === '1' && sessionStorage.getItem('ss_vote_key') === voteKey;
+  } catch {}
+  if (fromDiagnosis || fromSite) {
+    const url = new URL(location.href);
+    // Alphabet voting uses the session marker and does not need the fragment.
+    if (url.hash === '#submit' && (mode === '10' || mode === '26')) url.hash = '';
+    history.replaceState({ ...history.state, skipResultIntro: true }, '', url);
+    return;
+  }
+  try {
     if (sessionStorage.getItem(key) === '1') return;
-  } catch { if (fromDiagnosis) return; }
+  } catch {}
 
   const subject = mode === 'subject', number = mode === 'number';
   const sample = subject ? '国' : number ? '1' : 'A';

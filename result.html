@@ -2849,7 +2849,7 @@ function markVoteDone(votedLetters = []) {
   }
   const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
   localStorage.setItem(submissionKey, '1'); // Same browser, once per theme.
-  if (location.hash === '#submit') history.replaceState(null, '', location.pathname + location.search);
+  if (location.hash === '#submit') history.replaceState({ ...history.state, skipResultIntro: true }, '', location.pathname + location.search);
 }
 
 /* ────────────────────────────────────────────────

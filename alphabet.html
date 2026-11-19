@@ -1325,7 +1325,7 @@ btnResult.addEventListener('click', () => {
   const done = letters.filter(l => colorMap[l]).length;
   if (done === 0) { showToast('色を1つ以上設定してから結果を見よう'); return; }
   const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
-  const resultUrl = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}`;
+  const resultUrl = `result.html?mode=${isFullMode ? '26' : '10'}&r=${encoded}#submit`;
 
   // ── 投票済みチェック（localStorage で永続管理）──
   const alreadyVoted = localStorage.getItem('ss_submitted') === '1';

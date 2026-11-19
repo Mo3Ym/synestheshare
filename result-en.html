@@ -39,7 +39,7 @@
       if (params.has(key)) image.searchParams.set(key, params.get(key));
     }
     if (document.documentElement.lang === 'en') image.searchParams.set('lang', 'en');
-    image.searchParams.set('v', '19');
+    image.searchParams.set('v', '20');
   }
   const ogImageUrl = image.href;
   const pageUrl = location.href;
@@ -2251,7 +2251,7 @@ function buildShareSection(diag, coloredLetters) {
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '19');
+  ogUrl.searchParams.set('v', '20');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2345,7 +2345,7 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('majority');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '19');
+  image.searchParams.set('v', '20');
   const shareText = `🎨My ${isSubjectMode ? 'school-subject' : 'number'} colors are ${type.name}.\n\n— What color is your “${sampleItem}”?\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
 }

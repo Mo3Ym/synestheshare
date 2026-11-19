@@ -17,7 +17,7 @@ assert(picker.includes('result.html?mode=subject&r='));
 assert(picker.includes('ss_submitted_subject'));
 assert(!picker.includes('images_sub/'));
 assert.deepEqual(parseAnswer('01234','subject').map(item=>item.letter),ids);
-assert.deepEqual(displayAnswer(parseAnswer('0----','subject')).map(item => item.letter), ['language', '…']);
+assert.deepEqual(displayAnswer(parseAnswer('0----','subject')).map(item => item.letter), ['language']);
 
 for(const english of [false,true]) {
   const html=await readFile(new URL(`../result${english?'-en':''}.html`,import.meta.url),'utf8');

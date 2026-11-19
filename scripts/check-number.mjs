@@ -18,7 +18,7 @@ assert(page.includes('result.html?mode=number&r='));
 assert(page.includes('ss_submitted_number'));
 const answer = parseAnswer('0123456789', 'number');
 assert.equal(answer.map(item=>item.letter).join(''), '1234567890');
-assert.deepEqual(displayAnswer(parseAnswer('0-', 'number')).map(item => item.letter), ['1', '…']);
+assert.deepEqual(displayAnswer(parseAnswer('0-', 'number')).map(item => item.letter), ['1']);
 for (const english of [false,true]) for (const local of [false,true]) {
   const html = await readFile(new URL(`../result${english?'-en':''}.html`, import.meta.url),'utf8');
   const script = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(match=>match[2].includes('const DUMMY_VOTES'))[2].split('window.DUMMY_VOTES =')[0];

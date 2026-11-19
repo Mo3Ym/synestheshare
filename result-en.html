@@ -1205,19 +1205,6 @@ footer {
   0%,100% { opacity: 1; }
   50%     { opacity: 0.20; }
 }
-@keyframes rWaveDrift1 {
-  0%   { transform: translateY(  0px); }
-  100% { transform: translateY(-42px); }
-}
-@keyframes rWaveDrift2 {
-  0%   { transform: translateY( 0px); }
-  100% { transform: translateY(32px); }
-}
-@keyframes rWaveDrift3 {
-  0%   { transform: translateY(  0px); }
-  100% { transform: translateY(-24px); }
-}
-
 /* ── result hero 大気層（暗背景：overlay で光感） ── */
 .rh-atmo {
   position: absolute; inset: 0;
@@ -1284,13 +1271,6 @@ footer {
   animation: rParticleDrift4 20s ease-in-out infinite alternate-reverse,
              rParticlePulse   6s ease-in-out infinite -3.5s;
 }
-.rh-wave-svg {
-  position: absolute; top: 0; left: 0;
-  width: 100%; height: 100%; pointer-events: none; z-index: 0;
-}
-.rh-wave-g1 { animation: rWaveDrift1 10s ease-in-out infinite alternate; }
-.rh-wave-g2 { animation: rWaveDrift2 14s ease-in-out infinite alternate-reverse; }
-.rh-wave-g3 { animation: rWaveDrift3 12s ease-in-out infinite alternate; }
 
 </style>
 <link rel="stylesheet" href="assets/language.css">
@@ -1767,12 +1747,6 @@ function buildTypeHero(coloredLetters, diag) {
     <div class="rh-p-b" aria-hidden="true"></div>
     <div class="rh-p-c" aria-hidden="true"></div>
     <div class="rh-p-d" aria-hidden="true"></div>
-    <svg class="rh-wave-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <defs><filter id="wfr" x="-10%" y="-100%" width="120%" height="300%"><feGaussianBlur stdDeviation="2.0"/></filter></defs>
-      <g class="rh-wave-g1" filter="url(#wfr)"><path d="M -100,650 C 180,590 480,510 760,455 C 1000,408 1260,388 1540,382" fill="none" stroke="white" stroke-width="3.0" opacity="0.28"/></g>
-      <g class="rh-wave-g2" filter="url(#wfr)"><path d="M -100,510 C 200,480 460,448 750,422 C 1000,400 1260,390 1540,386" fill="none" stroke="white" stroke-width="1.8" opacity="0.17"/></g>
-      <g class="rh-wave-g3" filter="url(#wfr)"><path d="M -100,800 C 160,730 440,650 740,585 C 990,530 1250,506 1540,498" fill="none" stroke="white" stroke-width="1.3" opacity="0.11"/></g>
-    </svg>
     <div class="type-hero-inner">
       <div class="type-eyebrow">Color Personality — ${isSubjectMode ? 'Subjects' : isNumberMode ? 'Numbers' : 'Alphabet'}</div>
       <div class="type-label">Your synesthesia profile</div>

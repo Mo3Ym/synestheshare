@@ -295,31 +295,6 @@ nav ul a:hover { color: var(--ink); }
   50%     { opacity: 0.20; }
 }
 
-/* ── 波リボン（SVG・透視収束） ── */
-.hero-wave-svg {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-/* 手前ほど大きく動き、奥ほど小さく動く（遠近感） */
-.wave-g1 { animation: waveDrift1 10s ease-in-out infinite alternate; }
-.wave-g2 { animation: waveDrift2 14s ease-in-out infinite alternate-reverse; }
-.wave-g3 { animation: waveDrift3 12s ease-in-out infinite alternate; }
-@keyframes waveDrift1 {
-  0%   { transform: translateY(  0px); }
-  100% { transform: translateY(-42px); }
-}
-@keyframes waveDrift2 {
-  0%   { transform: translateY( 0px); }
-  100% { transform: translateY(32px); }
-}
-@keyframes waveDrift3 {
-  0%   { transform: translateY(  0px); }
-  100% { transform: translateY(-24px); }
-}
-
 .hero {
   position: relative; z-index: 1;
   min-height: 100svh;
@@ -896,31 +871,6 @@ nav ul a:hover { color: var(--ink); }
   <div class="hero-p-b" aria-hidden="true"></div>
   <div class="hero-p-c" aria-hidden="true"></div>
   <div class="hero-p-d" aria-hidden="true"></div>
-
-  <!-- 波リボン：手前から奥へ収束する透視図法 -->
-  <svg class="hero-wave-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"
-       xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <filter id="wf" x="-10%" y="-100%" width="120%" height="300%">
-        <feGaussianBlur stdDeviation="2.0"/>
-      </filter>
-    </defs>
-    <!-- 波1：手前（低い・太い・明るい）→ 右奥へ収束 -->
-    <g class="wave-g1" filter="url(#wf)">
-      <path d="M -100,780 C 180,720 480,620 760,555 C 1000,500 1260,472 1540,465"
-            fill="none" stroke="white" stroke-width="3.0" opacity="0.34"/>
-    </g>
-    <!-- 波2：中間距離（間隔が広くまばら） -->
-    <g class="wave-g2" filter="url(#wf)">
-      <path d="M -100,620 C 200,590 460,558 750,530 C 1000,508 1260,496 1540,490"
-            fill="none" stroke="white" stroke-width="1.8" opacity="0.20"/>
-    </g>
-    <!-- 波3：一番奥（細く・薄く・手前と間隔大） -->
-    <g class="wave-g3" filter="url(#wf)">
-      <path d="M -100,900 C 160,830 440,720 740,648 C 990,592 1250,568 1540,558"
-            fill="none" stroke="white" stroke-width="1.3" opacity="0.13"/>
-    </g>
-  </svg>
 
   <section class="hero">
     <div class="hero-text">

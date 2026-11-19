@@ -46,8 +46,8 @@ function card(title, question, english, logoMark) {
     <path d="M-40 552C295 449 344 657 740 580s325-170 495-188v246H-40Z" fill="#fff" fill-opacity=".11"/>
     <path d="M-40 552C295 449 344 657 740 580s325-170 495-188M-50 590C334 515 450 673 866 580q220-73 368-90"
       fill="none" stroke="url(#wave)" stroke-width="1.5"/>
-    <image x="48" y="48" width="36" height="36" href="${logoMark}"/>
-    <text x="94" y="78" font-family="${fontLatin}" font-size="35" font-weight="500" fill="${ink}">SynestheShare</text>
+    <image x="24" y="24" width="36" height="36" href="${logoMark}"/>
+    <text x="70" y="54" font-family="${fontLatin}" font-size="35" font-weight="500" fill="${ink}">SynestheShare</text>
     <path d="M240 141h48m626 0h48" fill="none" stroke="${ink}" stroke-opacity=".7"/>
     <text x="600" y="157" text-anchor="middle" font-family="${family}" font-size="${english ? 44 : 47}"
       letter-spacing="${english ? 1 : 7}" fill="${ink}">${escape(title)}</text>

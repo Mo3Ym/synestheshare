@@ -61,6 +61,42 @@ async function saveSheet(name, items, makeTile) {
   save(name, Buffer.concat(masks));
 }
 
+async function savePercentageSheet() {
+  const width = 190, height = 88;
+  const percent = await raster(svg(48, height, `<text x="0" y="73" font-family="${fontLatin}" font-size="47">%</text>`), true);
+  const tiles = [];
+  for (let value = 0; value <= 100; value++) {
+    const digits = await raster(svg(width, height, `<text x="3" y="73" font-family="${fontLatin}" font-size="76">${value}</text>`), true);
+    const tile = Buffer.alloc(width * height);
+    let top = height, bottom = 0, right = 0;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const alpha = digits[y * width + x];
+        if (alpha) right = Math.max(right, x);
+        if (alpha >= 128) {
+          top = Math.min(top, y);
+          bottom = Math.max(bottom, y);
+        }
+      }
+    }
+    // Round and straight numerals have different optical overshoots in Outfit.
+    // Align their visible height, keeping the percent sign on a shared baseline.
+    const percentLeft = right + 7;
+    for (let y = 0; y < height; y++) {
+      const source = top + (y - 20) * (bottom - top) / 53;
+      if (source >= 0 && source < height - 1) {
+        const row = Math.floor(source), fraction = source - row;
+        for (let x = 0; x <= right; x++) {
+          tile[y * width + x] = Math.round(digits[row * width + x] * (1 - fraction) + digits[(row + 1) * width + x] * fraction);
+        }
+      }
+      percent.copy(tile, y * width + percentLeft, y * 48, y * 48 + Math.min(48, width - percentLeft));
+    }
+    tiles.push(tile);
+  }
+  save('v17-values.alpha.deflate', Buffer.concat(tiles));
+}
+
 (async () => {
   fs.mkdirSync(output, { recursive: true });
   const outfitFont = process.env.OGP_OUTFIT_FONT || path.join(os.homedir(), 'AppData/Local/Microsoft/Windows/Fonts/Outfit-Bold.ttf');
@@ -104,10 +140,11 @@ async function saveSheet(name, items, makeTile) {
       return svg(180, 49, `<text x="${isMatch ? 178 : 2}" y="34" text-anchor="${isMatch ? 'end' : 'start'}" font-family="${locale === 'en' ? fontLatin : fontJP}" font-size="${rank ? 29 : 25}" font-weight="500">${label}</text>`);
     });
   }
-  await saveSheet('v17-values.alpha.deflate', Array.from({length: 101}, (_, value) => value), value =>
-    svg(190, 88, `<text x="3" y="73" font-family="${fontLatin}" font-size="76">${value}<tspan font-size="47" dx="2">%</tspan></text>`));
-  await saveSheet('v17-letters.alpha.deflate', [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'], letter =>
-    svg(72, 72, `<text x="36" y="52" text-anchor="middle" font-family="${fontLatin}" font-size="45" font-weight="700">${letter}</text>`));
+  await savePercentageSheet();
+  await saveSheet('v17-letters.alpha.deflate', [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'], letter => {
+    const alphabet = /[A-Z]/.test(letter);
+    return svg(72, 72, `<text x="36" y="${alphabet ? 54 : 52}" text-anchor="middle" font-family="${fontLatin}" font-size="${alphabet ? 51 : 45}" font-weight="700">${letter}</text>`);
+  });
   await saveSheet('v17-subjects.alpha.deflate', ['国','数','理','社','英'], letter =>
     svg(72, 72, `<text x="36" y="50" text-anchor="middle" font-family="${fontJP}" font-size="37" font-weight="700">${letter}</text>`));
   console.log('Built v17 OGP backgrounds, stats and palette glyphs.');

@@ -161,6 +161,9 @@ nav ul a:hover { color: var(--ink); }
   --hero-spacing-reference: clamp(844px, 819.46px + 6.2921vw, 900px);
   --hero-spacing-scale: var(--legacy-hero-spacing-scale, 1);
   --hero-ink3: rgba(255,255,255,.72);
+  --hero-dot-size: clamp(34px, 13vw, 60px);
+  height: calc(100vh - var(--nav-h));
+  height: calc(100svh - var(--nav-h));
   position: relative; overflow: hidden;
   padding: calc(clamp(2.25rem, 9vw, 4.25rem) * var(--hero-spacing-scale))
            clamp(1rem, 4.6vw, 1.5rem)
@@ -196,11 +199,15 @@ nav ul a:hover { color: var(--ink); }
 .type-hero[data-type="neon"] { --hero-shade: 0.58; }
 .type-hero-inner {
   position: relative; z-index: 1;
+  flex: 1 1 auto; min-height: 0;
   max-width: 640px; margin: 0 auto; width: 100%;
+  overflow: auto; scrollbar-width: thin; scrollbar-color: #ffffff55 transparent;
   display: flex; flex-direction: column; align-items: center;
   gap: calc(clamp(1.2rem, 6vw, 2rem) * var(--hero-spacing-scale));
   text-align: center; color: #fffdf9;
+  justify-content: flex-start; justify-content: safe center;
 }
+.type-hero-inner > :not(.type-palette-strip) { flex-shrink: 0; }
 .type-hero-heading { display: grid; justify-items: center; gap: calc(.85rem * var(--hero-spacing-scale)); }
 .type-eyebrow {
   display: flex; align-items: center; gap: .7rem;
@@ -216,13 +223,19 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-hero[data-type="warm"] .type-title { color: #ffe9c9; }
 .type-palette-strip {
+  --palette-halo-space: 12px;
   display: flex; flex-wrap: wrap; justify-content: center;
-  max-width: 560px; column-gap: clamp(.45rem, 3vw, 1.05rem); row-gap: calc(clamp(.45rem, 3vw, 1.05rem) * var(--hero-spacing-scale));
+  align-content: flex-start; flex: 0 1 auto;
+  min-height: calc(var(--hero-dot-size) + 2 * var(--palette-halo-space));
+  padding: var(--palette-halo-space); margin-block: calc(-1 * var(--palette-halo-space));
+  max-width: min(100%, calc(560px + 2 * var(--palette-halo-space))); column-gap: clamp(.45rem, 3vw, 1.05rem);
+  row-gap: calc(clamp(.45rem, 3vw, 1.05rem) * var(--hero-spacing-scale));
+  overflow: auto; scrollbar-width: thin; scrollbar-color: #ffffff66 transparent;
 }
 .type-hero .type-palette-dot {
-  width: clamp(34px, 13vw, 60px); height: clamp(34px, 13vw, 60px);
+  width: var(--hero-dot-size); height: var(--hero-dot-size); flex-shrink: 0;
   font-size: clamp(1rem, 5.7vw, 1.65rem);
-  box-shadow: 0 0 17px #e9dcff54, inset 0 1px 0 #ffffff60;
+  box-shadow: 0 0 11px #e9dcff48, inset 0 1px 0 #ffffff60;
 }
 .subject-mode .type-hero .type-palette-dot { font-size: clamp(.88rem, 4.2vw, 1.3rem); }
 .type-stat-card {
@@ -258,13 +271,14 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-hero-insight .type-palette-dot { flex: 0 0 auto; width: 36px; height: 36px; font-size: .93rem; }
 .type-hero-insight p { margin: calc(.65rem * var(--hero-spacing-scale)) 0 0; font-size: .85rem; line-height: 1.65; color: #fffdf9e0; word-break: normal; }
-.type-hero-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(.55rem * var(--hero-spacing-scale)) .55rem; margin-top: calc(.35rem * var(--hero-spacing-scale)); }
+.type-hero-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(.55rem * var(--hero-spacing-scale)) clamp(.35rem, 1.5vw, .55rem); margin-top: calc(.35rem * var(--hero-spacing-scale)); }
 .type-hero-chip {
   display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .1rem .25rem;
-  border: 1px solid #ffffff40; border-radius: 99px; padding: .45rem .7rem;
-  background: #ffffff10; color: #fffdf9; font-size: .71rem; font-weight: 500;
+  border: 1px solid #ffffff40; border-radius: 99px; padding: .45rem clamp(.38rem, 1.65vw, .7rem);
+  background: #ffffff10; color: #fffdf9; font-size: clamp(.66rem, 2.75vw, .71rem); font-weight: 500;
 }
 .type-hero-chip strong { color: #ffe3a1; font-weight: 700; }
+html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 .type-name-color { font-family: var(--outfit); letter-spacing: .04em; }
 .subject-mode .sense-circle { font-size: 0.86rem; }
 .subject-mode .vote-letter-badge { font-size: 0.64rem; }
@@ -274,7 +288,7 @@ nav ul a:hover { color: var(--ink); }
 /* ══ スクロールインジケーター ══ */
 .scroll-indicator {
   position: relative;
-  align-self: center;
+  align-self: center; flex-shrink: 0;
   z-index: 2;
   display: flex; flex-direction: column; align-items: center; gap: calc(.5rem * var(--hero-spacing-scale));
   cursor: pointer; text-decoration: none;
@@ -514,12 +528,16 @@ nav ul a:hover { color: var(--ink); }
 /* 1行レイアウト：左＝色エリア、右＝テキスト */
 .sense-row {
   --sense-gap: 0.85rem;
+  --sense-visual-share: 41%;
   --sense-circle-size: clamp(38px, 6vw, 54px);
   --sense-circle-cell: clamp(40px, 12vw, 64px);
   --sense-operator-width: clamp(17px, 5vw, 34px);
   display: grid;
-  grid-template-columns: minmax(calc(2 * var(--sense-circle-cell) + var(--sense-operator-width)), 41%) minmax(0, 1fr);
+  grid-template-columns: minmax(calc(2 * var(--sense-circle-cell) + var(--sense-operator-width)), var(--sense-visual-share)) minmax(0, 1fr);
   align-items: center; gap: var(--sense-gap);
+}
+@media (max-width: 480px) {
+  .sense-row { --sense-visual-share: 38%; }
 }
 
 /* 色エリア（左） */
@@ -713,14 +731,13 @@ nav ul a:hover { color: var(--ink); }
 .vote-outlier {
   display: flex; align-items: center; gap: 0.45rem;
   padding-left: calc(28px + 0.6rem);
-  font-size: 0.7rem; color: var(--ink3); line-height: 1.5;
+  color: var(--ink3); line-height: 1.5;
 }
 .vote-outlier-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .vote-outlier strong { color: var(--ink2); font-weight: 700; }
 
 /* ══ 診断コメント ══ */
 #mainWrap .profile-card .section-title {
-  font-size: clamp(1rem, 2.6vw, 1.2rem);
   margin-bottom: .8rem;
 }
 .diag-body {
@@ -817,6 +834,7 @@ nav ul a:hover { color: var(--ink); }
 }
 .diag-lead { font-size: .9rem; font-weight: 400; color: var(--ink2); word-break: normal; }
 .diag-type-reflection { color: #6f6f68; font-style: italic; }
+.vote-outlier, .diag-type-reflection { font-size: .7rem; }
 #mainWrap #diagnosis .section-title { font-size: clamp(1.2rem, 3vw, 1.55rem); }
 #diagnosis .diag-type-main { font-size: clamp(1.45rem, 4.5vw, 2.05rem); }
 #diagnosis .diag-lead { color: var(--result-card-muted); line-height: 1.75; }
@@ -1539,7 +1557,7 @@ const TYPE_BG = {
   earth:  'earth',
 };
 
-function buildTypeHero(coloredLetters, diag = null) {
+function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(item => item.id === typeId);
   const title = isSubjectMode ? 'あなたの教科色感覚' : isNumberMode ? 'あなたの数字色感覚' : 'あなたの文字色感覚';
@@ -1562,6 +1580,7 @@ function buildTypeHero(coloredLetters, diag = null) {
     <div class="rh-p-c" aria-hidden="true"></div>
     <div class="rh-p-d" aria-hidden="true"></div>
     <div class="type-hero-inner">
+      ${voteErrorNotice}
       <header class="type-hero-heading">
         <div class="type-eyebrow">RESULT</div>
         <h1 class="type-title">${title}</h1>
@@ -1789,8 +1808,7 @@ function buildSenseCard(coloredLetters) {
 
   const empathyText = !mostEmpathy
     ? `<div class="empathy-pct-label">${isSubjectMode ? '選んだ教科すべてで世間と異なる色を選んでいました。' : 'すべての文字で<wbr>世間と異なる色を<wbr>選んでいました。'}</div>`
-    : `<div class="sense-sentence">あなたが選んだ${empathyColor}。</div>
-       <div class="sense-sentence">${highestPct >= 50 ? '多くの人も同じ色を感じています。' : '同じ色を感じた人もいます。'}</div>`;
+    : `<div class="sense-sentence"><span class="sense-strong">${highestPct}%</span>の人が、${itemLabel(mostEmpathy)}にあなたと同じ${empathyColor}を感じていました。</div>`;
 
   // ── 個性：色円HTML ──
   const uTopColorHex2 = uVotes[0]?.color || '#9698a8';
@@ -2102,7 +2120,7 @@ function render() {
   setTimeout(() => {
     // ① ファーストビュー
     const voteErrorNotice = window.themeVoteError ? '<div role="status" style="padding:1rem;text-align:center;color:white;background:#28384d">投票を保存できませんでした。接続設定またはデータベースの権限を確認してください。<br><span id="voteSaveErrorCode"></span></div>' : '';
-    typeHeroArea.innerHTML = voteErrorNotice + buildTypeHero(coloredLetters, diag);
+    typeHeroArea.innerHTML = buildTypeHero(coloredLetters, diag, voteErrorNotice);
     const voteSaveErrorCode = document.getElementById('voteSaveErrorCode');
     if (voteSaveErrorCode) voteSaveErrorCode.textContent = window.themeVoteError;
 

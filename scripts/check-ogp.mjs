@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { onRequest } from '../functions/api/og.js';
 import { parseAnswer, displayAnswer, renderPixels } from '../lib/og-renderer.js';
 import { ogImageUrl } from '../lib/og-url.js';
+import classifyColorType from '../lib/color-type.js';
 
 const assets = { async fetch(url) {
   try { return new Response(await readFile(new URL(`..${new URL(url).pathname}`, import.meta.url))); }
@@ -41,6 +42,16 @@ for (const [query, file] of samples) {
 }
 
 const context = {request: new Request('https://example.test/api/og'), env: {ASSETS: assets}};
+const backgroundSwatches = new Set();
+for (const [encoded, type] of Object.entries({ '0': 'warm', '6': 'cool', '4': 'nature', A: 'mono', '8': 'pastel', '0554': 'neon', '7': 'dream', '9': 'earth' })) {
+  const answer = parseAnswer(encoded, '10');
+  assert.equal(classifyColorType(answer.map(item => item.color)), type);
+  const pixels = await renderPixels(context, answer, '10', null, 'empathy');
+  const corner = (600 * 1200 + 1150) * 3;
+  backgroundSwatches.add(pixels.slice(corner, corner + 3).join(','));
+}
+assert.equal(backgroundSwatches.size, 8, 'Every color type has its own OGP background');
+
 const answer = parseAnswer('0527416C25', '10');
 const withoutStats = await renderPixels(context, answer, '10', null, 'empathy');
 const withStats = await renderPixels(context, answer, '10', 19, 'empathy', 'ja', 81);
@@ -59,5 +70,5 @@ assert.equal(image.searchParams.get('majority'), '81');
 assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
-assert.equal(image.searchParams.get('v'), '24');
+assert.equal(image.searchParams.get('v'), '25');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');

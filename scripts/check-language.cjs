@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
+const classifyColorType = require('../lib/color-type.js');
 // Exercise the menu's actual event handlers, including an answer changed after load.
 for (const english of [false, true]) {
   const events = {};
@@ -46,7 +47,7 @@ for (const page of ['index', 'alphabet', 'result', 'number', 'subject']) {
   if (page === 'result') {
     const script = [...source.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(match => match[2].includes('const DUMMY_VOTES'))[2].split('window.DUMMY_VOTES =')[0];
     const context = vm.createContext({
-      URL, URLSearchParams,
+      URL, URLSearchParams, classifyColorType,
       location: { origin:'https://example.test', href:'https://example.test/result-en?r=5566476C25&mode=10', search:'?r=5566476C25&mode=10' },
       window: { addEventListener() {}, innerWidth:1200 },
       document: { getElementById:()=>({setAttribute(){}}) },

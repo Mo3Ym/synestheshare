@@ -39,7 +39,7 @@
       if (params.has(key)) image.searchParams.set(key, params.get(key));
     }
     if (document.documentElement.lang === 'en') image.searchParams.set('lang', 'en');
-    image.searchParams.set('v', '24');
+    image.searchParams.set('v', '25');
   }
   const ogImageUrl = image.href;
   const pageUrl = location.href;
@@ -669,53 +669,78 @@ nav ul a:hover { color: var(--ink); }
 .highlight-mine-marker::after { content: '▼'; font-size: 0.48rem; color: var(--ink); line-height: 1; }
 
 /* ══ DISCOVERY カード ══ */
-/* 2列グリッド */
+#uniqueness, #diagnosis {
+  --result-card-ink: #303951;
+  --result-card-muted: #555d74;
+  --result-card-rule: #cdc9dc;
+  background: linear-gradient(125deg, rgba(255,255,255,.91), rgba(246,242,255,.85));
+  border-color: rgba(255,255,255,.86);
+  border-radius: clamp(20px, 4vw, 29px);
+  color: var(--result-card-ink);
+}
+#mainWrap :is(#uniqueness, #diagnosis) .section-eyebrow { color: #77778e; }
+#mainWrap :is(#uniqueness, #diagnosis) .section-title { color: var(--result-card-ink); }
 .sense-grid {
-  display: flex; flex-direction: column; gap: 1.75rem;
+  display: flex; flex-direction: column; gap: clamp(.85rem, 3vw, 1.25rem);
 }
-.sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
+.sense-col { display: flex; flex-direction: column; gap: .75rem; }
 .sense-col-label {
-  font-family: var(--jp); font-weight: 550; font-size: 1.05rem;
-  color: var(--ink);
+  font-family: var(--jp); font-weight: 600; font-size: 1.05rem;
+  color: var(--result-card-ink);
 }
-.sense-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
+.sense-divider { height: 1px; background: var(--result-card-rule); }
 
 /* 1行レイアウト：左＝色エリア、右＝テキスト */
 .sense-row {
-  display: flex; align-items: flex-start; gap: 0.85rem;
+  --sense-gap: 0.85rem;
+  --sense-circle-size: clamp(38px, 6vw, 54px);
+  --sense-circle-cell: clamp(40px, 12vw, 64px);
+  --sense-operator-width: clamp(17px, 5vw, 34px);
+  display: grid;
+  grid-template-columns: minmax(calc(2 * var(--sense-circle-cell) + var(--sense-operator-width)), 41%) minmax(0, 1fr);
+  align-items: center; gap: var(--sense-gap);
 }
 
 /* 色エリア（左） */
 .sense-circles {
-  display: flex; align-items: flex-start; flex-shrink: 0;
+  display: flex; align-items: flex-start; justify-content: center;
 }
 .sense-circle-wrap {
   display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
-  width: 48px;
+  width: var(--sense-circle-cell);
 }
 .sense-circle {
   border-radius: 50%;
-  width: 38px; height: 38px;
+  width: var(--sense-circle-size); height: var(--sense-circle-size);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--outfit); font-weight: 700; font-size: 1.05rem;
+  font-family: var(--outfit); font-weight: 700; font-size: clamp(1.05rem, 2.8vw, 1.5rem);
 }
 .sense-circle-label {
   font-family: var(--outfit); font-size: 0.65rem; font-weight: 700;
   color: var(--ink2); text-align: center; line-height: 1.3;
   white-space: nowrap;
 }
-/* vs / = 記号 */
+/* vs 記号 */
 .sense-op {
   font-family: var(--outfit); font-size: 0.75rem; font-weight: 700;
   color: var(--ink3); flex-shrink: 0; line-height: 1;
-  width: 22px; text-align: center;
-  margin-top: calc(19px - 0.375rem);
+  width: var(--sense-operator-width); text-align: center;
+  margin-top: calc((var(--sense-circle-size) - .75rem) / 2);
 }
 
 /* テキストエリア（右） */
-.sense-text { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 0; padding-top: 0.15rem; }
+.sense-text {
+  position: relative; align-self: stretch;
+  display: flex; flex-direction: column; justify-content: center; gap: .25rem; min-width: 0;
+  padding: .15rem 0 .15rem clamp(.4rem, 1.4vw, .85rem);
+}
+.sense-text::before {
+  content: ''; position: absolute; inset-block: 0.15rem;
+  inset-inline-start: calc(var(--sense-gap) / -2);
+  width: 1px; background: var(--result-card-rule);
+}
 .sense-sentence {
-  font-size: 0.85rem; font-weight: 400; color: var(--ink2); line-height: 1.65;
+  font-size: clamp(.8rem, 1.7vw, .95rem); font-weight: 450; color: var(--result-card-ink); line-height: 1.65;
   word-break: keep-all; overflow-wrap: break-word;
 }
 .sense-strong { font-family: var(--outfit); font-weight: 700; color: var(--ink); }
@@ -725,7 +750,6 @@ nav ul a:hover { color: var(--ink); }
 /* 文言行 */
 .empathy-pct-label { font-size: 0.85rem; font-weight: 400; color: var(--ink2); line-height: 1.6; }
 .empathy-comment { font-size: 0.72rem; color: var(--ink3); font-style: italic; line-height: 1.5; margin-top: 0.1rem; }
-.sense-text .empathy-comment { color: #6f6f68; }
 .empathy-badge {
   width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
@@ -874,38 +898,157 @@ nav ul a:hover { color: var(--ink); }
 .vote-outlier strong { color: var(--ink2); font-weight: 700; }
 
 /* ══ 診断コメント ══ */
-/* ══ 診断コメント ══ */
+#mainWrap .profile-card .section-title {
+  font-size: clamp(1rem, 2.6vw, 1.2rem);
+  margin-bottom: .8rem;
+}
 .diag-body {
-  display: flex; flex-direction: column; gap: 0.6rem;
+  display: flex; flex-direction: column; gap: .45rem;
 }
 .diag-type-main {
-  font-family: var(--jp); font-weight: 600;
-  font-size: clamp(1.15rem, 2.4vw, 1.3rem);
-  color: var(--c1); line-height: 1.2; letter-spacing: -0.01em;
+  font-family: var(--jp); font-weight: 700;
+  font-size: clamp(1.45rem, 4vw, 1.9rem);
+  color: var(--profile-accent); line-height: 1.2; letter-spacing: -0.025em;
+  margin-bottom: .3rem;
+}
+#colortype {
+  --profile-glow: #efe5fb;
+  --profile-light: #fff7ff;
+  --profile-ribbon: #e4c9f38f;
+  --profile-tip: #b29beaa1;
+  background:
+    radial-gradient(ellipse at 87% 31%, #ffffffad, transparent 27%),
+    radial-gradient(ellipse at 76% 72%, var(--profile-light), transparent 28%),
+    radial-gradient(ellipse at 94% 88%, var(--profile-glow), transparent 53%),
+    linear-gradient(112deg, #fbfafff5, #f4edf9ee);
+}
+@supports (color: color-mix(in srgb, white, black)) {
+  #colortype {
+    --profile-glow: color-mix(in srgb, var(--profile-accent) 15%, #fff5fa);
+    --profile-ribbon: color-mix(in srgb, var(--profile-accent) 32%, #f2dff670);
+    --profile-tip: color-mix(in srgb, var(--profile-accent) 27%, #c8b8f2ae);
+  }
+}
+#colortype[data-type="warm"] {
+  --profile-title-end: #db715e;
+  background: linear-gradient(112deg, #f6f3ff, #fbf1f9);
+}
+#colortype::before, #colortype::after {
+  content: ''; position: absolute; z-index: -1; pointer-events: none;
+  border-top: 1px solid #ffffff94;
+  box-shadow: inset 0 2px 8px #ffffff54;
+  mask-image: linear-gradient(90deg, transparent 4%, #000 44%);
+}
+#colortype::before {
+  inset-inline-end: -13%; bottom: -45%;
+  width: 73%; height: 99%;
+  border-radius: 72% 34% 0 0 / 82% 60% 0 0;
+  transform: rotate(-24deg);
+  background:
+    radial-gradient(ellipse at 64% 4%, #ffffffbf, transparent 29%),
+    radial-gradient(ellipse at 47% 11%, var(--profile-light), transparent 48%),
+    linear-gradient(103deg, transparent 7%, var(--profile-ribbon) 57%, var(--profile-tip) 97%);
+}
+#colortype::after {
+  inset-inline-end: -13%; bottom: -52%;
+  width: 63%; height: 86%;
+  border-radius: 83% 29% 0 0 / 96% 57% 0 0;
+  transform: rotate(-17deg);
+  background:
+    radial-gradient(ellipse at 76% 7%, #fff3ffc9, transparent 34%),
+    linear-gradient(102deg, transparent 6%, var(--profile-ribbon) 51%, var(--profile-tip) 82%);
+}
+/* Use only the original image's text-free areas and blend them into the card. */
+#colortype[data-type="warm"]::before,
+#colortype[data-type="warm"]::after {
+  inset: auto -1.1% 0 -1%;
+  width: auto; height: auto;
+  aspect-ratio: 838 / 286;
+  border: 0; border-radius: 0; box-shadow: none; transform: translateY(2.8%);
+  background: url('assets/backgrounds/sunset-card-reference.png') center / contain no-repeat;
+  mask-composite: intersect;
+}
+#colortype[data-type="warm"]::before {
+  mask-image:
+    linear-gradient(to right, transparent 64%, #000 69%),
+    linear-gradient(to bottom, transparent 6%, #000 24%);
+}
+#colortype[data-type="warm"]::after {
+  mask-image:
+    linear-gradient(to right, transparent 53%, #000 65%),
+    linear-gradient(to bottom, transparent 6%, #000 24%, #000 56%, transparent 64%, transparent 85%, #000 91%);
+}
+#colortype .diag-type-main {
+  font-family: var(--outfit);
+  font-size: clamp(1.9rem, 6.5vw, 2.8rem);
+}
+@supports (background-clip: text) and (color: color-mix(in srgb, white, black)) {
+  #colortype .diag-type-main {
+    width: fit-content;
+    background-image: linear-gradient(100deg, var(--profile-accent), var(--profile-title-end, color-mix(in srgb, var(--profile-accent), #372a46 27%)));
+    background-clip: text;
+    color: transparent;
+  }
 }
 .diag-type-desc {
   font-size: 0.85rem; font-weight: 400; color: var(--ink2);
-  line-height: 1.8; border-left: 2.5px solid var(--border);
-  padding-left: 0.85rem; margin-top: 0.1rem;
+  line-height: 1.7;
 }
-.diag-lead { font-size: .9rem; font-weight: 400; color: var(--ink); word-break: normal; }
-h3.diag-lead { font-size: 1rem; font-weight: 550; }
+.diag-lead { font-size: .9rem; font-weight: 400; color: var(--ink2); word-break: normal; }
 .diag-type-reflection { color: #6f6f68; font-style: italic; }
-/* 根拠行 */
-.diag-basis {
-  margin-top: 1rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.82rem; color: var(--ink2); line-height: 1.7;
-  display: block;
+#mainWrap #diagnosis .section-title { font-size: clamp(1.2rem, 3vw, 1.55rem); }
+#diagnosis .diag-type-main { font-size: clamp(1.45rem, 4.5vw, 2.05rem); }
+#diagnosis .diag-lead { color: var(--result-card-muted); line-height: 1.75; }
+#diagnosis { --diagnosis-padding: 1.5rem; }
+@media (min-width: 768px) {
+  #diagnosis { --diagnosis-padding: 1.75rem; }
 }
-.diag-basis strong { color: var(--ink); font-weight: 600; }
-.diag-basis-label {
-  font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink3); background: var(--border);
-  padding: 0.1rem 0.5rem; border-radius: 4px; flex-shrink: 0;
+.diagnosis-content { position: relative; }
+.diagnosis-content::before, .diagnosis-content::after {
+  content: ''; position: absolute; z-index: -1; pointer-events: none;
+  top: calc(52% + .04 * var(--diagnosis-padding)); border-radius: 50%; aspect-ratio: 1;
 }
+.diagnosis-content::before {
+  width: clamp(58px, 16vw, 102px); right: calc(clamp(38px, 9vw, 65px) - var(--diagnosis-padding));
+  transform: translateY(-64%);
+  background: linear-gradient(135deg, #ffddbc91 15%, #c9b5ef75 75%);
+}
+.diagnosis-content::after {
+  width: clamp(47px, 13vw, 88px); right: calc(clamp(21px, 5.5vw, 36px) - var(--diagnosis-padding));
+  transform: translateY(-35%);
+  background: linear-gradient(145deg, #ad92e95c, #dacefa50);
+}
+@media (min-width: 520px) {
+  #diagnosis .diag-body { padding-inline-end: 7rem; }
+}
+.diagnosis-stats {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1rem 0 0;
+  padding-top: .85rem;
+  border-top: 1px solid var(--result-card-rule);
+}
+.diagnosis-metric {
+  display: grid; grid-template-columns: auto minmax(0, max-content);
+  justify-content: center; align-content: center; align-items: center;
+  column-gap: clamp(.45rem, 2vw, .75rem);
+  padding-inline: .3rem;
+}
+.diagnosis-metric + .diagnosis-metric { border-inline-start: 1px solid var(--result-card-rule); }
+.diagnosis-metric-icon {
+  width: clamp(30px, 8.5vw, 42px); height: clamp(30px, 8.5vw, 42px);
+  display: grid; place-items: center;
+  border-radius: 40%; color: #a064b4; background: #a064b41a;
+}
+.diagnosis-metric-icon.is-rank { color: #d97558; background: #ed9c7f26; }
+.diagnosis-metric-icon svg { width: 58%; height: 58%; }
+.diagnosis-metric-text { margin: 0; }
+.diagnosis-metric dt { font-size: .68rem; font-weight: 600; color: var(--result-card-muted); line-height: 1.3; }
+.diagnosis-metric dd {
+  margin: .15rem 0 0;
+  color: var(--result-card-ink); font: 700 clamp(1.2rem, 4.6vw, 1.75rem)/1.05 var(--outfit);
+  white-space: nowrap;
+}
+.diagnosis-metric-prefix { font: 650 .65em var(--jp); margin-inline-end: .2em; }
 
 /* ══ シェア ══ */
 .share-section { display: flex; flex-direction: column; gap: 0.9rem; }
@@ -1232,6 +1375,7 @@ footer {
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast"></div>
 
+<script src="lib/color-type.js"></script>
 <script>
 /* ══════════════════════════════════════
    ダミーデータ（Supabase実装後に差し替え）
@@ -1471,25 +1615,26 @@ function getDiagType(majorityRate, rareScore) {
     label: '✦ 孤高の共感覚者',
     color: '#9060c0',
     desc: 'あなただけが知っている、<wbr>希少な色の世界',
-    descFull: 'あなたの色覚は<wbr>非常にユニーク。同じ感覚を持つ人は<wbr>少数派です。その鋭い感性は、<wbr>アートや創造的な分野で<wbr>力を発揮するかもしれません。'
+    summary: '同じ色を選んだ人は少数派でした。'
   };
   if (rareScore >= 40)  return {
     label: '◈ 個性派の色覚者',
     color: '#ffae66',
     desc: '人によって印象が<wbr>分かれやすい、<wbr>独自の色感覚',
-    descFull: 'ほどよくユニーク。一般的な傾向は<wbr>踏まえつつも、<wbr>あなたらしい独自の<wbr>色使いが光っています。'
+    summary: 'よく選ばれる色と、あなたらしい色が混ざっています。'
   };
   if (majorityRate >= 70) return {
     label: '◎ 共感覚の王道',
     color: '#4da8e8',
     desc: '多くの人と色の感覚を<wbr>共有する、<wbr>共感覚の王道',
-    descFull: 'あなたの色覚は<wbr>多くの人と<wbr>共通しています。共感覚の<wbr>「スタンダード」に近い<wbr>感性の持ち主です。'
+    summary: 'あなたの色覚は多くの人と共通しています。',
+    note: '共感覚の「スタンダード」に近い感性の持ち主です。'
   };
   return {
     label: '◇ バランス感受者',
     color: '#67bf92',
     desc: '多数派と少数派が交差する、<wbr>広い感性の持ち主',
-    descFull: '多数派の色と<wbr>少数派の色が<wbr>混在しています。広い感性で<wbr>さまざまな色世界を<wbr>持ち合わせています。'
+    summary: '多数派と少数派、両方の色を選びました。'
   };
 }
 
@@ -1512,7 +1657,6 @@ const COLOR_TYPES = [
     name: 'SUNSET TYPE',
     color: '#ffae66',
     summary: '暖色系の色が多く選ばれました。',
-    reflection: '暖かく、光を感じさせる色彩。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     tagline: '温かく燃えるような<wbr>色彩の感覚。\nあなたの中には、<wbr>光のような熱量が<wbr>宿っている。',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
@@ -1575,36 +1719,7 @@ const COLOR_TYPES = [
 ];
 
 function detectColorType(coloredLetters) {
-  const counts = {};
-  coloredLetters.forEach(l => {
-    const c = colorMap[l];
-    counts[c] = (counts[c] || 0) + 1;
-  });
-  const total = coloredLetters.length;
-  const hasBrown = (counts['#9f6f4f']||0) >= 1;
-
-  const warm   = ((counts['#ff7f7f']||0) + (counts['#ffae66']||0) + (counts['#f5dc72']||0)) / total;
-  const cool   = ((counts['#4da8e8']||0) + (counts['#8edfff']||0) + (counts['#9272ff']||0)) / total;
-  const nature = ((counts['#67bf92']||0) + (counts['#a8d85c']||0)) / total;
-  const mono   = ((counts['#2b2d38']||0) + (counts['#9698a8']||0) + (counts['#fffdf9']||0)) / total;
-  const pastel = ((counts['#fffdf9']||0) + (counts['#8edfff']||0) + (counts['#ee9fd0']||0) + (counts['#f5dc72']||0)) / total;
-  const dream  = ((counts['#9272ff']||0) + (counts['#ee9fd0']||0) + (counts['#4da8e8']||0)) / total;
-  // earth は茶色必須。茶色がなければカウントしない
-  const earth  = hasBrown
-    ? ((counts['#9f6f4f']||0) + (counts['#67bf92']||0) + (counts['#a8d85c']||0)) / total
-    : 0;
-
-  if (mono >= 0.55) return 'mono';
-  if (earth >= 0.4) return 'earth';                   // 茶色ありのときのみ
-  if (pastel >= 0.55 && warm < 0.3 && cool < 0.3) return 'pastel';
-  if (dream >= 0.5 && warm < 0.2) return 'dream';
-  if (cool >= 0.5 && warm < 0.2) return 'cool';
-  if (nature >= 0.45 && warm < 0.3) return 'nature';
-  if (warm >= 0.45) return 'warm';
-  if (warm >= 0.22 && cool >= 0.22) return 'neon';
-  // フォールバック：earthを除いたスコアで最大を選ぶ
-  const scores = { warm, cool, nature, mono, dream, pastel };
-  return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+  return classifyColorType(coloredLetters.map(letter => colorMap[letter]));
 }
 
 const TYPE_BG = {
@@ -1863,29 +1978,17 @@ function buildHighlightCard(coloredLetters) {
 /* ══ 個性・共感 統合カード ══ */
 function buildSenseCard(coloredLetters) {
   // ── 個性：最も少数派だった文字 ──
-  const { mostUnique: _mu, isAllMajority } = calcMostUnique(coloredLetters);
-  let mostUnique = _mu;
+  const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
 
   const uColor = mostUnique ? colorMap[mostUnique] : null;
   const uVotes = mostUnique ? DUMMY_VOTES[mostUnique] : [];
-  const uMatchIdx = uColor ? uVotes.findIndex(v => v.color === uColor) : -1;
-  const isOutlier = uMatchIdx === -1;
-  const uMyPct = (uMatchIdx >= 0) ? uVotes[uMatchIdx]?.pct || 0 : 0;
   const uTopPct = uVotes[0]?.pct || 0;
-
-  // バッジ：isAllMajorityのみ共通の的アイコン、それ以外は常にアルファベット円
-  const uniqueBadge = isAllMajority
-    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
-    : `<div class="empathy-badge"${isBright(uColor)?' data-bright="1"':''} style="background:${uColor};color:${textColorFor(uColor)}"><span>${itemLabel(mostUnique, true)}</span></div>`;
 
   const uTopColorName = getColorName(uVotes[0]?.color || '');
   const uMyColorName  = getColorName(uColor || '');
   const uTopColorHex  = uVotes[0]?.color || '#9698a8';
 
-  // %表示（個性側）
-  const uniquePctHtml = isAllMajority ? '' : '';
-
-  const uniqueLabelHtml = isAllMajority
+  const uniqueText = isAllMajority
     ? `<div class="empathy-pct-label">${isSubjectMode ? '選んだ教科すべてで世間と一致' : 'すべての文字で<wbr>世間と一致'}</div>`
     : `<div class="sense-sentence">
         <span class="sense-strong">${uTopPct}%</span>が<span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span>を選ぶ${itemLabel(mostUnique)}に、
@@ -1893,16 +1996,6 @@ function buildSenseCard(coloredLetters) {
       <div class="sense-sentence">
         <span class="sense-strong">あなた</span>は<span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>を見ていました。
       </div>`;
-
-  const uniqueCommentHtml = `<div class="empathy-comment">${
-    isAllMajority ? 'あなたの共感覚は、<wbr>多くの人と共鳴しています。'
-    : isOutlier ? '誰とも重ならない、<wbr>あなただけの色。'
-    : uMyPct <= 10 ? 'ほとんどの人とは<wbr>違う感覚を持っています。'
-    : uMyPct <= 20 ? '少数派の感覚。<wbr>その見え方は、<wbr>あなたならでは。'
-    : '世間とは少し違う、<wbr>独自の感覚。'
-  }</div>`;
-
-  const uniqueText = `${uniquePctHtml}${uniqueLabelHtml}${uniqueCommentHtml}`;
 
   // ── 共感：最も共感された文字 ──
   let mostEmpathy = null, highestPct = -1;
@@ -1915,24 +2008,13 @@ function buildSenseCard(coloredLetters) {
   });
 
   const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
-  const empathyBadge = !mostEmpathy
-    ? `<div class="empathy-badge" style="background:transparent;font-size:1.8rem;border:none"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>`
-    : `<div class="empathy-badge"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>`;
-
-  const empathyComment = !mostEmpathy ? 'あなたの感覚は、<wbr>誰とも違う独自の宇宙を<wbr>持っています。'
-    : highestPct >= 70 ? 'その感覚は、<wbr>多くの人の心と<wbr>静かに重なっています。'
-    : highestPct >= 50 ? '2人に1人以上が、<wbr>あなたと同じ色を<wbr>感じていました。'
-    : 'それぞれの感じ方の中に、<wbr>確かな共鳴がありました。';
-
   const eColorName = eColor ? getColorName(eColor) : '';
+  const empathyColor = eColor ? `<span class="sense-color-word" style="color:${isBright(eColor)?'var(--result-card-ink)':eColor}">${eColorName}</span>` : '';
 
-  const empathyLabelHtml = !mostEmpathy
+  const empathyText = !mostEmpathy
     ? `<div class="empathy-pct-label">${isSubjectMode ? '選んだ教科すべてで世間と異なる色を選んでいました。' : 'すべての文字で<wbr>世間と異なる色を<wbr>選んでいました。'}</div>`
-    : `<div class="sense-sentence">
-        <span class="sense-strong">${highestPct}%</span>の人が、${itemLabel(mostEmpathy)}にあなたと同じ<span class="sense-color-word" style="color:${isBright(eColor)?'var(--ink)':eColor}">${eColorName}</span>を感じていました。
-      </div>`;
-
-  const empathyText = `${empathyLabelHtml}<div class="empathy-comment">${empathyComment}</div>`;
+    : `<div class="sense-sentence">あなたが選んだ${empathyColor}。</div>
+       <div class="sense-sentence">${highestPct >= 50 ? '多くの人も同じ色を感じています。' : '同じ色を感じた人もいます。'}</div>`;
 
   // ── 個性：色円HTML ──
   const uTopColorHex2 = uVotes[0]?.color || '#9698a8';
@@ -1955,46 +2037,26 @@ function buildSenseCard(coloredLetters) {
     ? `<div class="sense-circle-wrap">
          <div style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
        </div>`
-    : `<div class="sense-circle-wrap">
-         <div class="sense-circle mine"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>
-         <span class="sense-circle-label">あなた</span>
-       </div>
-       <div class="sense-op">=</div>
-       <div class="sense-circle-wrap">
-         <div class="sense-circle theirs"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>
-         <span class="sense-circle-label">みんな</span>
-       </div>`;
+    : `<div class="sense-circle mine"${isBright(eColor)?' data-bright="1"':''} style="background:${eColor};color:${textColorFor(eColor)}"><span>${itemLabel(mostEmpathy, true)}</span></div>`;
 
   return `<div class="card" id="uniqueness">
-    <div class="section-eyebrow">01 — DISCOVERY</div>
+    <div class="section-eyebrow">DISCOVERY</div>
     <h2 class="section-title">感覚の違いを、発見する。</h2>
     <div class="sense-grid">
       <div class="sense-col">
         <h3 class="sense-col-label">${isSubjectMode ? '最も個性的な教科' : isNumberMode ? '最も個性的だった数字' : '最も個性的だった文字'}</h3>
-        ${isAllMajority
-          ? `<div class="sense-row">
-               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
-               <div class="sense-text">${uniqueText}</div>
-             </div>`
-          : `<div class="sense-row">
-               <div class="sense-circles">${uCirclesHtml}</div>
-               <div class="sense-text">${uniqueText}</div>
-             </div>`
-        }
+        <div class="sense-row">
+          <div class="sense-circles">${uCirclesHtml}</div>
+          <div class="sense-text">${uniqueText}</div>
+        </div>
       </div>
       <div class="sense-divider"></div>
       <div class="sense-col">
         <h3 class="sense-col-label">${isSubjectMode ? '最も共感された教科' : isNumberMode ? '最も共感された数字' : '最も共感された文字'}</h3>
-        ${!mostEmpathy
-          ? `<div class="sense-row">
-               <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
-               <div class="sense-text">${empathyText}</div>
-             </div>`
-          : `<div class="sense-row">
-               <div class="sense-circles">${eCirclesHtml}</div>
-               <div class="sense-text">${empathyText}</div>
-             </div>`
-        }
+        <div class="sense-row">
+          <div class="sense-circles">${eCirclesHtml}</div>
+          <div class="sense-text">${empathyText}</div>
+        </div>
       </div>
     </div>
   </div>`;
@@ -2060,7 +2122,7 @@ function buildVoteSection(coloredLetters) {
   const hidden  = coloredLetters.slice(3);
 
   let html = `<div class="card" id="vote">
-    <div class="section-eyebrow">02 — VOTE</div>
+    <div class="section-eyebrow">VOTE</div>
     <h2 class="section-title">みんなが感じた色</h2>
     <div class="vote-collapse-wrap" id="voteCollapseWrap">
       <div class="vote-list">
@@ -2086,18 +2148,39 @@ function buildVoteSection(coloredLetters) {
 function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
   const rareStat = calcRareStat(diag);
-  const [lead, ...details] = type.descFull.match(/[^。.]+[。.]?/g);
-  const matchLabel = isSubjectMode ? '教科が世間と一致' : isNumberMode ? '数字が世間と一致' : '文字が世間と一致';
-  return `<div class="card" id="diagnosis">
-    <div class="section-eyebrow">04 — YOUR SENSE</div>
-    <h2 class="section-title">あなたの<wbr>共感覚タイプ</h2>
-    <div class="diag-body">
-      <div class="diag-type-main" style="color:${type.color}">${type.label}</div>
-      <h3 class="diag-lead">${lead}</h3>
-      <p class="diag-type-desc">${details.join('').trim()}</p>
+  return `<div class="card profile-card" id="diagnosis" style="--profile-accent:${type.color}">
+    <div class="diagnosis-content">
+      <div class="section-eyebrow">SYNESTHESIA TYPE</div>
+      <h2 class="section-title">あなたの<wbr>共感覚タイプ</h2>
+      <div class="diag-body">
+        <h3 class="diag-type-main">${type.label}</h3>
+        <p class="diag-lead">${type.summary}${type.note ? '<br>' + type.note : ''}</p>
+      </div>
     </div>
-    <div class="diag-basis">
-      多数派一致率：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}${matchLabel}）<br>${rareStat.label}：<strong>上位${rareStat.value}%</strong>
+    <div class="diagnosis-stats">
+      <div class="diagnosis-metric">
+        <span class="diagnosis-metric-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="9" cy="7.5" r="3.25"/><circle cx="17.4" cy="8.8" r="2.45"/>
+            <path d="M2 18a5.25 5.25 0 0 1 5.25-5.25h3.5A5.25 5.25 0 0 1 16 18v1H2zm15.5.9V18a6.7 6.7 0 0 0-1.65-4.4h2.05a4.1 4.1 0 0 1 4.1 4.1v1.2z"/>
+          </svg>
+        </span>
+        <dl class="diagnosis-metric-text">
+          <dt>多数派一致率</dt>
+          <dd>${diag.majorityRate}%</dd>
+        </dl>
+      </div>
+      <div class="diagnosis-metric">
+        <span class="diagnosis-metric-icon is-rank" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="m3 7 5 3 4-5 4 5 5-3-2.5 9h-13zm3 10.5h12V19H6z"/>
+          </svg>
+        </span>
+        <dl class="diagnosis-metric-text">
+          <dt>${rareStat.label}</dt>
+          <dd><span class="diagnosis-metric-prefix">上位</span>${rareStat.value}%</dd>
+        </dl>
+      </div>
     </div>
   </div>`;
 }
@@ -2108,13 +2191,13 @@ function buildColorTypeSection(coloredLetters) {
   const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
   const typeColor = type.color || 'rgba(24,24,24,0.88)';
 
-  return `<div class="card" id="colortype">
-    <div class="section-eyebrow">03 — COLOR TYPE</div>
+  return `<div class="card profile-card" id="colortype" data-type="${type.id}" style="--profile-accent:${typeColor}">
+    <div class="section-eyebrow">COLOR TYPE</div>
     <h2 class="section-title">あなたが選んだ色の傾向</h2>
     <div class="diag-body">
-      <h3 class="diag-type-main" style="color:${typeColor}">${type.name}</h3>
+      <h3 class="diag-type-main">${type.name}</h3>
       <p class="diag-lead">${type.summary}</p>
-      <p class="diag-type-desc diag-type-reflection">${(type.reflection || type.tagline).replace(/(<wbr>)?\n/g, '<br>')}</p>
+      <p class="diag-type-desc diag-type-reflection">${type.tagline.split('\n').at(-1)}</p>
     </div>
   </div>`;
 }
@@ -2137,7 +2220,7 @@ function buildShareSection(diag, coloredLetters) {
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '24');
+  ogUrl.searchParams.set('v', '25');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2231,7 +2314,7 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('majority');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '24');
+  image.searchParams.set('v', '25');
   const shareText = `🎨私の${themeName}の色は ${type.name} でした。\n\n――あなたの「${sampleItem}」は、何色ですか？\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">リンクを送って、<wbr>あなたの結果をシェアしよう。</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Xにシェア</a></div></div>`;
 }

@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { parseAnswer, displayAnswer } from '../lib/og-renderer.js';
 import { onRequest } from '../functions/api/og.js';
+import classifyColorType from '../lib/color-type.js';
 
 const page = await readFile(new URL('../number.html', import.meta.url), 'utf8');
 const main = [...page.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(match => match[2].includes('const LETTERS_10'))[2];
@@ -23,7 +24,7 @@ for (const english of [false,true]) for (const local of [false,true]) {
   const html = await readFile(new URL(`../result${english?'-en':''}.html`, import.meta.url),'utf8');
   const script = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)].find(match=>match[2].includes('const DUMMY_VOTES'))[2].split('window.DUMMY_VOTES =')[0];
   const elements = {};
-  const context = vm.createContext({ URL, URLSearchParams,
+  const context = vm.createContext({ URL, URLSearchParams, classifyColorType,
     location:{protocol:local?'file:':'https:',origin:local?'null':'https://example.test',href:`${local?'file:///C:/preview':'https://example.test'}/result${english?'-en':''}.html?mode=number&r=---3------`,search:'?mode=number&r=---3------'},
     window:{addEventListener(){}},
     document:{getElementById:id=>elements[id] ||= {innerHTML:'',setAttribute(){}}},

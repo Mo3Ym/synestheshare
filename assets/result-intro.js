@@ -31,9 +31,7 @@
     view: 'See their results', start: 'Try it yourself (2 min) →', close: 'Close introduction',
   } : {
     title: `あなたの${highlightedSample}は、<wbr>何<strong class="hl-mint">色</strong>ですか？`,
-    description: subject || number
-      ? `${subject ? '教科' : '数字'}に感じる色を、みんなと比べるサイトです。`
-      : '文字や感じる色を、みんなと比べるサイトです。',
+    description: `${subject ? '教科' : number ? '数字' : '文字'}に感じる色を、みんなと比べるサイトです。`,
     view: 'この人の結果を見る', start: '診断してみる（2分）', close: '説明を閉じる',
   };
   const dialog = document.createElement('dialog');

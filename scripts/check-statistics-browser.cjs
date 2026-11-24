@@ -46,8 +46,8 @@ export const getDoc=async ref=>({exists:()=>!!window.__fixtureDB[ref.path],data:
  const stats=await page.evaluate(()=>window.__fixtureDB);
  if(mode==='subject')assert.deepEqual(stats['statistics/subject-language'],legacy?{'赤':2}:undefined);const ids=mode==='subject'?['language','math','science','social','english']:'1234567890'.split('');
  for(let i=0;i<answer.length;i++) if(answer[i]!=='-') assert.equal(Object.values(stats['statistics/'+(mode==='subject'?'subject-':'')+(ids[i]==='language'?'japanese':ids[i])]).reduce((a,b)=>a+b,0),mode==='number'&&ids[i]==='4'?3:1);
- assert.equal(await page.locator('.type-palette-dot').count(),answer.replaceAll('-','').length);
- if(mode==='number')assert.match(await page.locator('.type-stat-card-label').last().innerText(),english?/number/i:/数字/);
+ assert.equal(await page.locator('.type-palette-strip .type-palette-dot').count(),answer.replaceAll('-','').length);
+ if(mode==='number')assert.match(await page.locator('.type-title').innerText(),english?/number/i:/数字/);
  assert.equal(new URL(page.url()).hash,'');
  assert(!(await page.locator('#btnXShare').getAttribute('data-url')).includes('submit'));
  await page.evaluate(()=>sessionStorage.setItem('fixtureDB',JSON.stringify(window.__fixtureDB)));

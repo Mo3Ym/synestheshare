@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>結果TOPの余白調整 | SynestheShare</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f3eff8; color: #28273a; font: 400 .88rem/1.55 "Noto Sans JP", "Meiryo", sans-serif; }
+  button, input, select, textarea { font: inherit; }
+  button, select, input { color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid #7846a4; outline-offset: 3px; }
+  .editor { display: grid; grid-template-columns: minmax(19rem, 23rem) minmax(0, 1fr); min-height: 100vh; }
+  .panel { background: #fff; border-inline-end: 1px solid #ddd5e8; padding: 1.35rem; }
+  h1 { font-size: 1.3rem; margin: 0 0 .35rem; }
+  p { margin: 0 0 1rem; color: #5c566c; }
+  .controls { display: grid; grid-template-columns: minmax(0, 1fr) 4.65rem 4.65rem; align-items: center; gap: .5rem; }
+  .heading { color: #5c566c; font-size: .72rem; text-align: center; }
+  .controls input { width: 100%; min-width: 0; padding: .32rem .25rem; border: 1px solid #d1c8de; border-radius: .45rem; background: #fbf9ff; text-align: center; }
+  .controls input[data-edited] { border-color: #9365b3; background: #f7ecff; }
+  .control-value { display: grid; grid-template-columns: minmax(0, 1fr) 1.3rem; align-items: stretch; gap: .15rem; }
+  .control-value .reset-value { padding: 0; border-color: transparent; background: transparent; color: #684398; }
+  .control-value .reset-value:hover:not(:disabled) { background: #f2e9fa; }
+  .control-value .reset-value:disabled { opacity: .25; cursor: default; }
+  .control-name { font-size: .79rem; }
+  .actions { display: flex; gap: .5rem; margin: 1.1rem 0 .65rem; }
+  button, select { border: 1px solid #d0c7de; border-radius: .55rem; background: #fff; padding: .45rem .7rem; }
+  button[aria-pressed="true"], #copy-css { background: #52316d; color: #fff; border-color: #52316d; }
+  #copy-css:disabled { opacity: .5; cursor: default; }
+  #css-output { width: 100%; min-height: 8rem; resize: vertical; padding: .65rem; border: 1px solid #d1c8de; border-radius: .55rem; font: .74rem/1.5 monospace; }
+  #status { min-height: 1.5rem; margin-top: .35rem; font-size: .77rem; }
+  .dashboard { min-width: 0; padding: 1.1rem; }
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .65rem; margin-bottom: .75rem; }
+  .toolbar label { display: inline-flex; align-items: center; gap: .35rem; }
+  #preview-height { width: 5rem; padding: .35rem; border: 1px solid #d0c7de; border-radius: .45rem; }
+  .toolbar output { color: #5c566c; font: .8rem monospace; }
+  #preview-stage { display: grid; justify-content: center; align-items: start; padding: .55rem 0; }
+  #preview-shell { position: relative; overflow: hidden; border-radius: .85rem; box-shadow: 0 .6rem 1.8rem #4934632c; background: #fff; }
+  #preview { display: block; border: 0; transform-origin: top left; background: #fff; }
+  @media (max-width: 760px) {
+    .editor { grid-template-columns: 1fr; }
+    .panel { border-inline-end: 0; border-bottom: 1px solid #ddd5e8; }
+    .dashboard { padding: .75rem; }
+  }
+</style>
+<main class="editor">
+  <section class="panel" aria-labelledby="editor-title">
+    <h1 id="editor-title">結果TOPの余白調整</h1>
+    <p>スマホとPCの基準の余白を px で入力します。画面幅の間を補間し、縦の余白はプレビューの高さに合わせて伸縮します。</p>
+    <div class="controls" id="spacing-controls">
+      <span class="heading">調整する場所</span><span class="heading">390px</span><span class="heading">1280px</span>
+    </div>
+    <div class="actions">
+      <button type="button" id="copy-css" disabled>CSSをコピー</button>
+      <button type="button" id="reset">すべてリセット</button>
+    </div>
+    <textarea id="css-output" aria-label="調整後のCSS" readonly placeholder="余白を変更するとCSSが表示されます"></textarea>
+    <p id="status" role="status"></p>
+  </section>
+  <section class="dashboard" aria-label="結果ページのプレビュー">
+    <div class="toolbar" aria-label="プレビュー設定">
+      <button type="button" data-device="320,568" aria-pressed="false">小型スマホ</button>
+      <button type="button" data-device="390,844" aria-pressed="true">スマホ</button>
+      <button type="button" data-device="768,1024" aria-pressed="false">タブレット</button>
+      <button type="button" data-device="1280,900" aria-pressed="false">PC</button>
+      <label>サンプル <select id="sample"><option value="five">5文字</option><option value="one">1文字</option><option value="all">26文字</option></select></label>
+      <label>高さ <input id="preview-height" type="number" min="320" max="1600" step="1" value="844"> px</label>
+      <label><input type="checkbox" id="guides"> 余白ガイド</label>
+      <output id="preview-size">390 × 844</output>
+    </div>
+    <div id="preview-stage"><div id="preview-shell"><iframe id="preview" title="結果TOPのプレビュー"></iframe></div></div>
+  </section>
+</main>
+<!-- Result hero preview snapshot. Statistics are sample data. -->
+<template id="preview-head"><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/result-color-circles.css">
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:  #fffdf9;
+  --bg:     #f0f0ec;
+  --ink:    #2b2d38;
+  --ink2:   #555550;
+  --ink3:   #aaaaaa;
+  --border: #e0e0dc;
+  --c1: #ff7f7f;
+  --outfit: 'Outfit', sans-serif;
+  --jp: 'Noto Sans JP',"HiraginoUDSansN-W3","ヒラギノUD角ゴ ProN W3",
+        "Hiragino Sans","ヒラギノ角ゴシック",
+        "Meiryo UI","Meiryo",sans-serif;
+  --marker-h: 24px;
+  --nav-h: 54px;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: var(--jp); overflow-x: hidden; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+h1,h2,h3,p { word-break: keep-all; overflow-wrap: break-word; }
+
+/* ══ NAV（コンパクト） ══ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 1.5rem;
+  background: rgba(247,247,245,0.88);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(224,224,220,0.7);
+}
+.nav-logo {
+  position: absolute; left: 1.5rem;
+  display: flex; align-items: center; text-decoration: none; height: 26px;
+}
+.nav-logo img { height: 100%; width: auto; display: block; }
+.nav-right { position: absolute; right: 1.5rem; display: flex; align-items: center; gap: 0.9rem; }
+.nav-language {
+  min-height: 32px;
+  max-width: 92px;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid rgba(43,45,56,0.18);
+  border-radius: 8px;
+  background: rgba(255,253,249,0.75);
+  color: var(--ink2);
+  font-family: var(--jp);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.nav-language:focus-visible { outline: 2px solid #9272ff; outline-offset: 3px; }
+@media (max-width: 480px) {
+  .nav-logo { left: 0.75rem; height: 26px; }
+  .nav-right { right: 0.75rem; gap: 0.5rem; }
+  .nav-language { max-width: 80px; font-size: 0.66rem; }
+  .nav-right .nav-back { font-size: 0.65rem; letter-spacing: 0; }
+}
+nav ul { list-style: none; display: flex; gap: 1.8rem; }
+nav ul a { color: var(--ink2); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; font-family: var(--jp); }
+nav ul a:hover { color: var(--ink); }
+
+.nav-back {
+  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--ink3);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+  transition: color 0.15s;
+}
+.nav-back:hover { color: var(--ink); }
+
+@keyframes blobdrift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(20px,14px) scale(1.05); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.type-art-canvas {
+  display: none;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.type-art-canvas.is-ready { opacity: 1; }
+
+/* ══ ページ全体ラッパー ══ */
+.page-outer {
+  min-height: 100vh;
+  padding-top: var(--nav-h);
+}
+
+/* ══ タイプカード（ファーストビュー・明るい背景） ══ */
+.type-hero {
+  --hero-shade: 0.50;
+  /* Keep the current spacing at 390 × 844 and 1280 × 900. */
+  --hero-spacing-reference: clamp(844px, 819.46px + 6.2921vw, 900px);
+  --hero-spacing-scale: var(--legacy-hero-spacing-scale, 1);
+  --hero-ink3: rgba(255,255,255,.72);
+  position: relative; overflow: hidden;
+  padding: calc(clamp(2.25rem, 9vw, 4.25rem) * var(--hero-spacing-scale))
+           clamp(1rem, 4.6vw, 1.5rem)
+           calc(clamp(1.25rem, calc(var(--hero-spacing-reference) * .035), 2.25rem) * var(--hero-spacing-scale));
+  display: flex; flex-direction: column;
+  row-gap: calc(clamp(1.35rem, 6vw, 2.75rem) * var(--hero-spacing-scale));
+  background-color: #0a1628;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+@supports (opacity: calc(100svh / 1px)) {
+  .type-hero {
+    --hero-spacing-scale: clamp(.65, calc(100svh / var(--hero-spacing-reference)), 1.4);
+  }
+}
+/* Darken only the background, keeping the palette and text at full brightness. */
+.type-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(10,16,30,var(--hero-shade));
+}
+.type-hero[data-type="dream"] { --hero-shade: 0.62; }
+.type-hero[data-type="pastel"] { --hero-shade: 0.66; }
+.type-hero[data-type="cool"],
+.type-hero[data-type="warm"] { --hero-shade: 0.52; }
+.type-hero[data-type="nature"],
+.type-hero[data-type="earth"] { --hero-shade: 0.56; }
+.type-hero[data-type="mono"] { --hero-shade: 0.60; }
+.type-hero[data-type="neon"] { --hero-shade: 0.58; }
+.type-hero-inner {
+  position: relative; z-index: 1;
+  max-width: 640px; margin: 0 auto; width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  gap: calc(clamp(1.2rem, 6vw, 2rem) * var(--hero-spacing-scale));
+  text-align: center; color: #fffdf9;
+}
+.type-hero-heading { display: grid; justify-items: center; gap: calc(.85rem * var(--hero-spacing-scale)); }
+.type-eyebrow {
+  display: flex; align-items: center; gap: .7rem;
+  font: 600 .68rem var(--outfit); letter-spacing: .2em; text-transform: uppercase;
+}
+.type-eyebrow::before, .type-eyebrow::after {
+  content: ''; width: clamp(20px, 9vw, 44px); height: 1px; background: #ffffff45;
+}
+.type-title {
+  font-family: var(--jp); font-weight: 450; line-height: 1.4;
+  font-size: clamp(1.55rem, 8.8vw, 3rem); letter-spacing: .015em;
+  color: #fffdf9; text-wrap: balance;
+}
+.type-hero[data-type="warm"] .type-title { color: #ffe9c9; }
+.type-palette-strip {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  max-width: 560px; column-gap: clamp(.45rem, 3vw, 1.05rem); row-gap: calc(clamp(.45rem, 3vw, 1.05rem) * var(--hero-spacing-scale));
+}
+.type-hero .type-palette-dot {
+  width: clamp(34px, 13vw, 60px); height: clamp(34px, 13vw, 60px);
+  font-size: clamp(1rem, 5.7vw, 1.65rem);
+  box-shadow: 0 0 17px #e9dcff54, inset 0 1px 0 #ffffff60;
+}
+.subject-mode .type-hero .type-palette-dot { font-size: clamp(.88rem, 4.2vw, 1.3rem); }
+.type-stat-card {
+  width: min(100%, 520px);
+  background: linear-gradient(180deg, #ffffff1c, #ffffff12);
+  border: 1px solid #ffffff32; border-radius: 20px;
+  box-shadow: inset 0 1px 0 #ffffff18;
+}
+.type-stat-row {
+  display: grid; grid-template-columns: minmax(0,1fr) 1px minmax(0,1fr);
+  align-items: center; padding: calc(1.15rem * var(--hero-spacing-scale)) .5rem;
+}
+.type-stat-item { display: flex; flex-direction: column; align-items: center; gap: calc(.32rem * var(--hero-spacing-scale)); }
+.type-stat-sep { height: 100%; background: linear-gradient(transparent, #ffffff37 50%, transparent); }
+.type-stat-card-label {
+  font-family: var(--outfit); font-size: .74rem; font-weight: 600;
+  color: #fffdf9e0; line-height: 1.3;
+}
+.type-stat-card-value {
+  font: 700 clamp(1.85rem, 7.7vw, 2.85rem)/1 var(--outfit);
+  color: #fffdf9;
+}
+.type-stat-prefix { font-family: var(--jp); font-size: .55em; margin-inline-end: .12em; }
+.type-stat-percent { font-size: .78em; }
+.type-hero-insight { width: min(100%, 540px); }
+.type-hero-insight h2 {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  font-size: clamp(.85rem, 3.5vw, 1.05rem); font-weight: 500;
+  color: #fff7e8;
+}
+.type-hero-insight h2::before, .type-hero-insight h2::after {
+  content: ''; height: 1px; flex: 1 1 12px; max-width: 42px; background: #ffffff40;
+}
+.type-hero-insight .type-palette-dot { flex: 0 0 auto; width: 36px; height: 36px; font-size: .93rem; }
+.type-hero-insight p { margin: calc(.65rem * var(--hero-spacing-scale)) 0 0; font-size: .85rem; line-height: 1.65; color: #fffdf9e0; word-break: normal; }
+.type-hero-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(.55rem * var(--hero-spacing-scale)) .55rem; margin-top: calc(.35rem * var(--hero-spacing-scale)); }
+.type-hero-chip {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .1rem .25rem;
+  border: 1px solid #ffffff40; border-radius: 99px; padding: .45rem .7rem;
+  background: #ffffff10; color: #fffdf9; font-size: .71rem; font-weight: 500;
+}
+.type-hero-chip strong { color: #ffe3a1; font-weight: 700; }
+.type-name-color { font-family: var(--outfit); letter-spacing: .04em; }
+.subject-mode .sense-circle { font-size: 0.86rem; }
+.subject-mode .vote-letter-badge { font-size: 0.64rem; }
+.subject-mode .empathy-badge { font-size: 1.07rem; }
+.subject-mode .highlight-badge { font-size: 1.15rem; }
+
+/* ══ スクロールインジケーター ══ */
+.scroll-indicator {
+  position: relative;
+  align-self: center;
+  z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: calc(.5rem * var(--hero-spacing-scale));
+  cursor: pointer; text-decoration: none;
+  animation: scrollIndicatorFade 0.8s ease 1.2s both;
+}
+@keyframes scrollIndicatorFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.scroll-indicator-label {
+  font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.scroll-indicator-line {
+  width: 1px; height: 28px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.25));
+}
+.scroll-indicator-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.13);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  box-shadow: 0 8px 28px rgba(60,100,220,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.scroll-indicator:hover .scroll-indicator-icon {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.22);
+  transform: translateY(2px);
+}
+.scroll-indicator-icon svg {
+  display: block;
+  animation: arrowBounce 2.4s cubic-bezier(.45,.05,.55,.95) infinite;
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(4px); }
+}
+
+@keyframes atmoA {
+  0%   { transform: translate(0,0)    scale(1)    rotate(0deg); }
+  40%  { transform: translate(7%,5%)  scale(1.05) rotate(10deg); }
+  70%  { transform: translate(-4%,8%) scale(0.97) rotate(-6deg); }
+  100% { transform: translate(4%,-6%) scale(1.03) rotate(14deg); }
+}
+@keyframes atmoB {
+  0%   { transform: translate(0,0)    scale(1); }
+  55%  { transform: translate(-9%,6%) scale(1.07); }
+  100% { transform: translate(5%,-4%) scale(0.96); }
+}
+@keyframes rParticleDrift1 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate( 28px,-45px); }
+}
+@keyframes rParticleDrift2 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate(-32px,-50px); }
+}
+@keyframes rParticleDrift3 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate( 22px,-38px); }
+}
+@keyframes rParticleDrift4 {
+  0%   { transform: translate(  0px,  0px); }
+  100% { transform: translate(-20px,-32px); }
+}
+@keyframes rParticlePulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.20; }
+}
+/* ── result hero 大気層（暗背景：overlay で光感） ── */
+.rh-atmo {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  mix-blend-mode: overlay;
+}
+.rh-atmo::before {
+  content: '';
+  position: absolute; width: 130%; height: 130%; top: -15%; left: -15%;
+  background: radial-gradient(ellipse 65% 55% at 38% 48%,
+    rgba(255,140,100,0.22) 0%, rgba(200,100,220,0.12) 42%, transparent 70%);
+  filter: blur(55px);
+  animation: atmoA 40s ease-in-out infinite alternate;
+}
+.rh-atmo::after {
+  content: '';
+  position: absolute; width: 130%; height: 130%; top: -15%; right: -20%;
+  background: radial-gradient(ellipse 58% 62% at 62% 52%,
+    rgba(80,160,255,0.18) 0%, rgba(140,80,220,0.12) 48%, transparent 72%);
+  filter: blur(65px);
+  animation: atmoB 55s ease-in-out infinite alternate-reverse;
+}
+
+/* ── result hero 粒子 ── */
+.rh-p-a, .rh-p-b, .rh-p-c, .rh-p-d {
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: transparent; pointer-events: none; z-index: 1;
+}
+.rh-p-a {
+  box-shadow:
+     9vw 16vh 5px 1px rgba(255,255,255,0.85), 24vw 70vh 4px 1px rgba(255,255,255,0.80),
+    40vw 30vh 5px 1px rgba(255,255,255,0.83), 57vw 82vh 4px 1px rgba(255,255,255,0.78),
+    74vw 44vh 5px 1px rgba(255,255,255,0.84), 89vw 20vh 4px 1px rgba(255,255,255,0.80),
+    17vw 57vh 5px 1px rgba(255,255,255,0.86), 50vw 64vh 4px 1px rgba(255,255,255,0.78),
+    65vw 10vh 5px 1px rgba(255,255,255,0.82), 93vw 56vh 4px 1px rgba(255,255,255,0.80);
+  animation: rParticleDrift1 12s ease-in-out infinite alternate,
+             rParticlePulse   4s ease-in-out infinite -1.2s;
+}
+.rh-p-b {
+  box-shadow:
+    15vw 40vh 5px 1px rgba(255,255,255,0.82), 33vw  6vh 4px 1px rgba(255,255,255,0.78),
+    51vw 74vh 5px 1px rgba(255,255,255,0.86), 69vw 34vh 4px 1px rgba(255,255,255,0.80),
+    86vw 66vh 5px 1px rgba(255,255,255,0.83),  6vw 84vh 4px 1px rgba(255,255,255,0.78),
+    43vw 47vh 5px 1px rgba(255,255,255,0.84), 79vw 88vh 4px 1px rgba(255,255,255,0.80),
+    27vw 24vh 5px 1px rgba(255,255,255,0.86), 96vw 14vh 4px 1px rgba(255,255,255,0.78);
+  animation: rParticleDrift2 17s ease-in-out infinite alternate-reverse,
+             rParticlePulse   5s ease-in-out infinite -2.8s;
+}
+.rh-p-c {
+  box-shadow:
+    19vw 50vh 9px 2px rgba(255,215,190,0.68), 46vw 22vh 8px 2px rgba(255,205,178,0.64),
+    73vw 70vh 9px 2px rgba(255,218,192,0.70), 31vw 88vh 8px 2px rgba(255,210,182,0.62),
+    61vw 37vh 9px 2px rgba(255,215,188,0.66), 11vw 64vh 8px 2px rgba(255,205,178,0.64),
+    87vw 42vh 9px 2px rgba(255,218,192,0.68), 53vw 76vh 8px 2px rgba(255,210,182,0.62);
+  animation: rParticleDrift3 14s ease-in-out infinite alternate,
+             rParticlePulse   5s ease-in-out infinite -0.6s;
+}
+.rh-p-d {
+  box-shadow:
+    26vw 62vh 18px 5px rgba(255,222,205,0.50), 63vw 16vh 16px 4px rgba(218,205,255,0.46),
+    81vw 76vh 20px 6px rgba(255,222,205,0.52), 11vw 32vh 15px 4px rgba(205,218,255,0.44),
+    49vw 52vh 18px 5px rgba(255,218,198,0.50), 91vw 26vh 16px 4px rgba(218,205,255,0.48);
+  animation: rParticleDrift4 20s ease-in-out infinite alternate-reverse,
+             rParticlePulse   6s ease-in-out infinite -3.5s;
+}
+
+
+
+  nav { pointer-events: none; }
+  .scroll-indicator, .scroll-indicator-icon svg, .rh-atmo::before, .rh-atmo::after,
+  .rh-p-a, .rh-p-b, .rh-p-c, .rh-p-d { animation: none; }
+  .preview-after { padding: 32px 24px; background: #f2edf8; text-align: center; color: #303951; scroll-margin-top: var(--nav-h); }
+  .show-spacing-guides .type-hero-inner > *, .show-spacing-guides .scroll-indicator { outline: 1px dashed #fffdf9bd; outline-offset: 2px; }
+  .show-spacing-guides .type-hero-inner { background: #eab1ff18; }
+  @media (max-width: 960px) { nav ul { display: none; } }
+
+</style></template>
+<template id="preview-five">
+<div class="page-outer"><nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/logo.png" alt="SynestheShare">
+  </a>
+  <ul class="section-nav">
+    <li><a href="#typeHeroArea" aria-current="location">TOP</a></li>
+    <li><a href="#contentOuter">詳細</a></li>
+    <li><a href="#shareOuter">シェア</a></li>
+  </ul>
+  <div class="nav-right">
+
+  </div>
+</nav><div class="type-hero" data-type="warm" style="background-image:url('./assets/backgrounds/sunset.webp')">
+    
+    <div class="rh-atmo" aria-hidden="true"></div>
+    <div class="rh-p-a" aria-hidden="true"></div>
+    <div class="rh-p-b" aria-hidden="true"></div>
+    <div class="rh-p-c" aria-hidden="true"></div>
+    <div class="rh-p-d" aria-hidden="true"></div>
+    <div class="type-hero-inner">
+      <header class="type-hero-heading">
+        <div class="type-eyebrow">RESULT</div>
+        <h1 class="type-title">あなたの文字色感覚</h1>
+      </header>
+      <div class="type-palette-strip"><span class="type-palette-dot" style="background:#f5dc72;color:#fffdf9"><span>A</span></span><span class="type-palette-dot" style="background:#ff7f7f;color:#fffdf9"><span>B</span></span><span class="type-palette-dot" style="background:#9272ff;color:#fffdf9"><span>C</span></span><span class="type-palette-dot" style="background:#ffae66;color:#fffdf9"><span>D</span></span><span class="type-palette-dot" style="background:#67bf92;color:#fffdf9"><span>E</span></span></div>
+      <div class="type-stat-card">
+        <div class="type-stat-row">
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">多数派一致率</span>
+            <span class="type-stat-card-value">20<span class="type-stat-percent">%</span></span>
+          </div>
+          <span class="type-stat-sep" aria-hidden="true"></span>
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">共感度</span>
+            <span class="type-stat-card-value"><span class="type-stat-prefix">上位</span>39<span class="type-stat-percent">%</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="type-hero-insight">
+        <h2><span>最も個性的だったのは</span><span class="type-palette-dot" style="background:#ff7f7f;color:#fffdf9"><span>B</span></span></h2><p>62%が青を選ぶBに、<wbr>あなたは赤を見ていました。</p>
+      </div>
+      <div class="type-hero-chips">
+        <div class="type-hero-chip"><span>共感覚タイプ：</span><strong class="type-name-diag">バランス感受者</strong></div>
+        <div class="type-hero-chip"><span>色の傾向：</span><strong class="type-name-color">SUNSET TYPE</strong></div>
+      </div>
+    </div>
+    <a class="scroll-indicator" href="#contentOuter">
+      <span class="scroll-indicator-label">Scroll</span>
+      <span class="scroll-indicator-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
+          <polyline points="2,4 7,10 12,4"/>
+        </svg>
+      </span>
+    </a>
+  </div><div id="contentOuter" class="preview-after">感覚の違いを、発見する。</div></div>
+</template>
+<template id="preview-one">
+<div class="page-outer"><nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/logo.png" alt="SynestheShare">
+  </a>
+  <ul class="section-nav">
+    <li><a href="#typeHeroArea" aria-current="location">TOP</a></li>
+    <li><a href="#contentOuter">詳細</a></li>
+    <li><a href="#shareOuter">シェア</a></li>
+  </ul>
+  <div class="nav-right">
+
+  </div>
+</nav><div class="type-hero" data-type="warm" style="background-image:url('./assets/backgrounds/sunset.webp')">
+    
+    <div class="rh-atmo" aria-hidden="true"></div>
+    <div class="rh-p-a" aria-hidden="true"></div>
+    <div class="rh-p-b" aria-hidden="true"></div>
+    <div class="rh-p-c" aria-hidden="true"></div>
+    <div class="rh-p-d" aria-hidden="true"></div>
+    <div class="type-hero-inner">
+      <header class="type-hero-heading">
+        <div class="type-eyebrow">RESULT</div>
+        <h1 class="type-title">あなたの文字色感覚</h1>
+      </header>
+      <div class="type-palette-strip"><span class="type-palette-dot" style="background:#ff7f7f;color:#fffdf9"><span>A</span></span></div>
+      <div class="type-stat-card">
+        <div class="type-stat-row">
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">多数派一致率</span>
+            <span class="type-stat-card-value">100<span class="type-stat-percent">%</span></span>
+          </div>
+          <span class="type-stat-sep" aria-hidden="true"></span>
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">共感度</span>
+            <span class="type-stat-card-value"><span class="type-stat-prefix">上位</span>1<span class="type-stat-percent">%</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="type-hero-insight">
+        <h2><span>選んだ色がすべて多数派と一致</span></h2>
+      </div>
+      <div class="type-hero-chips">
+        <div class="type-hero-chip"><span>共感覚タイプ：</span><strong class="type-name-diag">共感覚の王道</strong></div>
+        <div class="type-hero-chip"><span>色の傾向：</span><strong class="type-name-color">SUNSET TYPE</strong></div>
+      </div>
+    </div>
+    <a class="scroll-indicator" href="#contentOuter">
+      <span class="scroll-indicator-label">Scroll</span>
+      <span class="scroll-indicator-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
+          <polyline points="2,4 7,10 12,4"/>
+        </svg>
+      </span>
+    </a>
+  </div><div id="contentOuter" class="preview-after">感覚の違いを、発見する。</div></div>
+</template>
+<template id="preview-all">
+<div class="page-outer"><nav>
+  <a class="nav-logo" href="index.html">
+    <img src="images/logo.png" alt="SynestheShare">
+  </a>
+  <ul class="section-nav">
+    <li><a href="#typeHeroArea" aria-current="location">TOP</a></li>
+    <li><a href="#contentOuter">詳細</a></li>
+    <li><a href="#shareOuter">シェア</a></li>
+  </ul>
+  <div class="nav-right">
+
+  </div>
+</nav><div class="type-hero" data-type="neon" style="background-image:url('./assets/backgrounds/neon.webp')">
+    
+    <div class="rh-atmo" aria-hidden="true"></div>
+    <div class="rh-p-a" aria-hidden="true"></div>
+    <div class="rh-p-b" aria-hidden="true"></div>
+    <div class="rh-p-c" aria-hidden="true"></div>
+    <div class="rh-p-d" aria-hidden="true"></div>
+    <div class="type-hero-inner">
+      <header class="type-hero-heading">
+        <div class="type-eyebrow">RESULT</div>
+        <h1 class="type-title">あなたの文字色感覚</h1>
+      </header>
+      <div class="type-palette-strip"><span class="type-palette-dot" style="background:#ff7f7f;color:#fffdf9"><span>A</span></span><span class="type-palette-dot" style="background:#ffae66;color:#fffdf9"><span>B</span></span><span class="type-palette-dot" style="background:#f5dc72;color:#fffdf9"><span>C</span></span><span class="type-palette-dot" style="background:#a8d85c;color:#fffdf9"><span>D</span></span><span class="type-palette-dot" style="background:#67bf92;color:#fffdf9"><span>E</span></span><span class="type-palette-dot" style="background:#4da8e8;color:#fffdf9"><span>F</span></span><span class="type-palette-dot" style="background:#8edfff;color:#fffdf9"><span>G</span></span><span class="type-palette-dot" style="background:#9272ff;color:#fffdf9"><span>H</span></span><span class="type-palette-dot" style="background:#ee9fd0;color:#fffdf9"><span>I</span></span><span class="type-palette-dot" style="background:#9f6f4f;color:#fffdf9"><span>J</span></span><span class="type-palette-dot" style="background:#2b2d38;color:#fffdf9"><span>K</span></span><span class="type-palette-dot" style="background:#9698a8;color:#fffdf9"><span>L</span></span><span class="type-palette-dot" data-bright="1" style="background:#fffdf9;color:#9698a8"><span>M</span></span><span class="type-palette-dot" style="background:#ff7f7f;color:#fffdf9"><span>N</span></span><span class="type-palette-dot" style="background:#ffae66;color:#fffdf9"><span>O</span></span><span class="type-palette-dot" style="background:#f5dc72;color:#fffdf9"><span>P</span></span><span class="type-palette-dot" style="background:#a8d85c;color:#fffdf9"><span>Q</span></span><span class="type-palette-dot" style="background:#67bf92;color:#fffdf9"><span>R</span></span><span class="type-palette-dot" style="background:#4da8e8;color:#fffdf9"><span>S</span></span><span class="type-palette-dot" style="background:#8edfff;color:#fffdf9"><span>T</span></span><span class="type-palette-dot" style="background:#9272ff;color:#fffdf9"><span>U</span></span><span class="type-palette-dot" style="background:#ee9fd0;color:#fffdf9"><span>V</span></span><span class="type-palette-dot" style="background:#9f6f4f;color:#fffdf9"><span>W</span></span><span class="type-palette-dot" style="background:#2b2d38;color:#fffdf9"><span>X</span></span><span class="type-palette-dot" style="background:#9698a8;color:#fffdf9"><span>Y</span></span><span class="type-palette-dot" data-bright="1" style="background:#fffdf9;color:#9698a8"><span>Z</span></span></div>
+      <div class="type-stat-card">
+        <div class="type-stat-row">
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">多数派一致率</span>
+            <span class="type-stat-card-value">31<span class="type-stat-percent">%</span></span>
+          </div>
+          <span class="type-stat-sep" aria-hidden="true"></span>
+          <div class="type-stat-item">
+            <span class="type-stat-card-label">共感度</span>
+            <span class="type-stat-card-value"><span class="type-stat-prefix">上位</span>42<span class="type-stat-percent">%</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="type-hero-insight">
+        <h2><span>最も個性的だったのは</span><span class="type-palette-dot" style="background:#ffae66;color:#fffdf9"><span>B</span></span></h2><p>62%が青を選ぶBに、<wbr>あなたは橙を見ていました。</p>
+      </div>
+      <div class="type-hero-chips">
+        <div class="type-hero-chip"><span>共感覚タイプ：</span><strong class="type-name-diag">個性派の色覚者</strong></div>
+        <div class="type-hero-chip"><span>色の傾向：</span><strong class="type-name-color">NEON TYPE</strong></div>
+      </div>
+    </div>
+    <a class="scroll-indicator" href="#contentOuter">
+      <span class="scroll-indicator-label">Scroll</span>
+      <span class="scroll-indicator-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
+          <polyline points="2,4 7,10 12,4"/>
+        </svg>
+      </span>
+    </a>
+  </div><div id="contentOuter" class="preview-after">感覚の違いを、発見する。</div></div>
+</template>
+<script>
+  const mobileWidth = 390;
+  const desktopWidth = 1280;
+  const fields = [
+    { id: 'top', label: 'TOPの上端', selector: '.type-hero', property: 'padding-top', initial: [36, 68] },
+    { id: 'side', label: 'TOPの左右', selector: '.type-hero', property: 'padding-inline', initial: [17.9, 24] },
+    { id: 'sections', label: '各ブロックの間', selector: '.type-hero-inner', property: 'gap', initial: [23.4, 32] },
+    { id: 'title', label: 'RESULTと見出しの間', selector: '.type-hero-heading', property: 'gap', initial: [13.6, 13.6] },
+    { id: 'palette', label: '色の丸どうしの間', selector: '.type-palette-strip', property: 'gap', initial: [11.7, 16.8] },
+    { id: 'stats', label: '集計カード内の上下', selector: '.type-stat-row', property: 'padding-block', initial: [18.4, 18.4] },
+    { id: 'chips', label: 'タイプ表示の上に足す余白', selector: '.type-hero-chips', property: 'margin-top', initial: [5.6, 5.6] },
+    { id: 'scroll', label: 'SCROLLの上', selector: '.type-hero', property: 'row-gap', initial: [23.4, 44] },
+    { id: 'bottom', label: 'SCROLLの下', selector: '.type-hero', property: 'padding-bottom', initial: [29.5, 31.5] },
+  ];
+  const storageKey = 'synestheshare-result-spacing-v1';
+  let values = {};
+  try { values = JSON.parse(localStorage.getItem(storageKey)) || {}; } catch {}
+  const controls = document.querySelector('#spacing-controls');
+  const preview = document.querySelector('#preview');
+  const stage = document.querySelector('#preview-stage');
+  const shell = document.querySelector('#preview-shell');
+  const output = document.querySelector('#css-output');
+  const status = document.querySelector('#status');
+  const copyButton = document.querySelector('#copy-css');
+  const sample = document.querySelector('#sample');
+  const previewHeight = document.querySelector('#preview-height');
+  const guides = document.querySelector('#guides');
+  let viewport = [390, 844];
+
+  function cssValue([mobile, desktop]) {
+    if (mobile === desktop) return mobile + 'px';
+    const slope = (desktop - mobile) * 100 / (desktopWidth - mobileWidth);
+    const intercept = mobile - slope * mobileWidth / 100;
+    const round = value => Number(value.toFixed(4));
+    return `clamp(${Math.min(mobile, desktop)}px, ${round(intercept)}px ${slope < 0 ? '-' : '+'} ${round(Math.abs(slope))}vw, ${Math.max(mobile, desktop)}px)`;
+  }
+
+  function refresh() {
+    const rules = new Map();
+    for (const field of fields) {
+      const pair = field.inputs.map((input, index) => {
+        const value = input.valueAsNumber;
+        return Number.isFinite(value) ? Math.min(160, Math.max(0, value)) : field.initial[index];
+      });
+      field.inputs.forEach((input, index) => {
+        const edited = input.valueAsNumber !== field.initial[index];
+        input.toggleAttribute('data-edited', edited);
+        input.nextElementSibling.disabled = !edited;
+      });
+      if (pair.every((value, index) => value === field.initial[index])) {
+        delete values[field.id];
+        continue;
+      }
+      values[field.id] = pair;
+      if (!rules.has(field.selector)) rules.set(field.selector, []);
+      const widthValue = cssValue(pair);
+      const scaledValue = `calc(${widthValue} * var(--hero-spacing-scale, 1))`;
+      const propertyValue = field.id === 'side' ? widthValue : field.id === 'palette' ? `${scaledValue} ${widthValue}` : scaledValue;
+      rules.get(field.selector).push(`  ${field.property}: ${propertyValue};`);
+    }
+    output.value = [...rules].map(([selector, declarations]) => `${selector} {\n${declarations.join('\n')}\n}`).join('\n\n');
+    copyButton.disabled = !output.value;
+    try { localStorage.setItem(storageKey, JSON.stringify(values)); } catch {}
+    const doc = preview.contentDocument;
+    const custom = doc?.getElementById('spacing-overrides');
+    if (custom) custom.textContent = output.value;
+    doc?.documentElement.classList.toggle('show-spacing-guides', guides.checked);
+  }
+
+  for (const field of fields) {
+    const label = document.createElement('span');
+    label.className = 'control-name';
+    label.textContent = field.label;
+    controls.append(label);
+    field.inputs = field.initial.map((value, index) => {
+      const group = document.createElement('div');
+      group.className = 'control-value';
+      const device = index === 0 ? 'スマホ' : 'PC';
+      const inputLabel = field.label + ' ' + device;
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = '0';
+      input.max = '160';
+      input.step = 'any';
+      input.inputMode = 'decimal';
+      input.value = values[field.id]?.[index] ?? value;
+      input.setAttribute('aria-label', inputLabel);
+      input.addEventListener('input', () => { status.textContent = ''; refresh(); });
+      const resetButton = document.createElement('button');
+      resetButton.type = 'button';
+      resetButton.className = 'reset-value';
+      resetButton.textContent = '↺';
+      resetButton.title = inputLabel + 'をリセット';
+      resetButton.setAttribute('aria-label', resetButton.title);
+      resetButton.addEventListener('click', () => {
+        input.value = field.initial[index];
+        refresh();
+        input.focus();
+        status.textContent = inputLabel + 'を初期値に戻しました。';
+      });
+      group.append(input, resetButton);
+      controls.append(group);
+      return input;
+    });
+  }
+
+  function resizePreview() {
+    const [width, height] = viewport;
+    const scale = Math.min(1, stage.clientWidth / width);
+    shell.style.width = width * scale + 'px';
+    shell.style.height = height * scale + 'px';
+    preview.style.width = width + 'px';
+    preview.style.height = height + 'px';
+    preview.style.transform = `scale(${scale})`;
+    document.querySelector('#preview-size').textContent = `${width} × ${height}` + (scale < 1 ? `（${Math.round(scale * 100)}%表示）` : '');
+  }
+
+  function loadSample() {
+    const header = document.querySelector('#preview-head').innerHTML;
+    const hero = document.querySelector('#preview-' + sample.value).innerHTML;
+    preview.srcdoc = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><base href="../">${header}<style id="spacing-overrides"></style><script src="assets/result-hero-spacing.js" defer><\/script></head><body>${hero}</body></html>`;
+  }
+
+  document.querySelectorAll('[data-device]').forEach(button => button.addEventListener('click', () => {
+    document.querySelector('[data-device][aria-pressed="true"]').setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-pressed', 'true');
+    viewport = button.dataset.device.split(',').map(Number);
+    previewHeight.value = viewport[1];
+    resizePreview();
+  }));
+  previewHeight.addEventListener('input', () => {
+    if (!previewHeight.validity.valid || !Number.isFinite(previewHeight.valueAsNumber)) return;
+    viewport[1] = previewHeight.valueAsNumber;
+    resizePreview();
+  });
+  document.querySelector('#reset').addEventListener('click', () => {
+    fields.forEach(field => field.inputs.forEach((input, index) => { input.value = field.initial[index]; }));
+    refresh();
+    status.textContent = '元の余白に戻しました。';
+  });
+  copyButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(output.value);
+      status.textContent = 'CSSをコピーしました。';
+    } catch {
+      output.focus();
+      output.select();
+      status.textContent = 'CSSを選択しました。Ctrl+Cでコピーできます。';
+    }
+  });
+  preview.addEventListener('load', refresh);
+  sample.addEventListener('change', loadSample);
+  guides.addEventListener('change', refresh);
+  new ResizeObserver(resizePreview).observe(stage);
+  resizePreview();
+  refresh();
+  loadSample();
+</script>
+</html>

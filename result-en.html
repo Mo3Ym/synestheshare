@@ -157,13 +157,25 @@ nav ul a:hover { color: var(--ink); }
 /* ══ タイプカード（ファーストビュー・明るい背景） ══ */
 .type-hero {
   --hero-shade: 0.50;
+  /* Keep the current spacing at 390 × 844 and 1280 × 900. */
+  --hero-spacing-reference: clamp(844px, 819.46px + 6.2921vw, 900px);
+  --hero-spacing-scale: var(--legacy-hero-spacing-scale, 1);
+  --hero-ink3: rgba(255,255,255,.72);
   position: relative; overflow: hidden;
-  padding: 55px 1.5rem 2.5rem;
-  display: flex; flex-direction: column; justify-content: center;
+  padding: calc(clamp(2.25rem, 9vw, 4.25rem) * var(--hero-spacing-scale))
+           clamp(1rem, 4.6vw, 1.5rem)
+           calc(clamp(1.25rem, calc(var(--hero-spacing-reference) * .035), 2.25rem) * var(--hero-spacing-scale));
+  display: flex; flex-direction: column;
+  row-gap: calc(clamp(1.35rem, 6vw, 2.75rem) * var(--hero-spacing-scale));
   background-color: #0a1628;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+@supports (opacity: calc(100svh / 1px)) {
+  .type-hero {
+    --hero-spacing-scale: clamp(.65, calc(100svh / var(--hero-spacing-reference)), 1.4);
+  }
 }
 /* Darken only the background, keeping the palette and text at full brightness. */
 .type-hero::before {
@@ -182,286 +194,95 @@ nav ul a:hover { color: var(--ink); }
 .type-hero[data-type="earth"] { --hero-shade: 0.56; }
 .type-hero[data-type="mono"] { --hero-shade: 0.60; }
 .type-hero[data-type="neon"] { --hero-shade: 0.58; }
-/* デスクトップ寄りの幅では hero 領域を 1.5 倍ほどの高さに伸ばす */
-@media (min-width: 600px) {
-  .type-hero { min-height: 780px; }
-}
-.type-hero-blob {
-  position: absolute; border-radius: 50%; filter: blur(70px);
-  pointer-events: none; z-index: 0;
-}
-.type-hero-blob-1 {
-  width: max(500px,90vw); height: max(500px,90vw);
-  top: -25%; right: -20%;
-  animation: blobdrift 9s ease-in-out infinite alternate;
-}
-.type-hero-blob-2 {
-  width: max(400px,75vw); height: max(400px,75vw);
-  bottom: -20%; left: -15%;
-  animation: blobdrift 13s ease-in-out infinite alternate-reverse;
-}
 .type-hero-inner {
   position: relative; z-index: 1;
   max-width: 640px; margin: 0 auto; width: 100%;
-  display: flex; flex-direction: column; gap: 1.1rem;
+  display: flex; flex-direction: column; align-items: center;
+  gap: calc(clamp(1.2rem, 6vw, 2rem) * var(--hero-spacing-scale));
+  text-align: center; color: #fffdf9;
 }
-
-/* ══ hero テーマ切替 ══ */
-.type-hero[data-theme="dark"] { --hero-ink: #f0f0ec; --hero-ink2: rgba(240,240,236,0.65); --hero-ink3: rgba(240,240,236,0.38); --hero-border: rgba(255,255,255,0.14); --hero-stat-bg: rgba(255,255,255,0.08); --hero-stat-border: rgba(255,255,255,0.14); }
-.type-hero[data-theme="light"] { --hero-ink: #2b2d38; --hero-ink2: rgba(24,24,24,0.6); --hero-ink3: rgba(24,24,24,0.35); --hero-border: rgba(0,0,0,0.12); --hero-stat-bg: rgba(0,0,0,0.04); --hero-stat-border: rgba(0,0,0,0.1); }
-
-/* ══ hero 全文字白色強制（背景画像対応） ══ */
-.type-hero .type-eyebrow,
-.type-hero .type-label,
-.type-hero .type-stat-value,
-.type-hero .type-palette-label { color: #fffdf9 !important; }
-.type-hero .type-stat-label,
-.type-hero .type-stat-sub,
-.type-hero .type-stat-card-label { color: rgba(255,255,255,0.8) !important; }
-
-.type-eyebrow { color: var(--hero-ink3); }
-.type-eyebrow::before { background: var(--hero-ink3); }
-.type-label { color: var(--hero-ink3); }
-.type-stat { background: var(--hero-stat-bg); border-color: var(--hero-stat-border); }
-.type-stat-label { color: var(--hero-ink3); }
-.scroll-indicator-label { color: var(--hero-ink3); }
-
-/* eyebrow */
+.type-hero-heading { display: grid; justify-items: center; gap: calc(.85rem * var(--hero-spacing-scale)); }
 .type-eyebrow {
-  font-family: var(--outfit); font-size: 0.55rem; font-weight: 600;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 0.5rem;
+  display: flex; align-items: center; gap: .7rem;
+  font: 600 .68rem var(--outfit); letter-spacing: .2em; text-transform: uppercase;
 }
-.type-eyebrow::before { content: ''; display: block; width: 18px; height: 1px; }
-
-/* あなたの共感覚タイプ ラベル */
-.type-label {
-  font-family: var(--jp); font-weight: 500;
-  font-size: 0.69rem; line-height: 1;
-  letter-spacing: 0.02em;
-  margin-top: -3px;
+.type-eyebrow::before, .type-eyebrow::after {
+  content: ''; width: clamp(20px, 9vw, 44px); height: 1px; background: #ffffff45;
 }
-
-/* 個性派センサー / 大地タイプ — 主役 */
-.type-name {
-  display: flex; flex-direction: column; gap: 0.1em;
+.type-title {
+  font-family: var(--jp); font-weight: 450; line-height: 1.4;
+  font-size: clamp(1.55rem, 8.8vw, 3rem); letter-spacing: .015em;
+  color: #fffdf9; text-wrap: balance;
 }
-.type-name-diag {
-  font-family: var(--jp); font-weight: 340;
-  font-size: 1.3rem;
-  line-height: 1.15; letter-spacing: -0.02em;
-  margin-top: 17px;
-
-  /* 淡い金色グラデーション */
-  background: linear-gradient(135deg,
-    #ffb347 0%, #ffd36b 40%, #fff0b0 70%, #ffd36b 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
-  filter: drop-shadow(0 0 10px rgba(255, 190, 80, 0.22));
+.type-hero[data-type="warm"] .type-title { color: #ffe9c9; }
+.type-palette-strip {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  max-width: 560px; column-gap: clamp(.45rem, 3vw, 1.05rem); row-gap: calc(clamp(.45rem, 3vw, 1.05rem) * var(--hero-spacing-scale));
 }
-.type-name-color {
-  font-family: var(--outfit); font-weight: 700;
-  font-size: clamp(2.2rem, 11.5vw, 4.8rem);
-  line-height: 1.05; letter-spacing: 0.08em;
-  white-space: nowrap;
-  margin-top: 7px;
-  display: flex; align-items: center; gap: 0.35em;
-  /* background-image を先に置き、clip を後に書く（shorthandのリセット回避） */
-  background-image: linear-gradient(135deg, #e8eeff 0%, #fffdf9 50%, #e8eeff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent !important;
+.type-hero .type-palette-dot {
+  width: clamp(34px, 13vw, 60px); height: clamp(34px, 13vw, 60px);
+  font-size: clamp(1rem, 5.7vw, 1.65rem);
+  box-shadow: 0 0 17px #e9dcff54, inset 0 1px 0 #ffffff60;
 }
-/* ── タイプ別グラデーション（background-imageで上書きしclipを維持） ── */
-.type-hero[data-type="cool"] .type-name-color {
-  background-image: linear-gradient(135deg, #8ff6ff 0%, #dffcff 30%, #7bcfff 65%, #d8bfff 100%);
-  filter: drop-shadow(0 0 14px rgba(143,246,255,0.22));
-  text-shadow: 0 2px 18px rgba(0,30,80,0.35);
-}
-.type-hero[data-type="warm"] .type-name-color {
-  background-image: linear-gradient(135deg, #ffcc80 0%, #fff8e0 35%, #ffb347 65%, #ffe8b0 100%);
-  filter: drop-shadow(0 0 14px rgba(255,170,60,0.22));
-  text-shadow: 0 2px 18px rgba(80,25,0,0.35);
-}
-.type-hero[data-type="nature"] .type-name-color {
-  background-image: linear-gradient(135deg, #a0ffcc 0%, #eafffb 35%, #70ffb0 65%, #d8fff0 100%);
-  filter: drop-shadow(0 0 14px rgba(80,220,140,0.22));
-  text-shadow: 0 2px 18px rgba(0,50,20,0.35);
-}
-.type-hero[data-type="mono"] .type-name-color {
-  background-image: linear-gradient(135deg, #c8c8c8 0%, #fffdf9 40%, #e0e0e0 70%, #fffdf9 100%);
-  filter: drop-shadow(0 0 16px rgba(210,210,210,0.3));
-  text-shadow: 0 2px 20px rgba(0,0,0,0.45);
-}
-.type-hero[data-type="pastel"] .type-name-color {
-  background-image: linear-gradient(135deg, #ffc8e0 0%, #fff8ff 38%, #f0b0ff 70%, #ffe0f0 100%);
-  filter: drop-shadow(0 0 12px rgba(220,100,180,0.22));
-  text-shadow: 0 2px 18px rgba(80,0,60,0.32);
-}
-.type-hero[data-type="neon"] .type-name-color {
-  background-image: linear-gradient(135deg, #ff9080 0%, #ffe8e4 40%, #ff7060 70%, #ffd0c8 100%);
-  filter: drop-shadow(0 0 14px rgba(255,100,70,0.28));
-  text-shadow: 0 2px 18px rgba(80,0,0,0.38);
-}
-.type-hero[data-type="dream"] .type-name-color {
-  background-image: linear-gradient(135deg, #d0a0ff 0%, #f8e8ff 35%, #c080ff 65%, #ffd8f8 100%);
-  filter: drop-shadow(0 0 14px rgba(160,80,255,0.25));
-  text-shadow: 0 2px 18px rgba(40,0,80,0.35);
-}
-.type-hero[data-type="earth"] .type-name-color {
-  background-image: linear-gradient(135deg, #e8c080 0%, #fff5dc 40%, #d4a050 70%, #ffe8b0 100%);
-  filter: drop-shadow(0 0 12px rgba(200,130,50,0.25));
-  text-shadow: 0 2px 18px rgba(60,25,0,0.38);
-}
-
-/* ── スマホ：タイプ名を中央寄せ ── */
-@media (max-width: 640px) {
-  .type-name-color { justify-content: center; }
-}
-
-/* 一致率・レア度 */
-.type-stats {
-  display: flex; gap: 0.45rem; margin-top: 0.2rem;
-}
-.type-stat {
-  display: flex; flex-direction: column; gap: 0.15rem;
-  padding: 0.8rem 0.9rem;
-  text-align: center; align-items: center;
-  background: rgba(255,255,255,0.13);
-  border: 1px solid rgba(255,255,255,0.22);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 8px 28px rgba(60,100,220,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
-  border-radius: 16px;
-  flex: 1;
-}
-.type-stat-label {
-  font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: #9698a8; line-height: 1;
-}
-.type-stat-value {
-  font-family: var(--outfit); font-weight: 700;
-  font-size: clamp(1.6rem, 5vw, 2.2rem); line-height: 1;
-  color: #2b2d38;
-}
-.type-stat-sub { font-size: 0.62rem; color: var(--ink3); line-height: 1.3; }
-/* タイプ診断欄（日本語は視覚的に圧力が強いため数値より少し小さく） */
-.type-stat-type {
-  font-family: var(--jp); font-weight: 400;
-  font-size: clamp(1.15rem, 3.5vw, 1.55rem); line-height: 1.15;
-  color: var(--ink);
-  margin-top: 0.05rem;
-}
-.type-stat-denom {
-  font-size: 0.55em; font-weight: 400;
-  color: var(--ink3);
-  letter-spacing: 0;
-  vertical-align: baseline;
-  margin-left: 1px;
-}
-
-/* タグライン */
-.type-tagline {
-  font-size: 0.8rem; color: var(--ink2);
-  line-height: 1.9; font-weight: 340;
-}
-
-/* ── 統合統計カード（“空気の層”として背景に溶け込む半透明ガラス） ── */
+.subject-mode .type-hero .type-palette-dot { font-size: clamp(.88rem, 4.2vw, 1.3rem); }
 .type-stat-card {
-  /* 縦方向に薄いグラデーションで奥行きを出し、白の重さを抑える */
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.11) 0%,
-    rgba(255,255,255,0.07) 100%
-  );
-  border: 1px solid rgba(255,255,255,0.16);
-  backdrop-filter: blur(22px) saturate(115%);
-  -webkit-backdrop-filter: blur(22px) saturate(115%);
-  /* ふんわりした外側の発光 + 内側のごく薄いハイライト線 */
-  box-shadow:
-    0 0 24px rgba(180,220,255,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.10);
-  border-radius: 20px; overflow: hidden;
+  width: min(100%, 520px);
+  background: linear-gradient(180deg, #ffffff1c, #ffffff12);
+  border: 1px solid #ffffff32; border-radius: 20px;
+  box-shadow: inset 0 1px 0 #ffffff18;
 }
 .type-stat-row {
-  display: flex; align-items: center;
-  padding: 0.9rem 0.75rem;
+  display: grid; grid-template-columns: minmax(0,1fr) 1px minmax(0,1fr);
+  align-items: center; padding: calc(1.15rem * var(--hero-spacing-scale)) .5rem;
 }
-.type-stat-item {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; gap: 0.3rem;
-}
-.type-stat-sep {
-  width: 1px; align-self: stretch;
-  /* 上下フェードで境界線を“霧の中の仕切り”寄りに */
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.16) 50%,
-    rgba(255,255,255,0) 100%
-  );
-  margin: 0 0.25rem;
-}
+.type-stat-item { display: flex; flex-direction: column; align-items: center; gap: calc(.32rem * var(--hero-spacing-scale)); }
+.type-stat-sep { height: 100%; background: linear-gradient(transparent, #ffffff37 50%, transparent); }
 .type-stat-card-label {
-  font-family: var(--outfit); font-size: 0.55rem; font-weight: 600;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.6); line-height: 1;
+  font-family: var(--outfit); font-size: .74rem; font-weight: 600;
+  color: #fffdf9e0; line-height: 1.3;
 }
 .type-stat-card-value {
-  font-family: var(--outfit); font-weight: 700;
-  font-size: clamp(1.6rem, 5.5vw, 2.4rem); line-height: 1;
-  color: #fffdf9 !important;
+  font: 700 clamp(1.85rem, 7.7vw, 2.85rem)/1 var(--outfit);
+  color: #fffdf9;
 }
-.type-stat-desc {
-  padding: 0 1.1rem 0.65rem;
-  font-family: var(--jp); font-size: 0.82rem; font-weight: 300;
-  color: rgba(255,255,255,0.88); line-height: 1.55;
-  text-align: center;
+.type-stat-prefix { font-family: var(--jp); font-size: .55em; margin-inline-end: .12em; }
+.type-stat-percent { font-size: .78em; }
+.type-hero-insight { width: min(100%, 540px); }
+.type-hero-insight h2 {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  font-size: clamp(.85rem, 3.5vw, 1.05rem); font-weight: 500;
+  color: #fff7e8;
 }
-
-/* パレットドット帯 */
-.type-palette-label {
-  font-family: var(--jp); font-size: 0.9rem; font-weight: 500;
-  color: var(--hero-ink3); margin-bottom: 0.5rem; margin-top: 1rem;
+.type-hero-insight h2::before, .type-hero-insight h2::after {
+  content: ''; height: 1px; flex: 1 1 12px; max-width: 42px; background: #ffffff40;
 }
-.type-palette-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 34px);
-  gap: 12px;
+.type-hero-insight .type-palette-dot { flex: 0 0 auto; width: 36px; height: 36px; font-size: .93rem; }
+.type-hero-insight p { margin: calc(.65rem * var(--hero-spacing-scale)) 0 0; font-size: .85rem; line-height: 1.65; color: #fffdf9e0; word-break: normal; }
+.type-hero-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(.55rem * var(--hero-spacing-scale)) .55rem; margin-top: calc(.35rem * var(--hero-spacing-scale)); }
+.type-hero-chip {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .1rem .25rem;
+  border: 1px solid #ffffff40; border-radius: 99px; padding: .45rem .7rem;
+  background: #ffffff10; color: #fffdf9; font-size: .71rem; font-weight: 500;
 }
-.subject-mode .type-palette-dot { font-size: 0.72rem; }
-.subject-mode .type-stat-subject > span { font-family: 'Noto Sans JP', sans-serif; font-size: 0.82em; }
+.type-hero-chip strong { color: #ffe3a1; font-weight: 700; }
+.type-name-color { font-family: var(--outfit); letter-spacing: .04em; }
 .subject-mode .sense-circle { font-size: 0.86rem; }
 .subject-mode .vote-letter-badge { font-size: 0.64rem; }
 .subject-mode .empathy-badge { font-size: 1.07rem; }
 .subject-mode .highlight-badge { font-size: 1.15rem; }
 
-/* 下スクロール誘導 */
-.type-scroll-hint {
-  display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;
-  font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ink3);
-}
-
 /* ══ スクロールインジケーター ══ */
 .scroll-indicator {
-  position: absolute;
-  bottom: 2.5rem; left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  align-self: center;
   z-index: 2;
-  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: calc(.5rem * var(--hero-spacing-scale));
   cursor: pointer; text-decoration: none;
   animation: scrollIndicatorFade 0.8s ease 1.2s both;
 }
 @keyframes scrollIndicatorFade {
-  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .scroll-indicator-label {
   font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;
@@ -1218,7 +1039,6 @@ footer {
 /* ══ RESPONSIVE ══ */
 @media (max-width: 960px) { nav ul { display: none; } }
 @media (max-width: 600px) {
-  .type-hero { padding: 55px 1.25rem 5rem; min-height: calc(100svh - var(--nav-h)); }
   .content-wrap { padding: 1.5rem 1.25rem 3rem; }
   .card { padding: 1.25rem; }
   footer { padding: 1.25rem; }
@@ -1332,6 +1152,7 @@ footer {
 <script src="assets/result-intro.js" defer></script>
 <link rel="stylesheet" href="assets/section-nav.css">
 <script src="assets/section-nav.js" defer></script>
+<script src="assets/result-hero-spacing.js" defer></script>
 </head>
 <body>
 
@@ -1537,21 +1358,6 @@ function textColorFor(bg) {
   return isBright(bg) ? '#9698a8' : '#fffdf9';
 }
 
-/* 背景Themesに対してアクセントカラーのコントラストを確保する
-   light背景: 輝度 > 0.55 なら暗くする
-   dark背景:  輝度 < 0.12 なら明るくする */
-function ensureContrast(hex, theme) {
-  const lum = getLuminance(hex);
-  const { r, g, b } = hexToRgb(hex);
-  if (theme === 'light' && lum > 0.55) {
-    return `rgb(${Math.round(r*0.55)},${Math.round(g*0.55)},${Math.round(b*0.55)})`;
-  }
-  if (theme === 'dark' && lum < 0.12) {
-    return `rgb(${Math.min(255,Math.round(r*2.2+80))},${Math.min(255,Math.round(g*2.2+80))},${Math.min(255,Math.round(b*2.2+80))})`;
-  }
-  return hex;
-}
-
 /* ══ HEROパレット描画 ══ */
 function buildHeroPalette() {
   const el = document.getElementById('heroPalette');
@@ -1733,89 +1539,59 @@ const TYPE_BG = {
   earth:  'earth',
 };
 
-function buildTypeHero(coloredLetters, diag) {
+function buildTypeHero(coloredLetters, diag = null) {
   const typeId = detectColorType(coloredLetters);
-  const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
-  const theme = 'dark';
-  const bgFile = TYPE_BG[typeId] || typeId;
-  const bgStyle = `background-image:url('./assets/backgrounds/${bgFile}.webp')`;
-  const diagType = getDiagType(diag.majorityRate, diag.rareScore);
+  const type = COLOR_TYPES.find(item => item.id === typeId);
+  const title = isSubjectMode ? 'Your school subject colors' : isNumberMode ? 'Your number colors' : 'Your letter colors';
+  const dot = letter => {
+    const color = colorMap[letter];
+    return `<span class="type-palette-dot"${isBright(color) ? ' data-bright="1"' : ''} style="background:${color};color:${textColorFor(color)}"><span>${itemLabel(letter, true)}</span></span>`;
+  };
+  const rareStat = diag ? calcRareStat(diag) : null;
+  const diagType = diag ? getDiagType(diag.majorityRate, diag.rareScore) : null;
+  const unique = diag ? calcMostUnique(coloredLetters) : null;
+  const mostUnique = unique?.isAllMajority ? null : unique?.mostUnique;
+  const majorityVote = mostUnique && DUMMY_VOTES[mostUnique]?.[0];
+  const highlight = majorityVote ? `${majorityVote.pct}% chose ${getColorName(majorityVote.color)} for ${itemLabel(mostUnique)}. You saw ${getColorName(colorMap[mostUnique])}.` : '';
 
-  const dots = coloredLetters.map(l => {
-    const c = colorMap[l];
-    const tc = textColorFor(c);
-    const brightAttr = isBright(c) ? ' data-bright="1"' : '';
-    return `<div class="type-palette-dot"${brightAttr} style="background:${c};color:${tc}"><span>${itemLabel(l, true)}</span></div>`;
-  }).join('');
-
-  const taglineHtml = type.tagline.replace(/()?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>');
-  const uniqueResult = calcMostUnique(coloredLetters);
-
-  // 一致率：背景Themesに合わせてコントラスト確保
-  const majColorRaw = diag.majorityRate >= 70 ? '#4da8e8'
-    : diag.majorityRate >= 50 ? '#2a7ab8'
-    : diag.majorityRate >= 30 ? '#555550'
-    : '#67bf92';
-  const majColor = ensureContrast(majColorRaw, theme);
-
-  const rareColorRaw = diag.rareScore >= 65 ? '#9272ff'
-    : diag.rareScore >= 40 ? '#9060c0'
-    : diag.rareScore >= 20 ? '#4da8e8'
-    : '#555550';
-  const rareColor = ensureContrast(rareColorRaw, theme);
-  const rareStat = calcRareStat(diag);
-
-  // タイプ名の色・diagType色もコントラスト確保
-  const typeColor = ensureContrast(type.color || '#2b2d38', theme);
-  const diagColor = ensureContrast(diagType.color, theme);
-
-  // Your most distinctive letterの色
-  const uniqueColor = uniqueResult.isAllMajority
-    ? 'var(--hero-ink3)'
-    : ensureContrast(colorMap[uniqueResult.mostUnique] || '#2b2d38', theme);
-
-  return `<div class="type-hero" data-type="${typeId}" data-theme="${theme}" style="${bgStyle}">
-    <canvas class="type-art-canvas" id="artCanvas"></canvas>
+  return `<div class="type-hero" data-type="${typeId}" style="background-image:url('./assets/backgrounds/${TYPE_BG[typeId]}.webp')">
+    ${diag ? '<canvas class="type-art-canvas" id="artCanvas" aria-hidden="true"></canvas>' : ''}
     <div class="rh-atmo" aria-hidden="true"></div>
     <div class="rh-p-a" aria-hidden="true"></div>
     <div class="rh-p-b" aria-hidden="true"></div>
     <div class="rh-p-c" aria-hidden="true"></div>
     <div class="rh-p-d" aria-hidden="true"></div>
     <div class="type-hero-inner">
-      <div class="type-eyebrow">Color Personality — ${isSubjectMode ? 'Subjects' : isNumberMode ? 'Numbers' : 'Alphabet'}</div>
-      <div class="type-label">Your synesthesia profile</div>
-      <div class="type-name">
-        <span class="type-name-diag" style="color:${diagColor}">${diagType.label}</span>
-        <span class="type-name-color" style="color:${typeColor}">${type.name}</span>
-      </div>
-      <div class="type-stat-card">
+      <header class="type-hero-heading">
+        <div class="type-eyebrow">RESULT</div>
+        <h1 class="type-title">${title}</h1>
+      </header>
+      <div class="type-palette-strip">${coloredLetters.map(dot).join('')}</div>
+      ${diag ? `<div class="type-stat-card">
         <div class="type-stat-row">
           <div class="type-stat-item">
             <span class="type-stat-card-label">Majority match</span>
-            <span class="type-stat-card-value" style="color:${majColor}">${diag.majorityRate}<span style="font-size:0.8em">%</span></span>
+            <span class="type-stat-card-value">${diag.majorityRate}<span class="type-stat-percent">%</span></span>
           </div>
-          <div class="type-stat-sep"></div>
+          <span class="type-stat-sep" aria-hidden="true"></span>
           <div class="type-stat-item">
             <span class="type-stat-card-label">${rareStat.label}</span>
-            <span class="type-stat-card-value" style="color:${rareColor}"><span style="font-size:0.5em">Top </span>${rareStat.value}<span style="font-size:0.8em">%</span></span>
-          </div>
-          <div class="type-stat-sep"></div>
-          <div class="type-stat-item">
-            <span class="type-stat-card-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Your most distinctive letter'}</span>
-            ${uniqueResult.isAllMajority
-              ? `<span class="type-stat-card-value" style="color:rgba(255,255,255,0.4)">-</span>`
-              : `<span class="type-stat-card-value${isSubjectMode ? ' type-stat-subject' : ''}" style="color:${uniqueColor}">${isSubjectMode ? `<span>${itemLabel(uniqueResult.mostUnique, true)}</span>` : itemLabel(uniqueResult.mostUnique)}</span>`
-            }
+            <span class="type-stat-card-value"><span class="type-stat-prefix">Top </span>${rareStat.value}<span class="type-stat-percent">%</span></span>
           </div>
         </div>
-        <div class="type-stat-desc">${diagType.desc.replace(/<wbr\s*\/?\s*>/g, '')}</div>
       </div>
-      <div class="type-palette-label">${isSubjectMode ? 'Your school-subject colors' : isNumberMode ? 'Your number colors' : 'Your letter colors'}</div>
-      <div class="type-palette-strip">${dots}</div>
+      <div class="type-hero-insight">
+        ${highlight ? `<h2><span>Your most distinctive choice</span>${dot(mostUnique)}</h2><p>${highlight}</p>`
+          : '<h2><span>All your colors match the majority</span></h2>'}
+      </div>` : ''}
+      <div class="type-hero-chips">
+        ${diagType ? `<div class="type-hero-chip"><span>Synesthesia type:</span><strong class="type-name-diag">${diagType.label.replace(/^[✦◈◎◇]\s*/, '')}</strong></div>` : ''}
+        <div class="type-hero-chip"><span>Color type:</span><strong class="type-name-color">${type.name}</strong></div>
+      </div>
     </div>
     <a class="scroll-indicator" href="#contentOuter">
       <span class="scroll-indicator-label">Scroll</span>
-      <span class="scroll-indicator-icon">
+      <span class="scroll-indicator-icon" aria-hidden="true">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
           <polyline points="2,4 7,10 12,4"/>
         </svg>
@@ -2269,26 +2045,6 @@ function buildShareSection(diag, coloredLetters) {
   </div>`;
 }
 
-/* ══ タイプ名を表（type-stat-card）の幅にフィットさせる（モバイル限定） ══ */
-function fitTypeName() {
-  const el = document.querySelector('.type-name-color');
-  const ref = document.querySelector('.type-stat-card');
-  if (!el || !ref) return;
-  // デスクトップは CSS の clamp に委ねる
-  if (window.innerWidth > 640) { el.style.fontSize = ''; return; }
-  // 一旦 CSS 既定値に戻してから測る
-  el.style.fontSize = '';
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const textW = range.getBoundingClientRect().width;
-  const targetW = ref.getBoundingClientRect().width;
-  if (textW > 0 && targetW > 0) {
-    const cur = parseFloat(getComputedStyle(el).fontSize);
-    el.style.fontSize = (cur * targetW / textW) + 'px';
-  }
-}
-window.addEventListener('resize', () => requestAnimationFrame(fitTypeName));
-
 /* ══ メイン描画 ══ */
 function renderWithoutStats(coloredLetters) {
   const type = COLOR_TYPES.find(item => item.id === detectColorType(coloredLetters));
@@ -2301,8 +2057,7 @@ function renderWithoutStats(coloredLetters) {
     : status === 'loading' ? 'Loading votes…'
     : status === 'error' ? 'Could not load the votes. Please try again later.'
     : 'There are no votes for some of your selections yet, so a resonance score is not available. You can still share your color type and colors below.';
-  const dots = coloredLetters.map(letter => `<div class="type-palette-dot" style="background:${colorMap[letter]};color:${textColorFor(colorMap[letter])}"><span>${itemLabel(letter, true)}</span></div>`).join('');
-  document.getElementById('typeHeroArea').innerHTML = `<div class="type-hero" data-type="${type.id}" data-theme="dark" style="background-image:url('assets/backgrounds/${TYPE_BG[type.id]}.webp')"><div class="type-hero-inner"><div class="type-label">${themeLabel}</div><div class="type-name-color">${type.name}</div><div class="type-palette-strip">${dots}</div></div></div>`;
+  document.getElementById('typeHeroArea').innerHTML = buildTypeHero(coloredLetters);
   document.getElementById('mainWrap').innerHTML = `<div class="card"><p>${message}</p>${window.themeVoteError ? '<p class="statistics-error-code"></p>' : ''}<a class="btn-back" href="${pickerUrl}${location.search}">← Choose your colors again</a></div>`;
   const errorCode = document.querySelector?.('.statistics-error-code');
   if (errorCode) errorCode.textContent = window.themeVoteError;
@@ -2351,8 +2106,6 @@ function render() {
     typeHeroArea.innerHTML = voteErrorNotice + buildTypeHero(coloredLetters, diag);
     const voteSaveErrorCode = document.getElementById('voteSaveErrorCode');
     if (voteSaveErrorCode) voteSaveErrorCode.textContent = window.themeVoteError;
-    setTimeout(fitTypeName, 0);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTypeName);
 
     // アートcanvas描画
     const artCanvas = document.getElementById('artCanvas');
@@ -2457,17 +2210,6 @@ function render() {
         }
       }
 
-      // background-clip:text 透明テキストを solid color にスワップ（html2canvas 対策）
-      const textSwaps = [];
-      target.querySelectorAll('.type-name-diag, .type-name-color').forEach(el => {
-        textSwaps.push({ el, style: el.getAttribute('style') || '' });
-        el.style.backgroundImage = 'none';
-        el.style.webkitTextFillColor = '#fffdf9';
-        el.style.color = '#fffdf9';
-        el.style.filter = 'none';
-        el.style.textShadow = 'none';
-      });
-
       try {
         // 背景画像をbase64に変換（CORSによるtainted canvas回避）
         const heroDom = target.querySelector('.type-hero');
@@ -2511,8 +2253,6 @@ function render() {
         if (newWin && !newWin.closed) newWin.close();
         showToast('Failed: ' + (e?.message || String(e)));
       } finally {
-        // スワップしたテキスト要素を復元
-        textSwaps.forEach(({ el, style }) => el.setAttribute('style', style));
         btn.disabled = false;
         btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg> Save image`;
       }

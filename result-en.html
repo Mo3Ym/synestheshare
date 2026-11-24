@@ -1999,6 +1999,9 @@ function buildShareSection(diag, coloredLetters) {
   sharedResult.searchParams.set('lang', 'en');
   sharedResult.hash = '';
   if (sharedResult.protocol === 'file:') sharedResult.href = `${shareOrigin}/${sharedResult.pathname.split('/').pop()}${sharedResult.search}`;
+  if (sharedResult.hostname === 'synestheshare.pages.dev') {
+    sharedResult.pathname = sharedResult.pathname.replace(/\/(result(?:-en)?)\.html$/, '/$1');
+  }
   const rareStat = calcRareStat(diag);
   sharedResult.searchParams.set('score', rareStat.value);
   sharedResult.searchParams.set('stat', rareStat.kind);
@@ -2023,7 +2026,7 @@ function buildShareSection(diag, coloredLetters) {
   const empathyText = itemLabel(mostEmpathy) || 'None';
   const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
   const senseName = isSubjectMode ? 'school-subject color sense' : isNumberMode ? 'number-color sense' : 'letter-color sense';
-  const shareText = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.\n\n${colorType.name} / ${diagName}\n${isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: '}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n\n— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?\n\n${resultUrl}`;
+  const shareText = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.\n\n${isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: '}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n${diagName} / ${colorType.name}\n\n— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">

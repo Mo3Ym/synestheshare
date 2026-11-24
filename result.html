@@ -1998,6 +1998,9 @@ function buildShareSection(diag, coloredLetters) {
   const sharedResult = new URL(location.href);
   sharedResult.hash = '';
   if (sharedResult.protocol === 'file:') sharedResult.href = `${shareOrigin}/${sharedResult.pathname.split('/').pop()}${sharedResult.search}`;
+  if (sharedResult.hostname === 'synestheshare.pages.dev') {
+    sharedResult.pathname = sharedResult.pathname.replace(/\/(result(?:-en)?)\.html$/, '/$1');
+  }
   const rareStat = calcRareStat(diag);
   sharedResult.searchParams.set('score', rareStat.value);
   sharedResult.searchParams.set('stat', rareStat.kind);
@@ -2022,7 +2025,7 @@ function buildShareSection(diag, coloredLetters) {
   const empathyText = itemLabel(mostEmpathy) || '該当なし';
   const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
   const senseName = isSubjectMode ? '教科色感覚' : isNumberMode ? '数字色感覚' : '文字色感覚';
-  const shareText = `🎨あなたの${senseName}は、${rareStat.label}上位${rareStat.value}%でした。\n\n${colorType.name} / ${diagName}\n${isSubjectMode ? '最も個性的な教科：' : isNumberMode ? '最も個性的だった数字：' : '最も個性的な文字：'}${uniqueText}\n${isSubjectMode ? '最も共感された教科：' : '最も共感された文字：'}${empathyText}\n\n――あなたの「${isSubjectMode ? '国語' : isNumberMode ? '1' : 'A'}」は、何色ですか？\n\n${resultUrl}`;
+  const shareText = `🎨あなたの${senseName}は、${rareStat.label}上位${rareStat.value}%でした。\n\n${isSubjectMode ? '最も個性的な教科：' : isNumberMode ? '最も個性的だった数字：' : '最も個性的な文字：'}${uniqueText}\n${isSubjectMode ? '最も共感された教科：' : '最も共感された文字：'}${empathyText}\n${diagName} / ${colorType.name}\n\n――あなたの「${isSubjectMode ? '国語' : isNumberMode ? '1' : 'A'}」は、何色ですか？\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   return `<div class="card">

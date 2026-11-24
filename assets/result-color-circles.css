@@ -1,3 +1,10 @@
+.hero h1 .hl-red, .result-intro h2 .hl-red {
+  color: #ef6378; font-weight: 500; text-shadow: 0 0 14px rgba(255,220,225,.65);
+}
+.hero h1 .hl-mint, .result-intro h2 .hl-mint {
+  color: #009da6; font-weight: 500; text-shadow: 0 0 14px rgba(207,255,249,.65);
+}
+
 .type-palette-dot {
   width: 34px;
   height: 34px;

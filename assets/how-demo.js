@@ -111,7 +111,7 @@
     if (selected) {
       const color = colorText(selected);
       if (english) result.append(percentage, ' of people saw the same ', color, ' in ', letter, ' as you.');
-      else result.append(percentage, 'の人が、', letter, 'にあなたと同じ', color, 'を感じていました。');
+      else result.append(percentage, 'の人が、', letter, 'にあなたと同じ', color, 'を感じていました！');
       reflection.textContent = english
         ? 'That feeling quietly resonates with others.'
         : 'その感覚は、多くの人の心と静かに重なっています。';
@@ -120,7 +120,7 @@
       const chosenColor = colorText(colors.find(color => color.key === choice));
       const wrapOpportunity = document.createElement('wbr');
       if (english) result.append(percentage, ' saw ', popularColor, ' in ', letter, '.', wrapOpportunity, ' You saw ', chosenColor, '.');
-      else result.append(percentage, 'が', popularColor, 'を選ぶ', letter, 'に、', wrapOpportunity, 'あなたは', chosenColor, 'を見ていました。');
+      else result.append(percentage, 'が', popularColor, 'を選ぶ', letter, 'に、', wrapOpportunity, 'あなたは', chosenColor, 'を見ていました！');
       reflection.textContent = english ? 'A color all your own.' : '誰とも重ならない、あなただけの色。';
     }
     const results = document.createElement('div');

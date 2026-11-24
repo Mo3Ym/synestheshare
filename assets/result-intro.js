@@ -24,13 +24,16 @@
 
   const subject = mode === 'subject', number = mode === 'number';
   const sample = subject ? '国' : number ? '1' : 'A';
+  const highlightedSample = `<strong class="hl-red">${subject ? (english ? 'Japanese' : '国語') : sample}</strong>`;
   const copy = english ? {
-    title: `What color is your “${subject ? 'Japanese' : sample}”?`,
+    title: `What <strong class="hl-mint">color</strong> is your ${highlightedSample}?`,
     description: `Compare the colors you associate with ${subject ? 'school subjects' : number ? 'numbers' : 'letters'}.`,
     view: 'See their results', start: 'Try it yourself (2 min) →', close: 'Close introduction',
   } : {
-    title: `あなたの「${subject ? '国語' : sample}」は、何色？`,
-    description: `${subject ? '教科' : number ? '数字' : '文字'}に感じる色を、みんなと比べるサイトです。`,
+    title: `あなたの${highlightedSample}は、<wbr>何<strong class="hl-mint">色</strong>ですか？`,
+    description: subject || number
+      ? `${subject ? '教科' : '数字'}に感じる色を、みんなと比べるサイトです。`
+      : '文字や感じる色を、みんなと比べるサイトです。',
     view: 'この人の結果を見る', start: '診断してみる（2分）', close: '説明を閉じる',
   };
   const dialog = document.createElement('dialog');

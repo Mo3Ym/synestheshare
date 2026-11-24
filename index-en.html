@@ -265,8 +265,6 @@ nav ul a:hover { color: var(--ink); }
   text-shadow: 0 0 22px rgba(255,255,255,0.20), 0 0 50px rgba(255,255,255,0.09);
 }
 .hero h1 strong { font-weight: 340; }
-.hero h1 .hl-red  { color: #ef6378; font-weight: 500; text-shadow: 0 0 14px rgba(255,220,225,.65); }
-.hero h1 .hl-mint { color: #009da6; font-weight: 500; text-shadow: 0 0 14px rgba(207,255,249,.65); }
 
 .hero-body {
   font-size: 0.92rem; color: #323c4b;
@@ -617,14 +615,6 @@ nav ul a:hover { color: var(--ink); }
 .how .sec-title { color: var(--white); font-size: clamp(1.65rem, 4vw, 2.65rem); margin-bottom: 1.6rem; }
 .how .sec-title strong { color: var(--c3); text-shadow: 0 0 20px #f5dc7229; }
 
-.steps { display: grid; grid-template-columns: repeat(4,1fr); gap: .35rem; }
-.step { display: flex; align-items: center; flex-direction: column; gap: .2rem; }
-.step-icon { width: clamp(34px, 6vw, 48px); aspect-ratio: 1; }
-.step-icon img { display: block; width: 100%; height: 100%; }
-.step-num { font: 600 .64rem var(--outfit); letter-spacing: .14em; color: #b5afc2; text-transform: uppercase; }
-.step-title { font-size: clamp(.73rem, 2vw, .95rem); word-break: keep-all; overflow-wrap: break-word; }
-.try-divider { display: flex; align-items: center; gap: 1rem; margin: 1.65rem auto 0; padding-bottom: 1rem; color: #d9d4e4; font-size: .82rem; letter-spacing: .08em; }
-.try-divider::before, .try-divider::after { content: ''; height: 1px; flex: 1; background: #ffffff40; }
 .try-card {
   --expand-duration: .28s;
   margin: .5rem clamp(.35rem, 2.5vw - .15rem, 1rem) 0;
@@ -882,7 +872,7 @@ nav ul a:hover { color: var(--ink); }
         What <strong class="hl-mint">color</strong> is your <strong class="hl-red">A</strong>?
       </h1>
       <p class="hero-body">
-        Do letters and numbers have colors for you? Follow your intuition, create your palette, and compare it with people around the world.
+        Compare the colors you see in letters and numbers with what others see.
       </p>
       <div class="hero-ctas">
         <!-- クリックでChoose a themeセクションへスクロール。ボタン内に2分を記載 -->
@@ -908,30 +898,7 @@ nav ul a:hover { color: var(--ink); }
 <section class="how" id="how">
   <div class="how-inner">
     <div class="sec-eyebrow">How it works</div>
-    <h2 class="sec-title">Your colors in <strong>2 minutes</strong></h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-icon"><img src="assets/icons/step-theme.svg" width="48" height="48" alt="" aria-hidden="true"></div>
-        <div class="step-num">Step 01</div>
-        <div class="step-title">Choose a theme</div>
-      </div>
-      <div class="step">
-        <div class="step-icon"><img src="assets/icons/step-color.svg" width="48" height="48" alt="" aria-hidden="true"></div>
-        <div class="step-num">Step 02</div>
-        <div class="step-title">Pick a color</div>
-      </div>
-      <div class="step">
-        <div class="step-icon"><img src="assets/icons/step-compare.svg" width="48" height="48" alt="" aria-hidden="true"></div>
-        <div class="step-num">Step 03</div>
-        <div class="step-title">Compare your palette</div>
-      </div>
-      <div class="step">
-        <div class="step-icon"><img src="assets/icons/step-share.svg" width="48" height="48" alt="" aria-hidden="true"></div>
-        <div class="step-num">Step 04</div>
-        <div class="step-title">Share your results</div>
-      </div>
-    </div>
-    <div class="try-divider">Try it for yourself</div>
+    <h2 class="sec-title"><strong>Try</strong> it for yourself</h2>
     <div class="try-card">
       <h3 id="try-question">Which color feels right for A?</h3>
       <div class="try-palette" role="radiogroup" aria-labelledby="try-question"></div>

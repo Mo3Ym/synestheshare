@@ -51,10 +51,8 @@
 
   function colorText(color) {
     const name = document.createElement('span');
-    name.className = 'try-match-color';
-    name.style.color = color.hex;
+    name.style.color = ['黒', '茶色'].includes(color.key) ? '#fff' : color.hex;
     name.textContent = english ? color.name.toLowerCase() : color.name;
-    if (['黒', '茶色'].includes(color.key)) name.classList.add('on-light');
     return name;
   }
 

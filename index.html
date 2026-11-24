@@ -609,14 +609,18 @@ nav ul a:hover { color: var(--ink); }
   bottom: -10%; right: -5%;
   border-radius: 50%; filter: blur(60px); pointer-events: none;
 }
-.how-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; text-align: center; }
+.how-inner {
+  --expand-duration: .28s;
+  --bar-duration: .75s;
+  --result-delay: calc(var(--expand-duration) + var(--bar-duration) + var(--last-segment-delay, 0ms));
+  position: relative; z-index: 1; max-width: 720px; margin: 0 auto; text-align: center;
+}
 .how .sec-eyebrow { justify-content: center; color: #c4bfcd; }
 .how .sec-eyebrow::before { display: none; }
 .how .sec-title { color: var(--white); font-size: clamp(1.65rem, 4vw, 2.65rem); margin-bottom: 1.6rem; }
 .how .sec-title strong { color: var(--c3); text-shadow: 0 0 20px #f5dc7229; }
 
 .try-card {
-  --expand-duration: .28s;
   margin: .5rem clamp(.35rem, 2.5vw - .15rem, 1rem) 0;
   padding: clamp(1.3rem, 4vw, 2.3rem) clamp(.65rem, 3vw, 1.75rem);
   border: 1px solid #f0eaff45;
@@ -636,8 +640,6 @@ nav ul a:hover { color: var(--ink); }
 .try-choice input:checked + .try-orb { outline: 1px solid #ffffffb0; outline-offset: 3px; }
 .try-choice input:focus-visible + .try-orb { outline: 3px solid white; outline-offset: 3px; }
 .try-feedback {
-  --bar-duration: .75s;
-  --result-delay: calc(var(--expand-duration) + var(--bar-duration) + var(--last-segment-delay));
   display: grid; grid-template-rows: minmax(1.75rem, 0fr); align-items: center;
   max-width: 480px; margin: 0 auto;
   font-size: .85rem; color: #e2ddeb;
@@ -675,9 +677,32 @@ nav ul a:hover { color: var(--ink); }
   font-size: .73rem; font-style: italic; line-height: 1.5; text-align: left;
   animation: try-marker-in .3s ease-out calc(var(--result-delay) + .5s) both;
 }
+.try-next {
+  display: grid; grid-template-rows: minmax(0, 0fr);
+  transition: grid-template-rows var(--expand-duration) ease-out;
+}
+.try-card.has-results + .try-next { grid-template-rows: minmax(0, 1fr); }
+.try-next > div { overflow: hidden; }
+.try-next-link {
+  display: inline-grid; justify-items: center; gap: .75rem;
+  margin: .8rem 0 .2rem; padding: .3rem .7rem; border-radius: 10px;
+  color: #e2ddeb; font-size: .9rem; text-decoration: none;
+  visibility: hidden;
+}
+.try-card.has-results + .try-next .try-next-link {
+  animation: try-next-in .35s ease-out calc(var(--result-delay) + .8s) both;
+}
+.try-next-link:hover { color: white; }
+.try-next-link:focus-visible { outline: 2px solid var(--c3); outline-offset: -2px; }
+@keyframes try-next-in {
+  from { visibility: hidden; opacity: 0; }
+  to { visibility: visible; opacity: 1; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .try-orb, .try-card, .try-feedback { transition: none; }
+  .try-orb, .try-card, .try-feedback, .try-next { transition: none; }
   .try-track span, .try-marker, .try-match, .try-reflection { animation: none; }
+  .try-card.has-results + .try-next .try-next-link { animation: none; visibility: visible; }
+  .try-next-link .scroll-indicator-icon svg { animation: none; }
 }
 
 /* ══════════════════════════════════════
@@ -749,7 +774,8 @@ nav ul a:hover { color: var(--ink); }
   transition: border-color 0.2s, background 0.2s, transform 0.2s;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
-.scroll-indicator:hover .scroll-indicator-icon {
+.scroll-indicator:hover .scroll-indicator-icon,
+.try-next-link:hover .scroll-indicator-icon {
   border-color: rgba(100,100,96,0.4);
   background: rgba(247,247,245,0.85);
   transform: translateY(2px);
@@ -910,6 +936,18 @@ nav ul a:hover { color: var(--ink); }
           </svg>
           色を選んでみましょう
         </p>
+      </div>
+    </div>
+    <div class="try-next">
+      <div>
+        <a class="try-next-link" href="#themes">
+          <span>では、他の文字はどうでしょう？</span>
+          <span class="scroll-indicator-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,0.7)">
+              <polyline points="2,4 7,10 12,4"/>
+            </svg>
+          </span>
+        </a>
       </div>
     </div>
   </div>

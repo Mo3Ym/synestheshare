@@ -1,6 +1,7 @@
 (() => {
   const palette = document.querySelector('.try-palette');
   const feedback = document.querySelector('.try-feedback');
+  const card = feedback.closest('.try-card');
   const english = document.documentElement.lang === 'en';
   // The Japanese names are the field names in statistics/A.
   const colors = [
@@ -97,7 +98,8 @@
       item.textContent = row.name + ' ' + row.pct + '%';
       legend.append(item);
     }
-    feedback.closest('.try-card').classList.add('has-results');
+    card.parentElement.style.setProperty('--last-segment-delay', (rows.length - 1) * 40 + 'ms');
+    card.classList.add('has-results');
     const result = document.createElement('p');
     result.className = 'try-match';
     const comparison = selected ?? rows[0];
@@ -126,7 +128,6 @@
     const results = document.createElement('div');
     results.className = 'try-results';
     results.append(summary, bar, legend, result, reflection);
-    feedback.style.setProperty('--last-segment-delay', (rows.length - 1) * 40 + 'ms');
     feedback.replaceChildren(results);
     const updateLegendFocus = () => {
       if (legend.scrollHeight > legend.clientHeight) legend.tabIndex = 0;

@@ -596,6 +596,13 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--jp); font-weight: 500; font-size: 1rem;
   margin-bottom: 1.25rem; color: var(--ink);
 }
+#mainWrap .section-title {
+  font-size: clamp(1.35rem, 3vw, 1.65rem);
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: normal;
+}
+#mainWrap .section-eyebrow { color: #6f6f68; }
 
 /* ══ 最も割れた文字ハイライト ══ */
 .highlight-card {
@@ -661,14 +668,14 @@ nav ul a:hover { color: var(--ink); }
 }
 .highlight-mine-marker::after { content: '▼'; font-size: 0.48rem; color: var(--ink); line-height: 1; }
 
-/* ══ Your Sense カード ══ */
+/* ══ DISCOVERY カード ══ */
 /* 2列グリッド */
 .sense-grid {
   display: flex; flex-direction: column; gap: 1.75rem;
 }
 .sense-col { display: flex; flex-direction: column; gap: 0.6rem; }
 .sense-col-label {
-  font-family: var(--jp); font-weight: 500; font-size: 1rem;
+  font-family: var(--jp); font-weight: 550; font-size: 1.05rem;
   color: var(--ink);
 }
 .sense-divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
@@ -708,7 +715,7 @@ nav ul a:hover { color: var(--ink); }
 /* テキストエリア（右） */
 .sense-text { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 0; padding-top: 0.15rem; }
 .sense-sentence {
-  font-size: 0.72rem; color: var(--ink2); line-height: 1.65;
+  font-size: 0.85rem; font-weight: 400; color: var(--ink2); line-height: 1.65;
   word-break: keep-all; overflow-wrap: break-word;
 }
 .sense-strong { font-family: var(--outfit); font-weight: 700; color: var(--ink); }
@@ -716,8 +723,9 @@ nav ul a:hover { color: var(--ink); }
 .sense-comment { font-size: 0.65rem; color: var(--ink3); font-style: italic; line-height: 1.6; }
 
 /* 文言行 */
-.empathy-pct-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.5; }
+.empathy-pct-label { font-size: 0.85rem; font-weight: 400; color: var(--ink2); line-height: 1.6; }
 .empathy-comment { font-size: 0.72rem; color: var(--ink3); font-style: italic; line-height: 1.5; margin-top: 0.1rem; }
+.sense-text .empathy-comment { color: #6f6f68; }
 .empathy-badge {
   width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
@@ -791,8 +799,8 @@ nav ul a:hover { color: var(--ink); }
   width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.08); align-self: center;
 }
-.vote-legend-label { font-size: 0.68rem; color: var(--ink3); line-height: 1; }
-.vote-legend-pct { font-family: var(--outfit); font-size: 0.68rem; font-weight: 700; color: var(--ink2); line-height: 1; }
+.vote-legend-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.2; }
+.vote-legend-pct { font-family: var(--outfit); font-size: 0.75rem; font-weight: 600; color: var(--ink2); line-height: 1.2; }
 
 .vote-skipped { font-size: 0.75rem; color: var(--ink3); font-style: italic; }
 
@@ -871,34 +879,32 @@ nav ul a:hover { color: var(--ink); }
   display: flex; flex-direction: column; gap: 0.6rem;
 }
 .diag-type-main {
-  font-family: var(--jp); font-weight: 700;
-  font-size: clamp(1.35rem, 4vw, 1.7rem);
+  font-family: var(--jp); font-weight: 600;
+  font-size: clamp(1.15rem, 2.4vw, 1.3rem);
   color: var(--c1); line-height: 1.2; letter-spacing: -0.01em;
 }
 .diag-type-desc {
-  font-size: 0.8rem; color: var(--ink3);
+  font-size: 0.85rem; font-weight: 400; color: var(--ink2);
   line-height: 1.8; border-left: 2.5px solid var(--border);
   padding-left: 0.85rem; margin-top: 0.1rem;
 }
+.diag-lead { font-size: .9rem; font-weight: 400; color: var(--ink); word-break: normal; }
+h3.diag-lead { font-size: 1rem; font-weight: 550; }
+.diag-type-reflection { color: #6f6f68; font-style: italic; }
 /* 根拠行 */
 .diag-basis {
   margin-top: 1rem;
   padding-top: 0.85rem;
   border-top: 1px solid var(--border);
-  font-size: 0.72rem; color: var(--ink3); line-height: 1.7;
+  font-size: 0.82rem; color: var(--ink2); line-height: 1.7;
   display: block;
 }
-.diag-basis strong { color: var(--ink3); font-weight: 700; }
+.diag-basis strong { color: var(--ink); font-weight: 600; }
 .diag-basis-label {
   font-family: var(--outfit); font-size: 0.6rem; font-weight: 600;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--ink3); background: var(--border);
   padding: 0.1rem 0.5rem; border-radius: 4px; flex-shrink: 0;
-}
-.diag-basis-dot {
-  display: inline-block;
-  width: 9px; height: 9px; border-radius: 50%;
-  vertical-align: middle; margin-right: 2px;
 }
 
 /* ══ シェア ══ */
@@ -1505,6 +1511,8 @@ const COLOR_TYPES = [
     id: 'warm',   theme: 'light',
     name: 'SUNSET TYPE',
     color: '#ffae66',
+    summary: 'You often chose warm colors.',
+    reflection: 'Warm colors that evoke light.\nThere is a warmth within you that feels like light.',
     tagline: 'A warm, glowing sense of color.\nThere is a warmth within you that feels like light.',
     blobColors: ['rgba(224,58,42,0.55)', 'rgba(232,120,32,0.4)'],
   },
@@ -1512,6 +1520,7 @@ const COLOR_TYPES = [
     id: 'cool',   theme: 'light',
     name: 'OCEAN TYPE',
     color: '#4da8e8',
+    summary: 'You often chose cool colors.',
     tagline: 'Colors with a quiet depth.\nColor speaks to your feelings before words do.',
     blobColors: ['rgba(24,136,200,0.5)', 'rgba(112,40,192,0.35)'],
   },
@@ -1519,6 +1528,7 @@ const COLOR_TYPES = [
     id: 'nature', theme: 'light',
     name: 'FOREST TYPE',
     color: '#2a7a30',
+    summary: 'You often chose shades of green.',
     tagline: 'Fresh colors, alive with a sense of growth.\nA quiet, rich sensitivity in rhythm with nature.',
     blobColors: ['rgba(42,158,96,0.5)', 'rgba(168,208,32,0.35)'],
   },
@@ -1526,6 +1536,7 @@ const COLOR_TYPES = [
     id: 'mono',   theme: 'light',
     name: 'VOID TYPE',
     color: '#555550',
+    summary: 'You often chose neutrals such as white, black, and gray.',
     tagline: 'A monochrome universe beyond color.\nThere is a depth here that only you know.',
     blobColors: ['rgba(80,80,80,0.5)', 'rgba(136,136,128,0.3)'],
   },
@@ -1533,6 +1544,7 @@ const COLOR_TYPES = [
     id: 'pastel', theme: 'light',
     name: 'BLOOM TYPE',
     color: '#c0507a',
+    summary: 'You often chose pale colors.',
     tagline: 'Soft, delicate colors, like a dream.\nYou see the light of a distant afternoon in your letters.',
     blobColors: ['rgba(255,144,184,0.45)', 'rgba(112,203,255,0.4)'],
   },
@@ -1540,6 +1552,7 @@ const COLOR_TYPES = [
     id: 'neon',   theme: 'light',
     name: 'NEON TYPE',
     color: '#c02818',
+    summary: 'Your palette mixes warm and cool colors.',
     tagline: 'Vivid colors, alive with the energy of night.\nFeelings and colors flow into one another.',
     blobColors: ['rgba(224,58,42,0.45)', 'rgba(112,40,192,0.4)'],
   },
@@ -1547,6 +1560,7 @@ const COLOR_TYPES = [
     id: 'dream',  theme: 'light',
     name: 'DREAM TYPE',
     color: '#9272ff',
+    summary: 'You often chose colors such as purple, pink, and blue.',
     tagline: 'Colors drifting between dreams and waking life.\nYour colors seem to come from somewhere beyond the everyday.',
     blobColors: ['rgba(112,40,192,0.5)', 'rgba(255,144,184,0.38)'],
   },
@@ -1554,6 +1568,7 @@ const COLOR_TYPES = [
     id: 'earth',  theme: 'light',
     name: 'EARTH TYPE',
     color: '#c07840',
+    summary: 'You often chose earthy colors such as brown and green.',
     tagline: 'Grounded colors, carrying memories of soil and grass.\nA quiet strength lives within your letters.',
     blobColors: ['rgba(139,69,19,0.5)', 'rgba(42,158,96,0.38)'],
   },
@@ -1950,11 +1965,12 @@ function buildSenseCard(coloredLetters) {
          <span class="sense-circle-label">Others</span>
        </div>`;
 
-  return `<div class="card">
-    <div class="section-eyebrow">Your Sense</div>
+  return `<div class="card" id="uniqueness">
+    <div class="section-eyebrow">01 — DISCOVERY</div>
+    <h2 class="section-title">Discover how differently we see.</h2>
     <div class="sense-grid">
       <div class="sense-col">
-        <div class="sense-col-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Most distinctive letter'}</div>
+        <h3 class="sense-col-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Most distinctive letter'}</h3>
         ${isAllMajority
           ? `<div class="sense-row">
                <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-target.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
@@ -1968,7 +1984,7 @@ function buildSenseCard(coloredLetters) {
       </div>
       <div class="sense-divider"></div>
       <div class="sense-col">
-        <div class="sense-col-label">${isSubjectMode ? 'Most shared subject' : 'Most shared letter'}</div>
+        <h3 class="sense-col-label">${isSubjectMode ? 'Most shared subject' : isNumberMode ? 'Most shared number' : 'Most shared letter'}</h3>
         ${!mostEmpathy
           ? `<div class="sense-row">
                <div style="font-size:1.8rem;flex-shrink:0;width:calc(48px + 22px + 48px);text-align:center"><img src="assets/icons/sense-spiral.svg" width="40" height="40" alt="" aria-hidden="true" style="vertical-align:middle"></div>
@@ -2043,9 +2059,9 @@ function buildVoteSection(coloredLetters) {
   const visible = coloredLetters.slice(0, 3);
   const hidden  = coloredLetters.slice(3);
 
-  let html = `<div class="card">
-    <div class="section-eyebrow">Vote</div>
-    <div class="section-title">${isSubjectMode ? 'Each subject’s colors' : 'Each letter’s colors'} — Compared with others</div>
+  let html = `<div class="card" id="vote">
+    <div class="section-eyebrow">02 — VOTE</div>
+    <h2 class="section-title">The colors others saw</h2>
     <div class="vote-collapse-wrap" id="voteCollapseWrap">
       <div class="vote-list">
         ${visible.map(buildItem).join('')}
@@ -2066,46 +2082,39 @@ function buildVoteSection(coloredLetters) {
   return html;
 }
 
-/* ══ 診断セクション①：共感覚タイプ（レア度ベース） ══ */
+/* ══ 共感覚タイプ ══ */
 function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
-  return `<div class="card">
-    <div class="section-eyebrow">Diagnosis — 1 / 2</div>
-    <div class="section-title">Your synesthesia profile</div>
+  const rareStat = calcRareStat(diag);
+  const [lead, ...details] = type.descFull.match(/[^。.]+[。.]?/g);
+  const matchLabel = isSubjectMode ? ' subjects match the majority' : isNumberMode ? ' numbers match the majority' : ' letters match the majority';
+  return `<div class="card" id="diagnosis">
+    <div class="section-eyebrow">04 — YOUR SENSE</div>
+    <h2 class="section-title">Your synesthesia profile</h2>
     <div class="diag-body">
       <div class="diag-type-main" style="color:${type.color}">${type.label}</div>
-      <div class="diag-type-desc">${type.descFull.replace(/。/g, '。<br>')}</div>
+      <h3 class="diag-lead">${lead}</h3>
+      <p class="diag-type-desc">${details.join('').trim()}</p>
     </div>
     <div class="diag-basis">
-      Majority match：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}${isSubjectMode ? ' subjects match the majority' : ' letters match the majority'}）<br>${calcRareStat(diag).label}：<strong>Top ${calcRareStat(diag).value}%</strong>
+      Majority match：<strong>${diag.majorityRate}%</strong>（${diag.majorityCount}/${diag.total}${matchLabel}）<br>${rareStat.label}：<strong>Top ${rareStat.value}%</strong>
     </div>
   </div>`;
 }
 
-/* ══ 診断セクション②：色傾向タイプ（色の分布ベース） ══ */
-function buildColorTypeSection(coloredLetters, diag) {
+/* ══ 色の傾向 ══ */
+function buildColorTypeSection(coloredLetters) {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
   const typeColor = type.color || 'rgba(24,24,24,0.88)';
 
-  // 主な色グループの集計（Top 3色）
-  const counts = {};
-  coloredLetters.forEach(l => { const c = colorMap[l]; counts[c] = (counts[c]||0)+1; });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  const basisDots = sorted.map(([c, n]) => {
-    const shadow = isBright(c) ? 'box-shadow:inset 0 0 0 1px rgba(0,0,0,0.12)' : '';
-    return `<span class="diag-basis-dot" style="background:${c};${shadow}"></span>${getColorName(c)}（${n}${isSubjectMode ? 'School subjects' : ' letters'}）`;
-  }).join('、');
-
-  return `<div class="card">
-    <div class="section-eyebrow">Diagnosis — 2 / 2</div>
-    <div class="section-title">Your color profile</div>
+  return `<div class="card" id="colortype">
+    <div class="section-eyebrow">03 — COLOR TYPE</div>
+    <h2 class="section-title">Your color tendencies</h2>
     <div class="diag-body">
-      <div class="diag-type-main" style="color:${typeColor}">${type.name}</div>
-      <div class="diag-type-desc">${type.tagline.replace(/()?\n/g, '<br>').replace(/。(?!<br>)/g, '。<br>')}</div>
-    </div>
-    <div class="diag-basis">
-      Your palette’s leading colors: <br>${basisDots}
+      <h3 class="diag-type-main" style="color:${typeColor}">${type.name}</h3>
+      <p class="diag-lead">${type.summary}</p>
+      <p class="diag-type-desc diag-type-reflection">${(type.reflection || type.tagline).replace(/()?\n/g, '<br>')}</p>
     </div>
   </div>`;
 }
@@ -2271,10 +2280,10 @@ function render() {
 
     // ② ダークエリア（診断・グラフ・ハイライト）
     mainWrap.innerHTML =
-      buildDiagSection(diag).replace('<div class="card">', '<div class="card" id="diagnosis">') +
-      buildColorTypeSection(coloredLetters, diag).replace('<div class="card">', '<div class="card" id="colortype">') +
-      buildSenseCard(coloredLetters).replace('<div class="card">', '<div class="card" id="uniqueness">') +
-      buildVoteSection(coloredLetters).replace('<div class="card">', '<div class="card" id="vote">');
+      buildSenseCard(coloredLetters) +
+      buildVoteSection(coloredLetters) +
+      buildColorTypeSection(coloredLetters) +
+      buildDiagSection(diag);
 
     // ③ Shareエリア（明るい背景）
     const shareOuter = document.getElementById('shareOuter');

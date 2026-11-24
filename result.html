@@ -428,13 +428,12 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   margin-bottom: 0.35rem;
 }
 .section-title {
-  font-family: var(--jp); font-weight: 500; font-size: 1rem;
-  margin-bottom: 1.25rem; color: var(--ink);
+  font-family: var(--jp); font-weight: 500; font-size: .95rem;
+  line-height: 1.45; margin-bottom: 1.45em; color: var(--ink);
 }
 #mainWrap .section-title {
-  font-size: clamp(1.35rem, 3vw, 1.65rem);
+  font-size: clamp(1.2rem, 2.75vw, 1.5rem);
   font-weight: 600;
-  line-height: 1.45;
   word-break: normal;
 }
 #mainWrap .section-eyebrow { color: #6f6f68; }
@@ -569,14 +568,9 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 
 /* テキストエリア（右） */
 .sense-text {
-  position: relative; align-self: stretch;
+  align-self: stretch;
   display: flex; flex-direction: column; justify-content: center; gap: .25rem; min-width: 0;
   padding: .15rem 0 .15rem clamp(.4rem, 1.4vw, .85rem);
-}
-.sense-text::before {
-  content: ''; position: absolute; inset-block: 0.15rem;
-  inset-inline-start: calc(var(--sense-gap) / -2);
-  width: 1px; background: var(--result-card-rule);
 }
 .sense-sentence {
   font-size: clamp(.8rem, 1.7vw, .95rem); font-weight: 450; color: var(--result-card-ink); line-height: 1.65;
@@ -737,9 +731,6 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 .vote-outlier strong { color: var(--ink2); font-weight: 700; }
 
 /* ══ 診断コメント ══ */
-#mainWrap .profile-card .section-title {
-  margin-bottom: .8rem;
-}
 .diag-body {
   display: flex; flex-direction: column; gap: .45rem;
 }
@@ -835,7 +826,7 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 .diag-lead { font-size: .9rem; font-weight: 400; color: var(--ink2); word-break: normal; }
 .diag-type-reflection { color: #6f6f68; font-style: italic; }
 .vote-outlier, .diag-type-reflection { font-size: .7rem; }
-#mainWrap #diagnosis .section-title { font-size: clamp(1.2rem, 3vw, 1.55rem); }
+#mainWrap #diagnosis .section-title { font-size: clamp(1.1rem, 2.75vw, 1.4rem); }
 #diagnosis .diag-type-main { font-size: clamp(1.45rem, 4.5vw, 2.05rem); }
 #diagnosis .diag-lead { color: var(--result-card-muted); line-height: 1.75; }
 #diagnosis { --diagnosis-padding: 1.5rem; }

@@ -159,7 +159,7 @@ module.exports = {
   'は、上位に入らない希少な選択です': ' is a rare choice, outside the leading colors.',
   '各文字の色': 'Each letter’s colors', '世間との比較': 'Compared with others', 'すべて表示': 'Show all',
   'タイプ診断': 'Your color profile', '選んだ色の傾向：': 'Your palette’s leading colors: ',
-  '該当なし': 'None', '結果をシェアする': 'Share your results',
+  '該当なし': 'None', '結果をシェアする': 'Share your results', '結果をシェア': 'Share results',
   '選んだ文字の色と診断結果': 'Your chosen letter colors and results',
   '画像を保存': 'Save image', '友だちに送る': 'Send to a friend', 'Xにシェア': 'Share on X',
   '色が設定されていません': 'No colors selected yet', '診断ページに戻る': 'Choose your colors',

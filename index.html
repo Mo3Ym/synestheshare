@@ -561,28 +561,9 @@ nav ul a:hover { color: var(--ink); }
   .theme-name { font-size: 1.2rem; }
 }
 .theme-desc {
-  font-size: 0.78rem; color: var(--ink2); line-height: 1.7;
+  font-size: 0.78rem; color: #4d4958; line-height: 1.7;
   font-weight: 300; flex: 1;
   word-break: keep-all; overflow-wrap: break-word;
-}
-
-/* 「→」だけのミニマルなCTA */
-.theme-cta {
-  display: flex; align-items: center; justify-content: center;
-  margin-top: 1.6rem;
-  padding: 0;
-  color: var(--ink3);
-  transition: color 0.3s ease;
-}
-.theme-card:hover .theme-cta { color: var(--ink); }
-.theme-cta-arrow {
-  font-family: var(--outfit); font-size: 1.05rem; font-weight: 400;
-  transition: transform 0.35s ease;
-  display: inline-block; opacity: 0.7;
-}
-.theme-card:hover .theme-cta-arrow {
-  transform: translateX(4px);
-  opacity: 1;
 }
 
 /* ══════════════════════════════════════
@@ -978,8 +959,6 @@ nav ul a:hover { color: var(--ink); }
         </div>
         <div class="theme-name">アルファベット</div>
         <div class="theme-desc">A〜Zは<wbr>どんな色？</div>
-        <!-- ③「このテーマで診断」ボタン -->
-        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="number.html" class="theme-card">
@@ -994,7 +973,6 @@ nav ul a:hover { color: var(--ink); }
         </div>
         <div class="theme-name">数字</div>
         <div class="theme-desc">0〜9は<wbr>どんな色？</div>
-        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
       <a href="subject.html" class="theme-card">
@@ -1009,7 +987,6 @@ nav ul a:hover { color: var(--ink); }
         </div>
         <div class="theme-name">教科</div>
         <div class="theme-desc">国語や数学は<wbr>どんな色？</div>
-        <div class="theme-cta"><span class="theme-cta-arrow">→</span></div>
       </a>
 
     </div>

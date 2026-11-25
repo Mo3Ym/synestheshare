@@ -72,6 +72,9 @@
   --ink:    #2b2d38;
   --ink2:   #555550;
   --ink3:   #aaaaaa;
+  --result-text: #555260;
+  --result-note: #625e6d;
+  --result-label: #827d8c;
   --border: #e0e0dc;
   --c1: #ff7f7f;
   --outfit: 'Outfit', sans-serif;
@@ -280,6 +283,30 @@ nav ul a:hover { color: var(--ink); }
 .type-hero-chip strong { color: #ffe3a1; font-weight: 700; }
 html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 .type-name-color { font-family: var(--outfit); letter-spacing: .04em; }
+.type-hero-actions {
+  position: relative; z-index: 2; flex-shrink: 0;
+  display: grid; justify-items: center; gap: clamp(.45rem, 1.8vh, 1rem);
+}
+.type-hero-share {
+  display: inline-flex; align-items: center; gap: .45rem;
+  min-height: 44px; padding: .4rem .85rem;
+  border: 1px solid #fffdf959; border-radius: 99px;
+  background: #15111b29; color: #fffdf9;
+  font: 500 .76rem var(--jp); text-decoration: none;
+}
+.type-hero-share:hover { background: #15111b55; }
+.type-hero-share:focus-visible { outline: 2px solid #fffdf9; outline-offset: 3px; }
+.type-hero-share svg { width: 15px; height: 15px; }
+@media (max-height: 680px) {
+  .type-hero { padding-block: clamp(.55rem, 1.8vh, .9rem); row-gap: .55rem; }
+  .type-hero-inner { gap: clamp(.4rem, 1.5vh, .7rem); }
+  .type-hero-heading { gap: .35rem; }
+  .type-stat-row { padding-block: .7rem; }
+  .type-hero-insight { margin-block-start: .25rem; }
+  .type-hero-insight p { margin-top: .3rem; }
+  .type-hero-chips { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, max-content); }
+  .type-hero-chip { padding-block: .3rem; }
+}
 .subject-mode .sense-circle { font-size: 0.86rem; }
 .subject-mode .vote-letter-badge { font-size: 0.64rem; }
 .subject-mode .empathy-badge { font-size: 1.07rem; }
@@ -424,7 +451,7 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 }
 .section-eyebrow {
   font-family: var(--outfit); font-size: 0.62rem; font-weight: 600;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink3);
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--result-label);
   margin-bottom: 0.35rem;
 }
 .section-title {
@@ -436,7 +463,6 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   font-weight: 600;
   word-break: normal;
 }
-#mainWrap .section-eyebrow { color: #6f6f68; }
 
 /* ══ 最も割れた文字ハイライト ══ */
 .highlight-card {
@@ -505,14 +531,13 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 /* ══ DISCOVERY カード ══ */
 #uniqueness, #diagnosis {
   --result-card-ink: #303951;
-  --result-card-muted: #555d74;
+  --result-card-muted: var(--result-text);
   --result-card-rule: #cdc9dc;
   background: linear-gradient(125deg, rgba(255,255,255,.91), rgba(246,242,255,.85));
   border-color: rgba(255,255,255,.86);
   border-radius: clamp(20px, 4vw, 29px);
   color: var(--result-card-ink);
 }
-#mainWrap :is(#uniqueness, #diagnosis) .section-eyebrow { color: #77778e; }
 #mainWrap :is(#uniqueness, #diagnosis) .section-title { color: var(--result-card-ink); }
 .sense-grid {
   display: flex; flex-direction: column; gap: clamp(.85rem, 3vw, 1.25rem);
@@ -577,7 +602,10 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   word-break: keep-all; overflow-wrap: break-word;
 }
 .sense-strong { font-family: var(--outfit); font-weight: 700; color: var(--ink); }
-.sense-color-word { font-weight: 700; }
+.sense-color-word {
+  font-weight: 700; color: var(--ink);
+  color: color-mix(in srgb, var(--sense-swatch), var(--ink) 68%);
+}
 .sense-comment { font-size: 0.65rem; color: var(--ink3); font-style: italic; line-height: 1.6; }
 
 /* 文言行 */
@@ -656,10 +684,10 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.08); align-self: center;
 }
-.vote-legend-label { font-size: 0.75rem; color: var(--ink2); line-height: 1.2; }
-.vote-legend-pct { font-family: var(--outfit); font-size: 0.75rem; font-weight: 600; color: var(--ink2); line-height: 1.2; }
+.vote-legend-label { font-size: 0.75rem; color: var(--result-text); line-height: 1.2; }
+.vote-legend-pct { font-family: var(--outfit); font-size: 0.75rem; font-weight: 600; color: var(--result-text); line-height: 1.2; }
 
-.vote-skipped { font-size: 0.75rem; color: var(--ink3); font-style: italic; }
+.vote-skipped { font-size: 0.75rem; color: var(--result-note); font-style: italic; }
 
 /* ══ 折りたたみ（フェード＋︙ボタン） ══ */
 .vote-collapse-wrap {
@@ -725,7 +753,7 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 .vote-outlier {
   display: flex; align-items: center; gap: 0.45rem;
   padding-left: calc(28px + 0.6rem);
-  color: var(--ink3); line-height: 1.5;
+  color: var(--result-note); line-height: 1.5;
 }
 .vote-outlier-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 .vote-outlier strong { color: var(--ink2); font-weight: 700; }
@@ -823,8 +851,8 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   font-size: 0.85rem; font-weight: 400; color: var(--ink2);
   line-height: 1.7;
 }
-.diag-lead { font-size: .9rem; font-weight: 400; color: var(--ink2); word-break: normal; }
-.diag-type-reflection { color: #6f6f68; font-style: italic; }
+.diag-lead { font-size: .9rem; font-weight: 400; color: var(--result-text); word-break: normal; }
+.diag-type-reflection { color: #504c5b; font-style: italic; }
 .vote-outlier, .diag-type-reflection { font-size: .7rem; }
 #mainWrap #diagnosis .section-title { font-size: clamp(1.1rem, 2.75vw, 1.4rem); }
 #diagnosis .diag-type-main { font-size: clamp(1.45rem, 4.5vw, 2.05rem); }
@@ -914,7 +942,7 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 }
 
 .share-btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.share-vote-note { font-style: normal; }
+.share-vote-note { color: var(--result-note); font-style: normal; }
 
 /* 画像保存ボタン */
 .btn-save-image {
@@ -1599,14 +1627,23 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
         <div class="type-hero-chip"><span>Color type:</span><strong class="type-name-color">${type.name}</strong></div>
       </div>
     </div>
-    <a class="scroll-indicator" href="#contentOuter">
-      <span class="scroll-indicator-label">Scroll</span>
-      <span class="scroll-indicator-icon" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
-          <polyline points="2,4 7,10 12,4"/>
+    <div class="type-hero-actions">
+      <a class="type-hero-share" href="#shareOuter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+          <path d="m8.6 10.5 6.8-4m-6.8 7 6.8 4"/>
+          <circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/>
         </svg>
-      </span>
-    </a>
+        Share results
+      </a>
+      <a class="scroll-indicator" href="#contentOuter">
+        <span class="scroll-indicator-label">Scroll</span>
+        <span class="scroll-indicator-icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
+            <polyline points="2,4 7,10 12,4"/>
+          </svg>
+        </span>
+      </a>
+    </div>
   </div>`;
 }
 
@@ -1762,6 +1799,10 @@ function buildHighlightCard(coloredLetters) {
 }
 
 /* ══ 個性・共感 統合カード ══ */
+function senseColorWord(color) {
+  return `<span class="sense-color-word" style="--sense-swatch:${isBright(color) ? 'var(--ink)' : color}">${getColorName(color)}</span>`;
+}
+
 function buildSenseCard(coloredLetters) {
   // ── 個性：最も少数派だった letters ──
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -1770,17 +1811,15 @@ function buildSenseCard(coloredLetters) {
   const uVotes = mostUnique ? DUMMY_VOTES[mostUnique] : [];
   const uTopPct = uVotes[0]?.pct || 0;
 
-  const uTopColorName = getColorName(uVotes[0]?.color || '');
-  const uMyColorName  = getColorName(uColor || '');
   const uTopColorHex  = uVotes[0]?.color || '#9698a8';
 
   const uniqueText = isAllMajority
     ? `<div class="empathy-pct-label">${isSubjectMode ? 'All your subject colors match the majority' : 'All your colors match the majority'}</div>`
     : `<div class="sense-sentence">
-        <span class="sense-strong">${uTopPct}%</span> chose <span class="sense-color-word" style="color:${isBright(uTopColorHex)?'var(--ink)':uTopColorHex}">${uTopColorName}</span> for ${itemLabel(mostUnique)}.
+        <span class="sense-strong">${uTopPct}%</span> chose ${senseColorWord(uTopColorHex)} for ${itemLabel(mostUnique)}.
       </div>
       <div class="sense-sentence">
-        <span class="sense-strong">You</span> saw <span class="sense-color-word" style="color:${isBright(uColor||'#888')?'var(--ink)':uColor}">${uMyColorName}</span>.
+        <span class="sense-strong">You</span> saw ${senseColorWord(uColor)}.
       </div>`;
 
   // ── 共感：Most shared letter ──
@@ -1794,8 +1833,7 @@ function buildSenseCard(coloredLetters) {
   });
 
   const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
-  const eColorName = eColor ? getColorName(eColor) : '';
-  const empathyColor = eColor ? `<span class="sense-color-word" style="color:${isBright(eColor)?'var(--result-card-ink)':eColor}">${eColorName}</span>` : '';
+  const empathyColor = eColor ? senseColorWord(eColor) : '';
 
   const empathyText = !mostEmpathy
     ? `<div class="empathy-pct-label">${isSubjectMode ? 'None of your subject colors matched the most popular choice.' : 'None of your colors matched the most popular choice.'}</div>`
@@ -2044,7 +2082,7 @@ function buildShareSection(diag, coloredLetters) {
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
           Save image
         </button>
-        <button class="btn-send-friend" id="btnSendFriend" data-text="${shareText.replace(/"/g,'&quot;')}">
+        <button class="btn-send-friend" id="btnSendFriend" data-text="${shareText.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Send to a friend
         </button>
@@ -2055,6 +2093,25 @@ function buildShareSection(diag, coloredLetters) {
       </div>
     </div>
   </div>`;
+}
+
+function bindResultShare(text) {
+  if (!text) return;
+  async function share() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'SynestheShare', text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      showToast('Copied to clipboard');
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+      showToast('Could not share your results');
+      document.getElementById('shareOuter')?.scrollIntoView();
+    }
+  }
+  document.getElementById('btnSendFriend')?.addEventListener?.('click', share);
 }
 
 /* ══ メイン描画 ══ */
@@ -2176,21 +2233,7 @@ function render() {
     document.getElementById('btnXShare')?.addEventListener('click', () => {
       window.open(document.getElementById('btnXShare').dataset.url, '_blank');
     });
-    // Send to a friendボタン（Web Share API → URLコピーにフォールバック）
-    document.getElementById('btnSendFriend')?.addEventListener('click', async () => {
-      const btn = document.getElementById('btnSendFriend');
-      const text = btn.dataset.text.replace(/&quot;/g, '"');
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'SynestheShare', text });
-        } catch (e) {
-          if (e.name !== 'AbortError') showToast('Could not share your results');
-        }
-      } else {
-        await navigator.clipboard.writeText(text).catch(() => {});
-        showToast('Copied to clipboard');
-      }
-    });
+    bindResultShare(document.getElementById('btnSendFriend')?.dataset.text);
 
     // ── STEP1: 画像保存ボタン ──
     document.getElementById('btnSaveImage')?.addEventListener('click', async () => {

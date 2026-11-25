@@ -341,10 +341,19 @@ nav ul a:hover { color: var(--ink); }
   max-width: 480px;
   margin-left: auto; margin-right: auto;
 }
-/* 26文字モード: 6列 */
+/* 26文字モード: 最終行も中央揃え */
 .alpha-grid.mode-26 {
-  grid-template-columns: repeat(6, 1fr);
+  --alpha-columns: 6;
+  --alpha-gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--alpha-gap);
   max-width: 100%;
+  margin-inline: auto;
+}
+.alpha-grid.mode-26 .alpha-cell {
+  flex: 0 0 calc((100% - (var(--alpha-columns) - 1) * var(--alpha-gap)) / var(--alpha-columns));
 }
 /* PC：円を少し小さく */
 @media (min-width: 641px) {
@@ -461,7 +470,7 @@ nav ul a:hover { color: var(--ink); }
   display: none;
 }
 .picker-title { font-family: var(--jp); font-weight: 700; font-size: 1rem; color: rgba(255,255,255,0.92); }
-.picker-title small { display: block; font-size: 0.75rem; color: rgba(255,255,255,0.45); font-weight: 300; margin-top: 0.1rem; }
+.picker-subtitle { display: block; font-size: 0.75rem; color: #fffdf9; font-weight: 300; margin-top: 0.1rem; }
 .picker-close {
   width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.20);
   background: rgba(255,255,255,0.06); cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -634,7 +643,7 @@ nav ul a:hover { color: var(--ink); }
   padding: 0.9rem 1.1rem;
   background: rgba(255,255,255,0.7);
   border: 1px solid var(--border); border-radius: 8px;
-  font-size: 0.78rem; color: var(--ink3); line-height: 1.6;
+  font-size: 0.78rem; color: #555260; line-height: 1.6;
   display: flex; align-items: flex-start; gap: 0.6rem;
   min-width: 0;
 }
@@ -672,7 +681,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
 ══════════════════════════════════════ */
 @media (max-width: 960px) {
   nav ul { display: none; }
-  .alpha-grid.mode-26 { grid-template-columns: repeat(6, 1fr); }
 }
 
 @media (max-width: 600px) {
@@ -688,7 +696,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   .progress-bar-wrap { padding: 0 1.25rem 1.5rem; }
   .main-wrap { padding: 2rem 1.25rem 0; }
   .alpha-grid.mode-10 { max-width: 100%; }
-  .alpha-grid.mode-26 { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .alpha-grid.mode-26 { --alpha-columns: 5; --alpha-gap: 8px; }
 
   .picker-sheet { border-radius: 16px 16px 0 0; padding: 1.25rem 1.25rem 2rem; }
 
@@ -712,10 +720,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     0 0 18px rgba(255,127,127,0.50),
     0 0 38px rgba(255,127,127,0.25);
 }
-.page-lead { color: rgba(255,255,255,0.62); }
-.progress-label { color: rgba(255,255,255,0.55); }
-.progress-count { color: rgba(255,255,255,0.75); }
-.mode-label { color: rgba(255,255,255,0.72); }
+.page-lead, .progress-label, .progress-count, .mode-label { color: #fffdf9; }
 .mode-label strong { color: var(--c1); font-weight: 340; }
 .btn-mode-toggle {
   color: rgba(255,255,255,0.85);
@@ -866,7 +871,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <div class="picker-letter-preview" id="pickerPreview">A</div>
       <div>
         <div class="picker-title" id="pickerTitle">A  — choose a color</div>
-        <div><small class="picker-title" style="font-size:0.75rem;color:var(--ink3);font-weight:300;display:block;margin-top:0.1rem;">Follow your intuition</small></div>
+        <small class="picker-subtitle">Follow your intuition</small>
       </div>
       <button class="picker-close" id="pickerClose">✕</button>
     </div>

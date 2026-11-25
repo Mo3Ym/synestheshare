@@ -2,6 +2,8 @@
   const palette = document.querySelector('.try-palette');
   const feedback = document.querySelector('.try-feedback');
   const card = feedback.closest('.try-card');
+  const alphabetLink = document.querySelector('.theme-card[href^="alphabet"]');
+  const alphabetHref = alphabetLink.getAttribute('href');
   const english = document.documentElement.lang === 'en';
   // The Japanese names are the field names in statistics/A.
   const colors = [
@@ -137,9 +139,17 @@
 
   palette.addEventListener('change', async ({ target }) => {
     const choice = target.value;
+    const colorIndex = colors.findIndex(color => color.key === choice);
+    const alphabetUrl = new URL(alphabetHref, location.href);
+    alphabetUrl.searchParams.set('mode', '10');
+    alphabetUrl.searchParams.set('r', '0123456789ABC'[colorIndex] + '---------');
+    alphabetLink.href = alphabetUrl.href;
     palette.querySelectorAll('input').forEach(input => { input.disabled = true; });
     palette.classList.add('has-choice');
     feedback.textContent = english ? 'Loading responses…' : 'みんなの回答を読み込み中…';
     draw(await readDistribution(), choice);
   }, { once: true });
+
+  // A new visit to the theme chooser starts a new diagnosis.
+  window.addEventListener('pagehide', () => alphabetLink.setAttribute('href', alphabetHref));
 })();

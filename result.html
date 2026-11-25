@@ -35,11 +35,11 @@
   const r      = params.get('r') || '';
   const image = new URL(r ? '/api/og' : '/ogp.png', base);
   if (r) {
-    for (const key of ['r', 'mode', 'majority', 'score', 'stat', 'lang', 'sense']) {
+    for (const key of ['r', 'mode', 'majority', 'score', 'stat', 'lang']) {
       if (params.has(key)) image.searchParams.set(key, params.get(key));
     }
     if (document.documentElement.lang === 'en') image.searchParams.set('lang', 'en');
-    image.searchParams.set('v', '28');
+    image.searchParams.set('v', '32');
   }
   const ogImageUrl = image.href;
   const pageUrl = location.href;
@@ -2294,11 +2294,11 @@ function buildShareSection(diag, coloredLetters) {
   sharedResult.searchParams.set('score', rareStat.value);
   sharedResult.searchParams.set('stat', rareStat.kind);
   sharedResult.searchParams.set('majority', diag.majorityRate);
-  sharedResult.searchParams.set('sense', diagType.id);
+  sharedResult.searchParams.delete('sense');
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '28');
+  ogUrl.searchParams.set('v', '32');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2399,7 +2399,7 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('sense');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '28');
+  image.searchParams.set('v', '32');
   const shareText = `🎨私の${themeName}の色は ${type.name} でした。\n\n――あなたの「${sampleItem}」は、何色ですか？\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">リンクを送って、<wbr>あなたの結果をシェアしよう。</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Xにシェア</a></div></div>`;
 }

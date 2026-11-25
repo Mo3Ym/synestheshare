@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { onRequest } from '../functions/api/og.js';
 import { parseAnswer, displayAnswer, renderPixels } from '../lib/og-renderer.js';
@@ -66,25 +65,16 @@ const invalidStats = await request('r=0527416C25&score=-1&majority=101');
 const absentStats = await request('r=0527416C25');
 assert.deepEqual(await invalidStats.arrayBuffer(), await absentStats.arrayBuffer());
 
-const effects = new Set();
-for (const [sense, majority, score, stat] of [
-  ['majority', 81, 19, 'empathy'],
-  ['balanced', 50, 19, 'empathy'],
-  ['distinctive', 30, 46, 'rarity'],
-  ['singular', 10, 22, 'rarity'],
-]) {
-  const withSense = await renderPixels(context, answer, '10', score, stat, 'ja', majority, sense);
-  assert.deepEqual(await renderPixels(context, answer, '10', score, stat, 'ja', majority), withSense);
-  const pixels = await renderPixels(context, answer, '10', null, 'empathy', 'ja', null, sense);
-  effects.add(createHash('sha256').update(pixels).digest('hex'));
-}
-assert.equal(effects.size, 4, 'Sense effects differ even for identical answers and statistics');
+const legacyQuery = 'r=0527416C25&majority=81&score=19';
+const withoutSense = await (await request(legacyQuery)).arrayBuffer();
+const legacySense = await request(legacyQuery + '&sense=singular');
+assert.deepEqual(await legacySense.arrayBuffer(), withoutSense);
 
 const image = new URL(ogImageUrl('https://example.test/result-en?r=0527416C25&majority=81&score=19&stat=empathy&sense=majority'));
 assert.equal(image.searchParams.get('majority'), '81');
 assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
-assert.equal(image.searchParams.get('sense'), 'majority');
-assert.equal(image.searchParams.get('v'), '28');
+assert.equal(image.searchParams.get('sense'), null);
+assert.equal(image.searchParams.get('v'), '32');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');

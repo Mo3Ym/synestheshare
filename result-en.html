@@ -598,11 +598,8 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 .sense-grid {
   display: flex; flex-direction: column; gap: clamp(.85rem, 3vw, 1.25rem);
 }
-.sense-col { display: flex; flex-direction: column; gap: .75rem; }
-.sense-col-label {
-  font-family: var(--jp); font-weight: 600; font-size: 1.05rem;
-  color: var(--result-card-ink);
-}
+.sense-col { display: flex; flex-direction: column; gap: calc(.75rem + 8px); }
+.sense-col-label { margin-bottom: 0; }
 .sense-divider { height: 1px; background: var(--result-card-rule); }
 
 /* 1行レイアウト：左＝色エリア、右＝テキスト */
@@ -1921,10 +1918,9 @@ function buildSenseCard(coloredLetters) {
 
   return `<div class="card" id="uniqueness">
     <div class="section-eyebrow">DISCOVERY</div>
-    <h2 class="section-title">Discover how differently we see.</h2>
     <div class="sense-grid">
       <div class="sense-col">
-        <h3 class="sense-col-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Most distinctive letter'}</h3>
+        <h2 class="section-title sense-col-label">${isSubjectMode ? 'Your most distinctive subject' : isNumberMode ? 'Most distinctive number' : 'Most distinctive letter'}</h2>
         <div class="sense-row">
           <div class="sense-circles">${uCirclesHtml}</div>
           <div class="sense-text">${uniqueText}</div>
@@ -1932,7 +1928,7 @@ function buildSenseCard(coloredLetters) {
       </div>
       <div class="sense-divider"></div>
       <div class="sense-col">
-        <h3 class="sense-col-label">${isSubjectMode ? 'Most shared subject' : isNumberMode ? 'Most shared number' : 'Most shared letter'}</h3>
+        <h2 class="section-title sense-col-label">${isSubjectMode ? 'Most shared subject' : isNumberMode ? 'Most shared number' : 'Most shared letter'}</h2>
         <div class="sense-row">
           <div class="sense-circles">${eCirclesHtml}</div>
           <div class="sense-text">${empathyText}</div>
@@ -2024,14 +2020,14 @@ function buildVoteSection(coloredLetters) {
   return html;
 }
 
-/* ══ 共感覚タイプ ══ */
+/* ══ Synesthesia type ══ */
 function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
   const rareStat = calcRareStat(diag);
   return `<div class="card profile-card" id="diagnosis" style="--profile-accent:${type.color}">
     <div class="diagnosis-content">
       <div class="section-eyebrow">SYNESTHESIA TYPE</div>
-      <h2 class="section-title">Your synesthesia profile</h2>
+      <h2 class="section-title">Synesthesia type</h2>
       <div class="diag-body">
         <h3 class="diag-type-main">${type.label}</h3>
         <p class="diag-lead">${type.summary}${type.note ? '<br>' + type.note : ''}</p>
@@ -2064,7 +2060,7 @@ function buildColorTypeSection(coloredLetters) {
 
   return `<div class="card profile-card" id="colortype" data-type="${type.id}" style="--profile-accent:${typeColor}">
     <div class="section-eyebrow">COLOR TYPE</div>
-    <h2 class="section-title">Your color tendencies</h2>
+    <h2 class="section-title">Color tendencies</h2>
     <div class="diag-body">
       <h3 class="diag-type-main">${type.name}</h3>
       <p class="diag-lead">${type.summary}</p>

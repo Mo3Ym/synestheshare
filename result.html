@@ -227,6 +227,11 @@ nav ul a:hover { color: var(--ink); }
     radial-gradient(ellipse 19% 24% at 79% 12%, #d2baff4e, transparent 94%),
     radial-gradient(ellipse 47% 25% at 14% 81%, #7975d433, transparent 96%);
   filter: blur(13px);
+  animation: rhStarHalo 9s ease-in-out infinite alternate;
+}
+@keyframes rhStarHalo {
+  from { opacity: .62; }
+  to { opacity: 1; }
 }
 @keyframes rhAuroraDrift {
   from { transform: translate3d(max(-90px, -11vw), 8vh, 0) rotate(-7deg); opacity: .65; }
@@ -949,12 +954,29 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   font-family: var(--outfit);
   font-size: clamp(1.9rem, 6.5vw, 2.8rem);
 }
-@supports (background-clip: text) and (color: color-mix(in srgb, white, black)) {
-  #colortype .diag-type-main {
+#colortype[data-type="cool"] { --profile-title-end: #4e64b5; }
+#colortype[data-type="nature"] { --profile-title-start: #568439; --profile-title-end: #1b7060; }
+#colortype[data-type="mono"] { --profile-title-start: #626b83; --profile-title-end: #32303e; }
+#colortype[data-type="pastel"] { --profile-title-end: #8755aa; }
+#colortype[data-type="neon"] { --profile-title-start: #c83c76; --profile-title-end: #6746bd; }
+#colortype[data-type="dream"] { --profile-title-end: #af508d; }
+#colortype[data-type="earth"] { --profile-title-end: #85613c; }
+#diagnosis[data-sense-type="majority"] { --profile-title-start: #257ac4; --profile-title-end: #4e5bbb; }
+#diagnosis[data-sense-type="balanced"] { --profile-title-start: #247b69; --profile-title-end: #536eb0; }
+#diagnosis[data-sense-type="distinctive"] { --profile-title-start: #aa5628; --profile-title-end: #b84478; }
+#diagnosis[data-sense-type="singular"] { --profile-title-start: #7750b1; --profile-title-end: #af5188; }
+@supports (background-clip: text) {
+  :is(#colortype, #diagnosis) .diag-type-main {
     width: fit-content;
-    background-image: linear-gradient(100deg, var(--profile-accent), var(--profile-title-end, color-mix(in srgb, var(--profile-accent), #372a46 27%)));
+    background-image: linear-gradient(100deg, var(--profile-title-start, var(--profile-accent)), var(--profile-title-end, var(--profile-accent)));
     background-clip: text;
     color: transparent;
+  }
+}
+@media (forced-colors: active) {
+  :is(#colortype, #diagnosis) .diag-type-main {
+    background-image: none;
+    color: CanvasText;
   }
 }
 .diag-type-desc {
@@ -1351,10 +1373,12 @@ footer {
   background: radial-gradient(circle closest-side, #fffdf5 0%, #e8dfff 9%, #c9b8f78c 25%, #aa94ee38 52%, transparent 100%);
   filter: blur(var(--star-blur));
   transform: translate(-50%, -50%); opacity: .62;
-  animation: rhStarTwinkle 7s ease-in-out var(--star-delay) infinite;
+  animation: rhStarTwinkle var(--star-period) ease-in-out var(--star-delay) infinite;
 }
-.rh-stars span:first-child { --star-x: 79%; --star-y: 12%; --star-size: 34px; --star-blur: 2.2px; --star-delay: -2s; }
-.rh-stars span:last-child { --star-x: 9%; --star-y: 81%; --star-size: 17px; --star-blur: 1.6px; --star-delay: -5s; }
+.rh-stars span:nth-child(1) { --star-x: 79%; --star-y: 12%; --star-size: 34px; --star-blur: 2.2px; --star-period: 6.2s; --star-delay: -2s; }
+.rh-stars span:nth-child(2) { --star-x: 9%; --star-y: 81%; --star-size: 17px; --star-blur: 1.6px; --star-period: 7.4s; --star-delay: -5s; }
+.rh-stars span:nth-child(3) { --star-x: 9%; --star-y: 28%; --star-size: 13px; --star-blur: 1.6px; --star-period: 5.4s; --star-delay: -3.6s; }
+.rh-stars span:nth-child(4) { --star-x: 91%; --star-y: 65%; --star-size: 15px; --star-blur: 1.8px; --star-period: 8.2s; --star-delay: -1s; }
 .rh-stars span::before {
   content: ''; position: absolute; inset: -60%;
   background:
@@ -1370,6 +1394,7 @@ footer {
   .rh-atmo::before, .rh-atmo::after,
   [data-sense-type="distinctive"] .rh-light::before,
   [data-sense-type="distinctive"] .rh-light::after,
+  [data-sense-type="singular"] .rh-light::before,
   .rh-p-a, .rh-p-b, .rh-p-c, .rh-p-d, .rh-diamonds span, .rh-stars span {
     animation: none;
   }
@@ -1835,7 +1860,7 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
     <div class="rh-p-c" aria-hidden="true"></div>
     <div class="rh-p-d" aria-hidden="true"></div>` : ''}
     ${senseType === 'balanced' ? buildBalancedLights() : ''}
-    ${senseType === 'singular' ? '<div class="rh-stars" aria-hidden="true"><span></span><span></span></div>' : ''}
+    ${senseType === 'singular' ? '<div class="rh-stars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>' : ''}
     <div class="type-hero-inner">
       ${voteErrorNotice}
       <header class="type-hero-heading">

@@ -5,155 +5,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SynestheShare — Debug</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; }
   body {
-    font-family: 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 2rem clamp(.75rem, 4vw, 2.5rem);
+    font-family: system-ui, sans-serif;
     background: #f7f7f5;
-    min-height: 100vh;
-    padding: 2.5rem 1.5rem;
-    color: #181818;
+    color: #24243a;
   }
-  h1 {
-    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em;
-    text-transform: uppercase; color: #888880;
-    margin-bottom: 2rem;
-    display: flex; align-items: center; gap: 0.6rem;
+  main { max-width: 64rem; margin-inline: auto; }
+  h1 { margin: 0 0 .5rem; font-size: 1.2rem; }
+  #debugNote { margin: 0 0 1.25rem; font-size: .875rem; color: #555260; }
+  .table-wrap {
+    overflow: auto; border: 1px solid #dbdbe2; border-radius: 16px; background: #fff;
   }
-  h1::before { content: ''; display: block; width: 20px; height: 1px; background: #888880; }
-  .debug-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; margin-bottom: 1.25rem; }
-  .debug-controls select { font: inherit; padding: .45rem .6rem; }
-  .debug-controls small { color: #555550; }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-    max-width: 900px;
+  table { width: 100%; min-width: 43rem; border-spacing: 0; font-size: .875rem; }
+  th, td { padding: .55rem .65rem; text-align: center; }
+  thead th { background: #efeff6; }
+  tbody th, tbody td { border-top: 1px solid #ececf0; }
+  tbody th { background: #fff; }
+  thead th:first-child, tbody th { position: sticky; left: 0; }
+  th:first-child { width: 8rem; text-align: start; white-space: nowrap; }
+  .preview-link {
+    display: flex; align-items: center; justify-content: center; min-height: 44px;
+    border: 1px solid #d6d5e0; border-radius: 10px;
+    background: var(--type-tint); color: #24243a; text-decoration: none;
   }
-  .card {
-    border-radius: 16px;
-    overflow: hidden;
-    text-decoration: none;
-    display: block;
-    position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  }
-  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
-  .card-art {
-    height: 120px;
-    position: relative;
-    overflow: hidden;
-  }
-  .card-art canvas { width: 100%; height: 100%; display: block; }
-  .card-body {
-    background: #fff;
-    padding: 1rem 1.1rem 1.1rem;
-    border-top: 1px solid rgba(0,0,0,0.06);
-  }
-  .card-type {
-    font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
-    margin-bottom: 0.25rem;
-  }
-  .card-param {
-    font-size: 0.65rem; font-family: monospace;
-    color: #888880; word-break: break-all;
-    line-height: 1.5;
-  }
-  .card-arrow {
-    position: absolute; top: 0.9rem; right: 1rem;
-    font-size: 0.75rem; color: #aaa;
-  }
+  .preview-link:hover { border-color: #75728a; }
+  .preview-link:focus-visible, .table-wrap:focus-visible { outline: 2px solid #4b4a75; outline-offset: -2px; }
 </style>
 </head>
 <body>
-<h1>SynestheShare — Type Debug</h1>
-<div class="debug-controls">
-  <label for="senseType">共感覚タイプ</label>
-  <select id="senseType">
-    <option value="">サンプル回答から判定</option>
-    <option value="majority">共感覚の王道</option>
-    <option value="balanced">バランス感受者</option>
-    <option value="distinctive">個性派の色覚者</option>
-    <option value="singular">孤高の共感覚者</option>
-  </select>
-  <small>デバッグでは投票されません。</small>
-</div>
-<div class="grid" id="grid"></div>
-
+<main>
+  <h1>SynestheShare — Type Debug</h1>
+  <p id="debugNote">プレビューでは投票されません。</p>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="タイプの組み合わせ">
+    <table aria-describedby="debugNote">
+      <thead>
+        <tr>
+          <th scope="col">TYPE</th>
+          <th scope="col">共感覚の王道</th>
+          <th scope="col">バランス感受者</th>
+          <th scope="col">個性派の色覚者</th>
+          <th scope="col">孤高の共感覚者</th>
+        </tr>
+      </thead>
+      <tbody id="typeRows"></tbody>
+    </table>
+  </div>
+</main>
 <script>
-const BASE = 'result.html';
-
 const TYPES = [
-  { id: 'warm',   name: 'SUNSET TYPE', r: '001122----', bg: '#f5ede4', colors: ['rgba(240,140,60,0.55)','rgba(224,80,40,0.28)','rgba(255,180,60,0.45)'] },
-  { id: 'cool',   name: 'OCEAN TYPE',  r: '6666665555', bg: '#e8f0f8', colors: ['rgba(24,136,200,0.45)','rgba(112,40,192,0.2)','rgba(112,203,255,0.3)'] },
-  { id: 'nature', name: 'FOREST TYPE', r: '334433----', bg: '#edf4e8', colors: ['rgba(42,158,96,0.4)','rgba(168,208,32,0.2)','rgba(42,158,96,0.25)'] },
-  { id: 'mono',   name: 'VOID TYPE',   r: 'AABBCC----', bg: '#f0f0ee', colors: ['rgba(24,24,24,0.18)','rgba(136,136,128,0.12)','rgba(80,80,80,0.1)'] },
-  { id: 'pastel', name: 'BLOOM TYPE',  r: 'CC6688CC--', bg: '#fdf0f5', colors: ['rgba(255,144,184,0.4)','rgba(112,203,255,0.35)','rgba(200,220,255,0.35)'] },
-  { id: 'neon',   name: 'NEON TYPE',   r: '0101565656', bg: '#f0eef8', colors: ['rgba(224,58,42,0.45)','rgba(112,40,192,0.35)','rgba(255,220,80,0.2)'] },
-  { id: 'dream',  name: 'DREAM TYPE',  r: '778855----', bg: '#f0eaf8', colors: ['rgba(176,96,232,0.45)','rgba(255,144,184,0.3)','rgba(112,40,192,0.2)'] },
-  { id: 'earth',  name: 'EARTH TYPE',  r: '994433----', bg: '#f0ece4', colors: ['rgba(192,120,64,0.4)','rgba(139,69,19,0.2)','rgba(42,158,96,0.25)'] },
+  { id: 'warm', name: 'SUNSET TYPE', answer: '001122----', tint: '#fbeee7' },
+  { id: 'cool', name: 'OCEAN TYPE', answer: '6666665555', tint: '#e7f3fa' },
+  { id: 'nature', name: 'FOREST TYPE', answer: '334433----', tint: '#edf4e8' },
+  { id: 'mono', name: 'VOID TYPE', answer: 'AABBCC----', tint: '#f0f0ee' },
+  { id: 'pastel', name: 'BLOOM TYPE', answer: 'CC6688CC--', tint: '#fbedf3' },
+  { id: 'neon', name: 'NEON TYPE', answer: '0101565656', tint: '#f2ebfa' },
+  { id: 'dream', name: 'DREAM TYPE', answer: '778855----', tint: '#ece9fa' },
+  { id: 'earth', name: 'EARTH TYPE', answer: '994433----', tint: '#f3ece4' },
 ];
+const senseIds = ['majority', 'balanced', 'distinctive', 'singular'];
+const senseHeadings = document.querySelectorAll('thead th:not(:first-child)');
+const rows = document.getElementById('typeRows');
 
-function drawMini(canvas, type) {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = canvas.offsetWidth, h = canvas.offsetHeight;
-  if (!w || !h) return;
-  canvas.width = w * dpr; canvas.height = h * dpr;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
+for (const type of TYPES) {
+  const row = rows.insertRow();
+  row.style.setProperty('--type-tint', type.tint);
+  const heading = document.createElement('th');
+  heading.scope = 'row';
+  heading.textContent = type.name;
+  row.append(heading);
 
-  ctx.fillStyle = type.bg; ctx.fillRect(0,0,w,h);
-
-  const rng = (() => { let s = 99; return () => { s ^= s<<13; s ^= s>>17; s ^= s<<5; return (s>>>0)/4294967296; }; })();
-
-  type.colors.forEach((c, i) => {
-    const x = w * [0.7, 0.15, 0.85][i];
-    const y = h * [0.25, 0.8, 0.6][i];
-    const r = w * [0.7, 0.55, 0.45][i];
-    const g = ctx.createRadialGradient(x,y,0,x,y,r);
-    g.addColorStop(0, c); g.addColorStop(1,'transparent');
-    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-  });
-
-  for (let i = 0; i < 40; i++) {
-    const x=rng()*w, y=rng()*h, r=0.5+rng()*2;
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${0.1+rng()*0.25})`; ctx.fill();
+  for (const [index, sense] of senseIds.entries()) {
+    const link = document.createElement('a');
+    const params = new URLSearchParams({ mode: '10', r: type.answer, debug: '1', previewColor: type.id, previewSense: sense });
+    link.className = 'preview-link';
+    link.href = `result.html?${params}`;
+    link.textContent = 'プレビュー';
+    link.setAttribute('aria-label', `${type.name} ／ ${senseHeadings[index].textContent}のプレビュー`);
+    row.insertCell().append(link);
   }
-
-  const v = ctx.createRadialGradient(w/2,h/2,h*0.1,w/2,h/2,w*0.75);
-  v.addColorStop(0,'transparent'); v.addColorStop(1,'rgba(0,0,0,0.1)');
-  ctx.fillStyle = v; ctx.fillRect(0,0,w,h);
 }
-
-const grid = document.getElementById('grid');
-const senseType = document.getElementById('senseType');
-
-TYPES.forEach(type => {
-  const card = document.createElement('a');
-  card.className = 'card';
-  card.innerHTML = `
-    <div class="card-art"><canvas></canvas></div>
-    <div class="card-body">
-      <div class="card-type">${type.name}</div>
-      <div class="card-param"></div>
-    </div>
-    <span class="card-arrow">→</span>
-  `;
-  grid.appendChild(card);
-
-  function updateLink() {
-    const params = new URLSearchParams({ mode: '10', r: type.r, debug: '1', previewColor: type.id });
-    if (senseType.value) params.set('previewSense', senseType.value);
-    card.href = `${BASE}?${params}`;
-    card.querySelector('.card-param').textContent = `?${params}`;
-  }
-  senseType.addEventListener('change', updateLink);
-  updateLink();
-
-  const canvas = card.querySelector('canvas');
-  requestAnimationFrame(() => drawMini(canvas, type));
-});
 </script>
 </body>
 </html>

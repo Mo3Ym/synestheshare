@@ -240,6 +240,44 @@ nav ul a:hover { color: var(--ink); }
   font-size: clamp(1rem, 5.7vw, 1.65rem);
   box-shadow: 0 0 11px #e9dcff48, inset 0 1px 0 #ffffff60;
 }
+/* Keep the entire alphabet palette in the page flow. */
+.type-hero[data-alphabet-palette] {
+  height: auto;
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+}
+.type-hero[data-alphabet-palette] :is(.type-hero-inner, .type-palette-strip) {
+  overflow: visible;
+}
+.type-hero[data-alphabet-palette] .type-palette-strip { flex: none; }
+.type-hero:is([data-alphabet-palette="medium"], [data-alphabet-palette="dense"]) .type-palette-strip {
+  --palette-halo-space: 8px;
+  --palette-gap: clamp(5px, 1.7vw, 9px);
+  gap: var(--palette-gap);
+  width: min(100%, calc(var(--palette-columns) * var(--hero-dot-size) + (var(--palette-columns) - 1) * var(--palette-gap) + 2 * var(--palette-halo-space) + 1px));
+}
+.type-hero[data-alphabet-palette="medium"] .type-palette-strip {
+  --palette-columns: 6;
+  --hero-dot-size: clamp(34px, 11.6vw, 52px);
+}
+.type-hero[data-alphabet-palette="dense"] .type-palette-strip {
+  --palette-columns: 7;
+  --hero-dot-size: clamp(31px, 10.5vw, 48px);
+}
+.type-hero:is([data-alphabet-palette="medium"], [data-alphabet-palette="dense"]) .type-palette-strip .type-palette-dot {
+  font-size: clamp(.95rem, 4.8vw, 1.35rem);
+}
+@media (min-width: 641px) {
+  .type-hero:is([data-alphabet-palette="medium"], [data-alphabet-palette="dense"]) .type-palette-strip {
+    --palette-columns: 9;
+  }
+}
+@media (max-height: 680px) {
+  .type-hero[data-alphabet-palette="dense"] .type-palette-strip {
+    --hero-dot-size: clamp(28px, 9.2vw, 38px);
+    --palette-gap: 5px;
+  }
+}
 .subject-mode .type-hero .type-palette-dot { font-size: clamp(.88rem, 4.2vw, 1.3rem); }
 .type-stat-card {
   width: min(100%, 520px);
@@ -287,21 +325,24 @@ nav ul a:hover { color: var(--ink); }
 }
 .type-hero-chip strong { color: #ffe3a1; font-weight: 700; }
 html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
-.type-name-color { font-family: var(--outfit); letter-spacing: .04em; }
-.type-hero-actions {
-  position: relative; z-index: 2; flex-shrink: 0;
-  display: grid; justify-items: center; gap: clamp(.45rem, 1.8vh, 1rem);
+@media (min-width: 375px) and (max-width: 600px) {
+  .type-hero-chip:lang(ja) { padding-inline: clamp(.56rem, 2.3vw, .78rem); }
 }
-.type-hero-share {
+@media (min-width: 460px) and (max-width: 600px) {
+  .type-hero-chip:lang(en) { padding-inline: clamp(.65rem, 2.3vw, .78rem); }
+}
+.type-name-color { font-family: var(--outfit); letter-spacing: .04em; }
+.result-share-link {
+  align-self: center;
   display: inline-flex; align-items: center; gap: .45rem;
   min-height: 44px; padding: .4rem .85rem;
-  border: 1px solid #fffdf959; border-radius: 99px;
-  background: #15111b29; color: #fffdf9;
+  border: 1px solid #fffdf9cf; border-radius: 99px;
+  background: #fffdf9de; color: var(--ink);
   font: 500 .76rem var(--jp); text-decoration: none;
 }
-.type-hero-share:hover { background: #15111b55; }
-.type-hero-share:focus-visible { outline: 2px solid #fffdf9; outline-offset: 3px; }
-.type-hero-share svg { width: 15px; height: 15px; }
+.result-share-link:hover { background: #fffdf9; }
+.result-share-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.result-share-link svg { width: 15px; height: 15px; }
 @media (max-height: 680px) {
   .type-hero { padding-block: clamp(.55rem, 1.8vh, .9rem); row-gap: .55rem; }
   .type-hero-inner { gap: clamp(.4rem, 1.5vh, .7rem); }
@@ -311,6 +352,16 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   .type-hero-insight p { margin-top: .3rem; }
   .type-hero-chips { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, max-content); }
   .type-hero-chip { padding-block: .3rem; }
+}
+@media (min-width: 641px) and (min-height: 681px) and (max-height: 800px) {
+  .type-hero[data-alphabet-palette="dense"] { padding-block: min(3.25vh, 1.65rem); }
+  .type-hero[data-alphabet-palette="dense"] .type-hero-inner { gap: min(3vh, 1.25rem); }
+  .type-hero[data-alphabet-palette="dense"] .type-hero-insight { margin-block-start: .65rem; }
+}
+@media (max-height: 680px) {
+  .type-hero[data-alphabet-palette="dense"] .type-hero-inner { gap: .45rem; }
+  .type-hero[data-alphabet-palette="dense"] .type-stat-row { padding-block: .45rem; }
+  .type-hero[data-alphabet-palette="dense"] .type-hero-insight .type-palette-dot { width: 29px; height: 29px; }
 }
 .subject-mode .sense-circle { font-size: 0.86rem; }
 .subject-mode .vote-letter-badge { font-size: 0.64rem; }
@@ -1603,8 +1654,10 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
   const mostUnique = unique?.isAllMajority ? null : unique?.mostUnique;
   const majorityVote = mostUnique && DUMMY_VOTES[mostUnique]?.[0];
   const highlight = majorityVote ? `${majorityVote.pct}%が${getColorName(majorityVote.color)}を選ぶ${itemLabel(mostUnique)}に、<wbr>あなたは${getColorName(colorMap[mostUnique])}を見ていました。` : '';
+  const answerCount = coloredLetters.length;
+  const paletteDensity = answerCount > 18 ? 'dense' : answerCount > 10 ? 'medium' : 'regular';
 
-  return `<div class="type-hero" data-type="${typeId}" style="background-image:url('./assets/backgrounds/${TYPE_BG[typeId]}.webp')">
+  return `<div class="type-hero" data-type="${typeId}"${isFullMode ? ` data-alphabet-palette="${paletteDensity}"` : ''} style="background-image:url('./assets/backgrounds/${TYPE_BG[typeId]}.webp')">
     ${diag ? '<canvas class="type-art-canvas" id="artCanvas" aria-hidden="true"></canvas>' : ''}
     <div class="rh-atmo" aria-hidden="true"></div>
     <div class="rh-p-a" aria-hidden="true"></div>
@@ -1640,23 +1693,14 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
         <div class="type-hero-chip"><span>色の傾向：</span><strong class="type-name-color">${type.name}</strong></div>
       </div>
     </div>
-    <div class="type-hero-actions">
-      <a class="type-hero-share" href="#shareOuter">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
-          <path d="m8.6 10.5 6.8-4m-6.8 7 6.8 4"/>
-          <circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/>
+    <a class="scroll-indicator" href="#contentOuter">
+      <span class="scroll-indicator-label">Scroll</span>
+      <span class="scroll-indicator-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
+          <polyline points="2,4 7,10 12,4"/>
         </svg>
-        結果をシェア
-      </a>
-      <a class="scroll-indicator" href="#contentOuter">
-        <span class="scroll-indicator-label">Scroll</span>
-        <span class="scroll-indicator-icon" aria-hidden="true">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hero-ink3)">
-            <polyline points="2,4 7,10 12,4"/>
-          </svg>
-        </span>
-      </a>
-    </div>
+      </span>
+    </a>
   </div>`;
 }
 
@@ -2118,6 +2162,14 @@ function bindResultShare(text) {
 }
 
 /* ══ メイン描画 ══ */
+const RESULT_SHARE_LINK = `<a class="result-share-link" href="#shareOuter">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+    <path d="m8.6 10.5 6.8-4m-6.8 7 6.8 4"/>
+    <circle cx="6" cy="12" r="3"/><circle cx="18" cy="5" r="3"/><circle cx="18" cy="19" r="3"/>
+  </svg>
+  結果をシェア
+</a>`;
+
 function renderWithoutStats(coloredLetters) {
   const type = COLOR_TYPES.find(item => item.id === detectColorType(coloredLetters));
   const themeName = isSubjectMode ? '教科' : '数字';
@@ -2130,7 +2182,7 @@ function renderWithoutStats(coloredLetters) {
     : status === 'error' ? '投票データを取得できませんでした。時間をおいて再度お試しください。'
     : '選んだ項目の投票データがまだないため、共感度は未集計です。色のタイプと選んだ色は、下の結果からシェアできます。';
   document.getElementById('typeHeroArea').innerHTML = buildTypeHero(coloredLetters);
-  document.getElementById('mainWrap').innerHTML = `<div class="card"><p>${message}</p>${window.themeVoteError ? '<p class="statistics-error-code"></p>' : ''}<a class="btn-back" href="${pickerUrl}${location.search}">← 色を選び直す</a></div>`;
+  document.getElementById('mainWrap').innerHTML = RESULT_SHARE_LINK + `<div class="card"><p>${message}</p>${window.themeVoteError ? '<p class="statistics-error-code"></p>' : ''}<a class="btn-back" href="${pickerUrl}${location.search}">← 色を選び直す</a></div>`;
   const errorCode = document.querySelector?.('.statistics-error-code');
   if (errorCode) errorCode.textContent = window.themeVoteError;
   const url = new URL(location.href);
@@ -2188,6 +2240,7 @@ function render() {
 
     // ② ダークエリア（診断・グラフ・ハイライト）
     mainWrap.innerHTML =
+      RESULT_SHARE_LINK +
       buildSenseCard(coloredLetters) +
       buildVoteSection(coloredLetters) +
       buildColorTypeSection(coloredLetters) +

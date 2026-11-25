@@ -35,11 +35,11 @@
   const r      = params.get('r') || '';
   const image = new URL(r ? '/api/og' : '/ogp.png', base);
   if (r) {
-    for (const key of ['r', 'mode', 'majority', 'score', 'stat', 'lang']) {
+    for (const key of ['r', 'mode', 'majority', 'score', 'stat', 'lang', 'sense']) {
       if (params.has(key)) image.searchParams.set(key, params.get(key));
     }
     if (document.documentElement.lang === 'en') image.searchParams.set('lang', 'en');
-    image.searchParams.set('v', '25');
+    image.searchParams.set('v', '28');
   }
   const ogImageUrl = image.href;
   const pageUrl = location.href;
@@ -884,22 +884,12 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   margin-bottom: .3rem;
 }
 #colortype {
-  --profile-glow: #efe5fb;
-  --profile-light: #fff7ff;
-  --profile-ribbon: #e4c9f38f;
-  --profile-tip: #b29beaa1;
+  --profile-haze: #fff2cf9c;
+  --profile-tip: #b5caed9e;
   background:
-    radial-gradient(ellipse at 87% 31%, #ffffffad, transparent 27%),
-    radial-gradient(ellipse at 76% 72%, var(--profile-light), transparent 28%),
-    radial-gradient(ellipse at 94% 88%, var(--profile-glow), transparent 53%),
-    linear-gradient(112deg, #fbfafff5, #f4edf9ee);
-}
-@supports (color: color-mix(in srgb, white, black)) {
-  #colortype {
-    --profile-glow: color-mix(in srgb, var(--profile-accent) 15%, #fff5fa);
-    --profile-ribbon: color-mix(in srgb, var(--profile-accent) 32%, #f2dff670);
-    --profile-tip: color-mix(in srgb, var(--profile-accent) 27%, #c8b8f2ae);
-  }
+    radial-gradient(ellipse at 77% 65%, var(--profile-haze), transparent 47%),
+    radial-gradient(ellipse at 100% 100%, var(--profile-tip), transparent 55%),
+    linear-gradient(112deg, #fbfafff5, #f6f0f8f0);
 }
 #colortype[data-type="warm"] {
   --profile-title-end: #db715e;
@@ -907,45 +897,26 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 }
 #colortype::before, #colortype::after {
   content: ''; position: absolute; z-index: -1; pointer-events: none;
-  border-top: 1px solid #ffffff94;
-  box-shadow: inset 0 2px 8px #ffffff54;
-  mask-image: linear-gradient(90deg, transparent 4%, #000 44%);
-}
-#colortype::before {
-  inset-inline-end: -13%; bottom: -45%;
-  width: 73%; height: 99%;
-  border-radius: 72% 34% 0 0 / 82% 60% 0 0;
-  transform: rotate(-24deg);
-  background:
-    radial-gradient(ellipse at 64% 4%, #ffffffbf, transparent 29%),
-    radial-gradient(ellipse at 47% 11%, var(--profile-light), transparent 48%),
-    linear-gradient(103deg, transparent 7%, var(--profile-ribbon) 57%, var(--profile-tip) 97%);
-}
-#colortype::after {
-  inset-inline-end: -13%; bottom: -52%;
-  width: 63%; height: 86%;
-  border-radius: 83% 29% 0 0 / 96% 57% 0 0;
-  transform: rotate(-17deg);
-  background:
-    radial-gradient(ellipse at 76% 7%, #fff3ffc9, transparent 34%),
-    linear-gradient(102deg, transparent 6%, var(--profile-ribbon) 51%, var(--profile-tip) 82%);
-}
-/* Use only the original image's text-free areas and blend them into the card. */
-#colortype[data-type="warm"]::before,
-#colortype[data-type="warm"]::after {
+  /* Reuse the same text-free regions of the Sunset artwork for every theme. */
   inset: auto -1.1% 0 -1%;
-  width: auto; height: auto;
   aspect-ratio: 838 / 286;
-  border: 0; border-radius: 0; box-shadow: none; transform: translateY(2.8%);
+  transform: translateY(2.8%);
   background: url('assets/backgrounds/sunset-card-reference.png') center / contain no-repeat;
   mask-composite: intersect;
 }
-#colortype[data-type="warm"]::before {
+#colortype:not([data-type="warm"])::before,
+#colortype:not([data-type="warm"])::after {
+  /* Recolor the wave while keeping the light and shadow from the original artwork. */
+  background-image: linear-gradient(137deg, var(--wave-light), var(--wave-middle, var(--wave-deep)) 62%, var(--wave-deep)), url('assets/backgrounds/sunset-card-reference.png');
+  background-blend-mode: color;
+  opacity: .86;
+}
+#colortype::before {
   mask-image:
     linear-gradient(to right, transparent 64%, #000 69%),
     linear-gradient(to bottom, transparent 6%, #000 24%);
 }
-#colortype[data-type="warm"]::after {
+#colortype::after {
   mask-image:
     linear-gradient(to right, transparent 53%, #000 65%),
     linear-gradient(to bottom, transparent 6%, #000 24%, #000 56%, transparent 64%, transparent 85%, #000 91%);
@@ -954,13 +925,41 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   font-family: var(--outfit);
   font-size: clamp(1.9rem, 6.5vw, 2.8rem);
 }
-#colortype[data-type="cool"] { --profile-title-end: #4e64b5; }
-#colortype[data-type="nature"] { --profile-title-start: #568439; --profile-title-end: #1b7060; }
-#colortype[data-type="mono"] { --profile-title-start: #626b83; --profile-title-end: #32303e; }
-#colortype[data-type="pastel"] { --profile-title-end: #8755aa; }
-#colortype[data-type="neon"] { --profile-title-start: #c83c76; --profile-title-end: #6746bd; }
-#colortype[data-type="dream"] { --profile-title-end: #af508d; }
-#colortype[data-type="earth"] { --profile-title-end: #85613c; }
+#colortype[data-type="cool"] {
+  --profile-title-start: #2c82b2; --profile-title-end: #555fa3;
+  --profile-haze: #dbeff9ae; --profile-tip: #b7c5efa8;
+  --wave-light: #a8d9ed; --wave-middle: #a8c6e6; --wave-deep: #9a9cce;
+}
+#colortype[data-type="nature"] {
+  --profile-title-start: #5a7a28; --profile-title-end: #17695d;
+  --profile-haze: #f0f5bab0; --profile-tip: #9ecbbca3;
+  --wave-light: #dcf099; --wave-middle: #a5d894; --wave-deep: #63ad98;
+}
+#colortype[data-type="mono"] {
+  --profile-title-start: #5a6474; --profile-title-end: #323643;
+  --profile-haze: #e8eaf0a3; --profile-tip: #a8b0beae;
+  --wave-light: #e0e3e9; --wave-middle: #bfc6d1; --wave-deep: #8e99ae;
+}
+#colortype[data-type="pastel"] {
+  --profile-title-start: #b34d83; --profile-title-end: #397ca4;
+  --profile-haze: #fff1c9a8; --profile-tip: #b6daf3a3;
+  --wave-light: #ffe6ae; --wave-middle: #f6c7e3; --wave-deep: #a9d5ec;
+}
+#colortype[data-type="neon"] {
+  --profile-title-start: #b95032; --profile-title-middle: #a84482; --profile-title-end: #365dbc;
+  --profile-haze: #ffe0bbb0; --profile-tip: #aebef5b3;
+  --wave-light: #fbbd83; --wave-middle: #dd9cde; --wave-deep: #96aff5;
+}
+#colortype[data-type="dream"] {
+  --profile-title-start: #a44e91; --profile-title-middle: #7853ba; --profile-title-end: #416db7;
+  --profile-haze: #f5d5efb0; --profile-tip: #a5b8efa8;
+  --wave-light: #f1bbdf; --wave-middle: #c5abf1; --wave-deep: #97baf1;
+}
+#colortype[data-type="earth"] {
+  --profile-title-start: #536f32; --profile-title-end: #895b39;
+  --profile-haze: #f3e5b2ad; --profile-tip: #c7ad8aa8;
+  --wave-light: #b3c294; --wave-middle: #d8c28d; --wave-deep: #ba9374;
+}
 #diagnosis[data-sense-type="majority"] { --profile-title-start: #257ac4; --profile-title-end: #4e5bbb; }
 #diagnosis[data-sense-type="balanced"] { --profile-title-start: #247b69; --profile-title-end: #536eb0; }
 #diagnosis[data-sense-type="distinctive"] { --profile-title-start: #aa5628; --profile-title-end: #b84478; }
@@ -968,7 +967,7 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
 @supports (background-clip: text) {
   :is(#colortype, #diagnosis) .diag-type-main {
     width: fit-content;
-    background-image: linear-gradient(100deg, var(--profile-title-start, var(--profile-accent)), var(--profile-title-end, var(--profile-accent)));
+    background-image: linear-gradient(100deg, var(--profile-title-start, var(--profile-accent)), var(--profile-title-middle, var(--profile-title-end, var(--profile-accent)) 100%), var(--profile-title-end, var(--profile-accent)));
     background-clip: text;
     color: transparent;
   }
@@ -1021,14 +1020,22 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   width: clamp(54px, 16vw, 96px);
 }
 #diagnosis[data-sense-type="balanced"] .diagnosis-content::before {
-  border: 1px solid #74a99f59;
-  background: linear-gradient(135deg, #f6ffde80, #a5e1ce87 52%, #a9d8ed5e);
-  transform: translate(-25%, 4%) rotate(45deg);
+  border-radius: 16% 24% 18% 22%;
+  background:
+    radial-gradient(ellipse at 29% 31%, #fbffe8b5, transparent 62%),
+    linear-gradient(135deg, #d8f2c899, #a5e1ce87 53%, #a9d8ed5e);
+  box-shadow: 0 0 14px #a5e1ce44;
+  filter: blur(1.5px);
+  transform: translate(-25%, 4%) rotate(41deg);
 }
 #diagnosis[data-sense-type="balanced"] .diagnosis-content::after {
-  border: 1px solid #9894c963;
-  background: linear-gradient(145deg, #e7f7ff91, #c0b3ed78 58%, #f5cfe787);
-  transform: translate(3%, 24%) rotate(45deg);
+  border-radius: 23% 16% 26% 19%;
+  background:
+    radial-gradient(ellipse at 60% 73%, #ffdfef9e, transparent 66%),
+    linear-gradient(145deg, #e7f7ff91, #c0b3ed82 58%, #f5cfe777);
+  box-shadow: 0 0 16px #c0b3ed45;
+  filter: blur(2px);
+  transform: translate(3%, 24%) rotate(49deg) scale(.92);
 }
 #diagnosis[data-sense-type="distinctive"] .diagnosis-content::before {
   background:
@@ -2288,10 +2295,11 @@ function buildShareSection(diag, coloredLetters) {
   sharedResult.searchParams.set('score', rareStat.value);
   sharedResult.searchParams.set('stat', rareStat.kind);
   sharedResult.searchParams.set('majority', diag.majorityRate);
+  sharedResult.searchParams.set('sense', diagType.id);
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '25');
+  ogUrl.searchParams.set('v', '28');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2389,9 +2397,10 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('score');
   url.searchParams.delete('stat');
   url.searchParams.delete('majority');
+  url.searchParams.delete('sense');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '25');
+  image.searchParams.set('v', '28');
   const shareText = `🎨My ${isSubjectMode ? 'school-subject' : 'number'} colors are ${type.name}.\n\n— What color is your “${sampleItem}”?\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
 }

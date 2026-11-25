@@ -56,7 +56,7 @@ export async function onRequest(context) {
   const majority = readPercentage(url.searchParams, 'majority');
   const stat = url.searchParams.get('stat') === 'rarity' ? 'rarity' : 'empathy';
   try {
-    const pixels = await renderPixels(context, answer, mode, score, stat, url.searchParams.get('lang') === 'en' ? 'en' : 'ja', majority);
+    const pixels = await renderPixels(context, answer, mode, score, stat, url.searchParams.get('lang') === 'en' ? 'en' : 'ja', majority, url.searchParams.get('sense'));
     const png = await encodePNG(pixels, 1200, 630);
     return new Response(png, { headers: {
       'Content-Type': 'image/png',

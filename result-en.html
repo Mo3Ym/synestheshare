@@ -273,7 +273,8 @@ nav ul a:hover { color: var(--ink); }
   font-size: clamp(.85rem, 3.5vw, 1.05rem); font-weight: 500;
   color: #fff7e8;
 }
-.type-hero-insight h2::before, .type-hero-insight h2::after {
+.type-hero-insight .type-hero-all-match::before,
+.type-hero-insight .type-hero-all-match::after {
   content: ''; height: 1px; flex: 1 1 12px; max-width: 42px; background: #ffffff40;
 }
 .type-hero-insight .type-palette-dot { flex: 0 0 auto; width: 36px; height: 36px; font-size: .93rem; }
@@ -1632,7 +1633,7 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
       </div>
       <div class="type-hero-insight">
         ${highlight ? `<h2><span>Your most distinctive choice</span>${dot(mostUnique)}</h2><p>${highlight}</p>`
-          : '<h2><span>All your colors match the majority</span></h2>'}
+          : '<h2 class="type-hero-all-match"><span>All your colors match the majority</span></h2>'}
       </div>` : ''}
       <div class="type-hero-chips">
         ${diagType ? `<div class="type-hero-chip"><span>Synesthesia type:</span><strong class="type-name-diag">${diagType.label.replace(/^[✦◈◎◇]\s*/, '')}</strong></div>` : ''}

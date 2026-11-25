@@ -20,6 +20,9 @@
     display: flex; align-items: center; gap: 0.6rem;
   }
   h1::before { content: ''; display: block; width: 20px; height: 1px; background: #888880; }
+  .debug-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; margin-bottom: 1.25rem; }
+  .debug-controls select { font: inherit; padding: .45rem .6rem; }
+  .debug-controls small { color: #555550; }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -64,6 +67,17 @@
 </head>
 <body>
 <h1>SynestheShare — Type Debug</h1>
+<div class="debug-controls">
+  <label for="senseType">共感覚タイプ</label>
+  <select id="senseType">
+    <option value="">サンプル回答から判定</option>
+    <option value="majority">共感覚の王道</option>
+    <option value="balanced">バランス感受者</option>
+    <option value="distinctive">個性派の色覚者</option>
+    <option value="singular">孤高の共感覚者</option>
+  </select>
+  <small>デバッグでは投票されません。</small>
+</div>
 <div class="grid" id="grid"></div>
 
 <script>
@@ -113,21 +127,29 @@ function drawMini(canvas, type) {
 }
 
 const grid = document.getElementById('grid');
+const senseType = document.getElementById('senseType');
 
 TYPES.forEach(type => {
-  const url = `${BASE}?mode=10&r=${type.r}`;
   const card = document.createElement('a');
   card.className = 'card';
-  card.href = url;
   card.innerHTML = `
     <div class="card-art"><canvas></canvas></div>
     <div class="card-body">
       <div class="card-type">${type.name}</div>
-      <div class="card-param">?mode=10&r=${type.r}</div>
+      <div class="card-param"></div>
     </div>
     <span class="card-arrow">→</span>
   `;
   grid.appendChild(card);
+
+  function updateLink() {
+    const params = new URLSearchParams({ mode: '10', r: type.r, debug: '1', previewColor: type.id });
+    if (senseType.value) params.set('previewSense', senseType.value);
+    card.href = `${BASE}?${params}`;
+    card.querySelector('.card-param').textContent = `?${params}`;
+  }
+  senseType.addEventListener('change', updateLink);
+  updateLink();
 
   const canvas = card.querySelector('canvas');
   requestAnimationFrame(() => drawMini(canvas, type));

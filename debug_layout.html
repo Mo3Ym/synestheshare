@@ -255,7 +255,7 @@ document.addEventListener('click', e => {
   if (e.target.matches('.preset[data-r]')) {
     const r = e.target.dataset.r;
     document.getElementById('rparam').value = r;
-    iframe.src = `result.html?r=${encodeURIComponent(r)}&mode=10&_=${Date.now()}`;
+    iframe.src = `result.html?r=${encodeURIComponent(r)}&mode=10&debug=1&_=${Date.now()}`;
   }
 });
 
@@ -264,7 +264,7 @@ document.getElementById('frameW').addEventListener('input', e => {
   iframe.style.width = e.target.value + 'px';
 });
 document.getElementById('rparam').addEventListener('change', e => {
-  iframe.src = `result.html?r=${encodeURIComponent(e.target.value)}&mode=10&_=${Date.now()}`;
+  iframe.src = `result.html?r=${encodeURIComponent(e.target.value)}&mode=10&debug=1&_=${Date.now()}`;
 });
 
 /* iframe ロード時 / 高さは縦いっぱい */
@@ -280,7 +280,7 @@ window.addEventListener('resize', () => {
   iframe.style.height = (window.innerHeight - 40) + 'px';
 });
 // 初回ロード（キャッシュバスター付きで古い 308 リダイレクト回避）
-iframe.src = `result.html?r=${encodeURIComponent(document.getElementById('rparam').value)}&mode=10&_=${Date.now()}`;
+iframe.src = `result.html?r=${encodeURIComponent(document.getElementById('rparam').value)}&mode=10&debug=1&_=${Date.now()}`;
 setupIframe();
 </script>
 </body>

@@ -1,5 +1,6 @@
 (() => {
   const params = new URLSearchParams(location.search);
+  if (params.get('debug') === '1') return;
   const answer = params.get('r') || '';
   if (!/^[0-9ABC-]+$/.test(answer) || !/[0-9ABC]/.test(answer)) return;
   const mode = params.get('mode') || '10';

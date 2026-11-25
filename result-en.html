@@ -167,7 +167,7 @@ nav ul a:hover { color: var(--ink); }
   --hero-dot-size: clamp(34px, 13vw, 60px);
   height: calc(100vh - var(--nav-h));
   height: calc(100svh - var(--nav-h));
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; isolation: isolate;
   padding: calc(clamp(2.25rem, 9vw, 4.25rem) * var(--hero-spacing-scale))
            clamp(1rem, 4.6vw, 1.5rem)
            calc(clamp(1.25rem, calc(var(--hero-spacing-reference) * .035), 2.25rem) * var(--hero-spacing-scale));
@@ -177,6 +177,61 @@ nav ul a:hover { color: var(--ink); }
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+.rh-light {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+.rh-light::before, .rh-light::after {
+  content: ''; position: absolute; inset: 0;
+}
+[data-sense-type="balanced"] .rh-light::before {
+  inset: -18% -15%;
+  background:
+    radial-gradient(ellipse 25% 45% at 9% 39%, #54d0c662, transparent 96%),
+    radial-gradient(ellipse 25% 43% at 92% 65%, #a393ec6b, transparent 94%);
+  transform: rotate(-14deg); filter: blur(18px);
+}
+[data-sense-type="balanced"] .rh-light::after {
+  background:
+    radial-gradient(ellipse 30% 34% at -2% 36%, #aaf8da46, transparent 95%),
+    radial-gradient(ellipse 26% 29% at 102% 63%, #beb2ff58, transparent 96%);
+  filter: blur(10px);
+}
+[data-sense-type="distinctive"] .rh-light {
+  /* Leave space for both the sideways drift and the tilt on tall screens. */
+  --aurora-overscan: calc(min(90px, 11vw) + 9vh + 24px);
+}
+[data-sense-type="distinctive"] .rh-light::before {
+  inset: -8% min(-39%, calc(-1 * var(--aurora-overscan))) -13% 9%;
+  background: conic-gradient(from 218deg at 88% 19%, transparent 0deg 7deg, #8eeada66 14deg, #b393ed83 22deg, #eca6b969 28deg, transparent 39deg 51deg, #8faaff50 59deg, transparent 73deg);
+  mask-image: linear-gradient(to right, transparent, #000 13%, #000 92%, transparent),
+              linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  mask-composite: intersect;
+  filter: blur(17px);
+  animation: rhAuroraDrift 5.5s ease-in-out -1.7s infinite alternate;
+}
+[data-sense-type="distinctive"] .rh-light::after {
+  inset: -16% calc(-1 * var(--aurora-overscan));
+  background:
+    linear-gradient(134deg, transparent 22%, #ac8ff830 38%, #e5befe72 44%, #a6defa3d 52%, transparent 65%),
+    linear-gradient(155deg, transparent 54%, #aecbfb59 64%, #ffd2a948 68%, transparent 75%);
+  mask-image: linear-gradient(to right, transparent, #000 30%, #000 91%, transparent),
+              linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  mask-composite: intersect;
+  filter: blur(12px);
+  animation: rhAuroraDrift 7.5s ease-in-out -4.7s infinite alternate-reverse;
+}
+[data-sense-type="singular"] .rh-light::before {
+  background:
+    radial-gradient(ellipse 52% 32% at 77% 12%, #9d8be46b, transparent 94%),
+    radial-gradient(ellipse 19% 24% at 79% 12%, #d2baff4e, transparent 94%),
+    radial-gradient(ellipse 47% 25% at 14% 81%, #7975d433, transparent 96%);
+  filter: blur(13px);
+}
+@keyframes rhAuroraDrift {
+  from { transform: translate3d(max(-90px, -11vw), 8vh, 0) rotate(-7deg); opacity: .65; }
+  52% { transform: translate3d(0, -1vh, 0) rotate(1deg); opacity: 1; }
+  to { transform: translate3d(min(90px, 11vw), -8vh, 0) rotate(7deg); opacity: .76; }
 }
 @supports (opacity: calc(100svh / 1px)) {
   .type-hero {
@@ -200,6 +255,7 @@ nav ul a:hover { color: var(--ink); }
 .type-hero[data-type="earth"] { --hero-shade: 0.56; }
 .type-hero[data-type="mono"] { --hero-shade: 0.60; }
 .type-hero[data-type="neon"] { --hero-shade: 0.58; }
+.type-hero[data-sense-type="singular"] { --hero-shade: 0.68; }
 .type-hero-inner {
   position: relative; z-index: 1;
   flex: 1 1 auto; min-height: 0;
@@ -223,6 +279,7 @@ nav ul a:hover { color: var(--ink); }
   font-family: var(--jp); font-weight: 450; line-height: 1.4;
   font-size: clamp(1.55rem, 8.8vw, 3rem); letter-spacing: .015em;
   color: #fffdf9; text-wrap: balance;
+  text-shadow: 0 0 8px #fff7ed40, 0 0 20px #ddd0ff29;
 }
 .type-hero[data-type="warm"] .type-title { color: #ffe9c9; }
 .type-palette-strip {
@@ -915,19 +972,58 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   #diagnosis { --diagnosis-padding: 1.75rem; }
 }
 .diagnosis-content { position: relative; }
-.diagnosis-content::before, .diagnosis-content::after {
+#diagnosis[data-sense-type="majority"] .diagnosis-content::before,
+#diagnosis[data-sense-type="majority"] .diagnosis-content::after {
   content: ''; position: absolute; z-index: -1; pointer-events: none;
   top: calc(52% + .04 * var(--diagnosis-padding)); border-radius: 50%; aspect-ratio: 1;
 }
-.diagnosis-content::before {
+#diagnosis[data-sense-type="majority"] .diagnosis-content::before {
   width: clamp(58px, 16vw, 102px); right: calc(clamp(38px, 9vw, 65px) - var(--diagnosis-padding));
   transform: translateY(-64%);
-  background: linear-gradient(135deg, #ffddbc91 15%, #c9b5ef75 75%);
+  background:
+    radial-gradient(ellipse at 26% 22%, #fff3d899, transparent 60%),
+    linear-gradient(135deg, #ffd0a5aa 12%, #f1b3d0a6 52%, #a7a5ec98 88%);
 }
-.diagnosis-content::after {
+#diagnosis[data-sense-type="majority"] .diagnosis-content::after {
   width: clamp(47px, 13vw, 88px); right: calc(clamp(21px, 5.5vw, 36px) - var(--diagnosis-padding));
   transform: translateY(-35%);
-  background: linear-gradient(145deg, #ad92e95c, #dacefa50);
+  background:
+    radial-gradient(ellipse at 34% 28%, #e1faff9e, transparent 63%),
+    linear-gradient(145deg, #a2dcebb0, #b6a3ec9c 59%, #ecc2ef83);
+}
+#diagnosis[data-sense-type="balanced"] .diagnosis-content::before,
+#diagnosis[data-sense-type="balanced"] .diagnosis-content::after,
+#diagnosis:is([data-sense-type="distinctive"], [data-sense-type="singular"]) .diagnosis-content::before {
+  content: ''; position: absolute; z-index: -1; pointer-events: none;
+  inset-inline-end: 0; top: 12%; aspect-ratio: 1;
+  width: clamp(54px, 16vw, 96px);
+}
+#diagnosis[data-sense-type="balanced"] .diagnosis-content::before {
+  border: 1px solid #74a99f59;
+  background: linear-gradient(135deg, #f6ffde80, #a5e1ce87 52%, #a9d8ed5e);
+  transform: translate(-25%, 4%) rotate(45deg);
+}
+#diagnosis[data-sense-type="balanced"] .diagnosis-content::after {
+  border: 1px solid #9894c963;
+  background: linear-gradient(145deg, #e7f7ff91, #c0b3ed78 58%, #f5cfe787);
+  transform: translate(3%, 24%) rotate(45deg);
+}
+#diagnosis[data-sense-type="distinctive"] .diagnosis-content::before {
+  background:
+    linear-gradient(135deg, #f7e7ff99, #a694e754) center / 46% 46% no-repeat,
+    conic-gradient(#f9cbb77d, #ffebc494, #aca8ec80, #f4acd976, #f9cbb77d);
+  transform: rotate(45deg);
+}
+#diagnosis[data-sense-type="singular"] .diagnosis-content::before {
+  inset-inline-end: calc(-.8 * var(--diagnosis-padding));
+  width: clamp(72px, 22vw, 126px);
+  clip-path: var(--sense-star);
+  background:
+    radial-gradient(ellipse at 47% 44%, #fff8df9e, transparent 54%),
+    conic-gradient(from 24deg, #c4b3f2bd, #f1b1d6a3, #ffcdada3, #a8c6f4b3, #c4b3f2bd);
+}
+[data-sense-type="singular"] {
+  --sense-star: polygon(50% 0, 62% 36%, 100% 50%, 62% 64%, 50% 100%, 38% 64%, 0 50%, 38% 36%);
 }
 @media (min-width: 520px) {
   #diagnosis .diag-body { padding-inline-end: 7rem; }
@@ -1234,6 +1330,50 @@ footer {
   animation: rParticleDrift4 20s ease-in-out infinite alternate-reverse,
              rParticlePulse   6s ease-in-out infinite -3.5s;
 }
+.rh-diamonds, .rh-stars {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+}
+.rh-diamonds span {
+  position: absolute; left: var(--light-x); top: var(--light-y);
+  width: var(--light-size); aspect-ratio: 1;
+  background: currentColor; color: var(--light-color);
+  box-shadow: 0 0 7px currentColor; filter: blur(var(--light-blur));
+  transform: rotate(45deg); opacity: .3;
+  animation: rhDiamondDrift var(--light-duration) ease-in-out var(--light-delay) infinite alternate;
+}
+@keyframes rhDiamondDrift {
+  from { transform: translate3d(-5px,8px,0) rotate(45deg); opacity: .16; }
+  to { transform: translate3d(6px,-9px,0) rotate(48deg); opacity: .43; }
+}
+.rh-stars span {
+  position: absolute; left: var(--star-x); top: var(--star-y);
+  width: var(--star-size); aspect-ratio: 1;
+  background: radial-gradient(circle closest-side, #fffdf5 0%, #e8dfff 9%, #c9b8f78c 25%, #aa94ee38 52%, transparent 100%);
+  filter: blur(var(--star-blur));
+  transform: translate(-50%, -50%); opacity: .62;
+  animation: rhStarTwinkle 7s ease-in-out var(--star-delay) infinite;
+}
+.rh-stars span:first-child { --star-x: 79%; --star-y: 12%; --star-size: 34px; --star-blur: 2.2px; --star-delay: -2s; }
+.rh-stars span:last-child { --star-x: 9%; --star-y: 81%; --star-size: 17px; --star-blur: 1.6px; --star-delay: -5s; }
+.rh-stars span::before {
+  content: ''; position: absolute; inset: -60%;
+  background:
+    radial-gradient(ellipse 49% 5% at center, #eee5ffc2, #d3c4ff55 32%, transparent 98%),
+    radial-gradient(ellipse 5% 49% at center, #eee5ffc2, #d3c4ff55 32%, transparent 98%);
+}
+@keyframes rhStarTwinkle {
+  0%, 100% { opacity: .30; transform: translate(-50%, -50%) scale(.92); }
+  44% { opacity: .90; transform: translate(-50%, -50%) scale(1.06); }
+  64% { opacity: .55; transform: translate(-50%, -50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rh-atmo::before, .rh-atmo::after,
+  [data-sense-type="distinctive"] .rh-light::before,
+  [data-sense-type="distinctive"] .rh-light::after,
+  .rh-p-a, .rh-p-b, .rh-p-c, .rh-p-d, .rh-diamonds span, .rh-stars span {
+    animation: none;
+  }
+}
 
 </style>
 <link rel="stylesheet" href="assets/language.css">
@@ -1356,6 +1496,13 @@ function snapToPreset(hex) {
 
 /* ══ URLパラメータ解析 ══ */
 const params = new URLSearchParams(location.search);
+const isDebugPreview = params.get('debug') === '1';
+const DEBUG_SENSE_STATS = new Map([
+  ['majority', { matchShare: .9, rareScore: 8 }],
+  ['balanced', { matchShare: .5, rareScore: 24 }],
+  ['distinctive', { matchShare: .3, rareScore: 54 }],
+  ['singular', { matchShare: .1, rareScore: 78 }],
+]);
 const isFullMode = params.get('mode') === '26';
 const isNumberMode = params.get('mode') === 'number';
 const isSubjectMode = params.get('mode') === 'subject';
@@ -1472,6 +1619,11 @@ function calcDiagnosis() {
   const coloredLetters = letters.filter(l => colorMap[l]);
   const total = coloredLetters.length;
   if (total === 0) return null;
+  const preview = isDebugPreview && DEBUG_SENSE_STATS.get(params.get('previewSense'));
+  if (preview) {
+    const majorityCount = Math.round(preview.matchShare * total);
+    return { majorityRate: Math.round(majorityCount / total * 100), rareScore: preview.rareScore, total, majorityCount };
+  }
 
   let majorityCount = 0; // 自分の色が1位と一致した数
   let raritySum = 0;     // 自分の色の順位（小さいほどレア）
@@ -1508,26 +1660,30 @@ function calcDiagnosis() {
 /* ══ 診断タイプ判定 ══ */
 function getDiagType(majorityRate, rareScore) {
   if (rareScore >= 65)  return {
-    label: '✦ The Singular Synesthete',
+    id: 'singular',
+    label: 'The Singular Synesthete',
     color: '#9060c0',
     desc: 'A rare world of colors that is yours alone',
     summary: 'Few people chose the same colors.'
   };
   if (rareScore >= 40)  return {
-    label: '◈ The Distinctive Colorist',
+    id: 'distinctive',
+    label: 'The Distinctive Colorist',
     color: '#ffae66',
     desc: 'An individual palette that offers a different perspective',
     summary: 'Your palette mixes popular colors with more personal choices.'
   };
   if (majorityRate >= 70) return {
-    label: '◎ The Kindred Synesthete',
+    id: 'majority',
+    label: 'The Kindred Synesthete',
     color: '#4da8e8',
     desc: 'A palette that resonates with many others',
     summary: 'Many people share your color associations.',
     note: 'Your palette is close to the most common associations.'
   };
   return {
-    label: '◇ The Balanced Perceiver',
+    id: 'balanced',
+    label: 'The Balanced Perceiver',
     color: '#67bf92',
     desc: 'A broad palette, where familiar and unusual colors meet',
     summary: 'You chose both common and uncommon colors.'
@@ -1615,6 +1771,8 @@ const COLOR_TYPES = [
 ];
 
 function detectColorType(coloredLetters) {
+  const previewColor = isDebugPreview && params.get('previewColor');
+  if (previewColor && COLOR_TYPES.some(type => type.id === previewColor)) return previewColor;
   return classifyColorType(coloredLetters.map(letter => colorMap[letter]));
 }
 
@@ -1637,6 +1795,20 @@ const RANK_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="tru
   <path d="m3 7 5 3 4-5 4 5 5-3-2.5 9h-13zm3 10.5h12V19H6z"/>
 </svg>`;
 
+function buildBalancedLights() {
+  const colors = ['#bcffe1', '#b3dbff', '#e0c3ff', '#ffc5ed', '#fff1bb', '#a2edee'];
+  const lights = Array.from({ length: 10 }, (_, index) => {
+    const x = 5 + index * 37 % 90;
+    const y = 8 + index * 23 % 85;
+    const size = index % 5 === 0 ? 15 : 4 + index * 3 % 6;
+    const blur = size >= 15 ? 4 : 1.6 + index % 3 * .5;
+    const duration = 8 + index % 6;
+    const delay = index * 7 % 19;
+    return `<span style="--light-x:${x}%;--light-y:${y}%;--light-size:${size}px;--light-blur:${blur}px;--light-color:${colors[index % colors.length]};--light-duration:${duration}s;--light-delay:-${delay}s"></span>`;
+  });
+  return `<div class="rh-diamonds" aria-hidden="true">${lights.join('')}</div>`;
+}
+
 function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
   const typeId = detectColorType(coloredLetters);
   const type = COLOR_TYPES.find(item => item.id === typeId);
@@ -1654,13 +1826,16 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
   const answerCount = coloredLetters.length;
   const paletteDensity = answerCount > 18 ? 'dense' : answerCount > 10 ? 'medium' : 'regular';
 
-  return `<div class="type-hero" data-type="${typeId}"${isFullMode ? ` data-alphabet-palette="${paletteDensity}"` : ''} style="background-image:url('./assets/backgrounds/${TYPE_BG[typeId]}.webp')">
-    ${diag ? '<canvas class="type-art-canvas" id="artCanvas" aria-hidden="true"></canvas>' : ''}
+  const senseType = diagType?.id || 'unclassified';
+  return `<div class="type-hero" data-type="${typeId}" data-sense-type="${senseType}"${isFullMode ? ` data-alphabet-palette="${paletteDensity}"` : ''} style="background-image:url('./assets/backgrounds/${TYPE_BG[typeId]}.webp')">
+    ${senseType === 'majority' ? '<canvas class="type-art-canvas" id="artCanvas" aria-hidden="true"></canvas>' : '<div class="rh-light" aria-hidden="true"></div>'}
     <div class="rh-atmo" aria-hidden="true"></div>
-    <div class="rh-p-a" aria-hidden="true"></div>
+    ${senseType === 'majority' ? `<div class="rh-p-a" aria-hidden="true"></div>
     <div class="rh-p-b" aria-hidden="true"></div>
     <div class="rh-p-c" aria-hidden="true"></div>
-    <div class="rh-p-d" aria-hidden="true"></div>
+    <div class="rh-p-d" aria-hidden="true"></div>` : ''}
+    ${senseType === 'balanced' ? buildBalancedLights() : ''}
+    ${senseType === 'singular' ? '<div class="rh-stars" aria-hidden="true"><span></span><span></span></div>' : ''}
     <div class="type-hero-inner">
       ${voteErrorNotice}
       <header class="type-hero-heading">
@@ -1686,7 +1861,7 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
           : '<h2 class="type-hero-all-match"><span>All your colors match the majority</span></h2>'}
       </div>` : ''}
       <div class="type-hero-chips">
-        ${diagType ? `<div class="type-hero-chip"><span>Synesthesia type:</span><strong class="type-name-diag">${diagType.label.replace(/^[✦◈◎◇]\s*/, '')}</strong></div>` : ''}
+        ${diagType ? `<div class="type-hero-chip"><span>Synesthesia type:</span><strong class="type-name-diag">${diagType.label}</strong></div>` : ''}
         <div class="type-hero-chip"><span>Color type:</span><strong class="type-name-color">${type.name}</strong></div>
       </div>
     </div>
@@ -2024,7 +2199,7 @@ function buildVoteSection(coloredLetters) {
 function buildDiagSection(diag) {
   const type = getDiagType(diag.majorityRate, diag.rareScore);
   const rareStat = calcRareStat(diag);
-  return `<div class="card profile-card" id="diagnosis" style="--profile-accent:${type.color}">
+  return `<div class="card profile-card" id="diagnosis" data-sense-type="${type.id}" style="--profile-accent:${type.color}">
     <div class="diagnosis-content">
       <div class="section-eyebrow">SYNESTHESIA TYPE</div>
       <h2 class="section-title">Synesthesia type</h2>
@@ -2106,7 +2281,7 @@ function buildShareSection(diag, coloredLetters) {
   });
   const uniqueText = isAllMajority ? 'All match the majority' : itemLabel(mostUnique) || 'None';
   const empathyText = itemLabel(mostEmpathy) || 'None';
-  const diagName = diagType.label.replace(/^[✦◈◎◇]\s*/, '');
+  const diagName = diagType.label;
   const senseName = isSubjectMode ? 'school-subject color sense' : isNumberMode ? 'number-color sense' : 'letter-color sense';
   const shareText = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.\n\n${isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: '}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n${diagName} / ${colorType.name}\n\n— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?\n\n${resultUrl}`;
   const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
@@ -2589,7 +2764,7 @@ render();
 </script>
 
 <!-- ══ Firebase 投票・集計ロジック ══ -->
-<script type="module" onerror="window.themeStatsStatus='error';window.themeVoteError='firebase-module-load';window.render?.()">
+<script type="module" onerror="if (!isDebugPreview) { window.themeStatsStatus='error';window.themeVoteError='firebase-module-load';window.render?.(); }">
 import { initializeApp }                          from 'firebase/app';
 import { getFirestore, doc, getDoc, writeBatch,
          increment, collection, serverTimestamp } from 'firebase/firestore';
@@ -2737,6 +2912,7 @@ function statsToVotes(statsData) {
    MAIN
 ──────────────────────────────────────────────── */
 (async () => {
+  if (isDebugPreview) return;
   /* Firebase が設定されていなければ静かにスキップ */
   if (firebaseConfig.apiKey === 'YOUR_API_KEY') {
     console.info('[SynestheShare] Firebase未設定のためスキップ');

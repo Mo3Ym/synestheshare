@@ -993,24 +993,22 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   #diagnosis { --diagnosis-padding: 1.75rem; }
 }
 .diagnosis-content { position: relative; }
+#diagnosis:is([data-sense-type="majority"], [data-sense-type="balanced"]) .diagnosis-content::before,
+#diagnosis:is([data-sense-type="majority"], [data-sense-type="balanced"]) .diagnosis-content::after {
+  opacity: .76;
+}
 #diagnosis[data-sense-type="majority"] .diagnosis-content::before,
 #diagnosis[data-sense-type="majority"] .diagnosis-content::after {
   content: ''; position: absolute; z-index: -1; pointer-events: none;
-  top: calc(52% + .04 * var(--diagnosis-padding)); border-radius: 50%; aspect-ratio: 1;
+  width: clamp(58px, 15.4vw, 80px); border-radius: 50%; aspect-ratio: 1;
 }
 #diagnosis[data-sense-type="majority"] .diagnosis-content::before {
-  width: clamp(58px, 16vw, 102px); right: calc(clamp(38px, 9vw, 65px) - var(--diagnosis-padding));
-  transform: translateY(-64%);
-  background:
-    radial-gradient(ellipse at 26% 22%, #fff3d899, transparent 60%),
-    linear-gradient(135deg, #ffd0a5aa 12%, #f1b3d0a6 52%, #a7a5ec98 88%);
+  top: 13px; inset-inline-end: clamp(24px, 6.8vw, 37px);
+  background: linear-gradient(135deg, #ffe5b0d4 5%, #f8b6c6bc 53%, #c5a4e0b3 100%);
 }
 #diagnosis[data-sense-type="majority"] .diagnosis-content::after {
-  width: clamp(47px, 13vw, 88px); right: calc(clamp(21px, 5.5vw, 36px) - var(--diagnosis-padding));
-  transform: translateY(-35%);
-  background:
-    radial-gradient(ellipse at 34% 28%, #e1faff9e, transparent 63%),
-    linear-gradient(145deg, #a2dcebb0, #b6a3ec9c 59%, #ecc2ef83);
+  top: clamp(31px, 8vw, 41px); inset-inline-end: 4px;
+  background: linear-gradient(145deg, #a5e6f5cc 3%, #a6c3efd0 52%, #ba93e1bf 100%);
 }
 #diagnosis[data-sense-type="balanced"] .diagnosis-content::before,
 #diagnosis[data-sense-type="balanced"] .diagnosis-content::after,
@@ -1020,22 +1018,17 @@ html[lang="en"] .type-hero-chip { font-size: clamp(.63rem, 2.6vw, .71rem); }
   width: clamp(54px, 16vw, 96px);
 }
 #diagnosis[data-sense-type="balanced"] .diagnosis-content::before {
-  border-radius: 16% 24% 18% 22%;
-  background:
-    radial-gradient(ellipse at 29% 31%, #fbffe8b5, transparent 62%),
-    linear-gradient(135deg, #d8f2c899, #a5e1ce87 53%, #a9d8ed5e);
-  box-shadow: 0 0 14px #a5e1ce44;
-  filter: blur(1.5px);
-  transform: translate(-25%, 4%) rotate(41deg);
+  top: 11px; inset-inline-end: clamp(21px, 5.9vw, 31px);
+  width: clamp(54px, 14vw, 74px);
+  border: 1px solid #4faaa7d4; border-radius: 6px;
+  transform: rotate(45deg);
 }
 #diagnosis[data-sense-type="balanced"] .diagnosis-content::after {
-  border-radius: 23% 16% 26% 19%;
-  background:
-    radial-gradient(ellipse at 60% 73%, #ffdfef9e, transparent 66%),
-    linear-gradient(145deg, #e7f7ff91, #c0b3ed82 58%, #f5cfe777);
-  box-shadow: 0 0 16px #c0b3ed45;
-  filter: blur(2px);
-  transform: translate(3%, 24%) rotate(49deg) scale(.92);
+  top: clamp(34px, 8.5vw, 45px); inset-inline-end: 6px;
+  width: clamp(39px, 10vw, 53px);
+  border-radius: 6px;
+  background: linear-gradient(145deg, #a6ddf2d6 4%, #b4a4eed2 51%, #eea5c9cc 100%);
+  transform: rotate(45deg);
 }
 #diagnosis[data-sense-type="distinctive"] .diagnosis-content::before {
   background:
@@ -1647,44 +1640,43 @@ function buildHeroPalette() {
 }
 
 /* ══ 診断スコア計算 ══ */
+function voteWeight(vote) {
+  return vote?.count ?? vote?.pct ?? 0;
+}
+
+function findMajorityMatch(votes, color) {
+  const selected = votes.find(vote => vote.color === color);
+  const mostVotes = voteWeight(votes[0]);
+  return mostVotes > 0 && voteWeight(selected) === mostVotes ? selected : null;
+}
+
 function calcDiagnosis() {
   const coloredLetters = letters.filter(l => colorMap[l]);
-  const total = coloredLetters.length;
-  if (total === 0) return null;
+  if (coloredLetters.length === 0) return null;
   const preview = isDebugPreview && DEBUG_SENSE_STATS.get(params.get('previewSense'));
   if (preview) {
+    const total = coloredLetters.length;
     const majorityCount = Math.round(preview.matchShare * total);
     return { majorityRate: Math.round(majorityCount / total * 100), rareScore: preview.rareScore, total, majorityCount };
   }
 
-  let majorityCount = 0; // 自分の色が1位と一致した数
-  let raritySum = 0;     // 自分の色の順位（小さいほどレア）
-
-  coloredLetters.forEach(l => {
-    const myColor = colorMap[l];
+  let majorityCount = 0;
+  let raritySum = 0;
+  let total = 0;
+  for (const l of coloredLetters) {
     const votes = DUMMY_VOTES[l] || [];
-    if (!votes.length) return;
+    const mostVotes = voteWeight(votes[0]);
+    if (mostVotes <= 0) continue;
+    total++;
+    const selectedVotes = voteWeight(votes.find(vote => vote.color === colorMap[l]));
+    if (selectedVotes === mostVotes) majorityCount++;
+    // 0 means tied for the lead, 1 means the selected color has no votes.
+    raritySum += (mostVotes - selectedVotes) / mostVotes;
+  }
 
-    // 自分の色がvotesに何位にあるか
-    // 完全一致なければ近似色で探す
-    let myRank = votes.findIndex(v => v.color === myColor);
-    if (myRank === -1) {
-      // 近似: hueが最も近いものを採用
-      const myH = rgbToHsl(myColor).h;
-      let minDiff = 999; let bestIdx = 0;
-      votes.forEach((v, i) => {
-        const diff = Math.abs(rgbToHsl(v.color).h - myH);
-        if (Math.min(diff, 360-diff) < minDiff) { minDiff = Math.min(diff, 360-diff); bestIdx = i; }
-      });
-      myRank = bestIdx;
-    }
-    if (myRank === 0) majorityCount++;
-    raritySum += myRank;
-  });
-
+  if (total === 0) return null;
   const majorityRate = Math.round(majorityCount / total * 100);
-  const avgRank = raritySum / total; // 0=全部1位（多数派）、高いほどレア
-  const rareScore = Math.min(100, Math.round(avgRank * 28));
+  const rareScore = Math.round(raritySum / total * 100);
 
   return { majorityRate, rareScore, total, majorityCount };
 }
@@ -1723,7 +1715,7 @@ function getDiagType(majorityRate, rareScore) {
 }
 
 /* Rarity/Resonanceラベルと値を返すヘルパー
-   x = rareScore（平均色順位ベースの希少度スコア）
+   x = rareScore（最多票の色との得票差に基づく希少度スコア）
    x >= 50（少数派）→ Rarity：Top (100-x)%  ← 常に50%以下
    x <  50（多数派）→ Resonance：Top x%         ← 常に50%未満 */
 function calcRareStat(diag) {
@@ -1916,7 +1908,7 @@ function calcMostUnique(coloredLetters) {
     const votes = DUMMY_VOTES[l] || [];
     if (!votes.length) return;
     const myMatchIdx = votes.findIndex(v => v.color === myColor);
-    if (myMatchIdx === 0) return;
+    if (findMajorityMatch(votes, myColor)) return;
     const myPct = myMatchIdx === -1 ? 0 : votes[myMatchIdx].pct;
     if (myPct < lowestMyPct) { lowestMyPct = myPct; mostUnique = l; }
   });
@@ -1932,22 +1924,24 @@ function calcMostUnique(coloredLetters) {
   return { mostUnique, isAllMajority };
 }
 
+function findMostEmpathy(coloredLetters) {
+  let mostEmpathy = null, highestPct = -1, highestExact = -1;
+  for (const letter of coloredLetters) {
+    const match = findMajorityMatch(DUMMY_VOTES[letter] || [], colorMap[letter]);
+    if (!match) continue;
+    const exactPct = match.exact ?? match.pct;
+    if (exactPct > highestExact) {
+      mostEmpathy = letter;
+      highestExact = exactPct;
+      highestPct = match.pct;
+    }
+  }
+  return { mostEmpathy, highestPct };
+}
+
 /* ══ 共感カード：Most shared letter ══ */
 function buildEmpathyCard(coloredLetters) {
-  // 自分の色がOthers1位と一致している lettersの中で、一致率が最も高いものを探す
-  let mostEmpathy = null, highestPct = -1;
-
-  coloredLetters.forEach(l => {
-    const myColor = colorMap[l];
-    const votes = DUMMY_VOTES[l] || [];
-    if (!votes.length) return;
-    const myMatchIdx = votes.findIndex(v => v.color === myColor);
-    if (myMatchIdx !== 0) return; // Others1位と一致している lettersのみ
-    if (votes[0].pct > highestPct) {
-      highestPct = votes[0].pct;
-      mostEmpathy = l;
-    }
-  });
+  const { mostEmpathy, highestPct } = findMostEmpathy(coloredLetters);
 
   // 誰とも一致しなかった場合
   if (!mostEmpathy) {
@@ -2084,14 +2078,7 @@ function buildSenseCard(coloredLetters) {
       </div>`;
 
   // ── 共感：Most shared letter ──
-  let mostEmpathy = null, highestPct = -1;
-  coloredLetters.forEach(l => {
-    const myColor = colorMap[l];
-    const votes = DUMMY_VOTES[l] || [];
-    if (!votes.length) return;
-    if (votes.findIndex(v => v.color === myColor) !== 0) return;
-    if (votes[0].pct > highestPct) { highestPct = votes[0].pct; mostEmpathy = l; }
-  });
+  const { mostEmpathy, highestPct } = findMostEmpathy(coloredLetters);
 
   const eColor = mostEmpathy ? colorMap[mostEmpathy] : null;
   const empathyColor = eColor ? senseColorWord(eColor) : '';
@@ -2303,15 +2290,7 @@ function buildShareSection(diag, coloredLetters) {
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
-  let mostEmpathy = null;
-  let highestPct = -1;
-  coloredLetters.forEach(letter => {
-    const votes = DUMMY_VOTES[letter] || [];
-    if (votes[0]?.color === colorMap[letter] && votes[0].pct > highestPct) {
-      mostEmpathy = letter;
-      highestPct = votes[0].pct;
-    }
-  });
+  const { mostEmpathy } = findMostEmpathy(coloredLetters);
   const uniqueText = isAllMajority ? 'All match the majority' : itemLabel(mostUnique) || 'None';
   const empathyText = itemLabel(mostEmpathy) || 'None';
   const diagName = diagType.label;
@@ -2424,6 +2403,10 @@ function render() {
     return;
   }
   const diag = calcDiagnosis();
+  if (!diag) {
+    renderWithoutStats(coloredLetters);
+    return;
+  }
 
   // blob用のTop 2色（typeHero・shareOuter共用）
   const counts = {};
@@ -2461,7 +2444,7 @@ function render() {
       <div class="share-blob" style="position:absolute;width:max(320px,75vw);height:max(320px,75vw);border-radius:50%;filter:blur(60px);pointer-events:none;bottom:-15%;left:-15%;background:radial-gradient(circle,rgba(${r2},${g2},${b2},0.38) 0%,transparent 65%)"></div>
       <div class="content-wrap">${buildShareSection(diag, coloredLetters)}</div>
       <div class="diag-btn-wrap">
-        <a class="btn-diag" href="index-en.html#themes">Take a new test (2 min) →</a>
+        <a class="btn-diag" href="index-en.html#themes">Start comparing colors (2 min)</a>
       </div>`;
 
     // バーアニメーション（最初の3件）
@@ -2927,6 +2910,7 @@ function statsToVotes(statsData) {
       .map(([name, count]) => ({
         color: NAME_TO_HEX[name] || name,
         name,
+        count,
         exact: count / total * 100,
         pct: Math.floor(count / total * 100),
       }));
@@ -2937,7 +2921,7 @@ function statsToVotes(statsData) {
       .sort((a, b) => b.rem - a.rem)
       .slice(0, remainder)
       .forEach(({ i }) => entries[i].pct++);
-    votes[letter] = entries.map(({ color, name, pct }) => ({ color, name: ({"赤":"Red","橙":"Orange","黄":"Yellow","黄緑":"Lime","緑":"Green","青":"Blue","水色":"Light blue","紫":"Purple","ピンク":"Pink","茶色":"Brown","黒":"Black","グレー":"Gray","白":"White"})[name] || name, pct }));
+    votes[letter] = entries.map(entry => ({ ...entry, name: ({"赤":"Red","橙":"Orange","黄":"Yellow","黄緑":"Lime","緑":"Green","青":"Blue","水色":"Light blue","紫":"Purple","ピンク":"Pink","茶色":"Brown","黒":"Black","グレー":"Gray","白":"White"})[entry.name] || entry.name }));
   });
   return votes;
 }

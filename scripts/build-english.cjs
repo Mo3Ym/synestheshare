@@ -59,7 +59,7 @@ for (const page of pages) {
   if (page === 'result') {
     source = source.replace("const sharedResult = new URL(location.href);", "const sharedResult = new URL(location.href);\n  sharedResult.searchParams.set('lang', 'en');");
     const colorNames = Object.fromEntries(['赤','橙','黄','黄緑','緑','青','水色','紫','ピンク','茶色','黒','グレー','白'].map(name => [name,copy[name]]));
-    source = source.replace('votes[letter] = entries.map(({ color, name, pct }) => ({ color, name, pct }));', `votes[letter] = entries.map(({ color, name, pct }) => ({ color, name: (${JSON.stringify(colorNames)})[name] || name, pct }));`);
+    source = source.replace('votes[letter] = entries;', `votes[letter] = entries.map(entry => ({ ...entry, name: (${JSON.stringify(colorNames)})[entry.name] || entry.name }));`);
   }
   if (page === 'number' || page === 'subject') {
     source = source.replace('https://mo3ym.github.io/synestheshare/', 'https://synestheshare.pages.dev/index-en.html');

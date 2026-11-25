@@ -29,11 +29,11 @@
   const copy = english ? {
     title: `What <strong class="hl-mint">color</strong> is your ${highlightedSample}?`,
     description: `Compare the colors you associate with ${subject ? 'school subjects' : number ? 'numbers' : 'letters'}.`,
-    view: 'See their results', start: 'Try it yourself (2 min) →', close: 'Close introduction',
+    view: 'See their results', start: 'Choose your colors (2 min)', close: 'Close introduction',
   } : {
     title: `あなたの${highlightedSample}は、<wbr>何<strong class="hl-mint">色</strong>ですか？`,
     description: `${subject ? '教科' : number ? '数字' : '文字'}に感じる色を、みんなと比べるサイトです。`,
-    view: 'この人の結果を見る', start: '診断してみる（2分）', close: '説明を閉じる',
+    view: 'この人の結果を見る', start: '色を選んでみる（2分）', close: '説明を閉じる',
   };
   const dialog = document.createElement('dialog');
   dialog.className = 'result-intro';

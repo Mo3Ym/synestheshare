@@ -61,6 +61,15 @@ const changedMajority = await renderPixels(context, answer, '10', 19, 'empathy',
 assert.notDeepEqual(statsRegion(changedMajority), statsRegion(withStats));
 const changedScore = await renderPixels(context, answer, '10', 20, 'empathy', 'ja', 81);
 assert.notDeepEqual(statsRegion(changedScore), statsRegion(withStats));
+const statHalf = (pixels, side) => Buffer.concat(Array.from({ length: 80 }, (_, index) => {
+  const row = (365 + index) * 1200 * 3;
+  const offset = side === 'left' ? 0 : 600 * 3;
+  return pixels.subarray(row + offset, row + offset + 600 * 3);
+}));
+assert.notDeepEqual(statHalf(changedScore, 'left'), statHalf(withStats, 'left'));
+assert.deepEqual(statHalf(changedScore, 'right'), statHalf(withStats, 'right'));
+assert.deepEqual(statHalf(changedMajority, 'left'), statHalf(withStats, 'left'));
+assert.notDeepEqual(statHalf(changedMajority, 'right'), statHalf(withStats, 'right'));
 const invalidStats = await request('r=0527416C25&score=-1&majority=101');
 const absentStats = await request('r=0527416C25');
 assert.deepEqual(await invalidStats.arrayBuffer(), await absentStats.arrayBuffer());
@@ -76,5 +85,5 @@ assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
 assert.equal(image.searchParams.get('sense'), null);
-assert.equal(image.searchParams.get('v'), '32');
+assert.equal(image.searchParams.get('v'), '33');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');

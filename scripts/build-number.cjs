@@ -3,6 +3,9 @@ const fs = require('node:fs');
 let page = fs.readFileSync('alphabet.html', 'utf8');
 page = page.replace('アルファベット診断', '数字診断')
   .replaceAll('A〜Z', '0〜9')
+  .replace('<strong class="hl-red">文字</strong>に色をつけよう。', '<strong class="hl-red">0〜9</strong>は<wbr>何色ですか？')
+  .replace('色を選んだ文字', '色を選んだ数字')
+  .replace('すべての文字を選ばなくてもOK', 'すべての数字を選ばなくてもOK')
   .replaceAll('No. 01 — Alphabet', 'No. 02 — Numbers')
   .replaceAll('アルファベット', '数字');
 page = page.replace("const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'];", "const LETTERS_10 = '1234567890'.split('');")
@@ -12,7 +15,8 @@ page = page.replace("const LETTERS_10 = ['A','B','C','D','E','F','G','X','Y','Z'
   .replaceAll('isFullMode ? LETTERS_26 : LETTERS_10', 'LETTERS_10')
   .replaceAll("${isFullMode ? '26' : '10'}", 'number')
   .replace("alphaGrid.className = 'alpha-grid ' + (isFullMode ? 'mode-26' : 'mode-10');", "alphaGrid.className = 'alpha-grid mode-10';");
-page = page.replace(/\s*<button class="btn-mode-toggle"[\s\S]*?<\/button>/, '')
+page = page.replace(/\s*<div class="mode-toggle-row">[\s\S]*?<\/div>/, '')
+  .replace(/\n  if \(btnModeToggle\) \{[\s\S]*?\n  \}/, '')
   .replace(/const btnModeToggle\s*=.*?;\r?\n/, '')
   .replace(/const modeToggleLabel\s*=.*?;\r?\n/, '')
   .replace(/btnModeToggle\.addEventListener\('click',[\s\S]*?\n\}\);/, '');

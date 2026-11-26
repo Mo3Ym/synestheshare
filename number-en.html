@@ -69,7 +69,7 @@ body {
 }
 
 /* wbr対応 */
-h1, h2, h3, p, .page-title, .page-lead, .mode-label,
+h1, h2, h3, p, .page-title, .page-lead,
 .picker-title, .hint, .result-title, .result-meta,
 nav ul a, .page-eyebrow, .page-breadcrumb {
   word-break: keep-all; overflow-wrap: break-word;
@@ -152,7 +152,7 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 .page-hero-wrap {
   position: relative;
-  padding-top: 6.5rem;
+  padding-top: calc(54px + 1.35rem);
   background: transparent;
 }
 .page-blob { display: none; }
@@ -180,8 +180,9 @@ nav ul a:hover { color: var(--ink); }
 .page-hero {
   position: relative; z-index: 1;
   max-width: 900px; margin: 0 auto;
-  padding: 3.5rem 2.5rem 2.5rem;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
+  padding: 0 1rem clamp(1.8rem, 6vw, 2.5rem);
+  display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+  text-align: center;
 }
 .page-eyebrow {
   font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
@@ -206,11 +207,10 @@ nav ul a:hover { color: var(--ink); }
   word-break: keep-all; overflow-wrap: break-word;
 }
 
-.page-hero-wrap .progress-bar-wrap { border-top: none; }
 .progress-bar-wrap {
-  width: 100%; max-width: 900px;
-  margin: 0 auto 0;
-  padding: 0 2.5rem 2rem;
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  padding: 0 1rem;
   position: relative; z-index: 1;
 }
 .progress-meta {
@@ -295,20 +295,16 @@ nav ul a:hover { color: var(--ink); }
 .main-wrap {
   position: relative; z-index: 1;
   max-width: 900px; margin: 0 auto;
-  padding: 3rem 2.5rem 0;
+  padding: clamp(1.8rem, 7vw, 2.5rem) 1rem 0;
 }
 
 /* ── モードトグル ── */
 .mode-toggle-row {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
+  display: flex; justify-content: center;
+  margin-top: .65rem;
 }
-.mode-label {
-  font-family: var(--outfit); font-size: 0.72rem; font-weight: 600;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink3);
-}
-.mode-label strong { color: var(--c1); font-size: 0.85rem; letter-spacing: 0; text-transform: none; font-family: var(--jp); font-weight: 340; }
 .btn-mode-toggle {
+  min-height: 44px;
   display: inline-flex; align-items: center; gap: 0.4rem;
   padding: 0.45rem 1.1rem; border-radius: 100px;
   border: 1.5px solid var(--border);
@@ -333,12 +329,11 @@ nav ul a:hover { color: var(--ink); }
 .alpha-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 2.5rem;
+  gap: clamp(8px, 2.6vw, 12px);
 }
 /* 10文字モード時のグリッド幅制限 */
 .alpha-grid.mode-10 {
-  max-width: 480px;
+  width: min(100%, 21.75rem);
   margin-left: auto; margin-right: auto;
 }
 /* 26文字モード: 最終行も中央揃え */
@@ -357,7 +352,6 @@ nav ul a:hover { color: var(--ink); }
 }
 /* PC：円を少し小さく */
 @media (min-width: 641px) {
-  .alpha-grid.mode-10 { max-width: 360px; }
   .alpha-grid.mode-26 { max-width: 440px; }
 }
 
@@ -536,7 +530,7 @@ nav ul a:hover { color: var(--ink); }
 
 /* ── 結果パレット ── */
 .result-section {
-  padding-top: 2.5rem;
+  padding-top: clamp(1.65rem, 6.5vw, 2.5rem);
   padding-bottom: 2rem;
 }
 @media (max-width: 600px), (hover: none) and (pointer: coarse) {
@@ -570,9 +564,10 @@ nav ul a:hover { color: var(--ink); }
 
 /* シェア・リセットボタン */
 .action-row {
-  display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+  display: flex; gap: 0.75rem; align-items: center; justify-content: center; flex-wrap: wrap;
 }
 .btn-result {
+  min-height: 48px;
   position: relative; isolation: isolate;
   background: rgba(255,90,90,0.88);
   backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%);
@@ -622,6 +617,7 @@ nav ul a:hover { color: var(--ink); }
 }
 .btn-result:disabled::before { display: none; }
 .btn-reset {
+  min-height: 44px;
   padding: 0.72rem 1.4rem; border-radius: 100px;
   border: 1px solid rgba(255,255,255,0.20);
   background: rgba(255,255,255,0.08);
@@ -635,6 +631,12 @@ nav ul a:hover { color: var(--ink); }
   background: rgba(255,255,255,0.14);
   border-color: rgba(255,255,255,0.38);
   color: rgba(255,255,255,0.9);
+}
+.result-selection-note {
+  margin-top: .6rem; text-align: center; color: #b9c4dc; font-size: .83rem;
+}
+.action-row button:focus-visible, .btn-mode-toggle:focus-visible {
+  outline: 2px solid #fffdf9; outline-offset: 3px;
 }
 
 /* ── ヒントテキスト ── */
@@ -687,15 +689,10 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   nav { padding: 0 1.25rem; }
   .nav-logo { left: 1.25rem; height: 26px; }
 
-  .page-hero { padding: 2.5rem 1.25rem 1.5rem; align-items: center; text-align: center; }
-  .page-eyebrow { justify-content: center; }
   .page-eyebrow::before { display: none; }
   .page-lead { text-align: center; max-width: 100%; }
   .page-breadcrumb { align-self: flex-start; }
 
-  .progress-bar-wrap { padding: 0 1.25rem 1.5rem; }
-  .main-wrap { padding: 2rem 1.25rem 0; }
-  .alpha-grid.mode-10 { max-width: 100%; }
   .alpha-grid.mode-26 { --alpha-columns: 5; --alpha-gap: 8px; }
 
   .picker-sheet { border-radius: 16px 16px 0 0; padding: 1.25rem 1.25rem 2rem; }
@@ -720,8 +717,7 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     0 0 18px rgba(255,127,127,0.50),
     0 0 38px rgba(255,127,127,0.25);
 }
-.page-lead, .progress-label, .progress-count, .mode-label { color: #fffdf9; }
-.mode-label strong { color: var(--c1); font-weight: 340; }
+.page-lead, .progress-label, .progress-count { color: #fffdf9; }
 .btn-mode-toggle {
   color: rgba(255,255,255,0.85);
   background: rgba(255,255,255,0.12);
@@ -818,14 +814,14 @@ footer a:hover { color: rgba(255,255,255,0.65); }
       <strong class="hl-red">0–9</strong> — what colors do you see?
     </h1>
     <p class="page-lead">
-      Choose the color that feels right.<br>You can leave any letter uncolored.
+      Choose the color that feels right.
     </p>
   </div>
 
   <!-- Progressバー -->
   <div class="progress-bar-wrap">
     <div class="progress-meta">
-      <span class="progress-label">Progress</span>
+      <span class="progress-label">Numbers colored</span>
       <span class="progress-count"><span>0</span> / 10</span>
     </div>
     <div class="progress-track">
@@ -841,21 +837,16 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   <div class="main-blob main-blob-3"></div>
   <div class="main-wrap">
 
-    <!-- モードトグル -->
-    <div class="mode-toggle-row">
-      <div class="mode-label">Pick a letter and give it a color</div>
-    </div>
-
     <!-- Numbersグリッド -->
     <div class="alpha-grid mode-10" id="alphaGrid"></div>
 
     <div class="result-section">
-    <div class="action-row">
-      <button class="btn-reset" id="btnReset">Reset</button>
-      <button class="btn-result" id="btnResult" disabled>See my results →</button>
+      <div class="action-row">
+        <button class="btn-reset" id="btnReset" type="button">Reset</button>
+        <button class="btn-result" id="btnResult" type="button" disabled>See my results →</button>
+      </div>
+      <p class="result-selection-note">You can leave some numbers uncolored.</p>
     </div>
-
-  </div><!-- /.result-section -->
 
   </div><!-- /.main-wrap -->
 </div><!-- /.main-outer -->

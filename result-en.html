@@ -39,7 +39,7 @@
       if (params.has(key)) image.searchParams.set(key, params.get(key));
     }
     if (document.documentElement.lang === 'en') image.searchParams.set('lang', 'en');
-    image.searchParams.set('v', '32');
+    image.searchParams.set('v', '33');
   }
   const ogImageUrl = image.href;
   const pageUrl = location.href;
@@ -986,7 +986,10 @@ html[lang="en"] .type-hero { --hero-detail-size: clamp(.63rem, 2.6vw, .71rem); }
 .diag-lead { font-size: .9rem; font-weight: 400; color: var(--result-text); word-break: normal; }
 .diag-type-reflection { color: #504c5b; font-style: italic; }
 .vote-outlier, .diag-type-reflection { font-size: .7rem; }
-#mainWrap #diagnosis .section-title { font-size: clamp(1.1rem, 2.75vw, 1.4rem); }
+#mainWrap #diagnosis .section-title, #shareOuter .section-title {
+  font-size: clamp(1.1rem, 2.75vw, 1.4rem);
+  font-weight: 600;
+}
 #diagnosis .diag-type-main { font-size: clamp(1.45rem, 4.5vw, 2.05rem); }
 #diagnosis .diag-lead { color: var(--result-card-muted); line-height: 1.75; }
 #diagnosis { --diagnosis-padding: 1.5rem; }
@@ -1871,13 +1874,13 @@ function buildTypeHero(coloredLetters, diag = null, voteErrorNotice = '') {
       ${diag ? `<div class="type-stat-card">
         <div class="type-stat-row">
           <div class="type-stat-item">
-            <span class="type-stat-card-label">${MAJORITY_ICON}Majority match</span>
-            <span class="type-stat-card-value">${diag.majorityRate}<span class="type-stat-percent">%</span></span>
+            <span class="type-stat-card-label">${RANK_ICON}${rareStat.label}</span>
+            <span class="type-stat-card-value"><span class="type-stat-prefix">Top </span>${rareStat.value}<span class="type-stat-percent">%</span></span>
           </div>
           <span class="type-stat-sep" aria-hidden="true"></span>
           <div class="type-stat-item">
-            <span class="type-stat-card-label">${RANK_ICON}${rareStat.label}</span>
-            <span class="type-stat-card-value"><span class="type-stat-prefix">Top </span>${rareStat.value}<span class="type-stat-percent">%</span></span>
+            <span class="type-stat-card-label">${MAJORITY_ICON}Majority match</span>
+            <span class="type-stat-card-value">${diag.majorityRate}<span class="type-stat-percent">%</span></span>
           </div>
         </div>
       </div>
@@ -2230,17 +2233,17 @@ function buildDiagSection(diag) {
     </div>
     <div class="diagnosis-stats">
       <div class="diagnosis-metric">
-        <span class="diagnosis-metric-icon">${MAJORITY_ICON}</span>
-        <dl class="diagnosis-metric-text">
-          <dt>Majority match</dt>
-          <dd>${diag.majorityRate}%</dd>
-        </dl>
-      </div>
-      <div class="diagnosis-metric">
         <span class="diagnosis-metric-icon is-rank">${RANK_ICON}</span>
         <dl class="diagnosis-metric-text">
           <dt>${rareStat.label}</dt>
           <dd><span class="diagnosis-metric-prefix">Top </span>${rareStat.value}%</dd>
+        </dl>
+      </div>
+      <div class="diagnosis-metric">
+        <span class="diagnosis-metric-icon">${MAJORITY_ICON}</span>
+        <dl class="diagnosis-metric-text">
+          <dt>Majority match</dt>
+          <dd>${diag.majorityRate}%</dd>
         </dl>
       </div>
     </div>
@@ -2287,7 +2290,7 @@ function buildShareSection(diag, coloredLetters) {
   const resultUrl = sharedResult.href;
   const ogUrl = new URL('/api/og', shareOrigin);
   ogUrl.search = sharedResult.search;
-  ogUrl.searchParams.set('v', '32');
+  ogUrl.searchParams.set('v', '33');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
   const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
@@ -2296,8 +2299,12 @@ function buildShareSection(diag, coloredLetters) {
   const empathyText = itemLabel(mostEmpathy) || 'None';
   const diagName = diagType.label;
   const senseName = isSubjectMode ? 'school-subject color sense' : isNumberMode ? 'number-color sense' : 'letter-color sense';
-  const shareText = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.\n\n${isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: '}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n${diagName} / ${colorType.name}\n\n— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?\n\n${resultUrl}`;
-  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+  const shareLead = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.`;
+  const uniqueLabel = isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: ';
+  const shareQuestion = `— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?`;
+  const shareText = `${shareLead}\n\n${uniqueLabel}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n${diagName} / ${colorType.name}\n\n${shareQuestion}\n\n${resultUrl}`;
+  const xText = `${shareLead}\n\nMajority match: ${diag.majorityRate}%\n${uniqueLabel}${itemLabel(mostUnique) || 'None'}\n\n${shareQuestion}\n\n${resultUrl}`;
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(xText)}`;
 
   return `<div class="card">
     <div class="section-eyebrow">Share</div>
@@ -2306,7 +2313,7 @@ function buildShareSection(diag, coloredLetters) {
       <p class="empathy-comment share-vote-note">Scores may change as more votes are submitted.</p>
       <div class="share-card-preview" id="shareCardPreview">
         <img src="${ogUrl.href.replace(/&/g, '&amp;')}" width="1200" height="630"
-          alt="${diag.majorityRate}% majority match. ${rareStat.label}: top ${rareStat.value}%."
+          alt="${rareStat.label}: top ${rareStat.value}%. ${diag.majorityRate}% majority match."
           decoding="async">
       </div>
       <div class="share-btn-row">
@@ -2380,7 +2387,7 @@ function renderWithoutStats(coloredLetters) {
   url.searchParams.delete('sense');
   const image = new URL('/api/og', shareOrigin);
   image.search = url.search;
-  image.searchParams.set('v', '32');
+  image.searchParams.set('v', '33');
   const shareText = `🎨My ${isSubjectMode ? 'school-subject' : 'number'} colors are ${type.name}.\n\n— What color is your “${sampleItem}”?\n\n${url.href}`;
   document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
 }

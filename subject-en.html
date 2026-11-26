@@ -1289,16 +1289,12 @@ btnResult.addEventListener('click', () => {
   const encoded = letters.map(l => colorToId(colorMap[l] || '')).join('');
   const resultUrl = `result-en.html?mode=subject&r=${encoded}#submit`;
 
-  // ── 投票済みチェック（localStorage で永続管理）──
-  const alreadyVoted = localStorage.getItem('ss_submitted_subject') === '1';
-
   const voteKey = `ss_voted_subject_${encoded}`;
   sessionStorage.setItem('ss_vote_key', voteKey);
-
+  const alreadyVoted = localStorage.getItem('ss_submitted_subject') === '1';
   if (!alreadyVoted) {
     sessionStorage.setItem('ss_from_alphabet', '1');
     sessionStorage.removeItem(voteKey);
-    // ※ localStorage への記録は result-en.html で投票成功後に行う
   } else {
     sessionStorage.removeItem('ss_from_alphabet');
   }

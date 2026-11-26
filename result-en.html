@@ -802,6 +802,9 @@ html[lang="en"] .type-hero { --hero-detail-size: clamp(.63rem, 2.6vw, .71rem); }
 }
 .vote-legend-label { font-size: 0.75rem; color: var(--result-text); line-height: 1.2; }
 .vote-legend-pct { font-family: var(--outfit); font-size: 0.75rem; font-weight: 600; color: var(--result-text); line-height: 1.2; }
+#vote .section-title { margin-bottom: .4rem; }
+.vote-source-note { margin-bottom: 1.25rem; color: var(--result-note); font-size: .75rem; }
+.vote-source-note time { white-space: nowrap; }
 
 .vote-skipped { font-size: 0.75rem; color: var(--result-note); font-style: italic; }
 
@@ -1130,7 +1133,8 @@ html[lang="en"] .type-hero { --hero-detail-size: clamp(.63rem, 2.6vw, .71rem); }
 }
 .btn-save-image:hover { opacity: 0.85; transform: translateY(-2px); }
 .btn-save-image:disabled { opacity: 0.5; cursor: wait; }
-.btn-x-share {
+.btn-x-share,
+.btn-social-share {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
   background: var(--ink); color: var(--bg); border: none; cursor: pointer;
@@ -1138,7 +1142,9 @@ html[lang="en"] .type-hero { --hero-detail-size: clamp(.63rem, 2.6vw, .71rem); }
   transition: opacity 0.15s, transform 0.12s;
   box-shadow: 0 4px 14px rgba(0,0,0,0.18);
 }
-.btn-x-share:hover { opacity: 0.85; transform: translateY(-2px); }
+.btn-social-share { text-decoration: none; }
+.btn-x-share:hover,
+.btn-social-share:hover { opacity: 0.85; transform: translateY(-2px); }
 .btn-send-friend {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.3rem; border-radius: 100px;
@@ -1158,6 +1164,7 @@ html[lang="en"] .type-hero { --hero-detail-size: clamp(.63rem, 2.6vw, .71rem); }
 }
 .btn-back:hover { background: var(--border); color: var(--ink); }
 .x-logo { width: 13px; height: 13px; fill: white; flex-shrink: 0; }
+.social-logo { width: 13px; height: 13px; color: white; flex-shrink: 0; }
 .toast {
   position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: var(--white);
@@ -2136,6 +2143,21 @@ function buildSenseCard(coloredLetters) {
   </div>`;
 }
 
+const voteTimeFormat = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+});
+
+function voteSourceNote(coloredLetters) {
+  const read = window.voteStatsRead;
+  const sources = new Set(coloredLetters.map(letter => read?.sources[letter] || 'sample'));
+  if (sources.size === 1 && sources.has('sample')) return 'Sample data';
+  if (sources.has('sample')) return 'Community votes (includes sample data)';
+  if (sources.has('cached')) return 'Includes previously saved vote data';
+  return `Community votes (<time datetime="${read.at.toISOString()}">${voteTimeFormat.format(read.at)}</time> JST)`;
+}
+
 function buildVoteSection(coloredLetters) {
   const buildItem = (l) => {
     const myColor = colorMap[l];
@@ -2198,6 +2220,7 @@ function buildVoteSection(coloredLetters) {
   let html = `<div class="card" id="vote">
     <div class="section-eyebrow">VOTE</div>
     <h2 class="section-title">The colors others saw</h2>
+    <p class="vote-source-note">${voteSourceNote(coloredLetters)}</p>
     <div class="vote-collapse-wrap" id="voteCollapseWrap">
       <div class="vote-list">
         ${visible.map(buildItem).join('')}
@@ -2268,12 +2291,34 @@ function buildColorTypeSection(coloredLetters) {
 }
 
 /* ══ Shareセクション HTML生成 ══ */
-function buildShareSection(diag, coloredLetters) {
-  const typeId = detectColorType(coloredLetters);
-  const colorType = COLOR_TYPES.find(t => t.id === typeId) || COLOR_TYPES[0];
-  const diagType = getDiagType(diag.majorityRate, diag.rareScore);
+function buildEnglishSocialLinks(resultUrl, title, text) {
+  if (document.documentElement.lang !== 'en') return '';
 
-  // STEP2: “感覚を見せる”方向のXShareテキスト
+  const reddit = new URL('https://www.reddit.com/submit');
+  reddit.searchParams.set('url', resultUrl);
+  reddit.searchParams.set('title', title);
+
+  const bluesky = new URL('https://bsky.app/intent/compose');
+  bluesky.searchParams.set('text', text);
+
+  return `<a class="btn-social-share" href="${reddit.href.replace(/&/g, '&amp;')}" target="_blank" rel="noopener noreferrer">
+          <svg class="social-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 9l1.4-5.7 4.5 1M5.2 11.2a2.5 2.5 0 1 0-2.4 4.2m16-4.2a2.5 2.5 0 1 1 2.4 4.2M8.6 17.5c1.5 1.5 5.3 1.5 6.8 0"/>
+            <ellipse cx="12" cy="15" rx="9.2" ry="6"/>
+            <circle cx="19.5" cy="4.6" r="1.7"/>
+            <path d="M8.5 14.5h.01m6.99 0h.01" stroke-width="2.7"/>
+          </svg>
+          Share on Reddit
+        </a>
+        <a class="btn-social-share" href="${bluesky.href}" target="_blank" rel="noopener noreferrer">
+          <svg class="social-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 11.4C10.9 9 8.1 5.2 5.4 3.2 3.4 1.7.5.6.5 4.2c0 1 .3 5.5.7 6.8.8 2.6 3.6 3.3 6.2 2.9-4.5.8-5.3 3.1-2.8 5.6 4.3 4.4 6.4-.8 7.4-3.5 1 2.7 3.1 7.9 7.4 3.5 2.5-2.5 1.7-4.8-2.8-5.6 2.6.4 5.4-.3 6.2-2.9.4-1.3.7-5.8.7-6.8 0-3.6-2.9-2.5-4.9-1-2.7 2-5.5 5.8-6.6 8.2Z"/>
+          </svg>
+          Share on Bluesky
+        </a>`;
+}
+
+function buildShareSection(diag, coloredLetters) {
   // result URL（自分の結果が開く）をShare
   const sharedResult = new URL(location.href);
   sharedResult.searchParams.set('lang', 'en');
@@ -2293,18 +2338,14 @@ function buildShareSection(diag, coloredLetters) {
   ogUrl.searchParams.set('v', '35');
   document.getElementById('ogImage')?.setAttribute('content', ogUrl.href);
   document.getElementById('twImage')?.setAttribute('content', ogUrl.href);
-  const { mostUnique, isAllMajority } = calcMostUnique(coloredLetters);
-  const { mostEmpathy } = findMostEmpathy(coloredLetters);
-  const uniqueText = isAllMajority ? 'All match the majority' : itemLabel(mostUnique) || 'None';
-  const empathyText = itemLabel(mostEmpathy) || 'None';
-  const diagName = diagType.label;
+  const { mostUnique } = calcMostUnique(coloredLetters);
   const senseName = isSubjectMode ? 'school-subject color sense' : isNumberMode ? 'number-color sense' : 'letter-color sense';
   const shareLead = `🎨Your ${senseName} ranked in the top ${rareStat.value}% for ${rareStat.label.toLowerCase()}.`;
   const uniqueLabel = isSubjectMode ? 'Most distinctive subject: ' : isNumberMode ? 'Most distinctive number: ' : 'Most distinctive letter: ';
   const shareQuestion = `— What color is your “${isSubjectMode ? 'Japanese' : isNumberMode ? '1' : 'A'}”?`;
-  const shareText = `${shareLead}\n\n${uniqueLabel}${uniqueText}\n${isSubjectMode ? 'Most shared subject: ' : 'Most shared letter: '}${empathyText}\n${diagName} / ${colorType.name}\n\n${shareQuestion}\n\n${resultUrl}`;
-  const xText = `${shareLead}\n\nMajority match: ${diag.majorityRate}%\n${uniqueLabel}${itemLabel(mostUnique) || 'None'}\n\n${shareQuestion}\n\n${resultUrl}`;
-  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(xText)}`;
+  const shareText = `${shareLead}\n\nMajority match: ${diag.majorityRate}%\n${uniqueLabel}${itemLabel(mostUnique) || 'None'}\n\n${shareQuestion}\n\n${resultUrl}`;
+  const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+  const socialLinks = buildEnglishSocialLinks(resultUrl, shareLead, `${shareLead}\n\n${shareQuestion}\n\n${resultUrl}`);
 
   return `<div class="card">
     <div class="section-eyebrow">Share</div>
@@ -2329,6 +2370,7 @@ function buildShareSection(diag, coloredLetters) {
           <svg class="x-logo" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.623L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
           Share on X
         </button>
+        ${socialLinks}
       </div>
     </div>
   </div>`;
@@ -2389,7 +2431,8 @@ function renderWithoutStats(coloredLetters) {
   image.search = url.search;
   image.searchParams.set('v', '35');
   const shareText = `🎨My ${isSubjectMode ? 'school-subject' : 'number'} colors are ${type.name}.\n\n— What color is your “${sampleItem}”?\n\n${url.href}`;
-  document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a></div></div>`;
+  const socialLinks = buildEnglishSocialLinks(url.href, shareText.split('\n')[0], shareText);
+  document.getElementById('shareOuter').innerHTML = `<div class="content-wrap"><div class="card"><div class="section-title">Send a link and share your results.</div><div class="share-card-preview"><img src="${image.href.replace(/&/g,'&amp;')}" width="1200" height="630" alt="${themeLabel}"></div><div class="share-btn-row"><a class="btn-x-share" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}">Share on X</a>${socialLinks}</div></div></div>`;
 }
 
 function render() {
@@ -2866,15 +2909,38 @@ function subjectVoteRecord() {
   return { items, legacyUnknown: localStorage.getItem('ss_submitted_subject') === '1' && !Object.keys(items).length };
 }
 
-function shouldVote() {
-  const mode = new URLSearchParams(location.search).get('mode');
-  const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
-  if (mode !== 'subject' && localStorage.getItem(submissionKey) === '1') return false;
+const ALPHABET_VOTES_KEY = 'ss_alphabet_votes_v1';
+
+function alphabetVoteRecord() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ALPHABET_VOTES_KEY));
+    if (Array.isArray(saved)) return new Set(saved.filter(letter => LETTERS_26.includes(letter)));
+  } catch {}
+
+  if (localStorage.getItem('ss_submitted') !== '1') return new Set();
+
+  // The old browser-wide flag can only be migrated when its successful submission is still available.
+  const voted = new Set();
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    const answer = /^ss_voted_([0-9ABC-]{10}|[0-9ABC-]{26})$/.exec(key)?.[1];
+    if (!answer || sessionStorage.getItem(key) !== 'done') continue;
+    const items = answer.length === 26 ? LETTERS_26 : LETTERS_10;
+    items.forEach((letter, index) => { if (COLOR_HEX[answer[index]]) voted.add(letter); });
+  }
+  return voted.size ? voted : null;
+}
+
+function shouldVote(mode, answer) {
+  if (mode === 'number' && localStorage.getItem('ss_submitted_number') === '1') return false;
   const explicitSubmission = ['number','subject'].includes(mode) && location.hash === '#submit';
   const fromAlphabet = explicitSubmission || sessionStorage.getItem('ss_from_alphabet') === '1';
   if (!fromAlphabet) return false;
   const voteKey = sessionStorage.getItem('ss_vote_key');
   if (!voteKey && !explicitSubmission) return false;
+  if (mode === '10' || mode === '26') {
+    return voteKey === `ss_voted_${answer}` && sessionStorage.getItem(voteKey) !== 'done';
+  }
   // Subject submissions are deduplicated per item, including after a key change.
   if (!explicitSubmission || mode !== 'subject') {
     if (sessionStorage.getItem(voteKey) === 'done') return false;
@@ -2882,19 +2948,52 @@ function shouldVote() {
   return true;
 }
 
-function markVoteDone(votedLetters = []) {
+function markVoteDone(mode, votedLetters) {
   const voteKey = sessionStorage.getItem('ss_vote_key');
-  if (voteKey) sessionStorage.setItem(voteKey, 'done');
+  if (voteKey && (mode === 'number' || mode === 'subject')) sessionStorage.setItem(voteKey, 'done');
   sessionStorage.removeItem('ss_from_alphabet');
-  const mode = new URLSearchParams(location.search).get('mode');
   if (mode === 'subject') {
     const record = subjectVoteRecord();
     votedLetters.forEach(letter => { record.items[subjectVoteKey(letter)] = true; });
     localStorage.setItem('ss_subject_votes_v1', JSON.stringify(record));
   }
   const submissionKey = mode === 'subject' ? 'ss_submitted_subject' : mode === 'number' ? 'ss_submitted_number' : 'ss_submitted';
-  localStorage.setItem(submissionKey, '1'); // Same browser, once per theme.
+  localStorage.setItem(submissionKey, '1'); // Keep the legacy flags for older pages.
   if (location.hash === '#submit') history.replaceState({ ...history.state, skipResultIntro: true }, '', location.pathname + location.search);
+}
+
+async function saveVotes(db, mode, answer, colorMap) {
+  const alphabet = mode === '10' || mode === '26';
+  const alphabetRecord = alphabet ? alphabetVoteRecord() : null;
+  let voteLetters = Object.keys(colorMap);
+  if (alphabet) {
+    voteLetters = alphabetRecord ? voteLetters.filter(letter => !alphabetRecord.has(letter)) : [];
+  } else if (mode === 'subject') {
+    const record = subjectVoteRecord();
+    voteLetters = voteLetters.filter(letter => !record.items[subjectVoteKey(letter)]);
+    if (record.legacyUnknown) {
+      const existing = await Promise.all(voteLetters.map(letter => getDoc(doc(db, 'statistics', statisticsId(mode, letter)))));
+      voteLetters = voteLetters.filter((letter, index) => !existing[index].exists());
+    }
+  }
+
+  if (voteLetters.length) {
+    const items = mode === '26' ? LETTERS_26 : LETTERS_10;
+    const recordedAnswer = alphabet ? Array.from(answer, (id, index) => voteLetters.includes(items[index]) ? id : '-').join('') : answer;
+    const batch = writeBatch(db);
+    batch.set(doc(collection(db, 'responses')), { r: recordedAnswer, mode, timestamp: serverTimestamp() });
+    for (const letter of voteLetters) {
+      const hex = colorMap[letter];
+      const colorName = COLOR_NAME[hex] || hex;
+      batch.set(doc(db, 'statistics', statisticsId(mode, letter)), { [colorName]: increment(1) }, { merge: true });
+    }
+    await batch.commit();
+  }
+  if (alphabetRecord) {
+    voteLetters.forEach(letter => alphabetRecord.add(letter));
+    localStorage.setItem(ALPHABET_VOTES_KEY, JSON.stringify([...alphabetRecord]));
+  }
+  markVoteDone(mode, voteLetters);
 }
 
 /* ────────────────────────────────────────────────
@@ -2951,43 +3050,19 @@ function statsToVotes(statsData) {
   const colorMap = parseColorMap();
   const letters  = Object.keys(colorMap);
   if (letters.length === 0) return;
+  const mode = params.get('mode') || '10';
+  const answer = params.get('r') || '';
 
   /* ── STEP 1: 投票を保存（alphabet→result の直接遷移時のみ） ── */
-  if (shouldVote()) {
+  if (shouldVote(mode, answer)) {
     try {
       window.themeVoteError = '';
-      let voteLetters = letters;
-      if (new URLSearchParams(location.search).get('mode') === 'subject') {
-        const record = subjectVoteRecord();
-        voteLetters = letters.filter(letter => !record.items[subjectVoteKey(letter)]);
-        // Older installs only recorded a theme-wide flag. Avoid recounting any
-        // existing subject while allowing genuinely missing subjects to be added.
-        if (record.legacyUnknown) {
-          const existing = await Promise.all(voteLetters.map(letter => getDoc(doc(db, 'statistics', statisticsId('subject', letter)))));
-          voteLetters = voteLetters.filter((letter, index) => !existing[index].exists());
-        }
+      const save = () => saveVotes(db, mode, answer, colorMap);
+      if ((mode === '10' || mode === '26') && navigator.locks) {
+        await navigator.locks.request('synestheshare-alphabet-vote', save);
+      } else {
+        await save();
       }
-      if (voteLetters.length) {
-      /* responses コレクションに1件追加 */
-      const batch = writeBatch(db);
-      batch.set(doc(collection(db, 'responses')), {
-        r:         new URLSearchParams(location.search).get('r') || '',
-        mode:      new URLSearchParams(location.search).get('mode') || '10',
-        timestamp: serverTimestamp(),
-      });
-
-      /* statistics/{letter} に各色の票数をインクリメント（キー=色名） */
-      voteLetters.forEach(l => {
-        const hex = colorMap[l];
-        if (!hex) return;
-        const colorName = COLOR_NAME[hex] || hex;
-        const ref = doc(db, 'statistics', statisticsId(new URLSearchParams(location.search).get('mode'), l));
-        batch.set(ref, { [colorName]: increment(1) }, { merge: true });
-      });
-      await batch.commit();
-      }
-
-      markVoteDone(voteLetters);
       console.info('[SynestheShare] 投票完了');
     } catch (e) {
       window.themeVoteError = e.code || 'unknown';
@@ -3001,6 +3076,7 @@ function statsToVotes(statsData) {
     const allLetters = statsMode === 'subject' ? ['language','math','science','social','english'] : (statsMode === 'number' ? '1234567890' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ').split('');
     const fetches = allLetters.map(l => getDoc(doc(db, 'statistics', statisticsId(statsMode, l))));
     const snaps   = await Promise.all(fetches);
+    const readAt = new Date();
 
     const statsData = {};
     allLetters.forEach((l, i) => {
@@ -3018,6 +3094,13 @@ function statsToVotes(statsData) {
     }
 
     const liveVotes = statsToVotes(statsData);
+    const sources = {};
+    allLetters.forEach((letter, index) => {
+      if (!liveVotes[letter]?.length) return;
+      const meta = snaps[index].metadata;
+      sources[letter] = meta?.fromCache || meta?.hasPendingWrites ? 'cached' : 'live';
+    });
+    window.voteStatsRead = { at: readAt, sources };
     window.themeStatsStatus = 'ready';
 
     /* グローバルの DUMMY_VOTES をリアルデータで上書き */

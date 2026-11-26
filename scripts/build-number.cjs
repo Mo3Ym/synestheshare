@@ -19,8 +19,14 @@ page = page.replace(/\s*<div class="mode-toggle-row">[\s\S]*?<\/div>/, '')
   .replace(/const btnModeToggle\s*=.*?;\r?\n/, '')
   .replace(/const modeToggleLabel\s*=.*?;\r?\n/, '')
   .replace(/btnModeToggle\.addEventListener\('click',[\s\S]*?\n\}\);/, '');
-page = page.replace("localStorage.getItem('ss_submitted')", "localStorage.getItem('ss_submitted_number')")
-  .replace('`ss_voted_${encoded}`', '`ss_voted_number_${encoded}`');
+page = page.replace('`ss_voted_${encoded}`', '`ss_voted_number_${encoded}`')
+  .replace("  sessionStorage.setItem('ss_from_alphabet', '1');", `  const alreadyVoted = localStorage.getItem('ss_submitted_number') === '1';
+  if (!alreadyVoted) {
+    sessionStorage.setItem('ss_from_alphabet', '1');
+    sessionStorage.removeItem(voteKey);
+  } else {
+    sessionStorage.removeItem('ss_from_alphabet');
+  }`);
 page = page.replace('  if (rParam) {', `  if (!rParam) {
     // Preserve choices from the previous number page's per-digit color URLs.
     for (const digit of LETTERS_10) {

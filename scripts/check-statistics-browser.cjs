@@ -62,6 +62,65 @@ export const getDoc=async ref=>({exists:()=>!!window.__fixtureDB[ref.path],data:
  }
  await context.close();
  }
+ for (const english of [false, true]) {
+  for (const history of ['fresh', 'recoverable', 'unknown']) {
+   const context = await browser.newContext();
+   await context.addInitScript(history => {
+    const baseline = history === 'fresh' ? {} : Object.fromEntries(
+     [...'ABCDE'].map(letter => ['statistics/' + letter, { '赤': 1 }])
+    );
+    window.__fixtureDB = JSON.parse(sessionStorage.getItem('fixtureDB') || JSON.stringify(baseline));
+    window.__commits = 0;
+    if (history !== 'fresh') localStorage.setItem('ss_submitted', '1');
+    if (history === 'recoverable') sessionStorage.setItem('ss_voted_00000-----', 'done');
+   }, history);
+   const page = await context.newPage();
+   const errors = [];
+   page.on('pageerror', error => errors.push(error.message));
+   await page.route(/^https?:/, async route => {
+    const url = route.request().url();
+    const body = url.endsWith('firebase-app.js') ? 'export const initializeApp=()=>({});'
+     : url.endsWith('firebase-firestore.js') ? firestoreFixture : '';
+    if (body) await route.fulfill({ contentType: 'text/javascript', headers: { 'Access-Control-Allow-Origin': '*' }, body });
+    else await route.abort();
+   });
+   const picker = pathToFileURL(path.resolve(english ? 'alphabet-en.html' : 'alphabet.html'));
+   async function submit(mode, answer) {
+    picker.search = `?mode=${mode}&r=${answer}`;
+    await page.goto(picker.href);
+    await page.locator('#btnResult').click();
+    await page.waitForURL(url => /\/result(-en)?\.html$/.test(url.pathname));
+    await page.waitForFunction(() => !sessionStorage.getItem('ss_from_alphabet'));
+    await page.locator('.type-stat-card').waitFor();
+    return page.evaluate(() => {
+     sessionStorage.setItem('fixtureDB', JSON.stringify(window.__fixtureDB));
+     return { stats: window.__fixtureDB, commits: window.__commits };
+    });
+   }
+   if (history === 'fresh') {
+    const first = await submit('10', '00000-----');
+    assert.equal(first.commits, 1);
+    assert.equal(first.stats['responses/response'].r, '00000-----');
+   }
+
+   const second = await submit('26', '5'.repeat(26));
+   for (const letter of 'ABCDE') assert.deepEqual(second.stats['statistics/' + letter], { '赤': 1 });
+   if (history === 'unknown') {
+    assert.equal(second.commits, 0);
+    assert.equal(second.stats['statistics/F'], undefined);
+   } else {
+    assert.equal(second.commits, 1);
+    for (const letter of 'FGHIJKLMNOPQRSTUVWXYZ') assert.deepEqual(second.stats['statistics/' + letter], { '青': 1 });
+    assert.equal(second.stats['responses/response'].r, '-----' + '5'.repeat(21));
+    assert.equal(await page.locator('.type-palette-strip .type-palette-dot').count(), 26);
+    const third = await submit('26', '2'.repeat(26));
+    assert.equal(third.commits, 0);
+    assert.deepEqual(third.stats, second.stats);
+   }
+   assert.deepEqual(errors, []);
+   await context.close();
+  }
+ }
  const deniedContext=await browser.newContext();
  await deniedContext.addInitScript(()=>{window.__fixtureDB={};window.__commits=0;window.__denyWrite=true;});
  const deniedPage=await deniedContext.newPage();
@@ -77,6 +136,6 @@ export const getDoc=async ref=>({exists:()=>!!window.__fixtureDB[ref.path],data:
  assert.deepEqual(await deniedPage.evaluate(()=>window.__fixtureDB),{});
  assert.equal(await deniedPage.evaluate(()=>localStorage.getItem('ss_submitted_number')),null);
  await deniedContext.close();
- console.log('Browser checks passed: picker-to-result, atomic vote counts, single/all digits, Japanese/English, no duplicate on reload and no vote marker in sharing. Database is mocked.');
+ console.log('Browser checks passed: picker-to-result, incremental alphabet voting and legacy history, number/subject voting, both languages, and share URLs. Database is mocked.');
  } finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

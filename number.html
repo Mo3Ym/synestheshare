@@ -152,7 +152,7 @@ nav ul a:hover { color: var(--ink); }
 ══════════════════════════════════════ */
 .page-hero-wrap {
   position: relative;
-  padding-top: calc(54px + 1.35rem);
+  padding-top: 6.5rem;
   background: transparent;
 }
 .page-blob { display: none; }
@@ -180,8 +180,8 @@ nav ul a:hover { color: var(--ink); }
 .page-hero {
   position: relative; z-index: 1;
   max-width: 900px; margin: 0 auto;
-  padding: 0 1rem clamp(1.8rem, 6vw, 2.5rem);
-  display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+  padding: 3.5rem 1rem 2.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: .75rem;
   text-align: center;
 }
 .page-eyebrow {
@@ -198,6 +198,10 @@ nav ul a:hover { color: var(--ink); }
   line-height: 1.2; letter-spacing: -0.01em;
   word-break: keep-all; overflow-wrap: break-word;
 }
+/* Position the alphabet intro without moving the progress bar. */
+.page-title:first-child { margin-block-start: -.1rem; }
+.page-title:first-child:lang(ja) { translate: .22em 0; }
+.page-title:first-child + .page-lead { margin-block-end: 2rem; }
 .page-title strong { font-weight: 340; }
 .page-title .hl-red  { color: var(--c1); font-weight: 340; }
 
@@ -210,7 +214,7 @@ nav ul a:hover { color: var(--ink); }
 .progress-bar-wrap {
   width: min(100%, 42rem);
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1rem 2rem;
   position: relative; z-index: 1;
 }
 .progress-meta {
@@ -295,34 +299,23 @@ nav ul a:hover { color: var(--ink); }
 .main-wrap {
   position: relative; z-index: 1;
   max-width: 900px; margin: 0 auto;
-  padding: clamp(1.8rem, 7vw, 2.5rem) 1rem 0;
+  padding: 3rem 1rem 0;
 }
 
 /* ── モードトグル ── */
 .mode-toggle-row {
   display: flex; justify-content: center;
-  margin-top: .65rem;
+  margin-top: 1.65rem;
 }
 .btn-mode-toggle {
   min-height: 44px;
   display: inline-flex; align-items: center; gap: 0.4rem;
-  padding: 0.45rem 1.1rem; border-radius: 100px;
-  border: 1.5px solid var(--border);
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  padding: .35rem .5rem;
+  border: 0; background: transparent;
   cursor: pointer; font-family: var(--jp); font-size: 0.78rem; font-weight: 700;
-  color: var(--ink2); transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
-  white-space: nowrap;
+  color: rgba(255,255,255,0.85); transition: color 0.15s;
 }
-.btn-mode-toggle:hover {
-  background: rgba(255,255,255,0.95); border-color: var(--ink3); color: var(--ink);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-}
-.btn-mode-toggle.full-mode {
-  background: rgba(220,50,32,0.88); border-color: transparent; color: white;
-  box-shadow: 0 3px 14px rgba(220,50,32,0.3);
-}
-.btn-mode-toggle.full-mode:hover { background: rgba(200,35,18,0.96); }
+.btn-mode-toggle:hover { color: #fffdf9; }
 .btn-mode-toggle-icon { font-size: 0.9rem; }
 
 /* ── 数字グリッド ── */
@@ -530,9 +523,10 @@ nav ul a:hover { color: var(--ink); }
 
 /* ── 結果パレット ── */
 .result-section {
-  padding-top: clamp(1.65rem, 6.5vw, 2.5rem);
+  padding-top: 2.5rem;
   padding-bottom: 2rem;
 }
+.alpha-grid + .result-section { padding-top: 5rem; }
 @media (max-width: 600px), (hover: none) and (pointer: coarse) {
   .result-section { padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px)); }
 }
@@ -632,9 +626,6 @@ nav ul a:hover { color: var(--ink); }
   border-color: rgba(255,255,255,0.38);
   color: rgba(255,255,255,0.9);
 }
-.result-selection-note {
-  margin-top: .6rem; text-align: center; color: #b9c4dc; font-size: .83rem;
-}
 .action-row button:focus-visible, .btn-mode-toggle:focus-visible {
   outline: 2px solid #fffdf9; outline-offset: 3px;
 }
@@ -689,10 +680,13 @@ footer a:hover { color: rgba(255,255,255,0.65); }
   nav { padding: 0 1.25rem; }
   .nav-logo { left: 1.25rem; height: 26px; }
 
+  .page-hero { padding-block: 2.5rem 1.5rem; }
   .page-eyebrow::before { display: none; }
   .page-lead { text-align: center; max-width: 100%; }
   .page-breadcrumb { align-self: flex-start; }
 
+  .progress-bar-wrap { padding-bottom: 1.5rem; }
+  .main-wrap { padding-top: 2rem; }
   .alpha-grid.mode-26 { --alpha-columns: 5; --alpha-gap: 8px; }
 
   .picker-sheet { border-radius: 16px 16px 0 0; padding: 1.25rem 1.25rem 2rem; }
@@ -718,28 +712,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
     0 0 38px rgba(255,127,127,0.25);
 }
 .page-lead, .progress-label, .progress-count { color: #fffdf9; }
-.btn-mode-toggle {
-  color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.25);
-}
-.btn-mode-toggle:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.22);
-  border-color: rgba(255,255,255,0.5);
-  box-shadow: none;
-}
-.btn-mode-toggle.full-mode {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.25);
-  color: rgba(255,255,255,0.85);
-  box-shadow: none;
-}
-.btn-mode-toggle.full-mode:hover {
-  background: rgba(255,255,255,0.22);
-  border-color: rgba(255,255,255,0.5);
-  color: #fff;
-}
 .alpha-bubble {
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(10px);
@@ -845,7 +817,6 @@ footer a:hover { color: rgba(255,255,255,0.65); }
         <button class="btn-reset" id="btnReset" type="button">リセット</button>
         <button class="btn-result" id="btnResult" type="button" disabled>結果を見る →</button>
       </div>
-      <p class="result-selection-note">すべての数字を選ばなくてもOK</p>
     </div>
 
   </div><!-- /.main-wrap -->

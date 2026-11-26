@@ -55,6 +55,7 @@ module.exports = {
   'A〜Zに色を割り当てて、あなただけの共感覚パレットを作ろう。': 'Give A–Z their colors and create your own synesthesia palette.',
   '文字や数字に色を感じる「共感覚」。あなただけのカラーを作って、みんなと比べてみよう。': 'Explore the colors you associate with letters and numbers. Create your palette and compare it with others.',
   '文字や数字に感じる色を、みんなと比べよう。': 'Compare the colors you see in letters and numbers with what others see.',
+  '赤、水色、黄色のAが並ぶSynestheShareのトップページ': 'SynestheShare homepage with a red, light blue and yellow A',
   '使い方': 'How it works', 'テーマ選択': 'Choose a theme', 'テーマを選ぶ': 'Choose a theme',
   'テーマ': 'Themes', '共感覚とは？': 'What is synesthesia?', '共感覚とは': 'About synesthesia',
   '色を比べる': 'Compare colors', 'さっそく試す（2分）': 'Try it now (2 min)',

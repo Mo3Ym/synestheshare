@@ -65,6 +65,8 @@ for (const page of pages) {
     source = source.replace('https://mo3ym.github.io/synestheshare/', 'https://synestheshare.pages.dev/index-en.html');
   }
   if (page === 'index') {
+    source = source.replace('property="og:url" content="https://synestheshare.pages.dev/"', 'property="og:url" content="https://synestheshare.pages.dev/index-en.html"')
+      .replaceAll('assets/ogp/home-ja-v1.png', 'assets/ogp/home-en-v1.png');
     source = source.replace('What colors are Japanese and math?', 'What colors are Japanese and math?<br>(For Japanese participants only)');
   }
   if (page === 'subject') {

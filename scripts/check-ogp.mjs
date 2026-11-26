@@ -70,6 +70,27 @@ assert.notDeepEqual(statHalf(changedScore, 'left'), statHalf(withStats, 'left'))
 assert.deepEqual(statHalf(changedScore, 'right'), statHalf(withStats, 'right'));
 assert.deepEqual(statHalf(changedMajority, 'left'), statHalf(withStats, 'left'));
 assert.notDeepEqual(statHalf(changedMajority, 'right'), statHalf(withStats, 'right'));
+function statInkCenter(pixels, start, end) {
+  let left = end, right = start;
+  for (let y = 365; y < 453; y++) {
+    for (let x = start; x < end; x++) {
+      if (pixels[(y * 1200 + x) * 3] < 190) continue;
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+    }
+  }
+  assert(right > left, 'Statistics contain visible lettering');
+  return (left + right) / 2;
+}
+for (const language of ['ja', 'en']) {
+  for (const value of [1, 40, 100]) {
+    const stats = await renderPixels(context, answer, '10', value, 'empathy', language, value);
+    assert(Math.abs(statInkCenter(stats, 207, 600) - 403.5) < 2);
+    assert(Math.abs(statInkCenter(stats, 601, 994) - 796.5) < 2);
+  }
+  const single = await renderPixels(context, answer, '10', null, 'empathy', language, 100);
+  assert(Math.abs(statInkCenter(single, 393, 808) - 600) < 2);
+}
 const invalidStats = await request('r=0527416C25&score=-1&majority=101');
 const absentStats = await request('r=0527416C25');
 assert.deepEqual(await invalidStats.arrayBuffer(), await absentStats.arrayBuffer());
@@ -85,5 +106,5 @@ assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
 assert.equal(image.searchParams.get('sense'), null);
-assert.equal(image.searchParams.get('v'), '33');
+assert.equal(image.searchParams.get('v'), '34');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');

@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SynestheShare — Debug</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@100..900&display=swap">
+<link rel="stylesheet" href="assets/result-color-circles.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   body {
@@ -33,6 +35,48 @@
   }
   .preview-link:hover { border-color: #75728a; }
   .preview-link:focus-visible, .table-wrap:focus-visible { outline: 2px solid #4b4a75; outline-offset: -2px; }
+  .ad-section { margin-top: 3rem; }
+  .ad-section > h2 { margin: 0 0 1rem; font-size: 1.2rem; }
+  .ad-preview + .ad-preview { margin-top: 1.75rem; }
+  .ad-preview-header {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+    gap: .4rem 1rem; margin-bottom: .55rem;
+  }
+  .ad-preview-header h3 { margin: 0; font-size: 1rem; }
+  .ad-preview-header a { color: #4b4a75; font-size: .875rem; }
+  .ad-artwork {
+    --outfit: 'Outfit', sans-serif;
+    position: relative;
+    aspect-ratio: 2064 / 1080;
+    container-type: inline-size;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: linear-gradient(rgba(255,255,255,.12), rgba(255,255,255,.20)),
+      url('assets/backgrounds/index_hero.webp') center / cover;
+    color: #181818;
+    font-family: 'Noto Sans JP', 'Hiragino Sans', 'Meiryo', sans-serif;
+    text-align: center;
+  }
+  .ad-logo { position: absolute; top: 3.2cqw; left: 3.2cqw; width: 21cqw; height: auto; }
+  .ad-content { display: grid; justify-items: center; gap: 2.7cqw; margin-top: 2cqw; }
+  .ad-content h4 {
+    margin: 0;
+    font-size: 6.1cqw;
+    font-weight: 340;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+  }
+  .ad-content h4 strong { font-weight: 500; }
+  .ad-title-red { color: #bd3f5b; }
+  .ad-title-color { color: #087884; }
+  .ad-colors { display: flex; align-items: center; gap: 1.5cqw; }
+  .ad-colors .type-palette-dot {
+    width: 10.3cqw; height: 10.3cqw; font-size: 5.2cqw;
+    background-color: var(--ad-color); color: #fffdf9;
+  }
+  .ad-question { font: 400 4.3cqw / 1 var(--outfit); color: #555260; }
+  .ad-content p { margin: 0; font-size: 3.05cqw; font-weight: 450; color: #323c4b; }
 </style>
 </head>
 <body>
@@ -53,6 +97,46 @@
       <tbody id="typeRows"></tbody>
     </table>
   </div>
+  <section class="ad-section" aria-labelledby="adTitle">
+    <h2 id="adTitle">X広告プレビュー</h2>
+    <article class="ad-preview">
+      <header class="ad-preview-header">
+        <h3>広告A｜好奇心</h3>
+        <a href="design/ads/x-ad-a.png" download>PNGを保存（2064 × 1080）</a>
+      </header>
+      <div class="ad-artwork" id="xAdA">
+        <img class="ad-logo" src="images/logo.png" alt="SynestheShare">
+        <div class="ad-content">
+          <h4>あなたの<strong class="ad-title-red">A</strong>は、何<strong class="ad-title-color">色</strong>？</h4>
+          <div class="ad-colors" aria-hidden="true">
+            <span class="type-palette-dot" style="--ad-color:#ff7f7f">A</span>
+            <span class="type-palette-dot" style="--ad-color:#4da8e8">A</span>
+            <span class="type-palette-dot" style="--ad-color:#f5dc72">A</span>
+            <span class="type-palette-dot" style="--ad-color:#9272ff">A</span>
+          </div>
+          <p>文字に感じる色を、みんなと比べよう。</p>
+        </div>
+      </div>
+    </article>
+    <article class="ad-preview">
+      <header class="ad-preview-header">
+        <h3>広告B｜意外性</h3>
+        <a href="design/ads/x-ad-b.png" download>PNGを保存（2064 × 1080）</a>
+      </header>
+      <div class="ad-artwork" id="xAdB">
+        <img class="ad-logo" src="images/logo.png" alt="SynestheShare">
+        <div class="ad-content">
+          <div class="ad-colors" aria-hidden="true">
+            <span class="type-palette-dot" style="--ad-color:#ff7f7f">A</span>
+            <span class="ad-question">?</span>
+            <span class="type-palette-dot" style="--ad-color:#4da8e8">A</span>
+          </div>
+          <h4>Aって、<strong class="ad-title-red">赤</strong>じゃないの？</h4>
+          <p>あなたの当たり前は、誰かの当たり前とは違う。</p>
+        </div>
+      </div>
+    </article>
+  </section>
 </main>
 <script>
 const TYPES = [

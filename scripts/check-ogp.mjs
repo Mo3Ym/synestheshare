@@ -86,7 +86,7 @@ for (const language of ['ja', 'en']) {
   for (const value of [1, 40, 100]) {
     const stats = await renderPixels(context, answer, '10', value, 'empathy', language, value);
     assert(Math.abs(statInkCenter(stats, 207, 600) - 403.5) < 2);
-    assert(Math.abs(statInkCenter(stats, 601, 994) - 796.5) < 2);
+    assert(Math.abs(statInkCenter(stats, 601, 994) - 784.5) < 2);
   }
   const single = await renderPixels(context, answer, '10', null, 'empathy', language, 100);
   assert(Math.abs(statInkCenter(single, 393, 808) - 600) < 2);
@@ -106,5 +106,5 @@ assert.equal(image.searchParams.get('score'), '19');
 assert.equal(image.searchParams.get('stat'), 'empathy');
 assert.equal(image.searchParams.get('lang'), 'en');
 assert.equal(image.searchParams.get('sense'), null);
-assert.equal(image.searchParams.get('v'), '34');
+assert.equal(image.searchParams.get('v'), '35');
 console.log('OGP checks passed: PNG output, palette overflow, bilingual output, both scores, legacy URLs and share metadata.');
